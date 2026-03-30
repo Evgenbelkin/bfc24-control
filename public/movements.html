@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>BFC24 CONTROL — Движения товара</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:#dfe3eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --warning:#d97706;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1360px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .btn-primary:hover{
+      background:var(--primary-hover);
+    }
+
+    .btn-light{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid #eef1f5;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:16px;
+    }
+
+    .card-title{
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 14px;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .filters{
+      display:grid;
+      grid-template-columns:1.5fr 1fr auto;
+      gap:12px;
+      align-items:end;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      min-width:0;
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    input, select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus, select:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+
+    .status.show{display:block}
+    .status.error{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+    .status.success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .status.info{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .stat{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      margin-top:10px;
+    }
+
+    table{
+      width:100%;
+      min-width:1200px;
+      border-collapse:collapse;
+      background:#fff;
+    }
+
+    th, td{
+      border-bottom:1px solid #eef1f5;
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    th{
+      background:#f8fafc;
+      font-weight:700;
+      color:#111827;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    tr:hover td{
+      background:#fbfdff;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid transparent;
+    }
+
+    .badge-receipt{
+      color:#166534;
+      background:#f0fdf4;
+      border-color:#bbf7d0;
+    }
+
+    .badge-sale{
+      color:#1d4ed8;
+      background:#eff6ff;
+      border-color:#bfdbfe;
+    }
+
+    .badge-writeoff{
+      color:#991b1b;
+      background:#fef2f2;
+      border-color:#fecaca;
+    }
+
+    .badge-adjustment{
+      color:#92400e;
+      background:#fff7ed;
+      border-color:#fed7aa;
+    }
+
+    .badge-transfer{
+      color:#5b21b6;
+      background:#f5f3ff;
+      border-color:#ddd6fe;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:24px 12px;
+    }
+
+    @media (max-width: 980px){
+      .filters,
+      .stats{
+        grid-template-columns:1fr;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .wrap{
+        padding:16px 12px 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">Движения товара</div>
+      <div class="top-actions">
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Фильтры</h2>
+
+      <div class="filters">
+        <div class="field">
+          <label for="searchInput">Поиск по товару / МХ / комментарию / пользователю</label>
+          <input id="searchInput" type="text" placeholder="Например: Тест товар, Контейнер 1, admin" />
+        </div>
+
+        <div class="field">
+          <label for="typeFilter">Тип движения</label>
+          <select id="typeFilter">
+            <option value="">Все</option>
+            <option value="receipt">Приёмка</option>
+            <option value="sale">Продажа</option>
+            <option value="writeoff">Списание</option>
+            <option value="adjustment">Корректировка</option>
+            <option value="transfer_in">Перемещение вход</option>
+            <option value="transfer_out">Перемещение выход</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>&nbsp;</label>
+          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Записей</div>
+          <div class="stat-value" id="rowsCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Приёмок</div>
+          <div class="stat-value" id="receiptCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Продаж</div>
+          <div class="stat-value" id="saleCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Списаний</div>
+          <div class="stat-value" id="writeoffCount">0</div>
+        </div>
+      </div>
+
+      <div id="pageStatus" class="status info"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">История движений</h2>
+      <div class="muted">Показываются движения товаров по складу и операциям.</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Тип</th>
+              <th>Товар</th>
+              <th>SKU</th>
+              <th>МХ</th>
+              <th>Кол-во</th>
+              <th>Сумма</th>
+              <th>Комментарий</th>
+              <th>Пользователь</th>
+              <th>Дата</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td colspan="10" class="empty">Загрузка данных...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:3003";
+    const FALLBACK_TENANT_ID = 1;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/login.html";
+    }
+
+    let authUser = null;
+    let movementsData = [];
+
+    const els = {
+      searchInput: document.getElementById("searchInput"),
+      typeFilter: document.getElementById("typeFilter"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      tbody: document.getElementById("tbody"),
+      pageStatus: document.getElementById("pageStatus"),
+      rowsCount: document.getElementById("rowsCount"),
+      receiptCount: document.getElementById("receiptCount"),
+      saleCount: document.getElementById("saleCount"),
+      writeoffCount: document.getElementById("writeoffCount")
+    };
+
+    function goBack() {
+      window.location.href = "/index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
+
+    function parseUser() {
+      try {
+        const raw = localStorage.getItem("user");
+        authUser = raw ? JSON.parse(raw) : null;
+      } catch {
+        authUser = null;
+      }
+    }
+
+    function getTenantId() {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
+        return Number(authUser.tenant_id);
+      }
+      return FALLBACK_TENANT_ID;
+    }
+
+    function authHeaders() {
+      return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      };
+    }
+
+    function showStatus(text, type = "info") {
+      els.pageStatus.className = "status show " + type;
+      els.pageStatus.textContent = text;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function extractList(data, keys) {
+      if (Array.isArray(data)) return data;
+      if (!data || typeof data !== "object") return [];
+
+      for (const key of keys) {
+        if (Array.isArray(data[key])) return data[key];
+      }
+
+      for (const value of Object.values(data)) {
+        if (Array.isArray(value)) return value;
+      }
+
+      return [];
+    }
+
+    function formatNumber(value) {
+      const n = Number(value || 0);
+      if (!Number.isFinite(n)) return "0";
+      return n % 1 === 0 ? String(n) : n.toFixed(2);
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value);
+      return d.toLocaleString("ru-RU");
+    }
+
+    function movementBadge(type) {
+      if (type === "receipt") return `<span class="badge badge-receipt">Приёмка</span>`;
+      if (type === "sale") return `<span class="badge badge-sale">Продажа</span>`;
+      if (type === "writeoff") return `<span class="badge badge-writeoff">Списание</span>`;
+      if (type === "adjustment") return `<span class="badge badge-adjustment">Корректировка</span>`;
+      if (type === "transfer_in") return `<span class="badge badge-transfer">Перемещение вход</span>`;
+      if (type === "transfer_out") return `<span class="badge badge-transfer">Перемещение выход</span>`;
+      return escapeHtml(type || "");
+    }
+
+    async function apiGet(path) {
+      const res = await fetch(API_BASE + path, {
+        method: "GET",
+        headers: authHeaders()
+      });
+
+      const text = await res.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || data.message || ("HTTP " + res.status));
+      }
+
+      return data;
+    }
+
+    function normalizeMovement(row) {
+      return {
+        id: row.id,
+        movement_type: row.movement_type || row.type || "",
+        item_name: row.item_name || row.product_name || row.name || "",
+        sku: row.sku || row.vendor_code || row.article || "",
+        location_name: row.location_name || row.location || "",
+        qty: Number(row.qty ?? row.quantity ?? 0),
+        amount: Number(row.amount ?? 0),
+        comment: row.comment || "",
+        user_name: row.username || row.user_name || row.created_by_name || "",
+        created_at: row.created_at || row.date || null
+      };
+    }
+
+    function getFilteredRows() {
+      const search = (els.searchInput.value || "").trim().toLowerCase();
+      const type = els.typeFilter.value;
+
+      return movementsData
+        .filter(row => !type || row.movement_type === type)
+        .filter(row => {
+          if (!search) return true;
+          const text = [
+            row.item_name,
+            row.sku,
+            row.location_name,
+            row.comment,
+            row.user_name,
+            row.movement_type
+          ].join(" ").toLowerCase();
+
+          return text.includes(search);
+        });
+    }
+
+    function updateStats(rows) {
+      els.rowsCount.textContent = String(rows.length);
+      els.receiptCount.textContent = String(rows.filter(r => r.movement_type === "receipt").length);
+      els.saleCount.textContent = String(rows.filter(r => r.movement_type === "sale").length);
+      els.writeoffCount.textContent = String(rows.filter(r => r.movement_type === "writeoff").length);
+    }
+
+    function renderTable() {
+      const rows = getFilteredRows();
+      updateStats(rows);
+
+      if (!rows.length) {
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="10" class="empty">Нет данных</td>
+          </tr>
+        `;
+        return;
+      }
+
+      els.tbody.innerHTML = rows.map(row => `
+        <tr>
+          <td>${escapeHtml(row.id)}</td>
+          <td>${movementBadge(row.movement_type)}</td>
+          <td>${escapeHtml(row.item_name)}</td>
+          <td>${escapeHtml(row.sku)}</td>
+          <td>${escapeHtml(row.location_name)}</td>
+          <td>${escapeHtml(formatNumber(row.qty))}</td>
+          <td>${escapeHtml(formatNumber(row.amount))}</td>
+          <td>${escapeHtml(row.comment)}</td>
+          <td>${escapeHtml(row.user_name)}</td>
+          <td>${escapeHtml(formatDate(row.created_at))}</td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadData() {
+      try {
+        const tenantId = getTenantId();
+        showStatus(`Загрузка движений...\nTenant ID: ${tenantId}`, "info");
+
+        const data = await apiGet(`/stock/movements?tenant_id=${tenantId}`);
+        movementsData = extractList(data, ["movements", "data", "rows"]).map(normalizeMovement);
+
+        renderTable();
+
+        showStatus(
+          `Данные загружены.\nTenant ID: ${tenantId}\nЗаписей: ${movementsData.length}`,
+          "success"
+        );
+      } catch (err) {
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="10" class="empty">Ошибка загрузки данных</td>
+          </tr>
+        `;
+        showStatus("Ошибка: " + err.message, "error");
+      }
+    }
+
+    function bindEvents() {
+      els.searchInput.addEventListener("input", renderTable);
+      els.typeFilter.addEventListener("change", renderTable);
+      els.refreshBtn.addEventListener("click", loadData);
+    }
+
+    function bootstrap() {
+      parseUser();
+      bindEvents();
+      loadData();
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>

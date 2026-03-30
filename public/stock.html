@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>BFC24 CONTROL — Остатки</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:#dfe3eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
+    .btn-primary:hover{background:var(--primary-hover)}
+
+    .btn-light{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid #eef1f5;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:16px;
+    }
+
+    .card-title{
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 14px;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .filters{
+      display:grid;
+      grid-template-columns:1.5fr 1fr auto;
+      gap:12px;
+      align-items:end;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      min-width:0;
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    input, select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus, select:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+
+    .status.show{display:block}
+    .status.error{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+    .status.success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .status.info{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .stat{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .table-wrap{
+      overflow:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      background:#fff;
+      min-width:900px;
+    }
+
+    th, td{
+      border-bottom:1px solid #eef1f5;
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    th{
+      background:#f8fafc;
+      font-weight:700;
+      color:#111827;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    tr:hover td{
+      background:#fbfdff;
+    }
+
+    .qty{
+      font-weight:700;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:24px 12px;
+    }
+
+    @media (max-width: 900px){
+      .filters,
+      .stats{
+        grid-template-columns:1fr;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .wrap{
+        padding:16px 12px 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">Остатки</div>
+      <div class="top-actions">
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Фильтры</h2>
+
+      <div class="filters">
+        <div class="field">
+          <label for="searchInput">Поиск по товару / артикулу / штрихкоду</label>
+          <input id="searchInput" type="text" placeholder="Например: Тест, SaaS, SKU, barcode" />
+        </div>
+
+        <div class="field">
+          <label for="locationFilter">Место хранения</label>
+          <select id="locationFilter">
+            <option value="">Все МХ</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>&nbsp;</label>
+          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Строк остатков</div>
+          <div class="stat-value" id="rowsCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Товаров</div>
+          <div class="stat-value" id="itemsCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Мест хранения</div>
+          <div class="stat-value" id="locationsCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Сумма по фильтру</div>
+          <div class="stat-value" id="qtyTotal">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Общая сумма</div>
+          <div class="stat-value" id="qtyGrandTotal">0</div>
+        </div>
+      </div>
+
+      <div id="pageStatus" class="status info"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Текущие остатки</h2>
+      <div class="muted">Показываются фактические остатки по товарам и местам хранения.</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Товар</th>
+              <th>Артикул / SKU</th>
+              <th>Штрихкод</th>
+              <th>Место хранения</th>
+              <th>Количество</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td colspan="5" class="empty">Загрузка данных...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:3003";
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/login.html";
+    }
+
+    let authUser = null;
+    let stockData = [];
+    let itemsData = [];
+    let locationsData = [];
+
+    const els = {
+      searchInput: document.getElementById("searchInput"),
+      locationFilter: document.getElementById("locationFilter"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      tbody: document.getElementById("tbody"),
+      pageStatus: document.getElementById("pageStatus"),
+      rowsCount: document.getElementById("rowsCount"),
+      itemsCount: document.getElementById("itemsCount"),
+      locationsCount: document.getElementById("locationsCount"),
+      qtyTotal: document.getElementById("qtyTotal"),
+      qtyGrandTotal: document.getElementById("qtyGrandTotal")
+    };
+
+    function goBack() {
+      window.location.href = "/index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
+
+    function parseUser() {
+      try {
+        const raw = localStorage.getItem("user");
+        authUser = raw ? JSON.parse(raw) : null;
+      } catch {
+        authUser = null;
+      }
+    }
+
+    function getTenantId() {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
+        return Number(authUser.tenant_id);
+      }
+      return 1;
+    }
+
+    function authHeaders() {
+      return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      };
+    }
+
+    function showStatus(text, type = "info") {
+      els.pageStatus.className = "status show " + type;
+      els.pageStatus.textContent = text;
+    }
+
+    function normalize(data, type = "") {
+      if (Array.isArray(data)) return data;
+      if (!data || typeof data !== "object") return [];
+
+      if (type === "stock") {
+        if (Array.isArray(data.stock)) return data.stock;
+        if (Array.isArray(data.data)) return data.data;
+        if (Array.isArray(data.rows)) return data.rows;
+        return [];
+      }
+
+      if (type === "items") {
+        if (Array.isArray(data.items)) return data.items;
+        if (Array.isArray(data.data)) return data.data;
+        if (Array.isArray(data.rows)) return data.rows;
+        return [];
+      }
+
+      if (type === "locations") {
+        if (Array.isArray(data.locations)) return data.locations;
+        if (Array.isArray(data.data)) return data.data;
+        if (Array.isArray(data.rows)) return data.rows;
+        return [];
+      }
+
+      if (Array.isArray(data.data)) return data.data;
+      if (Array.isArray(data.rows)) return data.rows;
+      return [];
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function apiGet(path) {
+      const res = await fetch(API_BASE + path, {
+        method: "GET",
+        headers: authHeaders()
+      });
+
+      const text = await res.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || data.message || ("HTTP " + res.status));
+      }
+
+      return data;
+    }
+
+    function renderLocationFilter() {
+      const options = locationsData
+        .slice()
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"))
+        .map(loc => {
+          const locationTitle = `${loc.name || ""}${loc.code ? " (" + loc.code + ")" : ""}`;
+          return `<option value="${escapeHtml(String(loc.id))}">${escapeHtml(locationTitle)}</option>`;
+        })
+        .join("");
+
+      els.locationFilter.innerHTML = `<option value="">Все МХ</option>` + options;
+    }
+
+    function buildRows() {
+      return stockData.map(stockRow => {
+        const itemId =
+          stockRow.item_id ??
+          stockRow.itemId ??
+          stockRow.product_id ??
+          stockRow.productId ??
+          null;
+
+        const locationId =
+          stockRow.location_id ??
+          stockRow.locationId ??
+          null;
+
+        const qty =
+          Number(
+            stockRow.qty ??
+            stockRow.quantity ??
+            stockRow.stock_qty ??
+            0
+          );
+
+        const item =
+          itemsData.find(i => String(i.id) === String(itemId)) || {};
+
+        const location =
+          locationsData.find(l => String(l.id) === String(locationId)) || {};
+
+        const locationName = location.name || stockRow.location_name || "";
+        const locationCode = location.code || stockRow.location_code || "";
+
+        return {
+          item_id: itemId,
+          item_name:
+            item.name ||
+            item.item_name ||
+            stockRow.item_name ||
+            stockRow.name ||
+            "",
+          sku:
+            item.sku ||
+            item.vendor_code ||
+            item.article ||
+            item.code ||
+            "",
+          barcode:
+            item.barcode ||
+            stockRow.barcode ||
+            "",
+          location_id: locationId,
+          location_name: locationName,
+          location_code: locationCode,
+          location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
+          qty
+        };
+      });
+    }
+
+    function renderTable() {
+      const search = (els.searchInput.value || "").trim().toLowerCase();
+      const selectedLocationId = els.locationFilter.value;
+
+      const allRows = buildRows();
+
+      const rows = allRows
+        .filter(row => {
+          if (!selectedLocationId) return true;
+          return String(row.location_id) === String(selectedLocationId);
+        })
+        .filter(row => {
+          if (!search) return true;
+          const text = [
+            row.item_name,
+            row.sku,
+            row.barcode,
+            row.location_name,
+            row.location_code
+          ].join(" ").toLowerCase();
+
+          return text.includes(search);
+        })
+        .sort((a, b) => {
+          const byItem = String(a.item_name || "").localeCompare(String(b.item_name || ""), "ru");
+          if (byItem !== 0) return byItem;
+
+          const byLocation = String(a.location_display || "").localeCompare(String(b.location_display || ""), "ru");
+          if (byLocation !== 0) return byLocation;
+
+          return Number(b.qty || 0) - Number(a.qty || 0);
+        });
+
+      els.rowsCount.textContent = String(rows.length);
+      els.itemsCount.textContent = String(itemsData.length);
+      els.locationsCount.textContent = String(locationsData.length);
+      els.qtyTotal.textContent = String(rows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
+      els.qtyGrandTotal.textContent = String(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
+
+      if (!rows.length) {
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty">Нет остатков по выбранному фильтру</td>
+          </tr>
+        `;
+        return;
+      }
+
+      els.tbody.innerHTML = rows.map(row => `
+        <tr>
+          <td>${escapeHtml(row.item_name || "Без названия")}</td>
+          <td>${escapeHtml(row.sku)}</td>
+          <td>${escapeHtml(row.barcode)}</td>
+          <td>${escapeHtml(row.location_display)}</td>
+          <td class="qty">${escapeHtml(row.qty)}</td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadData() {
+      try {
+        showStatus("Загрузка остатков...", "info");
+
+        const tenantId = getTenantId();
+
+        const [stockRes, itemsRes, locationsRes] = await Promise.all([
+          apiGet(`/stock?tenant_id=${tenantId}`),
+          apiGet(`/items?tenant_id=${tenantId}`),
+          apiGet(`/locations?tenant_id=${tenantId}`)
+        ]);
+
+        stockData = normalize(stockRes, "stock");
+        itemsData = normalize(itemsRes, "items");
+        locationsData = normalize(locationsRes, "locations");
+
+        renderLocationFilter();
+        renderTable();
+
+        showStatus(
+          `Данные загружены.\nСтрок остатков: ${stockData.length}\nТоваров: ${itemsData.length}\nМХ: ${locationsData.length}`,
+          "success"
+        );
+      } catch (err) {
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty">Ошибка загрузки данных</td>
+          </tr>
+        `;
+        showStatus("Ошибка: " + err.message, "error");
+      }
+    }
+
+    function bindEvents() {
+      els.searchInput.addEventListener("input", renderTable);
+      els.locationFilter.addEventListener("change", renderTable);
+      els.refreshBtn.addEventListener("click", loadData);
+    }
+
+    function bootstrap() {
+      parseUser();
+      bindEvents();
+      loadData();
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>

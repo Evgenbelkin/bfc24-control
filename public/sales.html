@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>BFC24 CONTROL — Продажа</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:#dfe3eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --danger:#dc2626;
+      --success:#16a34a;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
+    .btn-primary:hover{background:var(--primary-hover)}
+
+    .btn-light{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:16px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid #eef1f5;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+
+    .card-title{
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 14px;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      min-width:0;
+    }
+
+    .field.full{
+      grid-column:1 / -1;
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    textarea{
+      min-height:90px;
+      resize:vertical;
+    }
+
+    .autocomplete{
+      position:relative;
+    }
+
+    .results{
+      position:absolute;
+      left:0;
+      right:0;
+      top:calc(100% + 6px);
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      box-shadow:0 18px 40px rgba(15,23,42,.16);
+      max-height:280px;
+      overflow:auto;
+      z-index:1000;
+      display:none;
+    }
+
+    .result-item{
+      padding:12px 14px;
+      border-bottom:1px solid #f1f3f7;
+      cursor:pointer;
+    }
+
+    .result-item:last-child{border-bottom:none}
+    .result-item:hover{background:#f8fbff}
+
+    .result-title{
+      font-size:15px;
+      font-weight:700;
+      margin-bottom:4px;
+    }
+
+    .result-sub{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+      word-break:break-word;
+    }
+
+    .selected-box{
+      margin-top:10px;
+      padding:12px 14px;
+      border:1px dashed #bfd2ff;
+      background:#f7faff;
+      border-radius:12px;
+      display:none;
+    }
+
+    .selected-box.active{
+      display:block;
+    }
+
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+
+    .status.show{display:block}
+    .status.error{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+    .status.success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .status.info{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .stat{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .inline{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
+    .selected-stock{
+      margin-top:8px;
+      font-size:14px;
+      color:#1d4ed8;
+      font-weight:700;
+    }
+
+    .selected-stock.zero{
+      color:var(--danger);
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    @media (max-width: 760px){
+      .form-grid,
+      .stats{
+        grid-template-columns:1fr;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .wrap{
+        padding:16px 12px 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">Продажа</div>
+      <div class="top-actions">
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2 class="card-title">Новая продажа</h2>
+        <div class="muted">Экран работает с backend SaaS. Для owner tenant_id передаётся обязательно.</div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">Товаров загружено</div>
+            <div class="stat-value" id="itemsCount">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Мест хранения</div>
+            <div class="stat-value" id="locationsCount">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Клиентов</div>
+            <div class="stat-value" id="clientsCount">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Остатков загружено</div>
+            <div class="stat-value" id="stockCount">0</div>
+          </div>
+        </div>
+
+        <div id="pageStatus" class="status info"></div>
+
+        <form id="saleForm" autocomplete="off">
+          <div class="form-grid" style="margin-top:18px;">
+            <div class="field">
+              <label for="tenantId">Tenant ID</label>
+              <input id="tenantId" type="number" min="1" value="1" />
+              <div class="hint">Для owner обязательно.</div>
+            </div>
+
+            <div class="field">
+              <label for="paymentMethod">Способ оплаты</label>
+              <select id="paymentMethod">
+                <option value="cash">Наличные</option>
+                <option value="card">Карта</option>
+                <option value="transfer">Перевод</option>
+                <option value="consignment">Под реализацию</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label for="itemSearch">Товар</label>
+              <div class="autocomplete">
+                <input
+                  id="itemSearch"
+                  type="text"
+                  placeholder="Начни вводить название, штрихкод, SKU или артикул"
+                  autocomplete="off"
+                />
+                <div id="itemResults" class="results"></div>
+              </div>
+              <div id="selectedItemBox" class="selected-box"></div>
+            </div>
+
+            <div class="field">
+              <label for="locationId">Место хранения</label>
+              <select id="locationId">
+                <option value="">Выберите МХ</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="counterpartyId">Клиент</label>
+              <select id="counterpartyId">
+                <option value="">Без клиента</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="qty">Количество</label>
+              <input id="qty" type="number" min="1" step="1" value="1" />
+            </div>
+
+            <div class="field">
+              <label for="price">Цена за единицу</label>
+              <input id="price" type="number" min="0" step="0.01" value="0" />
+            </div>
+
+            <div class="field full">
+              <label for="comment">Комментарий</label>
+              <textarea id="comment" placeholder="Комментарий к продаже"></textarea>
+            </div>
+          </div>
+
+          <div class="inline" style="margin-top:18px;">
+            <button type="submit" class="btn btn-primary">Провести продажу</button>
+            <button type="button" class="btn btn-light" onclick="loadInitialData()">Обновить данные</button>
+          </div>
+        </form>
+
+        <div id="submitStatus" class="status"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3003';
+    const FALLBACK_TENANT_ID = 1;
+
+    let authUser = null;
+    let allItems = [];
+    let allLocations = [];
+    let allClients = [];
+    let stockMap = {};
+    let selectedItem = null;
+
+    const els = {
+      tenantId: document.getElementById('tenantId'),
+      paymentMethod: document.getElementById('paymentMethod'),
+      itemSearch: document.getElementById('itemSearch'),
+      itemResults: document.getElementById('itemResults'),
+      selectedItemBox: document.getElementById('selectedItemBox'),
+      locationId: document.getElementById('locationId'),
+      counterpartyId: document.getElementById('counterpartyId'),
+      qty: document.getElementById('qty'),
+      price: document.getElementById('price'),
+      comment: document.getElementById('comment'),
+      itemsCount: document.getElementById('itemsCount'),
+      locationsCount: document.getElementById('locationsCount'),
+      clientsCount: document.getElementById('clientsCount'),
+      stockCount: document.getElementById('stockCount'),
+      pageStatus: document.getElementById('pageStatus'),
+      submitStatus: document.getElementById('submitStatus'),
+      saleForm: document.getElementById('saleForm')
+    };
+
+    function getToken() {
+      return localStorage.getItem('token') || '';
+    }
+
+    function showStatus(el, text, type = 'info') {
+      el.className = 'status show ' + type;
+      el.textContent = text;
+    }
+
+    function hideStatus(el) {
+      el.className = 'status';
+      el.textContent = '';
+    }
+
+    function goBack() {
+      window.location.href = '/index.html';
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login.html';
+    }
+
+    function parseUser() {
+      try {
+        const raw = localStorage.getItem('user');
+        authUser = raw ? JSON.parse(raw) : null;
+      } catch {
+        authUser = null;
+      }
+    }
+
+    function getTenantId() {
+      const rawFromInput = Number(els.tenantId.value);
+      if (Number.isFinite(rawFromInput) && rawFromInput > 0) {
+        return rawFromInput;
+      }
+
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== '') {
+        return Number(authUser.tenant_id);
+      }
+
+      return FALLBACK_TENANT_ID;
+    }
+
+    function authHeaders() {
+      const token = getToken();
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      };
+    }
+
+    function extractList(data, keys) {
+      if (Array.isArray(data)) return data;
+      if (!data || typeof data !== 'object') return [];
+      for (const key of keys) {
+        if (Array.isArray(data[key])) return data[key];
+      }
+      for (const value of Object.values(data)) {
+        if (Array.isArray(value)) return value;
+      }
+      return [];
+    }
+
+    async function apiGet(path) {
+      const res = await fetch(API_BASE + path, {
+        method: 'GET',
+        headers: authHeaders()
+      });
+
+      const text = await res.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || data.message || ('HTTP ' + res.status));
+      }
+
+      return data;
+    }
+
+    async function apiPost(path, body) {
+      const res = await fetch(API_BASE + path, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(body)
+      });
+
+      const text = await res.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || data.message || ('HTTP ' + res.status));
+      }
+
+      return data;
+    }
+
+    function normalizeItem(item) {
+      return {
+        id: item.id,
+        tenant_id: item.tenant_id,
+        name: item.name || item.item_name || '',
+        sku: item.sku || '',
+        barcode: item.barcode || '',
+        vendor_code: item.vendor_code || item.article || '',
+        price: Number(item.price || item.sale_price || 0),
+        raw: item
+      };
+    }
+
+    function normalizeStockRow(row) {
+      return {
+        item_id: row.item_id ?? row.itemId ?? null,
+        location_id: row.location_id ?? row.locationId ?? null,
+        qty: Number(row.qty ?? row.quantity ?? row.stock_qty ?? 0)
+      };
+    }
+
+    function itemSearchText(item) {
+      return [
+        item.name,
+        item.sku,
+        item.barcode,
+        item.vendor_code
+      ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    }
+
+    function getCurrentStockQty() {
+      if (!selectedItem || !els.locationId.value) return null;
+      const key = `${selectedItem.id}_${els.locationId.value}`;
+      return Number(stockMap[key] || 0);
+    }
+
+    function renderSelectedItem() {
+      if (!selectedItem) {
+        els.selectedItemBox.classList.remove('active');
+        els.selectedItemBox.innerHTML = '';
+        return;
+      }
+
+      const stockQty = getCurrentStockQty();
+      let stockInfo = '';
+
+      if (stockQty !== null) {
+        stockInfo = `
+          <div class="selected-stock ${stockQty <= 0 ? 'zero' : ''}">
+            Остаток на выбранном МХ: ${stockQty}
+          </div>
+        `;
+      } else {
+        stockInfo = `
+          <div class="selected-stock">
+            Выбери место хранения, чтобы увидеть остаток
+          </div>
+        `;
+      }
+
+      els.selectedItemBox.classList.add('active');
+      els.selectedItemBox.innerHTML = `
+        <div><strong>Выбран товар:</strong> ${escapeHtml(selectedItem.name || 'Без названия')}</div>
+        <div class="muted" style="margin-top:6px;">
+          ID: ${escapeHtml(String(selectedItem.id ?? ''))}
+          ${selectedItem.sku ? ' | SKU: ' + escapeHtml(selectedItem.sku) : ''}
+          ${selectedItem.barcode ? ' | ШК: ' + escapeHtml(selectedItem.barcode) : ''}
+          ${selectedItem.vendor_code ? ' | Артикул: ' + escapeHtml(selectedItem.vendor_code) : ''}
+        </div>
+        ${stockInfo}
+      `;
+    }
+
+    function renderItemResults(items) {
+      if (!items.length) {
+        els.itemResults.innerHTML = `
+          <div class="result-item">
+            <div class="result-title">Ничего не найдено</div>
+            <div class="result-sub">Проверь название, штрихкод, SKU или артикул.</div>
+          </div>
+        `;
+        els.itemResults.style.display = 'block';
+        return;
+      }
+
+      els.itemResults.innerHTML = items.map(item => `
+        <div class="result-item" data-id="${escapeHtml(String(item.id))}">
+          <div class="result-title">${escapeHtml(item.name || 'Без названия')}</div>
+          <div class="result-sub">
+            ID: ${escapeHtml(String(item.id ?? ''))}
+            ${item.sku ? ' | SKU: ' + escapeHtml(item.sku) : ''}
+            ${item.barcode ? ' | ШК: ' + escapeHtml(item.barcode) : ''}
+            ${item.vendor_code ? ' | Артикул: ' + escapeHtml(item.vendor_code) : ''}
+          </div>
+        </div>
+      `).join('');
+
+      els.itemResults.style.display = 'block';
+
+      els.itemResults.querySelectorAll('.result-item[data-id]').forEach(node => {
+        node.addEventListener('click', () => {
+          const id = String(node.dataset.id);
+          const found = allItems.find(x => String(x.id) === id);
+          if (found) {
+            selectedItem = found;
+            els.itemSearch.value = found.name || '';
+            els.itemResults.style.display = 'none';
+            renderSelectedItem();
+
+            if (!Number(els.price.value) && Number(found.price) > 0) {
+              els.price.value = found.price;
+            }
+          }
+        });
+      });
+    }
+
+    function fillLocations() {
+      els.locationId.innerHTML = `<option value="">Выберите МХ</option>` +
+        allLocations.map(loc => `
+          <option value="${escapeHtml(String(loc.id))}">
+            ${escapeHtml(loc.name || '')}${loc.code ? ' (' + escapeHtml(loc.code) + ')' : ''}
+          </option>
+        `).join('');
+    }
+
+    function fillClients() {
+      els.counterpartyId.innerHTML = `<option value="">Без клиента</option>` +
+        allClients.map(client => `
+          <option value="${escapeHtml(String(client.id))}">
+            ${escapeHtml(client.name || '')}
+          </option>
+        `).join('');
+    }
+
+    async function loadItems() {
+      const tenantId = getTenantId();
+      if (!tenantId) throw new Error('Укажи tenant_id');
+
+      const data = await apiGet(`/items?tenant_id=${tenantId}`);
+      const items = extractList(data, ['items', 'data', 'rows'])
+        .map(normalizeItem);
+
+      allItems = items;
+      els.itemsCount.textContent = String(allItems.length);
+    }
+
+    async function loadLocations() {
+      const tenantId = getTenantId();
+      if (!tenantId) throw new Error('Укажи tenant_id');
+
+      const data = await apiGet(`/locations?tenant_id=${tenantId}`);
+      allLocations = extractList(data, ['locations', 'data', 'rows']);
+      els.locationsCount.textContent = String(allLocations.length);
+      fillLocations();
+    }
+
+    async function loadClients() {
+      const tenantId = getTenantId();
+      if (!tenantId) throw new Error('Укажи tenant_id');
+
+      const data = await apiGet(`/clients?tenant_id=${tenantId}`);
+      allClients = extractList(data, ['clients', 'counterparties', 'data', 'rows']);
+      els.clientsCount.textContent = String(allClients.length);
+      fillClients();
+    }
+
+    async function loadStock() {
+      const tenantId = getTenantId();
+      if (!tenantId) throw new Error('Укажи tenant_id');
+
+      const data = await apiGet(`/stock?tenant_id=${tenantId}`);
+      const rows = extractList(data, ['stock', 'data', 'rows']).map(normalizeStockRow);
+
+      stockMap = {};
+      rows.forEach(row => {
+        if (row.item_id === null || row.location_id === null) return;
+        const key = `${row.item_id}_${row.location_id}`;
+        stockMap[key] = row.qty;
+      });
+
+      els.stockCount.textContent = String(rows.length);
+    }
+
+    async function loadInitialData() {
+      hideStatus(els.pageStatus);
+
+      try {
+        showStatus(els.pageStatus, 'Загрузка данных...', 'info');
+        selectedItem = null;
+        renderSelectedItem();
+        els.itemResults.style.display = 'none';
+
+        await Promise.all([
+          loadItems(),
+          loadLocations(),
+          loadClients(),
+          loadStock()
+        ]);
+
+        renderSelectedItem();
+
+        showStatus(
+          els.pageStatus,
+          `Данные загружены.\nТоваров: ${allItems.length}, МХ: ${allLocations.length}, клиентов: ${allClients.length}, остатков: ${els.stockCount.textContent}`,
+          'success'
+        );
+      } catch (err) {
+        showStatus(els.pageStatus, 'Ошибка загрузки данных: ' + err.message, 'error');
+      }
+    }
+
+    function onItemSearchInput() {
+      const q = (els.itemSearch.value || '').trim().toLowerCase();
+
+      if (!q) {
+        els.itemResults.style.display = 'none';
+        return;
+      }
+
+      const filtered = allItems
+        .filter(item => itemSearchText(item).includes(q))
+        .slice(0, 30);
+
+      renderItemResults(filtered);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      hideStatus(els.submitStatus);
+
+      try {
+        const tenantId = getTenantId();
+        if (!tenantId) throw new Error('Укажи tenant_id');
+        if (!selectedItem || !selectedItem.id) throw new Error('Выбери товар из списка');
+        if (!els.locationId.value) throw new Error('Выбери место хранения');
+
+        const qty = Number(els.qty.value);
+        if (!Number.isFinite(qty) || qty <= 0) throw new Error('Количество должно быть больше 0');
+
+        const price = Number(els.price.value || 0);
+        if (!Number.isFinite(price) || price < 0) throw new Error('Цена не может быть отрицательной');
+
+        const stockQty = getCurrentStockQty();
+        if (stockQty === null) {
+          throw new Error('Не удалось определить остаток по выбранному месту хранения');
+        }
+
+        if (qty > stockQty) {
+          throw new Error(`Недостаточно товара. Остаток: ${stockQty}`);
+        }
+
+        const paymentMethod = els.paymentMethod.value;
+        const amount = +(qty * price).toFixed(2);
+
+        const body = {
+          tenant_id: tenantId,
+          item_id: Number(selectedItem.id),
+          location_id: Number(els.locationId.value),
+          qty,
+          price,
+          amount,
+          payment_method: paymentMethod,
+          comment: (els.comment.value || '').trim() || null
+        };
+
+        if (els.counterpartyId.value) {
+          body.counterparty_id = Number(els.counterpartyId.value);
+        }
+
+        showStatus(els.submitStatus, 'Провожу продажу...', 'info');
+
+        const result = await apiPost('/sales/sell', body);
+
+        await loadStock();
+        renderSelectedItem();
+
+        showStatus(
+          els.submitStatus,
+          'Продажа успешно проведена.\n\n' + JSON.stringify(result, null, 2),
+          'success'
+        );
+
+        els.qty.value = 1;
+        els.price.value = 0;
+        els.comment.value = '';
+        els.paymentMethod.value = 'cash';
+        els.counterpartyId.value = '';
+        els.locationId.value = '';
+        els.itemSearch.value = '';
+        selectedItem = null;
+        renderSelectedItem();
+        els.itemResults.style.display = 'none';
+      } catch (err) {
+        showStatus(els.submitStatus, 'Ошибка продажи: ' + err.message, 'error');
+      }
+    }
+
+    function bindEvents() {
+      els.itemSearch.addEventListener('input', onItemSearchInput);
+
+      els.itemSearch.addEventListener('focus', () => {
+        if (els.itemSearch.value.trim()) {
+          onItemSearchInput();
+        }
+      });
+
+      els.locationId.addEventListener('change', () => {
+        renderSelectedItem();
+      });
+
+      document.addEventListener('click', (e) => {
+        const inAutocomplete = e.target.closest('.autocomplete');
+        if (!inAutocomplete) {
+          els.itemResults.style.display = 'none';
+        }
+      });
+
+      els.saleForm.addEventListener('submit', handleSubmit);
+
+      els.tenantId.addEventListener('change', () => {
+        loadInitialData();
+      });
+    }
+
+    function bootstrap() {
+      parseUser();
+
+      if (!getToken()) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      if (authUser && authUser.tenant_id && !Number(els.tenantId.value)) {
+        els.tenantId.value = authUser.tenant_id;
+      }
+
+      bindEvents();
+      loadInitialData();
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>

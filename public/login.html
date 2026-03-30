@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>BFC24 CONTROL — Вход</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 14px;
+      width: 320px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin: 0 0 20px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .error {
+      color: red;
+      font-size: 13px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>BFC24 CONTROL</h2>
+
+  <div id="error" class="error"></div>
+
+  <input id="username" placeholder="Логин" />
+  <input id="password" type="password" placeholder="Пароль" />
+
+  <button onclick="login()">Войти</button>
+</div>
+
+<script>
+async function login() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const errorBox = document.getElementById('error');
+
+  errorBox.textContent = '';
+
+  try {
+    const res = await fetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      errorBox.textContent = translateError(data.error);
+      return;
+    }
+
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    // 🔥 КЛЮЧЕВОЕ — редирект по роли
+    if (data.user.role === 'owner') {
+      window.location.href = '/owner-dashboard.html';
+    } else {
+      window.location.href = '/index.html';
+    }
+
+  } catch (err) {
+    errorBox.textContent = 'Ошибка подключения к серверу';
+  }
+}
+
+function translateError(code) {
+  const map = {
+    invalid_credentials: 'Неверный логин или пароль',
+    tenant_blocked: 'Клиент заблокирован',
+    tenant_inactive: 'Клиент отключен',
+    subscription_blocked: 'Подписка заблокирована',
+    subscription_expired: 'Подписка истекла'
+  };
+
+  return map[code] || code;
+}
+</script>
+
+</body>
+</html>

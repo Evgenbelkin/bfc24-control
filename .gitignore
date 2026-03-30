@@ -1,0 +1,21 @@
+# node
+node_modules/
+
+# env
+.env
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# vscode
+.vscode/
+
+# build (если появится)
+dist/
+build/
