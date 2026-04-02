@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL вЂ” РњРµСЃС‚Р° С…СЂР°РЅРµРЅРёСЏ</title>
+  <title>BFC24 CONTROL — Места хранения</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -274,20 +274,20 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">РњРµСЃС‚Р° С…СЂР°РЅРµРЅРёСЏ</div>
+      <div class="title">Места хранения</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">РќР°Р·Р°Рґ</button>
-        <button class="btn btn-light" onclick="logout()">Р’С‹Р№С‚Рё</button>
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title" id="formTitle">РЎРѕР·РґР°С‚СЊ РјРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ</h2>
-      <div class="muted">РќР°РїСЂРёРјРµСЂ: РљРѕРЅС‚РµР№РЅРµСЂ 1, РљРѕРЅС‚РµР№РЅРµСЂ 2, РЎРєР»Р°Рґ РјР°РіР°Р·РёРЅР°, Р’РёС‚СЂРёРЅР°.</div>
+      <h2 class="card-title" id="formTitle">Создать место хранения</h2>
+      <div class="muted">Например: Контейнер 1, Контейнер 2, Склад магазина, Витрина.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">РњРµСЃС‚ С…СЂР°РЅРµРЅРёСЏ</div>
+          <div class="stat-label">Мест хранения</div>
           <div class="stat-value" id="locationsCount">0</div>
         </div>
         <div class="stat">
@@ -299,38 +299,38 @@
       <form id="locationForm" autocomplete="off" style="margin-top:18px;">
         <div class="form-grid">
           <div class="field">
-            <label for="name">РќР°Р·РІР°РЅРёРµ</label>
-            <input id="name" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: РљРѕРЅС‚РµР№РЅРµСЂ 1" />
+            <label for="name">Название</label>
+            <input id="name" type="text" placeholder="Например: Контейнер 1" />
           </div>
 
           <div class="field">
-            <label for="code">РљРѕРґ</label>
-            <input id="code" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: K1" />
+            <label for="code">Код</label>
+            <input id="code" type="text" placeholder="Например: K1" />
           </div>
 
           <div class="field">
-            <label for="locationType">РўРёРї</label>
+            <label for="locationType">Тип</label>
             <select id="locationType">
-              <option value="container">РљРѕРЅС‚РµР№РЅРµСЂ</option>
-              <option value="warehouse">РЎРєР»Р°Рґ</option>
+              <option value="container">Контейнер</option>
+              <option value="warehouse">Склад</option>
               <option value="storage">Storage</option>
-              <option value="shop">РњР°РіР°Р·РёРЅ</option>
-              <option value="shelf">РџРѕР»РєР°</option>
-              <option value="other">Р”СЂСѓРіРѕРµ</option>
+              <option value="shop">Магазин</option>
+              <option value="shelf">Полка</option>
+              <option value="other">Другое</option>
             </select>
           </div>
         </div>
 
         <div class="toolbar">
           <div class="field">
-            <label for="searchInput">РџРѕРёСЃРє</label>
-            <input id="searchInput" type="text" placeholder="РџРѕРёСЃРє РїРѕ РЅР°Р·РІР°РЅРёСЋ, РєРѕРґСѓ, С‚РёРїСѓ" />
+            <label for="searchInput">Поиск</label>
+            <input id="searchInput" type="text" placeholder="Поиск по названию, коду, типу" />
           </div>
 
           <div class="toolbar-actions">
-            <button type="submit" class="btn btn-primary" id="saveBtn">РЎРѕС…СЂР°РЅРёС‚СЊ</button>
-            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">РћС‚РјРµРЅРёС‚СЊ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ</button>
-            <button type="button" class="btn btn-light" id="refreshBtn">РћР±РЅРѕРІРёС‚СЊ СЃРїРёСЃРѕРє</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
+            <button type="button" class="btn btn-light" id="refreshBtn">Обновить список</button>
           </div>
         </div>
       </form>
@@ -340,24 +340,24 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">РЎРїРёСЃРѕРє РјРµСЃС‚ С…СЂР°РЅРµРЅРёСЏ</h2>
+      <h2 class="card-title">Список мест хранения</h2>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>РќР°Р·РІР°РЅРёРµ</th>
-              <th>РљРѕРґ</th>
-              <th>РўРёРї</th>
-              <th>РђРєС‚РёРІРЅРѕ</th>
-              <th>Р”Р°С‚Р°</th>
-              <th>Р”РµР№СЃС‚РІРёСЏ</th>
+              <th>Название</th>
+              <th>Код</th>
+              <th>Тип</th>
+              <th>Активно</th>
+              <th>Дата</th>
+              <th>Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="7" class="empty">Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...</td>
+              <td colspan="7" class="empty">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -366,7 +366,7 @@
   </div>
 
   <script>
-    const API_BASE = "";
+    const API_BASE = '';
     const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
@@ -547,8 +547,8 @@
 
     function resetForm() {
       editId = null;
-      els.formTitle.textContent = "РЎРѕР·РґР°С‚СЊ РјРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ";
-      els.saveBtn.textContent = "РЎРѕС…СЂР°РЅРёС‚СЊ";
+      els.formTitle.textContent = "Создать место хранения";
+      els.saveBtn.textContent = "Сохранить";
       els.cancelEditBtn.style.display = "none";
       els.name.value = "";
       els.code.value = "";
@@ -558,8 +558,8 @@
 
     function startEdit(location) {
       editId = location.id;
-      els.formTitle.textContent = `Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РјРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ #${location.id}`;
-      els.saveBtn.textContent = "РЎРѕС…СЂР°РЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ";
+      els.formTitle.textContent = `Редактировать место хранения #${location.id}`;
+      els.saveBtn.textContent = "Сохранить изменения";
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = location.name || "";
       els.code.value = location.code || "";
@@ -590,7 +590,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="empty">РќРµС‚ РґР°РЅРЅС‹С…</td>
+            <td colspan="7" class="empty">Нет данных</td>
           </tr>
         `;
         return;
@@ -602,11 +602,11 @@
           <td>${escapeHtml(row.name)}</td>
           <td>${escapeHtml(row.code)}</td>
           <td>${escapeHtml(row.location_type)}</td>
-          <td>${row.is_active ? "Р”Р°" : "РќРµС‚"}</td>
+          <td>${row.is_active ? "Да" : "Нет"}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
           <td>
             <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editLocation('${escapeHtml(row.id)}')">Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ</button>
+              <button type="button" class="btn btn-secondary" onclick="editLocation('${escapeHtml(row.id)}')">Редактировать</button>
             </div>
           </td>
         </tr>
@@ -617,7 +617,7 @@
       try {
         const tenantId = getTenantId();
         els.tenantValue.textContent = String(tenantId);
-        showStatus(els.pageStatus, `Р—Р°РіСЂСѓР·РєР° РјРµСЃС‚ С…СЂР°РЅРµРЅРёСЏ...\nTenant ID: ${tenantId}`, "info");
+        showStatus(els.pageStatus, `Загрузка мест хранения...\nTenant ID: ${tenantId}`, "info");
 
         const data = await apiGet(`/locations?tenant_id=${tenantId}`);
         locationsData = extractList(data, ["locations", "data", "rows"]).map(normalizeLocation);
@@ -626,16 +626,16 @@
 
         showStatus(
           els.pageStatus,
-          `Р”Р°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶РµРЅС‹.\nTenant ID: ${tenantId}\nРњРµСЃС‚ С…СЂР°РЅРµРЅРёСЏ: ${locationsData.length}`,
+          `Данные загружены.\nTenant ID: ${tenantId}\nМест хранения: ${locationsData.length}`,
           "success"
         );
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="empty">РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…</td>
+            <td colspan="7" class="empty">Ошибка загрузки данных</td>
           </tr>
         `;
-        showStatus(els.pageStatus, "РћС€РёР±РєР°: " + err.message, "error");
+        showStatus(els.pageStatus, "Ошибка: " + err.message, "error");
       }
     }
 
@@ -651,15 +651,15 @@
         const location_type = (els.locationType.value || "").trim();
 
         if (!name) {
-          throw new Error("РќР°Р·РІР°РЅРёРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ");
+          throw new Error("Название обязательно");
         }
 
         if (!code) {
-          throw new Error("РљРѕРґ РѕР±СЏР·Р°С‚РµР»РµРЅ");
+          throw new Error("Код обязателен");
         }
 
         if (!location_type) {
-          throw new Error("РўРёРї РѕР±СЏР·Р°С‚РµР»РµРЅ");
+          throw new Error("Тип обязателен");
         }
 
         const body = {
@@ -670,19 +670,19 @@
         };
 
         if (editId) {
-          showStatus(els.submitStatus, `РЎРѕС…СЂР°РЅСЏСЋ РёР·РјРµРЅРµРЅРёСЏ РјРµСЃС‚Р° С…СЂР°РЅРµРЅРёСЏ #${editId}...`, "info");
+          showStatus(els.submitStatus, `Сохраняю изменения места хранения #${editId}...`, "info");
           await apiPut(`/locations/${editId}`, body);
-          showStatus(els.submitStatus, `РњРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ #${editId} СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»РµРЅРѕ`, "success");
+          showStatus(els.submitStatus, `Место хранения #${editId} успешно обновлено`, "success");
         } else {
-          showStatus(els.submitStatus, "РЎРѕР·РґР°СЋ РјРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ...", "info");
+          showStatus(els.submitStatus, "Создаю место хранения...", "info");
           await apiPost("/locations", body);
-          showStatus(els.submitStatus, "РњРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ СѓСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅРѕ", "success");
+          showStatus(els.submitStatus, "Место хранения успешно создано", "success");
         }
 
         resetForm();
         await loadData();
       } catch (err) {
-        showStatus(els.submitStatus, "РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ: " + err.message, "error");
+        showStatus(els.submitStatus, "Ошибка сохранения: " + err.message, "error");
       }
     }
 

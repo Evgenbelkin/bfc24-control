@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL вЂ” РћСЃС‚Р°С‚РєРё</title>
+  <title>BFC24 CONTROL — Остатки</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -242,54 +242,54 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">РћСЃС‚Р°С‚РєРё</div>
+      <div class="title">Остатки</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">РќР°Р·Р°Рґ</button>
-        <button class="btn btn-light" onclick="logout()">Р’С‹Р№С‚Рё</button>
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Р¤РёР»СЊС‚СЂС‹</h2>
+      <h2 class="card-title">Фильтры</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">РџРѕРёСЃРє РїРѕ С‚РѕРІР°СЂСѓ / Р°СЂС‚РёРєСѓР»Сѓ / С€С‚СЂРёС…РєРѕРґСѓ</label>
-          <input id="searchInput" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: РўРµСЃС‚, SaaS, SKU, barcode" />
+          <label for="searchInput">Поиск по товару / артикулу / штрихкоду</label>
+          <input id="searchInput" type="text" placeholder="Например: Тест, SaaS, SKU, barcode" />
         </div>
 
         <div class="field">
-          <label for="locationFilter">РњРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ</label>
+          <label for="locationFilter">Место хранения</label>
           <select id="locationFilter">
-            <option value="">Р’СЃРµ РњРҐ</option>
+            <option value="">Все МХ</option>
           </select>
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">РћР±РЅРѕРІРёС‚СЊ</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">РЎС‚СЂРѕРє РѕСЃС‚Р°С‚РєРѕРІ</div>
+          <div class="stat-label">Строк остатков</div>
           <div class="stat-value" id="rowsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">РўРѕРІР°СЂРѕРІ</div>
+          <div class="stat-label">Товаров</div>
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">РњРµСЃС‚ С…СЂР°РЅРµРЅРёСЏ</div>
+          <div class="stat-label">Мест хранения</div>
           <div class="stat-value" id="locationsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">РЎСѓРјРјР° РїРѕ С„РёР»СЊС‚СЂСѓ</div>
+          <div class="stat-label">Сумма по фильтру</div>
           <div class="stat-value" id="qtyTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">РћР±С‰Р°СЏ СЃСѓРјРјР°</div>
+          <div class="stat-label">Общая сумма</div>
           <div class="stat-value" id="qtyGrandTotal">0</div>
         </div>
       </div>
@@ -298,23 +298,23 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">РўРµРєСѓС‰РёРµ РѕСЃС‚Р°С‚РєРё</h2>
-      <div class="muted">РџРѕРєР°Р·С‹РІР°СЋС‚СЃСЏ С„Р°РєС‚РёС‡РµСЃРєРёРµ РѕСЃС‚Р°С‚РєРё РїРѕ С‚РѕРІР°СЂР°Рј Рё РјРµСЃС‚Р°Рј С…СЂР°РЅРµРЅРёСЏ.</div>
+      <h2 class="card-title">Текущие остатки</h2>
+      <div class="muted">Показываются фактические остатки по товарам и местам хранения.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>РўРѕРІР°СЂ</th>
-              <th>РђСЂС‚РёРєСѓР» / SKU</th>
-              <th>РЁС‚СЂРёС…РєРѕРґ</th>
-              <th>РњРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ</th>
-              <th>РљРѕР»РёС‡РµСЃС‚РІРѕ</th>
+              <th>Товар</th>
+              <th>Артикул / SKU</th>
+              <th>Штрихкод</th>
+              <th>Место хранения</th>
+              <th>Количество</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="5" class="empty">Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...</td>
+              <td colspan="5" class="empty">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -323,7 +323,7 @@
   </div>
 
   <script>
-    const API_BASE = "";
+    const API_BASE = '';
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -456,7 +456,7 @@
         })
         .join("");
 
-      els.locationFilter.innerHTML = `<option value="">Р’СЃРµ РњРҐ</option>` + options;
+      els.locationFilter.innerHTML = `<option value="">Все МХ</option>` + options;
     }
 
     function buildRows() {
@@ -559,7 +559,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="empty">РќРµС‚ РѕСЃС‚Р°С‚РєРѕРІ РїРѕ РІС‹Р±СЂР°РЅРЅРѕРјСѓ С„РёР»СЊС‚СЂСѓ</td>
+            <td colspan="5" class="empty">Нет остатков по выбранному фильтру</td>
           </tr>
         `;
         return;
@@ -567,7 +567,7 @@
 
       els.tbody.innerHTML = rows.map(row => `
         <tr>
-          <td>${escapeHtml(row.item_name || "Р‘РµР· РЅР°Р·РІР°РЅРёСЏ")}</td>
+          <td>${escapeHtml(row.item_name || "Без названия")}</td>
           <td>${escapeHtml(row.sku)}</td>
           <td>${escapeHtml(row.barcode)}</td>
           <td>${escapeHtml(row.location_display)}</td>
@@ -578,7 +578,7 @@
 
     async function loadData() {
       try {
-        showStatus("Р—Р°РіСЂСѓР·РєР° РѕСЃС‚Р°С‚РєРѕРІ...", "info");
+        showStatus("Загрузка остатков...", "info");
 
         const tenantId = getTenantId();
 
@@ -596,16 +596,16 @@
         renderTable();
 
         showStatus(
-          `Р”Р°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶РµРЅС‹.\nРЎС‚СЂРѕРє РѕСЃС‚Р°С‚РєРѕРІ: ${stockData.length}\nРўРѕРІР°СЂРѕРІ: ${itemsData.length}\nРњРҐ: ${locationsData.length}`,
+          `Данные загружены.\nСтрок остатков: ${stockData.length}\nТоваров: ${itemsData.length}\nМХ: ${locationsData.length}`,
           "success"
         );
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="empty">РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…</td>
+            <td colspan="5" class="empty">Ошибка загрузки данных</td>
           </tr>
         `;
-        showStatus("РћС€РёР±РєР°: " + err.message, "error");
+        showStatus("Ошибка: " + err.message, "error");
       }
     }
 

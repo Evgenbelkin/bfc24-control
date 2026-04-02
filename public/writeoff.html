@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL вЂ” РЎРїРёСЃР°РЅРёРµ</title>
+  <title>BFC24 CONTROL — Списание</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -277,24 +277,24 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">РЎРїРёСЃР°РЅРёРµ</div>
+      <div class="title">Списание</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">РќР°Р·Р°Рґ</button>
-        <button class="btn btn-light" onclick="logout()">Р’С‹Р№С‚Рё</button>
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">РќРѕРІРѕРµ СЃРїРёСЃР°РЅРёРµ</h2>
-      <div class="muted">Р’С‹Р±РµСЂРё С‚РѕРІР°СЂ, РјРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ, РєРѕР»РёС‡РµСЃС‚РІРѕ Рё СѓРєР°Р¶Рё РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ РєРѕРјРјРµРЅС‚Р°СЂРёР№.</div>
+      <h2 class="card-title">Новое списание</h2>
+      <div class="muted">Выбери товар, место хранения, количество и укажи обязательный комментарий.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">РўРѕРІР°СЂРѕРІ Р·Р°РіСЂСѓР¶РµРЅРѕ</div>
+          <div class="stat-label">Товаров загружено</div>
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">РњРµСЃС‚ С…СЂР°РЅРµРЅРёСЏ</div>
+          <div class="stat-label">Мест хранения</div>
           <div class="stat-value" id="locationsCount">0</div>
         </div>
         <div class="stat">
@@ -308,12 +308,12 @@
       <form id="writeoffForm" autocomplete="off">
         <div class="form-grid" style="margin-top:18px;">
           <div class="field full">
-            <label for="itemSearch">РўРѕРІР°СЂ</label>
+            <label for="itemSearch">Товар</label>
             <div class="autocomplete">
               <input
                 id="itemSearch"
                 type="text"
-                placeholder="РќР°С‡РЅРё РІРІРѕРґРёС‚СЊ РЅР°Р·РІР°РЅРёРµ, С€С‚СЂРёС…РєРѕРґ, SKU РёР»Рё Р°СЂС‚РёРєСѓР»"
+                placeholder="Начни вводить название, штрихкод, SKU или артикул"
                 autocomplete="off"
               />
               <div id="itemResults" class="results"></div>
@@ -322,27 +322,27 @@
           </div>
 
           <div class="field">
-            <label for="locationId">РњРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ</label>
+            <label for="locationId">Место хранения</label>
             <select id="locationId">
-              <option value="">Р’С‹Р±РµСЂРёС‚Рµ РњРҐ</option>
+              <option value="">Выберите МХ</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="qty">РљРѕР»РёС‡РµСЃС‚РІРѕ</label>
+            <label for="qty">Количество</label>
             <input id="qty" type="number" min="1" step="1" value="1" />
           </div>
 
           <div class="field full">
-            <label for="comment">РљРѕРјРјРµРЅС‚Р°СЂРёР№</label>
-            <textarea id="comment" placeholder="РќР°РїСЂРёРјРµСЂ: Р±СЂР°Рє, РїРѕРІСЂРµР¶РґРµРЅРёРµ, РїРµСЂРµСЃРѕСЂС‚, СѓС‚РµСЂСЏ"></textarea>
-            <div class="hint">РљРѕРјРјРµРЅС‚Р°СЂРёР№ РѕР±СЏР·Р°С‚РµР»РµРЅ.</div>
+            <label for="comment">Комментарий</label>
+            <textarea id="comment" placeholder="Например: брак, повреждение, пересорт, утеря"></textarea>
+            <div class="hint">Комментарий обязателен.</div>
           </div>
         </div>
 
         <div class="inline">
-          <button type="submit" class="btn btn-primary">РџСЂРѕРІРµСЃС‚Рё СЃРїРёСЃР°РЅРёРµ</button>
-          <button type="button" class="btn btn-light" id="refreshBtn">РћР±РЅРѕРІРёС‚СЊ РґР°РЅРЅС‹Рµ</button>
+          <button type="submit" class="btn btn-primary">Провести списание</button>
+          <button type="button" class="btn btn-light" id="refreshBtn">Обновить данные</button>
         </div>
       </form>
 
@@ -351,7 +351,7 @@
   </div>
 
   <script>
-    const API_BASE = "";
+    const API_BASE = '';
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -519,12 +519,12 @@
 
       els.selectedItemBox.classList.add("active");
       els.selectedItemBox.innerHTML = `
-        <div><strong>Р’С‹Р±СЂР°РЅ С‚РѕРІР°СЂ:</strong> ${escapeHtml(selectedItem.name || "Р‘РµР· РЅР°Р·РІР°РЅРёСЏ")}</div>
+        <div><strong>Выбран товар:</strong> ${escapeHtml(selectedItem.name || "Без названия")}</div>
         <div class="muted" style="margin-top:6px;">
           ID: ${escapeHtml(String(selectedItem.id ?? ""))}
           ${selectedItem.sku ? " | SKU: " + escapeHtml(selectedItem.sku) : ""}
-          ${selectedItem.barcode ? " | РЁРљ: " + escapeHtml(selectedItem.barcode) : ""}
-          ${selectedItem.vendor_code ? " | РђСЂС‚РёРєСѓР»: " + escapeHtml(selectedItem.vendor_code) : ""}
+          ${selectedItem.barcode ? " | ШК: " + escapeHtml(selectedItem.barcode) : ""}
+          ${selectedItem.vendor_code ? " | Артикул: " + escapeHtml(selectedItem.vendor_code) : ""}
         </div>
       `;
     }
@@ -533,8 +533,8 @@
       if (!items.length) {
         els.itemResults.innerHTML = `
           <div class="result-item">
-            <div class="result-title">РќРёС‡РµРіРѕ РЅРµ РЅР°Р№РґРµРЅРѕ</div>
-            <div class="result-sub">РџСЂРѕРІРµСЂСЊ РЅР°Р·РІР°РЅРёРµ, С€С‚СЂРёС…РєРѕРґ, SKU РёР»Рё Р°СЂС‚РёРєСѓР».</div>
+            <div class="result-title">Ничего не найдено</div>
+            <div class="result-sub">Проверь название, штрихкод, SKU или артикул.</div>
           </div>
         `;
         els.itemResults.style.display = "block";
@@ -543,12 +543,12 @@
 
       els.itemResults.innerHTML = items.map(item => `
         <div class="result-item" data-id="${escapeHtml(String(item.id))}">
-          <div class="result-title">${escapeHtml(item.name || "Р‘РµР· РЅР°Р·РІР°РЅРёСЏ")}</div>
+          <div class="result-title">${escapeHtml(item.name || "Без названия")}</div>
           <div class="result-sub">
             ID: ${escapeHtml(String(item.id ?? ""))}
             ${item.sku ? " | SKU: " + escapeHtml(item.sku) : ""}
-            ${item.barcode ? " | РЁРљ: " + escapeHtml(item.barcode) : ""}
-            ${item.vendor_code ? " | РђСЂС‚РёРєСѓР»: " + escapeHtml(item.vendor_code) : ""}
+            ${item.barcode ? " | ШК: " + escapeHtml(item.barcode) : ""}
+            ${item.vendor_code ? " | Артикул: " + escapeHtml(item.vendor_code) : ""}
           </div>
         </div>
       `).join("");
@@ -571,7 +571,7 @@
 
     function fillLocations() {
       els.locationId.innerHTML =
-        `<option value="">Р’С‹Р±РµСЂРёС‚Рµ РњРҐ</option>` +
+        `<option value="">Выберите МХ</option>` +
         allLocations.map(loc => `
           <option value="${escapeHtml(String(loc.id))}">
             ${escapeHtml(loc.name || "")}${loc.code ? " (" + escapeHtml(loc.code) + ")" : ""}
@@ -598,7 +598,7 @@
       hideStatus(els.pageStatus);
 
       try {
-        showStatus(els.pageStatus, "Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...", "info");
+        showStatus(els.pageStatus, "Загрузка данных...", "info");
 
         selectedItem = null;
         renderSelectedItem();
@@ -612,11 +612,11 @@
 
         showStatus(
           els.pageStatus,
-          `Р”Р°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶РµРЅС‹.\nРўРѕРІР°СЂРѕРІ: ${allItems.length}\nРњРҐ: ${allLocations.length}`,
+          `Данные загружены.\nТоваров: ${allItems.length}\nМХ: ${allLocations.length}`,
           "success"
         );
       } catch (err) {
-        showStatus(els.pageStatus, "РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…: " + err.message, "error");
+        showStatus(els.pageStatus, "Ошибка загрузки данных: " + err.message, "error");
       }
     }
 
@@ -643,21 +643,21 @@
         const tenantId = getTenantId();
 
         if (!selectedItem || !selectedItem.id) {
-          throw new Error("Р’С‹Р±РµСЂРё С‚РѕРІР°СЂ РёР· СЃРїРёСЃРєР°");
+          throw new Error("Выбери товар из списка");
         }
 
         if (!els.locationId.value) {
-          throw new Error("Р’С‹Р±РµСЂРё РјРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ");
+          throw new Error("Выбери место хранения");
         }
 
         const qty = Number(els.qty.value);
         if (!qty || qty <= 0) {
-          throw new Error("РљРѕР»РёС‡РµСЃС‚РІРѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 0");
+          throw new Error("Количество должно быть больше 0");
         }
 
         const comment = (els.comment.value || "").trim();
         if (!comment) {
-          throw new Error("РљРѕРјРјРµРЅС‚Р°СЂРёР№ РѕР±СЏР·Р°С‚РµР»РµРЅ");
+          throw new Error("Комментарий обязателен");
         }
 
         const body = {
@@ -668,13 +668,13 @@
           comment
         };
 
-        showStatus(els.submitStatus, "РџСЂРѕРІРѕР¶Сѓ СЃРїРёСЃР°РЅРёРµ...", "info");
+        showStatus(els.submitStatus, "Провожу списание...", "info");
 
         const result = await apiPost("/writeoff", body);
 
         showStatus(
           els.submitStatus,
-          "РЎРїРёСЃР°РЅРёРµ СѓСЃРїРµС€РЅРѕ РїСЂРѕРІРµРґРµРЅРѕ.\n\n" + JSON.stringify(result, null, 2),
+          "Списание успешно проведено.\n\n" + JSON.stringify(result, null, 2),
           "success"
         );
 
@@ -686,7 +686,7 @@
         renderSelectedItem();
         els.itemResults.style.display = "none";
       } catch (err) {
-        showStatus(els.submitStatus, "РћС€РёР±РєР° СЃРїРёСЃР°РЅРёСЏ: " + err.message, "error");
+        showStatus(els.submitStatus, "Ошибка списания: " + err.message, "error");
       }
     }
 
