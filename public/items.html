@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL — Товары</title>
+  <title>BFC24 CONTROL вЂ” РўРѕРІР°СЂС‹</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -279,20 +279,20 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Товары</div>
+      <div class="title">РўРѕРІР°СЂС‹</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()">РќР°Р·Р°Рґ</button>
+        <button class="btn btn-light" onclick="logout()">Р’С‹Р№С‚Рё</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title" id="formTitle">Создать товар</h2>
-      <div class="muted">Карточка товара для приёмки, продажи, списания и остатков.</div>
+      <h2 class="card-title" id="formTitle">РЎРѕР·РґР°С‚СЊ С‚РѕРІР°СЂ</h2>
+      <div class="muted">РљР°СЂС‚РѕС‡РєР° С‚РѕРІР°СЂР° РґР»СЏ РїСЂРёС‘РјРєРё, РїСЂРѕРґР°Р¶Рё, СЃРїРёСЃР°РЅРёСЏ Рё РѕСЃС‚Р°С‚РєРѕРІ.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Товаров</div>
+          <div class="stat-label">РўРѕРІР°СЂРѕРІ</div>
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
@@ -304,46 +304,46 @@
       <form id="itemForm" autocomplete="off" style="margin-top:18px;">
         <div class="form-grid">
           <div class="field">
-            <label for="name">Название</label>
-            <input id="name" type="text" placeholder="Например: Тест товар SaaS" />
+            <label for="name">РќР°Р·РІР°РЅРёРµ</label>
+            <input id="name" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: РўРµСЃС‚ С‚РѕРІР°СЂ SaaS" />
           </div>
 
           <div class="field">
-            <label for="sku">Артикул / SKU</label>
-            <input id="sku" type="text" placeholder="Например: SKU-001" />
+            <label for="sku">РђСЂС‚РёРєСѓР» / SKU</label>
+            <input id="sku" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: SKU-001" />
           </div>
 
           <div class="field">
-            <label for="barcode">Штрихкод</label>
-            <input id="barcode" type="text" placeholder="Например: 1234567890123" />
+            <label for="barcode">РЁС‚СЂРёС…РєРѕРґ</label>
+            <input id="barcode" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: 1234567890123" />
           </div>
 
           <div class="field">
-            <label for="purchasePrice">Закупочная цена</label>
+            <label for="purchasePrice">Р—Р°РєСѓРїРѕС‡РЅР°СЏ С†РµРЅР°</label>
             <input id="purchasePrice" type="number" step="0.01" min="0" value="0" />
           </div>
 
           <div class="field">
-            <label for="salePrice">Цена продажи</label>
+            <label for="salePrice">Р¦РµРЅР° РїСЂРѕРґР°Р¶Рё</label>
             <input id="salePrice" type="number" step="0.01" min="0" value="0" />
           </div>
 
           <div class="field">
-            <label for="unit">Единица</label>
-            <input id="unit" type="text" placeholder="Например: pcs" value="pcs" />
+            <label for="unit">Р•РґРёРЅРёС†Р°</label>
+            <input id="unit" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: pcs" value="pcs" />
           </div>
         </div>
 
         <div class="toolbar">
           <div class="field">
-            <label for="searchInput">Поиск</label>
-            <input id="searchInput" type="text" placeholder="Поиск по названию, артикулу, штрихкоду" />
+            <label for="searchInput">РџРѕРёСЃРє</label>
+            <input id="searchInput" type="text" placeholder="РџРѕРёСЃРє РїРѕ РЅР°Р·РІР°РЅРёСЋ, Р°СЂС‚РёРєСѓР»Сѓ, С€С‚СЂРёС…РєРѕРґСѓ" />
           </div>
 
           <div class="toolbar-actions">
-            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
-            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
-            <button type="button" class="btn btn-light" id="refreshBtn">Обновить список</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">РЎРѕС…СЂР°РЅРёС‚СЊ</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">РћС‚РјРµРЅРёС‚СЊ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ</button>
+            <button type="button" class="btn btn-light" id="refreshBtn">РћР±РЅРѕРІРёС‚СЊ СЃРїРёСЃРѕРє</button>
           </div>
         </div>
       </form>
@@ -353,27 +353,27 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Список товаров</h2>
+      <h2 class="card-title">РЎРїРёСЃРѕРє С‚РѕРІР°СЂРѕРІ</h2>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Название</th>
-              <th>Артикул / SKU</th>
-              <th>Штрихкод</th>
-              <th>Ед.</th>
-              <th>Закупка</th>
-              <th>Продажа</th>
-              <th>Активно</th>
-              <th>Дата</th>
-              <th>Действия</th>
+              <th>РќР°Р·РІР°РЅРёРµ</th>
+              <th>РђСЂС‚РёРєСѓР» / SKU</th>
+              <th>РЁС‚СЂРёС…РєРѕРґ</th>
+              <th>Р•Рґ.</th>
+              <th>Р—Р°РєСѓРїРєР°</th>
+              <th>РџСЂРѕРґР°Р¶Р°</th>
+              <th>РђРєС‚РёРІРЅРѕ</th>
+              <th>Р”Р°С‚Р°</th>
+              <th>Р”РµР№СЃС‚РІРёСЏ</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="10" class="empty">Загрузка данных...</td>
+              <td colspan="10" class="empty">Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...</td>
             </tr>
           </tbody>
         </table>
@@ -382,7 +382,7 @@
   </div>
 
   <script>
-    const API_BASE = "http://localhost:3003";
+    const API_BASE = "";
     const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
@@ -575,8 +575,8 @@
 
     function resetForm() {
       editId = null;
-      els.formTitle.textContent = "Создать товар";
-      els.saveBtn.textContent = "Сохранить";
+      els.formTitle.textContent = "РЎРѕР·РґР°С‚СЊ С‚РѕРІР°СЂ";
+      els.saveBtn.textContent = "РЎРѕС…СЂР°РЅРёС‚СЊ";
       els.cancelEditBtn.style.display = "none";
       els.name.value = "";
       els.sku.value = "";
@@ -589,8 +589,8 @@
 
     function startEdit(item) {
       editId = item.id;
-      els.formTitle.textContent = `Редактировать товар #${item.id}`;
-      els.saveBtn.textContent = "Сохранить изменения";
+      els.formTitle.textContent = `Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ С‚РѕРІР°СЂ #${item.id}`;
+      els.saveBtn.textContent = "РЎРѕС…СЂР°РЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ";
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = item.name || "";
       els.sku.value = item.sku || "";
@@ -625,7 +625,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="10" class="empty">Нет данных</td>
+            <td colspan="10" class="empty">РќРµС‚ РґР°РЅРЅС‹С…</td>
           </tr>
         `;
         return;
@@ -640,11 +640,11 @@
           <td>${escapeHtml(row.unit)}</td>
           <td>${escapeHtml(formatMoney(row.purchase_price))}</td>
           <td>${escapeHtml(formatMoney(row.sale_price))}</td>
-          <td>${row.is_active ? "Да" : "Нет"}</td>
+          <td>${row.is_active ? "Р”Р°" : "РќРµС‚"}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
           <td>
             <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">Редактировать</button>
+              <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ</button>
             </div>
           </td>
         </tr>
@@ -655,7 +655,7 @@
       try {
         const tenantId = getTenantId();
         els.tenantValue.textContent = String(tenantId);
-        showStatus(els.pageStatus, `Загрузка товаров...\nTenant ID: ${tenantId}`, "info");
+        showStatus(els.pageStatus, `Р—Р°РіСЂСѓР·РєР° С‚РѕРІР°СЂРѕРІ...\nTenant ID: ${tenantId}`, "info");
 
         const data = await apiGet(`/items?tenant_id=${tenantId}`);
         itemsData = extractList(data, ["items", "data", "rows"]).map(normalizeItem);
@@ -664,16 +664,16 @@
 
         showStatus(
           els.pageStatus,
-          `Данные загружены.\nTenant ID: ${tenantId}\nТоваров: ${itemsData.length}`,
+          `Р”Р°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶РµРЅС‹.\nTenant ID: ${tenantId}\nРўРѕРІР°СЂРѕРІ: ${itemsData.length}`,
           "success"
         );
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="10" class="empty">Ошибка загрузки данных</td>
+            <td colspan="10" class="empty">РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…</td>
           </tr>
         `;
-        showStatus(els.pageStatus, "Ошибка: " + err.message, "error");
+        showStatus(els.pageStatus, "РћС€РёР±РєР°: " + err.message, "error");
       }
     }
 
@@ -692,15 +692,15 @@
         const unit = (els.unit.value || "").trim() || "pcs";
 
         if (!name) {
-          throw new Error("Название обязательно");
+          throw new Error("РќР°Р·РІР°РЅРёРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ");
         }
 
         if (!Number.isFinite(purchase_price) || purchase_price < 0) {
-          throw new Error("Закупочная цена должна быть 0 или больше");
+          throw new Error("Р—Р°РєСѓРїРѕС‡РЅР°СЏ С†РµРЅР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ 0 РёР»Рё Р±РѕР»СЊС€Рµ");
         }
 
         if (!Number.isFinite(sale_price) || sale_price < 0) {
-          throw new Error("Цена продажи должна быть 0 или больше");
+          throw new Error("Р¦РµРЅР° РїСЂРѕРґР°Р¶Рё РґРѕР»Р¶РЅР° Р±С‹С‚СЊ 0 РёР»Рё Р±РѕР»СЊС€Рµ");
         }
 
         const body = {
@@ -714,19 +714,19 @@
         };
 
         if (editId) {
-          showStatus(els.submitStatus, `Сохраняю изменения товара #${editId}...`, "info");
+          showStatus(els.submitStatus, `РЎРѕС…СЂР°РЅСЏСЋ РёР·РјРµРЅРµРЅРёСЏ С‚РѕРІР°СЂР° #${editId}...`, "info");
           await apiPut(`/items/${editId}`, body);
-          showStatus(els.submitStatus, `Товар #${editId} успешно обновлён`, "success");
+          showStatus(els.submitStatus, `РўРѕРІР°СЂ #${editId} СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»С‘РЅ`, "success");
         } else {
-          showStatus(els.submitStatus, "Создаю товар...", "info");
+          showStatus(els.submitStatus, "РЎРѕР·РґР°СЋ С‚РѕРІР°СЂ...", "info");
           await apiPost("/items", body);
-          showStatus(els.submitStatus, "Товар успешно создан", "success");
+          showStatus(els.submitStatus, "РўРѕРІР°СЂ СѓСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅ", "success");
         }
 
         resetForm();
         await loadData();
       } catch (err) {
-        showStatus(els.submitStatus, "Ошибка сохранения: " + err.message, "error");
+        showStatus(els.submitStatus, "РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ: " + err.message, "error");
       }
     }
 

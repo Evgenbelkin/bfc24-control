@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL — Деньги</title>
+  <title>BFC24 CONTROL вЂ” Р”РµРЅСЊРіРё</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -266,63 +266,63 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Деньги</div>
+      <div class="title">Р”РµРЅСЊРіРё</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()">РќР°Р·Р°Рґ</button>
+        <button class="btn btn-light" onclick="logout()">Р’С‹Р№С‚Рё</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтры</h2>
+      <h2 class="card-title">Р¤РёР»СЊС‚СЂС‹</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск по клиенту / товару / комментарию</label>
-          <input id="searchInput" type="text" placeholder="Например: Иванов, Тест товар, наличные" />
+          <label for="searchInput">РџРѕРёСЃРє РїРѕ РєР»РёРµРЅС‚Сѓ / С‚РѕРІР°СЂСѓ / РєРѕРјРјРµРЅС‚Р°СЂРёСЋ</label>
+          <input id="searchInput" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: РРІР°РЅРѕРІ, РўРµСЃС‚ С‚РѕРІР°СЂ, РЅР°Р»РёС‡РЅС‹Рµ" />
         </div>
 
         <div class="field">
-          <label for="typeFilter">Тип движения</label>
+          <label for="typeFilter">РўРёРї РґРІРёР¶РµРЅРёСЏ</label>
           <select id="typeFilter">
-            <option value="">Все</option>
-            <option value="income">Доход</option>
-            <option value="expense">Расход</option>
+            <option value="">Р’СЃРµ</option>
+            <option value="income">Р”РѕС…РѕРґ</option>
+            <option value="expense">Р Р°СЃС…РѕРґ</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="paymentFilter">Способ оплаты</label>
+          <label for="paymentFilter">РЎРїРѕСЃРѕР± РѕРїР»Р°С‚С‹</label>
           <select id="paymentFilter">
-            <option value="">Все</option>
-            <option value="cash">Наличные</option>
-            <option value="card">Карта</option>
-            <option value="transfer">Перевод</option>
-            <option value="consignment">Под реализацию</option>
+            <option value="">Р’СЃРµ</option>
+            <option value="cash">РќР°Р»РёС‡РЅС‹Рµ</option>
+            <option value="card">РљР°СЂС‚Р°</option>
+            <option value="transfer">РџРµСЂРµРІРѕРґ</option>
+            <option value="consignment">РџРѕРґ СЂРµР°Р»РёР·Р°С†РёСЋ</option>
           </select>
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn">РћР±РЅРѕРІРёС‚СЊ</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Записей</div>
+          <div class="stat-label">Р—Р°РїРёСЃРµР№</div>
           <div class="stat-value" id="rowsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Доход</div>
+          <div class="stat-label">Р”РѕС…РѕРґ</div>
           <div class="stat-value" id="incomeTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Расход</div>
+          <div class="stat-label">Р Р°СЃС…РѕРґ</div>
           <div class="stat-value" id="expenseTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Баланс</div>
+          <div class="stat-label">Р‘Р°Р»Р°РЅСЃ</div>
           <div class="stat-value" id="balanceTotal">0</div>
         </div>
       </div>
@@ -331,27 +331,27 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Движения денег</h2>
-      <div class="muted">Показываются денежные операции по продажам, оплатам и другим действиям.</div>
+      <h2 class="card-title">Р”РІРёР¶РµРЅРёСЏ РґРµРЅРµРі</h2>
+      <div class="muted">РџРѕРєР°Р·С‹РІР°СЋС‚СЃСЏ РґРµРЅРµР¶РЅС‹Рµ РѕРїРµСЂР°С†РёРё РїРѕ РїСЂРѕРґР°Р¶Р°Рј, РѕРїР»Р°С‚Р°Рј Рё РґСЂСѓРіРёРј РґРµР№СЃС‚РІРёСЏРј.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Тип</th>
-              <th>Сумма</th>
-              <th>Оплата</th>
-              <th>Клиент</th>
-              <th>Товар</th>
-              <th>Категория</th>
-              <th>Комментарий</th>
-              <th>Дата</th>
+              <th>РўРёРї</th>
+              <th>РЎСѓРјРјР°</th>
+              <th>РћРїР»Р°С‚Р°</th>
+              <th>РљР»РёРµРЅС‚</th>
+              <th>РўРѕРІР°СЂ</th>
+              <th>РљР°С‚РµРіРѕСЂРёСЏ</th>
+              <th>РљРѕРјРјРµРЅС‚Р°СЂРёР№</th>
+              <th>Р”Р°С‚Р°</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="9" class="empty">Загрузка данных...</td>
+              <td colspan="9" class="empty">Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...</td>
             </tr>
           </tbody>
         </table>
@@ -360,7 +360,7 @@
   </div>
 
   <script>
-    const API_BASE = "http://localhost:3003";
+    const API_BASE = "";
     const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
@@ -465,18 +465,18 @@
     }
 
     function paymentLabel(value) {
-      if (value === "cash") return "Наличные";
-      if (value === "card") return "Карта";
-      if (value === "transfer") return "Перевод";
-      if (value === "consignment") return "Под реализацию";
+      if (value === "cash") return "РќР°Р»РёС‡РЅС‹Рµ";
+      if (value === "card") return "РљР°СЂС‚Р°";
+      if (value === "transfer") return "РџРµСЂРµРІРѕРґ";
+      if (value === "consignment") return "РџРѕРґ СЂРµР°Р»РёР·Р°С†РёСЋ";
       return value || "";
     }
 
     function typeBadge(type) {
       if (type === "expense") {
-        return `<span class="badge badge-expense">Расход</span>`;
+        return `<span class="badge badge-expense">Р Р°СЃС…РѕРґ</span>`;
       }
-      return `<span class="badge badge-income">Доход</span>`;
+      return `<span class="badge badge-income">Р”РѕС…РѕРґ</span>`;
     }
 
     async function apiGet(path) {
@@ -563,7 +563,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="empty">Нет данных</td>
+            <td colspan="9" class="empty">РќРµС‚ РґР°РЅРЅС‹С…</td>
           </tr>
         `;
         return;
@@ -587,7 +587,7 @@
     async function loadData() {
       try {
         const tenantId = getTenantId();
-        showStatus(`Загрузка денег...\nTenant ID: ${tenantId}`, "info");
+        showStatus(`Р—Р°РіСЂСѓР·РєР° РґРµРЅРµРі...\nTenant ID: ${tenantId}`, "info");
 
         const [cashRes, summaryRes] = await Promise.all([
           apiGet(`/cash?tenant_id=${tenantId}`),
@@ -604,16 +604,16 @@
         renderTable();
 
         showStatus(
-          `Данные загружены.\nTenant ID: ${tenantId}\nЗаписей: ${cashData.length}`,
+          `Р”Р°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶РµРЅС‹.\nTenant ID: ${tenantId}\nР—Р°РїРёСЃРµР№: ${cashData.length}`,
           "success"
         );
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="empty">Ошибка загрузки данных</td>
+            <td colspan="9" class="empty">РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…</td>
           </tr>
         `;
-        showStatus("Ошибка: " + err.message, "error");
+        showStatus("РћС€РёР±РєР°: " + err.message, "error");
       }
     }
 

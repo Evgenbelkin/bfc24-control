@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL — Продажа</title>
+  <title>BFC24 CONTROL вЂ” РџСЂРѕРґР°Р¶Р°</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{
@@ -294,33 +294,33 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Продажа</div>
+      <div class="title">РџСЂРѕРґР°Р¶Р°</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()">РќР°Р·Р°Рґ</button>
+        <button class="btn btn-light" onclick="logout()">Р’С‹Р№С‚Рё</button>
       </div>
     </div>
 
     <div class="grid">
       <div class="card">
-        <h2 class="card-title">Новая продажа</h2>
-        <div class="muted">Экран работает с backend SaaS. Для owner tenant_id передаётся обязательно.</div>
+        <h2 class="card-title">РќРѕРІР°СЏ РїСЂРѕРґР°Р¶Р°</h2>
+        <div class="muted">Р­РєСЂР°РЅ СЂР°Р±РѕС‚Р°РµС‚ СЃ backend SaaS. Р”Р»СЏ owner tenant_id РїРµСЂРµРґР°С‘С‚СЃСЏ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ.</div>
 
         <div class="stats">
           <div class="stat">
-            <div class="stat-label">Товаров загружено</div>
+            <div class="stat-label">РўРѕРІР°СЂРѕРІ Р·Р°РіСЂСѓР¶РµРЅРѕ</div>
             <div class="stat-value" id="itemsCount">0</div>
           </div>
           <div class="stat">
-            <div class="stat-label">Мест хранения</div>
+            <div class="stat-label">РњРµСЃС‚ С…СЂР°РЅРµРЅРёСЏ</div>
             <div class="stat-value" id="locationsCount">0</div>
           </div>
           <div class="stat">
-            <div class="stat-label">Клиентов</div>
+            <div class="stat-label">РљР»РёРµРЅС‚РѕРІ</div>
             <div class="stat-value" id="clientsCount">0</div>
           </div>
           <div class="stat">
-            <div class="stat-label">Остатков загружено</div>
+            <div class="stat-label">РћСЃС‚Р°С‚РєРѕРІ Р·Р°РіСЂСѓР¶РµРЅРѕ</div>
             <div class="stat-value" id="stockCount">0</div>
           </div>
         </div>
@@ -332,26 +332,26 @@
             <div class="field">
               <label for="tenantId">Tenant ID</label>
               <input id="tenantId" type="number" min="1" value="1" />
-              <div class="hint">Для owner обязательно.</div>
+              <div class="hint">Р”Р»СЏ owner РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ.</div>
             </div>
 
             <div class="field">
-              <label for="paymentMethod">Способ оплаты</label>
+              <label for="paymentMethod">РЎРїРѕСЃРѕР± РѕРїР»Р°С‚С‹</label>
               <select id="paymentMethod">
-                <option value="cash">Наличные</option>
-                <option value="card">Карта</option>
-                <option value="transfer">Перевод</option>
-                <option value="consignment">Под реализацию</option>
+                <option value="cash">РќР°Р»РёС‡РЅС‹Рµ</option>
+                <option value="card">РљР°СЂС‚Р°</option>
+                <option value="transfer">РџРµСЂРµРІРѕРґ</option>
+                <option value="consignment">РџРѕРґ СЂРµР°Р»РёР·Р°С†РёСЋ</option>
               </select>
             </div>
 
             <div class="field full">
-              <label for="itemSearch">Товар</label>
+              <label for="itemSearch">РўРѕРІР°СЂ</label>
               <div class="autocomplete">
                 <input
                   id="itemSearch"
                   type="text"
-                  placeholder="Начни вводить название, штрихкод, SKU или артикул"
+                  placeholder="РќР°С‡РЅРё РІРІРѕРґРёС‚СЊ РЅР°Р·РІР°РЅРёРµ, С€С‚СЂРёС…РєРѕРґ, SKU РёР»Рё Р°СЂС‚РёРєСѓР»"
                   autocomplete="off"
                 />
                 <div id="itemResults" class="results"></div>
@@ -360,38 +360,38 @@
             </div>
 
             <div class="field">
-              <label for="locationId">Место хранения</label>
+              <label for="locationId">РњРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ</label>
               <select id="locationId">
-                <option value="">Выберите МХ</option>
+                <option value="">Р’С‹Р±РµСЂРёС‚Рµ РњРҐ</option>
               </select>
             </div>
 
             <div class="field">
-              <label for="counterpartyId">Клиент</label>
+              <label for="counterpartyId">РљР»РёРµРЅС‚</label>
               <select id="counterpartyId">
-                <option value="">Без клиента</option>
+                <option value="">Р‘РµР· РєР»РёРµРЅС‚Р°</option>
               </select>
             </div>
 
             <div class="field">
-              <label for="qty">Количество</label>
+              <label for="qty">РљРѕР»РёС‡РµСЃС‚РІРѕ</label>
               <input id="qty" type="number" min="1" step="1" value="1" />
             </div>
 
             <div class="field">
-              <label for="price">Цена за единицу</label>
+              <label for="price">Р¦РµРЅР° Р·Р° РµРґРёРЅРёС†Сѓ</label>
               <input id="price" type="number" min="0" step="0.01" value="0" />
             </div>
 
             <div class="field full">
-              <label for="comment">Комментарий</label>
-              <textarea id="comment" placeholder="Комментарий к продаже"></textarea>
+              <label for="comment">РљРѕРјРјРµРЅС‚Р°СЂРёР№</label>
+              <textarea id="comment" placeholder="РљРѕРјРјРµРЅС‚Р°СЂРёР№ Рє РїСЂРѕРґР°Р¶Рµ"></textarea>
             </div>
           </div>
 
           <div class="inline" style="margin-top:18px;">
-            <button type="submit" class="btn btn-primary">Провести продажу</button>
-            <button type="button" class="btn btn-light" onclick="loadInitialData()">Обновить данные</button>
+            <button type="submit" class="btn btn-primary">РџСЂРѕРІРµСЃС‚Рё РїСЂРѕРґР°Р¶Сѓ</button>
+            <button type="button" class="btn btn-light" onclick="loadInitialData()">РћР±РЅРѕРІРёС‚СЊ РґР°РЅРЅС‹Рµ</button>
           </div>
         </form>
 
@@ -401,7 +401,7 @@
   </div>
 
   <script>
-    const API_BASE = 'http://localhost:3003';
+    const API_BASE = '';
     const FALLBACK_TENANT_ID = 1;
 
     let authUser = null;
@@ -592,25 +592,25 @@
       if (stockQty !== null) {
         stockInfo = `
           <div class="selected-stock ${stockQty <= 0 ? 'zero' : ''}">
-            Остаток на выбранном МХ: ${stockQty}
+            РћСЃС‚Р°С‚РѕРє РЅР° РІС‹Р±СЂР°РЅРЅРѕРј РњРҐ: ${stockQty}
           </div>
         `;
       } else {
         stockInfo = `
           <div class="selected-stock">
-            Выбери место хранения, чтобы увидеть остаток
+            Р’С‹Р±РµСЂРё РјРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ, С‡С‚РѕР±С‹ СѓРІРёРґРµС‚СЊ РѕСЃС‚Р°С‚РѕРє
           </div>
         `;
       }
 
       els.selectedItemBox.classList.add('active');
       els.selectedItemBox.innerHTML = `
-        <div><strong>Выбран товар:</strong> ${escapeHtml(selectedItem.name || 'Без названия')}</div>
+        <div><strong>Р’С‹Р±СЂР°РЅ С‚РѕРІР°СЂ:</strong> ${escapeHtml(selectedItem.name || 'Р‘РµР· РЅР°Р·РІР°РЅРёСЏ')}</div>
         <div class="muted" style="margin-top:6px;">
           ID: ${escapeHtml(String(selectedItem.id ?? ''))}
           ${selectedItem.sku ? ' | SKU: ' + escapeHtml(selectedItem.sku) : ''}
-          ${selectedItem.barcode ? ' | ШК: ' + escapeHtml(selectedItem.barcode) : ''}
-          ${selectedItem.vendor_code ? ' | Артикул: ' + escapeHtml(selectedItem.vendor_code) : ''}
+          ${selectedItem.barcode ? ' | РЁРљ: ' + escapeHtml(selectedItem.barcode) : ''}
+          ${selectedItem.vendor_code ? ' | РђСЂС‚РёРєСѓР»: ' + escapeHtml(selectedItem.vendor_code) : ''}
         </div>
         ${stockInfo}
       `;
@@ -620,8 +620,8 @@
       if (!items.length) {
         els.itemResults.innerHTML = `
           <div class="result-item">
-            <div class="result-title">Ничего не найдено</div>
-            <div class="result-sub">Проверь название, штрихкод, SKU или артикул.</div>
+            <div class="result-title">РќРёС‡РµРіРѕ РЅРµ РЅР°Р№РґРµРЅРѕ</div>
+            <div class="result-sub">РџСЂРѕРІРµСЂСЊ РЅР°Р·РІР°РЅРёРµ, С€С‚СЂРёС…РєРѕРґ, SKU РёР»Рё Р°СЂС‚РёРєСѓР».</div>
           </div>
         `;
         els.itemResults.style.display = 'block';
@@ -630,12 +630,12 @@
 
       els.itemResults.innerHTML = items.map(item => `
         <div class="result-item" data-id="${escapeHtml(String(item.id))}">
-          <div class="result-title">${escapeHtml(item.name || 'Без названия')}</div>
+          <div class="result-title">${escapeHtml(item.name || 'Р‘РµР· РЅР°Р·РІР°РЅРёСЏ')}</div>
           <div class="result-sub">
             ID: ${escapeHtml(String(item.id ?? ''))}
             ${item.sku ? ' | SKU: ' + escapeHtml(item.sku) : ''}
-            ${item.barcode ? ' | ШК: ' + escapeHtml(item.barcode) : ''}
-            ${item.vendor_code ? ' | Артикул: ' + escapeHtml(item.vendor_code) : ''}
+            ${item.barcode ? ' | РЁРљ: ' + escapeHtml(item.barcode) : ''}
+            ${item.vendor_code ? ' | РђСЂС‚РёРєСѓР»: ' + escapeHtml(item.vendor_code) : ''}
           </div>
         </div>
       `).join('');
@@ -661,7 +661,7 @@
     }
 
     function fillLocations() {
-      els.locationId.innerHTML = `<option value="">Выберите МХ</option>` +
+      els.locationId.innerHTML = `<option value="">Р’С‹Р±РµСЂРёС‚Рµ РњРҐ</option>` +
         allLocations.map(loc => `
           <option value="${escapeHtml(String(loc.id))}">
             ${escapeHtml(loc.name || '')}${loc.code ? ' (' + escapeHtml(loc.code) + ')' : ''}
@@ -670,7 +670,7 @@
     }
 
     function fillClients() {
-      els.counterpartyId.innerHTML = `<option value="">Без клиента</option>` +
+      els.counterpartyId.innerHTML = `<option value="">Р‘РµР· РєР»РёРµРЅС‚Р°</option>` +
         allClients.map(client => `
           <option value="${escapeHtml(String(client.id))}">
             ${escapeHtml(client.name || '')}
@@ -680,7 +680,7 @@
 
     async function loadItems() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error('Укажи tenant_id');
+      if (!tenantId) throw new Error('РЈРєР°Р¶Рё tenant_id');
 
       const data = await apiGet(`/items?tenant_id=${tenantId}`);
       const items = extractList(data, ['items', 'data', 'rows'])
@@ -692,7 +692,7 @@
 
     async function loadLocations() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error('Укажи tenant_id');
+      if (!tenantId) throw new Error('РЈРєР°Р¶Рё tenant_id');
 
       const data = await apiGet(`/locations?tenant_id=${tenantId}`);
       allLocations = extractList(data, ['locations', 'data', 'rows']);
@@ -702,7 +702,7 @@
 
     async function loadClients() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error('Укажи tenant_id');
+      if (!tenantId) throw new Error('РЈРєР°Р¶Рё tenant_id');
 
       const data = await apiGet(`/clients?tenant_id=${tenantId}`);
       allClients = extractList(data, ['clients', 'counterparties', 'data', 'rows']);
@@ -712,7 +712,7 @@
 
     async function loadStock() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error('Укажи tenant_id');
+      if (!tenantId) throw new Error('РЈРєР°Р¶Рё tenant_id');
 
       const data = await apiGet(`/stock?tenant_id=${tenantId}`);
       const rows = extractList(data, ['stock', 'data', 'rows']).map(normalizeStockRow);
@@ -731,7 +731,7 @@
       hideStatus(els.pageStatus);
 
       try {
-        showStatus(els.pageStatus, 'Загрузка данных...', 'info');
+        showStatus(els.pageStatus, 'Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...', 'info');
         selectedItem = null;
         renderSelectedItem();
         els.itemResults.style.display = 'none';
@@ -747,11 +747,11 @@
 
         showStatus(
           els.pageStatus,
-          `Данные загружены.\nТоваров: ${allItems.length}, МХ: ${allLocations.length}, клиентов: ${allClients.length}, остатков: ${els.stockCount.textContent}`,
+          `Р”Р°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶РµРЅС‹.\nРўРѕРІР°СЂРѕРІ: ${allItems.length}, РњРҐ: ${allLocations.length}, РєР»РёРµРЅС‚РѕРІ: ${allClients.length}, РѕСЃС‚Р°С‚РєРѕРІ: ${els.stockCount.textContent}`,
           'success'
         );
       } catch (err) {
-        showStatus(els.pageStatus, 'Ошибка загрузки данных: ' + err.message, 'error');
+        showStatus(els.pageStatus, 'РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…: ' + err.message, 'error');
       }
     }
 
@@ -785,23 +785,23 @@
 
       try {
         const tenantId = getTenantId();
-        if (!tenantId) throw new Error('Укажи tenant_id');
-        if (!selectedItem || !selectedItem.id) throw new Error('Выбери товар из списка');
-        if (!els.locationId.value) throw new Error('Выбери место хранения');
+        if (!tenantId) throw new Error('РЈРєР°Р¶Рё tenant_id');
+        if (!selectedItem || !selectedItem.id) throw new Error('Р’С‹Р±РµСЂРё С‚РѕРІР°СЂ РёР· СЃРїРёСЃРєР°');
+        if (!els.locationId.value) throw new Error('Р’С‹Р±РµСЂРё РјРµСЃС‚Рѕ С…СЂР°РЅРµРЅРёСЏ');
 
         const qty = Number(els.qty.value);
-        if (!Number.isFinite(qty) || qty <= 0) throw new Error('Количество должно быть больше 0');
+        if (!Number.isFinite(qty) || qty <= 0) throw new Error('РљРѕР»РёС‡РµСЃС‚РІРѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 0');
 
         const price = Number(els.price.value || 0);
-        if (!Number.isFinite(price) || price < 0) throw new Error('Цена не может быть отрицательной');
+        if (!Number.isFinite(price) || price < 0) throw new Error('Р¦РµРЅР° РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕР№');
 
         const stockQty = getCurrentStockQty();
         if (stockQty === null) {
-          throw new Error('Не удалось определить остаток по выбранному месту хранения');
+          throw new Error('РќРµ СѓРґР°Р»РѕСЃСЊ РѕРїСЂРµРґРµР»РёС‚СЊ РѕСЃС‚Р°С‚РѕРє РїРѕ РІС‹Р±СЂР°РЅРЅРѕРјСѓ РјРµСЃС‚Сѓ С…СЂР°РЅРµРЅРёСЏ');
         }
 
         if (qty > stockQty) {
-          throw new Error(`Недостаточно товара. Остаток: ${stockQty}`);
+          throw new Error(`РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ С‚РѕРІР°СЂР°. РћСЃС‚Р°С‚РѕРє: ${stockQty}`);
         }
 
         const paymentMethod = els.paymentMethod.value;
@@ -822,7 +822,7 @@
           body.counterparty_id = Number(els.counterpartyId.value);
         }
 
-        showStatus(els.submitStatus, 'Провожу продажу...', 'info');
+        showStatus(els.submitStatus, 'РџСЂРѕРІРѕР¶Сѓ РїСЂРѕРґР°Р¶Сѓ...', 'info');
 
         const result = await apiPost('/sales/sell', body);
 
@@ -831,7 +831,7 @@
 
         showStatus(
           els.submitStatus,
-          'Продажа успешно проведена.\n\n' + JSON.stringify(result, null, 2),
+          'РџСЂРѕРґР°Р¶Р° СѓСЃРїРµС€РЅРѕ РїСЂРѕРІРµРґРµРЅР°.\n\n' + JSON.stringify(result, null, 2),
           'success'
         );
 
@@ -846,7 +846,7 @@
         renderSelectedItem();
         els.itemResults.style.display = 'none';
       } catch (err) {
-        showStatus(els.submitStatus, 'Ошибка продажи: ' + err.message, 'error');
+        showStatus(els.submitStatus, 'РћС€РёР±РєР° РїСЂРѕРґР°Р¶Рё: ' + err.message, 'error');
       }
     }
 
@@ -897,3 +897,4 @@
   </script>
 </body>
 </html>
+

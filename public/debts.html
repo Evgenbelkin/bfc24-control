@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL — Долги клиентов</title>
+  <title>BFC24 CONTROL вЂ” Р”РѕР»РіРё РєР»РёРµРЅС‚РѕРІ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -301,57 +301,57 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Долги клиентов</div>
+      <div class="title">Р”РѕР»РіРё РєР»РёРµРЅС‚РѕРІ</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()">РќР°Р·Р°Рґ</button>
+        <button class="btn btn-light" onclick="logout()">Р’С‹Р№С‚Рё</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтры</h2>
+      <h2 class="card-title">Р¤РёР»СЊС‚СЂС‹</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск по клиенту / товару / комментарию</label>
-          <input id="searchInput" type="text" placeholder="Например: Иванов, Тест товар, реализация" />
+          <label for="searchInput">РџРѕРёСЃРє РїРѕ РєР»РёРµРЅС‚Сѓ / С‚РѕРІР°СЂСѓ / РєРѕРјРјРµРЅС‚Р°СЂРёСЋ</label>
+          <input id="searchInput" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: РРІР°РЅРѕРІ, РўРµСЃС‚ С‚РѕРІР°СЂ, СЂРµР°Р»РёР·Р°С†РёСЏ" />
         </div>
 
         <div class="field">
-          <label for="statusFilter">Статус</label>
+          <label for="statusFilter">РЎС‚Р°С‚СѓСЃ</label>
           <select id="statusFilter">
-            <option value="">Все</option>
-            <option value="open">Открыт</option>
-            <option value="partial">Частично оплачен</option>
-            <option value="paid">Оплачен</option>
+            <option value="">Р’СЃРµ</option>
+            <option value="open">РћС‚РєСЂС‹С‚</option>
+            <option value="partial">Р§Р°СЃС‚РёС‡РЅРѕ РѕРїР»Р°С‡РµРЅ</option>
+            <option value="paid">РћРїР»Р°С‡РµРЅ</option>
           </select>
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn">РћР±РЅРѕРІРёС‚СЊ</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Всего долгов</div>
+          <div class="stat-label">Р’СЃРµРіРѕ РґРѕР»РіРѕРІ</div>
           <div class="stat-value" id="totalCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Открытых</div>
+          <div class="stat-label">РћС‚РєСЂС‹С‚С‹С…</div>
           <div class="stat-value" id="openCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Частично оплачено</div>
+          <div class="stat-label">Р§Р°СЃС‚РёС‡РЅРѕ РѕРїР»Р°С‡РµРЅРѕ</div>
           <div class="stat-value" id="partialCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Оплачено</div>
+          <div class="stat-label">РћРїР»Р°С‡РµРЅРѕ</div>
           <div class="stat-value" id="paidCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Остаток к оплате</div>
+          <div class="stat-label">РћСЃС‚Р°С‚РѕРє Рє РѕРїР»Р°С‚Рµ</div>
           <div class="stat-value" id="balanceTotal">0</div>
         </div>
       </div>
@@ -360,30 +360,30 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Список долгов</h2>
-      <div class="muted">Можно принимать частичную или полную оплату по каждому долгу.</div>
+      <h2 class="card-title">РЎРїРёСЃРѕРє РґРѕР»РіРѕРІ</h2>
+      <div class="muted">РњРѕР¶РЅРѕ РїСЂРёРЅРёРјР°С‚СЊ С‡Р°СЃС‚РёС‡РЅСѓСЋ РёР»Рё РїРѕР»РЅСѓСЋ РѕРїР»Р°С‚Сѓ РїРѕ РєР°Р¶РґРѕРјСѓ РґРѕР»РіСѓ.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Клиент</th>
-              <th>Товар</th>
-              <th>МХ</th>
-              <th>Кол-во</th>
-              <th>Сумма</th>
-              <th>Оплачено</th>
-              <th>Остаток</th>
-              <th>Статус</th>
-              <th>Комментарий</th>
-              <th>Дата</th>
-              <th>Оплата</th>
+              <th>РљР»РёРµРЅС‚</th>
+              <th>РўРѕРІР°СЂ</th>
+              <th>РњРҐ</th>
+              <th>РљРѕР»-РІРѕ</th>
+              <th>РЎСѓРјРјР°</th>
+              <th>РћРїР»Р°С‡РµРЅРѕ</th>
+              <th>РћСЃС‚Р°С‚РѕРє</th>
+              <th>РЎС‚Р°С‚СѓСЃ</th>
+              <th>РљРѕРјРјРµРЅС‚Р°СЂРёР№</th>
+              <th>Р”Р°С‚Р°</th>
+              <th>РћРїР»Р°С‚Р°</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="12" class="empty">Загрузка данных...</td>
+              <td colspan="12" class="empty">Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...</td>
             </tr>
           </tbody>
         </table>
@@ -392,7 +392,7 @@
   </div>
 
   <script>
-    const API_BASE = "http://localhost:3003";
+    const API_BASE = "";
     const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
@@ -493,12 +493,12 @@
 
     function getStatusBadge(status) {
       if (status === "paid") {
-        return `<span class="badge badge-paid">Оплачен</span>`;
+        return `<span class="badge badge-paid">РћРїР»Р°С‡РµРЅ</span>`;
       }
       if (status === "partial") {
-        return `<span class="badge badge-partial">Частично оплачен</span>`;
+        return `<span class="badge badge-partial">Р§Р°СЃС‚РёС‡РЅРѕ РѕРїР»Р°С‡РµРЅ</span>`;
       }
-      return `<span class="badge badge-open">Открыт</span>`;
+      return `<span class="badge badge-open">РћС‚РєСЂС‹С‚</span>`;
     }
 
     async function apiGet(path) {
@@ -621,7 +621,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="12" class="empty">Нет данных</td>
+            <td colspan="12" class="empty">РќРµС‚ РґР°РЅРЅС‹С…</td>
           </tr>
         `;
         return;
@@ -645,16 +645,16 @@
             <td>
               <div class="pay-box">
                 <div class="pay-row">
-                  <input type="number" min="0.01" step="0.01" placeholder="Сумма" id="pay_amount_${escapeHtml(row.id)}" ${payDisabled} />
+                  <input type="number" min="0.01" step="0.01" placeholder="РЎСѓРјРјР°" id="pay_amount_${escapeHtml(row.id)}" ${payDisabled} />
                   <select id="pay_method_${escapeHtml(row.id)}" ${payDisabled}>
-                    <option value="cash">Наличные</option>
-                    <option value="card">Карта</option>
-                    <option value="transfer">Перевод</option>
+                    <option value="cash">РќР°Р»РёС‡РЅС‹Рµ</option>
+                    <option value="card">РљР°СЂС‚Р°</option>
+                    <option value="transfer">РџРµСЂРµРІРѕРґ</option>
                   </select>
                 </div>
-                <input type="text" placeholder="Комментарий к оплате" id="pay_comment_${escapeHtml(row.id)}" ${payDisabled} />
-                <button type="button" class="btn btn-success" onclick="payDebt('${escapeHtml(row.id)}')" ${payDisabled}>Принять оплату</button>
-                <div class="small">Остаток: ${escapeHtml(formatMoney(row.balance_amount))}</div>
+                <input type="text" placeholder="РљРѕРјРјРµРЅС‚Р°СЂРёР№ Рє РѕРїР»Р°С‚Рµ" id="pay_comment_${escapeHtml(row.id)}" ${payDisabled} />
+                <button type="button" class="btn btn-success" onclick="payDebt('${escapeHtml(row.id)}')" ${payDisabled}>РџСЂРёРЅСЏС‚СЊ РѕРїР»Р°С‚Сѓ</button>
+                <div class="small">РћСЃС‚Р°С‚РѕРє: ${escapeHtml(formatMoney(row.balance_amount))}</div>
               </div>
             </td>
           </tr>
@@ -665,21 +665,21 @@
     async function loadData() {
       try {
         const tenantId = getTenantId();
-        showStatus(`Загрузка долгов...\nTenant ID: ${tenantId}`, "info");
+        showStatus(`Р—Р°РіСЂСѓР·РєР° РґРѕР»РіРѕРІ...\nTenant ID: ${tenantId}`, "info");
 
         const data = await apiGet(`/debts?tenant_id=${tenantId}`);
         debtsData = extractList(data, ["debts", "data", "rows"]).map(normalizeDebt);
 
         renderTable();
 
-        showStatus(`Данные загружены.\nTenant ID: ${tenantId}\nДолгов: ${debtsData.length}`, "success");
+        showStatus(`Р”Р°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶РµРЅС‹.\nTenant ID: ${tenantId}\nР”РѕР»РіРѕРІ: ${debtsData.length}`, "success");
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="12" class="empty">Ошибка загрузки данных</td>
+            <td colspan="12" class="empty">РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…</td>
           </tr>
         `;
-        showStatus("Ошибка: " + err.message, "error");
+        showStatus("РћС€РёР±РєР°: " + err.message, "error");
       }
     }
 
@@ -692,12 +692,12 @@
         const commentEl = document.getElementById(`pay_comment_${debtId}`);
 
         if (!amountEl) {
-          throw new Error("Поле суммы не найдено");
+          throw new Error("РџРѕР»Рµ СЃСѓРјРјС‹ РЅРµ РЅР°Р№РґРµРЅРѕ");
         }
 
         const amount = Number(amountEl.value);
         if (!amount || amount <= 0) {
-          throw new Error("Укажи корректную сумму оплаты");
+          throw new Error("РЈРєР°Р¶Рё РєРѕСЂСЂРµРєС‚РЅСѓСЋ СЃСѓРјРјСѓ РѕРїР»Р°С‚С‹");
         }
 
         const body = {
@@ -707,14 +707,14 @@
           comment: commentEl ? ((commentEl.value || "").trim() || null) : null
         };
 
-        showStatus(`Провожу оплату по долгу #${debtId}...\nTenant ID: ${tenantId}`, "info");
+        showStatus(`РџСЂРѕРІРѕР¶Сѓ РѕРїР»Р°С‚Сѓ РїРѕ РґРѕР»РіСѓ #${debtId}...\nTenant ID: ${tenantId}`, "info");
 
         await apiPost(`/debts/${debtId}/pay`, body);
 
-        showStatus(`Оплата по долгу #${debtId} успешно проведена`, "success");
+        showStatus(`РћРїР»Р°С‚Р° РїРѕ РґРѕР»РіСѓ #${debtId} СѓСЃРїРµС€РЅРѕ РїСЂРѕРІРµРґРµРЅР°`, "success");
         await loadData();
       } catch (err) {
-        showStatus("Ошибка оплаты: " + err.message, "error");
+        showStatus("РћС€РёР±РєР° РѕРїР»Р°С‚С‹: " + err.message, "error");
       }
     }
 

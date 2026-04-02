@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL — Клиенты</title>
+  <title>BFC24 CONTROL вЂ” РљР»РёРµРЅС‚С‹</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -279,20 +279,20 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Клиенты</div>
+      <div class="title">РљР»РёРµРЅС‚С‹</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()">РќР°Р·Р°Рґ</button>
+        <button class="btn btn-light" onclick="logout()">Р’С‹Р№С‚Рё</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title" id="formTitle">Создать клиента</h2>
-      <div class="muted">Карточка клиента для продаж, долгов и денежных операций.</div>
+      <h2 class="card-title" id="formTitle">РЎРѕР·РґР°С‚СЊ РєР»РёРµРЅС‚Р°</h2>
+      <div class="muted">РљР°СЂС‚РѕС‡РєР° РєР»РёРµРЅС‚Р° РґР»СЏ РїСЂРѕРґР°Р¶, РґРѕР»РіРѕРІ Рё РґРµРЅРµР¶РЅС‹С… РѕРїРµСЂР°С†РёР№.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Клиентов</div>
+          <div class="stat-label">РљР»РёРµРЅС‚РѕРІ</div>
           <div class="stat-value" id="clientsCount">0</div>
         </div>
         <div class="stat">
@@ -304,31 +304,31 @@
       <form id="clientForm" autocomplete="off" style="margin-top:18px;">
         <div class="form-grid">
           <div class="field">
-            <label for="name">Имя</label>
-            <input id="name" type="text" placeholder="Например: ИП Иванов" />
+            <label for="name">РРјСЏ</label>
+            <input id="name" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: РРџ РРІР°РЅРѕРІ" />
           </div>
 
           <div class="field">
-            <label for="phone">Телефон</label>
-            <input id="phone" type="text" placeholder="Например: 79991234567" />
+            <label for="phone">РўРµР»РµС„РѕРЅ</label>
+            <input id="phone" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: 79991234567" />
           </div>
 
           <div class="field full">
-            <label for="comment">Комментарий</label>
-            <textarea id="comment" placeholder="Примечание по клиенту"></textarea>
+            <label for="comment">РљРѕРјРјРµРЅС‚Р°СЂРёР№</label>
+            <textarea id="comment" placeholder="РџСЂРёРјРµС‡Р°РЅРёРµ РїРѕ РєР»РёРµРЅС‚Сѓ"></textarea>
           </div>
         </div>
 
         <div class="toolbar">
           <div class="field">
-            <label for="searchInput">Поиск</label>
-            <input id="searchInput" type="text" placeholder="Поиск по имени, телефону, комментарию" />
+            <label for="searchInput">РџРѕРёСЃРє</label>
+            <input id="searchInput" type="text" placeholder="РџРѕРёСЃРє РїРѕ РёРјРµРЅРё, С‚РµР»РµС„РѕРЅСѓ, РєРѕРјРјРµРЅС‚Р°СЂРёСЋ" />
           </div>
 
           <div class="toolbar-actions">
-            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
-            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
-            <button type="button" class="btn btn-light" id="refreshBtn">Обновить список</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">РЎРѕС…СЂР°РЅРёС‚СЊ</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">РћС‚РјРµРЅРёС‚СЊ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ</button>
+            <button type="button" class="btn btn-light" id="refreshBtn">РћР±РЅРѕРІРёС‚СЊ СЃРїРёСЃРѕРє</button>
           </div>
         </div>
       </form>
@@ -338,24 +338,24 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Список клиентов</h2>
+      <h2 class="card-title">РЎРїРёСЃРѕРє РєР»РёРµРЅС‚РѕРІ</h2>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Имя</th>
-              <th>Телефон</th>
-              <th>Комментарий</th>
-              <th>Активно</th>
-              <th>Дата</th>
-              <th>Действия</th>
+              <th>РРјСЏ</th>
+              <th>РўРµР»РµС„РѕРЅ</th>
+              <th>РљРѕРјРјРµРЅС‚Р°СЂРёР№</th>
+              <th>РђРєС‚РёРІРЅРѕ</th>
+              <th>Р”Р°С‚Р°</th>
+              <th>Р”РµР№СЃС‚РІРёСЏ</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="7" class="empty">Загрузка данных...</td>
+              <td colspan="7" class="empty">Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...</td>
             </tr>
           </tbody>
         </table>
@@ -364,7 +364,7 @@
   </div>
 
   <script>
-    const API_BASE = "http://localhost:3003";
+    const API_BASE = "";
     const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
@@ -545,8 +545,8 @@
 
     function resetForm() {
       editId = null;
-      els.formTitle.textContent = "Создать клиента";
-      els.saveBtn.textContent = "Сохранить";
+      els.formTitle.textContent = "РЎРѕР·РґР°С‚СЊ РєР»РёРµРЅС‚Р°";
+      els.saveBtn.textContent = "РЎРѕС…СЂР°РЅРёС‚СЊ";
       els.cancelEditBtn.style.display = "none";
       els.name.value = "";
       els.phone.value = "";
@@ -556,8 +556,8 @@
 
     function startEdit(client) {
       editId = client.id;
-      els.formTitle.textContent = `Редактировать клиента #${client.id}`;
-      els.saveBtn.textContent = "Сохранить изменения";
+      els.formTitle.textContent = `Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РєР»РёРµРЅС‚Р° #${client.id}`;
+      els.saveBtn.textContent = "РЎРѕС…СЂР°РЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ";
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = client.name || "";
       els.phone.value = client.phone || "";
@@ -588,7 +588,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="empty">Нет данных</td>
+            <td colspan="7" class="empty">РќРµС‚ РґР°РЅРЅС‹С…</td>
           </tr>
         `;
         return;
@@ -600,11 +600,11 @@
           <td>${escapeHtml(row.name)}</td>
           <td>${escapeHtml(row.phone)}</td>
           <td>${escapeHtml(row.comment)}</td>
-          <td>${row.is_active ? "Да" : "Нет"}</td>
+          <td>${row.is_active ? "Р”Р°" : "РќРµС‚"}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
           <td>
             <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editClient('${escapeHtml(row.id)}')">Редактировать</button>
+              <button type="button" class="btn btn-secondary" onclick="editClient('${escapeHtml(row.id)}')">Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ</button>
             </div>
           </td>
         </tr>
@@ -615,7 +615,7 @@
       try {
         const tenantId = getTenantId();
         els.tenantValue.textContent = String(tenantId);
-        showStatus(els.pageStatus, `Загрузка клиентов...\nTenant ID: ${tenantId}`, "info");
+        showStatus(els.pageStatus, `Р—Р°РіСЂСѓР·РєР° РєР»РёРµРЅС‚РѕРІ...\nTenant ID: ${tenantId}`, "info");
 
         const data = await apiGet(`/clients?tenant_id=${tenantId}`);
         clientsData = extractList(data, ["clients", "counterparties", "data", "rows"]).map(normalizeClient);
@@ -624,16 +624,16 @@
 
         showStatus(
           els.pageStatus,
-          `Данные загружены.\nTenant ID: ${tenantId}\nКлиентов: ${clientsData.length}`,
+          `Р”Р°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶РµРЅС‹.\nTenant ID: ${tenantId}\nРљР»РёРµРЅС‚РѕРІ: ${clientsData.length}`,
           "success"
         );
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="empty">Ошибка загрузки данных</td>
+            <td colspan="7" class="empty">РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…</td>
           </tr>
         `;
-        showStatus(els.pageStatus, "Ошибка: " + err.message, "error");
+        showStatus(els.pageStatus, "РћС€РёР±РєР°: " + err.message, "error");
       }
     }
 
@@ -648,7 +648,7 @@
         const comment = (els.comment.value || "").trim();
 
         if (!name) {
-          throw new Error("Имя обязательно");
+          throw new Error("РРјСЏ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ");
         }
 
         const body = {
@@ -659,19 +659,19 @@
         };
 
         if (editId) {
-          showStatus(els.submitStatus, `Сохраняю изменения клиента #${editId}...`, "info");
+          showStatus(els.submitStatus, `РЎРѕС…СЂР°РЅСЏСЋ РёР·РјРµРЅРµРЅРёСЏ РєР»РёРµРЅС‚Р° #${editId}...`, "info");
           await apiPut(`/clients/${editId}`, body);
-          showStatus(els.submitStatus, `Клиент #${editId} успешно обновлён`, "success");
+          showStatus(els.submitStatus, `РљР»РёРµРЅС‚ #${editId} СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»С‘РЅ`, "success");
         } else {
-          showStatus(els.submitStatus, "Создаю клиента...", "info");
+          showStatus(els.submitStatus, "РЎРѕР·РґР°СЋ РєР»РёРµРЅС‚Р°...", "info");
           await apiPost("/clients", body);
-          showStatus(els.submitStatus, "Клиент успешно создан", "success");
+          showStatus(els.submitStatus, "РљР»РёРµРЅС‚ СѓСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅ", "success");
         }
 
         resetForm();
         await loadData();
       } catch (err) {
-        showStatus(els.submitStatus, "Ошибка сохранения: " + err.message, "error");
+        showStatus(els.submitStatus, "РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ: " + err.message, "error");
       }
     }
 
