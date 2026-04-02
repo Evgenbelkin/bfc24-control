@@ -81,6 +81,22 @@
       border:1px solid var(--line);
     }
 
+    .btn-quick{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+      padding:10px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .btn-quick:hover{
+      border-color:#b8c4d9;
+      background:#f8fafc;
+    }
+
     .card{
       background:var(--card);
       border:1px solid #eef1f5;
@@ -103,7 +119,7 @@
 
     .filters{
       display:grid;
-      grid-template-columns:1.5fr 1fr auto;
+      grid-template-columns:1.4fr 1fr 1fr 1fr auto;
       gap:12px;
       align-items:end;
     }
@@ -134,6 +150,13 @@
     input:focus, select:focus{
       border-color:#9db8ff;
       box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    .quick-range{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:14px;
     }
 
     .status{
@@ -194,7 +217,7 @@
 
     table{
       width:100%;
-      min-width:1200px;
+      min-width:1250px;
       border-collapse:collapse;
       background:#fff;
     }
@@ -266,7 +289,7 @@
       padding:24px 12px;
     }
 
-    @media (max-width: 980px){
+    @media (max-width: 1100px){
       .filters,
       .stats{
         grid-template-columns:1fr;
@@ -297,8 +320,8 @@
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск по товару / МХ / комментарию / пользователю</label>
-          <input id="searchInput" type="text" placeholder="Например: Тест товар, Контейнер 1, admin" />
+          <label for="searchInput">Поиск по товару / SKU / МХ / комментарию / пользователю</label>
+          <input id="searchInput" type="text" placeholder="Например: Кабель, SKU-001, Контейнер 1, admin" />
         </div>
 
         <div class="field">
@@ -315,9 +338,27 @@
         </div>
 
         <div class="field">
+          <label for="dateFrom">Дата с</label>
+          <input id="dateFrom" type="date" />
+        </div>
+
+        <div class="field">
+          <label for="dateTo">Дата по</label>
+          <input id="dateTo" type="date" />
+        </div>
+
+        <div class="field">
           <label>&nbsp;</label>
           <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
         </div>
+      </div>
+
+      <div class="quick-range">
+        <button type="button" class="btn-quick" onclick="setToday()">Сегодня</button>
+        <button type="button" class="btn-quick" onclick="setLastDays(7)">7 дней</button>
+        <button type="button" class="btn-quick" onclick="setLastDays(30)">30 дней</button>
+        <button type="button" class="btn-quick" onclick="setCurrentMonth()">Этот месяц</button>
+        <button type="button" class="btn-quick" onclick="clearDates()">Всё время</button>
       </div>
 
       <div class="stats">
@@ -356,7 +397,6 @@
               <th>SKU</th>
               <th>МХ</th>
               <th>Кол-во</th>
-              <th>Сумма</th>
               <th>Комментарий</th>
               <th>Пользователь</th>
               <th>Дата</th>
@@ -364,7 +404,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="10" class="empty">Загрузка данных...</td>
+              <td colspan="9" class="empty">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -372,21 +412,23 @@
     </div>
   </div>
 
-  <script>
-    const API_BASE = "http://localhost:3003";
-    const FALLBACK_TENANT_ID = 1;
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
 
+  <script>
     const token = localStorage.getItem("token");
     if (!token) {
       window.location.href = "/login.html";
     }
 
-    let authUser = null;
     let movementsData = [];
 
     const els = {
       searchInput: document.getElementById("searchInput"),
       typeFilter: document.getElementById("typeFilter"),
+      dateFrom: document.getElementById("dateFrom"),
+      dateTo: document.getElementById("dateTo"),
       refreshBtn: document.getElementById("refreshBtn"),
       tbody: document.getElementById("tbody"),
       pageStatus: document.getElementById("pageStatus"),
@@ -406,41 +448,9 @@
       window.location.href = "/login.html";
     }
 
-    function parseUser() {
-      try {
-        const raw = localStorage.getItem("user");
-        authUser = raw ? JSON.parse(raw) : null;
-      } catch {
-        authUser = null;
-      }
-    }
-
-    function getTenantId() {
-      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
-        return Number(authUser.tenant_id);
-      }
-      return FALLBACK_TENANT_ID;
-    }
-
-    function authHeaders() {
-      return {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      };
-    }
-
     function showStatus(text, type = "info") {
       els.pageStatus.className = "status show " + type;
       els.pageStatus.textContent = text;
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
     }
 
     function extractList(data, keys) {
@@ -466,9 +476,7 @@
 
     function formatDate(value) {
       if (!value) return "";
-      const d = new Date(value);
-      if (Number.isNaN(d.getTime())) return String(value);
-      return d.toLocaleString("ru-RU");
+      return AppUI.displayDateTime(value);
     }
 
     function movementBadge(type) {
@@ -478,42 +486,20 @@
       if (type === "adjustment") return `<span class="badge badge-adjustment">Корректировка</span>`;
       if (type === "transfer_in") return `<span class="badge badge-transfer">Перемещение вход</span>`;
       if (type === "transfer_out") return `<span class="badge badge-transfer">Перемещение выход</span>`;
-      return escapeHtml(type || "");
-    }
-
-    async function apiGet(path) {
-      const res = await fetch(API_BASE + path, {
-        method: "GET",
-        headers: authHeaders()
-      });
-
-      const text = await res.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { raw: text };
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || ("HTTP " + res.status));
-      }
-
-      return data;
+      return AppUI.escapeHtml(type || "");
     }
 
     function normalizeMovement(row) {
       return {
         id: row.id,
-        movement_type: row.movement_type || row.type || "",
-        item_name: row.item_name || row.product_name || row.name || "",
-        sku: row.sku || row.vendor_code || row.article || "",
-        location_name: row.location_name || row.location || "",
-        qty: Number(row.qty ?? row.quantity ?? 0),
-        amount: Number(row.amount ?? 0),
+        movement_type: row.movement_type || "",
+        item_name: row.item_name || "",
+        sku: row.sku || "",
+        location_name: row.location_name || "",
+        qty: Number(row.qty ?? 0),
         comment: row.comment || "",
-        user_name: row.username || row.user_name || row.created_by_name || "",
-        created_at: row.created_at || row.date || null
+        user_name: row.user_name || row.created_by_username || "",
+        created_at: row.created_at || null
       };
     }
 
@@ -525,6 +511,7 @@
         .filter(row => !type || row.movement_type === type)
         .filter(row => {
           if (!search) return true;
+
           const text = [
             row.item_name,
             row.sku,
@@ -552,7 +539,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="10" class="empty">Нет данных</td>
+            <td colspan="9" class="empty">Нет данных</td>
           </tr>
         `;
         return;
@@ -560,26 +547,44 @@
 
       els.tbody.innerHTML = rows.map(row => `
         <tr>
-          <td>${escapeHtml(row.id)}</td>
+          <td>${AppUI.escapeHtml(row.id)}</td>
           <td>${movementBadge(row.movement_type)}</td>
-          <td>${escapeHtml(row.item_name)}</td>
-          <td>${escapeHtml(row.sku)}</td>
-          <td>${escapeHtml(row.location_name)}</td>
-          <td>${escapeHtml(formatNumber(row.qty))}</td>
-          <td>${escapeHtml(formatNumber(row.amount))}</td>
-          <td>${escapeHtml(row.comment)}</td>
-          <td>${escapeHtml(row.user_name)}</td>
-          <td>${escapeHtml(formatDate(row.created_at))}</td>
+          <td>${AppUI.escapeHtml(row.item_name)}</td>
+          <td>${AppUI.escapeHtml(row.sku)}</td>
+          <td>${AppUI.escapeHtml(row.location_name)}</td>
+          <td>${AppUI.escapeHtml(formatNumber(row.qty))}</td>
+          <td>${AppUI.escapeHtml(row.comment)}</td>
+          <td>${AppUI.escapeHtml(row.user_name || "—")}</td>
+          <td>${AppUI.escapeHtml(formatDate(row.created_at))}</td>
         </tr>
       `).join("");
     }
 
+    function buildQuery() {
+      const params = new URLSearchParams();
+      params.set("tenant_id", API.getTenantId());
+
+      if (els.typeFilter.value) {
+        params.set("type", els.typeFilter.value);
+      }
+
+      if (els.dateFrom.value) {
+        params.set("date_from", els.dateFrom.value);
+      }
+
+      if (els.dateTo.value) {
+        params.set("date_to", els.dateTo.value);
+      }
+
+      return params.toString();
+    }
+
     async function loadData() {
       try {
-        const tenantId = getTenantId();
+        const tenantId = API.getTenantId();
         showStatus(`Загрузка движений...\nTenant ID: ${tenantId}`, "info");
 
-        const data = await apiGet(`/stock/movements?tenant_id=${tenantId}`);
+        const data = await API.get(`/stock/movements?${buildQuery()}`);
         movementsData = extractList(data, ["movements", "data", "rows"]).map(normalizeMovement);
 
         renderTable();
@@ -591,21 +596,66 @@
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="10" class="empty">Ошибка загрузки данных</td>
+            <td colspan="9" class="empty">Ошибка загрузки данных</td>
           </tr>
         `;
-        showStatus("Ошибка: " + err.message, "error");
+        showStatus("Ошибка: " + AppUI.translateError(err.message), "error");
       }
+    }
+
+    function pad2(value) {
+      return String(value).padStart(2, "0");
+    }
+
+    function toDateInputValue(date) {
+      const y = date.getFullYear();
+      const m = pad2(date.getMonth() + 1);
+      const d = pad2(date.getDate());
+      return `${y}-${m}-${d}`;
+    }
+
+    function setToday() {
+      const today = new Date();
+      const value = toDateInputValue(today);
+      els.dateFrom.value = value;
+      els.dateTo.value = value;
+      loadData();
+    }
+
+    function setLastDays(days) {
+      const today = new Date();
+      const from = new Date();
+      from.setDate(today.getDate() - (days - 1));
+
+      els.dateFrom.value = toDateInputValue(from);
+      els.dateTo.value = toDateInputValue(today);
+      loadData();
+    }
+
+    function setCurrentMonth() {
+      const today = new Date();
+      const from = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      els.dateFrom.value = toDateInputValue(from);
+      els.dateTo.value = toDateInputValue(today);
+      loadData();
+    }
+
+    function clearDates() {
+      els.dateFrom.value = "";
+      els.dateTo.value = "";
+      loadData();
     }
 
     function bindEvents() {
       els.searchInput.addEventListener("input", renderTable);
-      els.typeFilter.addEventListener("change", renderTable);
+      els.typeFilter.addEventListener("change", loadData);
+      els.dateFrom.addEventListener("change", loadData);
+      els.dateTo.addEventListener("change", loadData);
       els.refreshBtn.addEventListener("click", loadData);
     }
 
     function bootstrap() {
-      parseUser();
       bindEvents();
       loadData();
     }

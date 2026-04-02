@@ -57,13 +57,13 @@ router.get("/", authRequired, async (req, res) => {
 router.post(
   "/incoming",
   authRequired,
-  requireRole("owner", "admin", "client_owner", "client_manager"),
+  requireRole("owner", "client"),
   async (req, res) => {
     const client = await pool.connect();
 
     try {
       const tenantId = getEffectiveTenantId(req);
-      const userId = req.user.id;
+      const userId = Number(req.user.id);
 
       if (!tenantId) {
         return res.status(400).json({
@@ -123,22 +123,22 @@ router.post(
       }
 
       const movement = await client.query(
-  `
-  INSERT INTO core.movements
-  (
-    tenant_id,
-    item_id,
-    location_id,
-    movement_type,
-    qty,
-    comment,
-    created_by
-  )
-  VALUES ($1, $2, $3, 'receipt', $4, $5, $6)
-  RETURNING id
-  `,
-  [tenantId, item_id, location_id, qty, comment || null, userId]
-);
+        `
+        INSERT INTO core.movements
+        (
+          tenant_id,
+          item_id,
+          location_id,
+          movement_type,
+          qty,
+          comment,
+          created_by
+        )
+        VALUES ($1, $2, $3, 'receipt', $4, $5, $6)
+        RETURNING id
+        `,
+        [tenantId, item_id, location_id, qty, comment || null, userId]
+      );
 
       await client.query("COMMIT");
 
@@ -172,6 +172,28 @@ router.get("/movements", authRequired, async (req, res) => {
       });
     }
 
+    const type = String(req.query.type || "").trim();
+    const dateFrom = String(req.query.date_from || "").trim();
+    const dateTo = String(req.query.date_to || "").trim();
+
+    const params = [tenantId];
+    let whereSql = `WHERE m.tenant_id = $1`;
+
+    if (type) {
+      params.push(type);
+      whereSql += ` AND m.movement_type = $${params.length}`;
+    }
+
+    if (dateFrom) {
+      params.push(dateFrom);
+      whereSql += ` AND m.created_at >= $${params.length}::date`;
+    }
+
+    if (dateTo) {
+      params.push(dateTo);
+      whereSql += ` AND m.created_at < ($${params.length}::date + INTERVAL '1 day')`;
+    }
+
     const sql = `
       SELECT
         m.id,
@@ -179,17 +201,21 @@ router.get("/movements", authRequired, async (req, res) => {
         m.qty,
         m.comment,
         m.created_at,
+        m.created_by,
         i.name AS item_name,
-        l.name AS location_name
+        i.sku,
+        l.name AS location_name,
+        u.username AS user_name
       FROM core.movements m
       JOIN core.items i ON i.id = m.item_id
       LEFT JOIN core.locations l ON l.id = m.location_id
-      WHERE m.tenant_id = $1
+      LEFT JOIN saas.users u ON u.id = m.created_by
+      ${whereSql}
       ORDER BY m.id DESC
-      LIMIT 100
+      LIMIT 500
     `;
 
-    const { rows } = await pool.query(sql, [tenantId]);
+    const { rows } = await pool.query(sql, params);
 
     return res.json({
       ok: true,
