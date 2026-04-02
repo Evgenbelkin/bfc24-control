@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL вЂ” Р’С…РѕРґ</title>
+  <title>BFC24 CONTROL — Вход</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
@@ -67,10 +67,10 @@
 
   <div id="error" class="error"></div>
 
-  <input id="username" placeholder="Р›РѕРіРёРЅ" />
-  <input id="password" type="password" placeholder="РџР°СЂРѕР»СЊ" />
+  <input id="username" placeholder="Логин" />
+  <input id="password" type="password" placeholder="Пароль" />
 
-  <button onclick="login()">Р’РѕР№С‚Рё</button>
+  <button onclick="login()">Войти</button>
 </div>
 
 <script>
@@ -98,7 +98,7 @@ async function login() {
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
 
-    // рџ”Ґ РљР›Р®Р§Р•Р’РћР• вЂ” СЂРµРґРёСЂРµРєС‚ РїРѕ СЂРѕР»Рё
+    // 🔥 КЛЮЧЕВОЕ — редирект по роли
     if (data.user.role === 'owner') {
       window.location.href = '/owner-dashboard.html';
     } else {
@@ -106,17 +106,17 @@ async function login() {
     }
 
   } catch (err) {
-    errorBox.textContent = 'РћС€РёР±РєР° РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє СЃРµСЂРІРµСЂСѓ';
+    errorBox.textContent = 'Ошибка подключения к серверу';
   }
 }
 
 function translateError(code) {
   const map = {
-    invalid_credentials: 'РќРµРІРµСЂРЅС‹Р№ Р»РѕРіРёРЅ РёР»Рё РїР°СЂРѕР»СЊ',
-    tenant_blocked: 'РљР»РёРµРЅС‚ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ',
-    tenant_inactive: 'РљР»РёРµРЅС‚ РѕС‚РєР»СЋС‡РµРЅ',
-    subscription_blocked: 'РџРѕРґРїРёСЃРєР° Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅР°',
-    subscription_expired: 'РџРѕРґРїРёСЃРєР° РёСЃС‚РµРєР»Р°'
+    invalid_credentials: 'Неверный логин или пароль',
+    tenant_blocked: 'Клиент заблокирован',
+    tenant_inactive: 'Клиент отключен',
+    subscription_blocked: 'Подписка заблокирована',
+    subscription_expired: 'Подписка истекла'
   };
 
   return map[code] || code;

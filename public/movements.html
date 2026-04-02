@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL вЂ” Р”РІРёР¶РµРЅРёСЏ С‚РѕРІР°СЂР°</title>
+  <title>BFC24 CONTROL — Движения товара</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -308,74 +308,74 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Р”РІРёР¶РµРЅРёСЏ С‚РѕРІР°СЂР°</div>
+      <div class="title">Движения товара</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">РќР°Р·Р°Рґ</button>
-        <button class="btn btn-light" onclick="logout()">Р’С‹Р№С‚Рё</button>
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Р¤РёР»СЊС‚СЂС‹</h2>
+      <h2 class="card-title">Фильтры</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">РџРѕРёСЃРє РїРѕ С‚РѕРІР°СЂСѓ / SKU / РњРҐ / РєРѕРјРјРµРЅС‚Р°СЂРёСЋ / РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ</label>
-          <input id="searchInput" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: РљР°Р±РµР»СЊ, SKU-001, РљРѕРЅС‚РµР№РЅРµСЂ 1, admin" />
+          <label for="searchInput">Поиск по товару / SKU / МХ / комментарию / пользователю</label>
+          <input id="searchInput" type="text" placeholder="Например: Кабель, SKU-001, Контейнер 1, admin" />
         </div>
 
         <div class="field">
-          <label for="typeFilter">РўРёРї РґРІРёР¶РµРЅРёСЏ</label>
+          <label for="typeFilter">Тип движения</label>
           <select id="typeFilter">
-            <option value="">Р’СЃРµ</option>
-            <option value="receipt">РџСЂРёС‘РјРєР°</option>
-            <option value="sale">РџСЂРѕРґР°Р¶Р°</option>
-            <option value="writeoff">РЎРїРёСЃР°РЅРёРµ</option>
-            <option value="adjustment">РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР°</option>
-            <option value="transfer_in">РџРµСЂРµРјРµС‰РµРЅРёРµ РІС…РѕРґ</option>
-            <option value="transfer_out">РџРµСЂРµРјРµС‰РµРЅРёРµ РІС‹С…РѕРґ</option>
+            <option value="">Все</option>
+            <option value="receipt">Приёмка</option>
+            <option value="sale">Продажа</option>
+            <option value="writeoff">Списание</option>
+            <option value="adjustment">Корректировка</option>
+            <option value="transfer_in">Перемещение вход</option>
+            <option value="transfer_out">Перемещение выход</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="dateFrom">Р”Р°С‚Р° СЃ</label>
+          <label for="dateFrom">Дата с</label>
           <input id="dateFrom" type="date" />
         </div>
 
         <div class="field">
-          <label for="dateTo">Р”Р°С‚Р° РїРѕ</label>
+          <label for="dateTo">Дата по</label>
           <input id="dateTo" type="date" />
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">РћР±РЅРѕРІРёС‚СЊ</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
         </div>
       </div>
 
       <div class="quick-range">
-        <button type="button" class="btn-quick" onclick="setToday()">РЎРµРіРѕРґРЅСЏ</button>
-        <button type="button" class="btn-quick" onclick="setLastDays(7)">7 РґРЅРµР№</button>
-        <button type="button" class="btn-quick" onclick="setLastDays(30)">30 РґРЅРµР№</button>
-        <button type="button" class="btn-quick" onclick="setCurrentMonth()">Р­С‚РѕС‚ РјРµСЃСЏС†</button>
-        <button type="button" class="btn-quick" onclick="clearDates()">Р’СЃС‘ РІСЂРµРјСЏ</button>
+        <button type="button" class="btn-quick" onclick="setToday()">Сегодня</button>
+        <button type="button" class="btn-quick" onclick="setLastDays(7)">7 дней</button>
+        <button type="button" class="btn-quick" onclick="setLastDays(30)">30 дней</button>
+        <button type="button" class="btn-quick" onclick="setCurrentMonth()">Этот месяц</button>
+        <button type="button" class="btn-quick" onclick="clearDates()">Всё время</button>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Р—Р°РїРёСЃРµР№</div>
+          <div class="stat-label">Записей</div>
           <div class="stat-value" id="rowsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">РџСЂРёС‘РјРѕРє</div>
+          <div class="stat-label">Приёмок</div>
           <div class="stat-value" id="receiptCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">РџСЂРѕРґР°Р¶</div>
+          <div class="stat-label">Продаж</div>
           <div class="stat-value" id="saleCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">РЎРїРёСЃР°РЅРёР№</div>
+          <div class="stat-label">Списаний</div>
           <div class="stat-value" id="writeoffCount">0</div>
         </div>
       </div>
@@ -384,27 +384,27 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">РСЃС‚РѕСЂРёСЏ РґРІРёР¶РµРЅРёР№</h2>
-      <div class="muted">РџРѕРєР°Р·С‹РІР°СЋС‚СЃСЏ РґРІРёР¶РµРЅРёСЏ С‚РѕРІР°СЂРѕРІ РїРѕ СЃРєР»Р°РґСѓ Рё РѕРїРµСЂР°С†РёСЏРј.</div>
+      <h2 class="card-title">История движений</h2>
+      <div class="muted">Показываются движения товаров по складу и операциям.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>РўРёРї</th>
-              <th>РўРѕРІР°СЂ</th>
+              <th>Тип</th>
+              <th>Товар</th>
               <th>SKU</th>
-              <th>РњРҐ</th>
-              <th>РљРѕР»-РІРѕ</th>
-              <th>РљРѕРјРјРµРЅС‚Р°СЂРёР№</th>
-              <th>РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ</th>
-              <th>Р”Р°С‚Р°</th>
+              <th>МХ</th>
+              <th>Кол-во</th>
+              <th>Комментарий</th>
+              <th>Пользователь</th>
+              <th>Дата</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="9" class="empty">Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...</td>
+              <td colspan="9" class="empty">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -480,12 +480,12 @@
     }
 
     function movementBadge(type) {
-      if (type === "receipt") return `<span class="badge badge-receipt">РџСЂРёС‘РјРєР°</span>`;
-      if (type === "sale") return `<span class="badge badge-sale">РџСЂРѕРґР°Р¶Р°</span>`;
-      if (type === "writeoff") return `<span class="badge badge-writeoff">РЎРїРёСЃР°РЅРёРµ</span>`;
-      if (type === "adjustment") return `<span class="badge badge-adjustment">РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР°</span>`;
-      if (type === "transfer_in") return `<span class="badge badge-transfer">РџРµСЂРµРјРµС‰РµРЅРёРµ РІС…РѕРґ</span>`;
-      if (type === "transfer_out") return `<span class="badge badge-transfer">РџРµСЂРµРјРµС‰РµРЅРёРµ РІС‹С…РѕРґ</span>`;
+      if (type === "receipt") return `<span class="badge badge-receipt">Приёмка</span>`;
+      if (type === "sale") return `<span class="badge badge-sale">Продажа</span>`;
+      if (type === "writeoff") return `<span class="badge badge-writeoff">Списание</span>`;
+      if (type === "adjustment") return `<span class="badge badge-adjustment">Корректировка</span>`;
+      if (type === "transfer_in") return `<span class="badge badge-transfer">Перемещение вход</span>`;
+      if (type === "transfer_out") return `<span class="badge badge-transfer">Перемещение выход</span>`;
       return AppUI.escapeHtml(type || "");
     }
 
@@ -539,7 +539,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="empty">РќРµС‚ РґР°РЅРЅС‹С…</td>
+            <td colspan="9" class="empty">Нет данных</td>
           </tr>
         `;
         return;
@@ -554,7 +554,7 @@
           <td>${AppUI.escapeHtml(row.location_name)}</td>
           <td>${AppUI.escapeHtml(formatNumber(row.qty))}</td>
           <td>${AppUI.escapeHtml(row.comment)}</td>
-          <td>${AppUI.escapeHtml(row.user_name || "вЂ”")}</td>
+          <td>${AppUI.escapeHtml(row.user_name || "—")}</td>
           <td>${AppUI.escapeHtml(formatDate(row.created_at))}</td>
         </tr>
       `).join("");
@@ -582,7 +582,7 @@
     async function loadData() {
       try {
         const tenantId = API.getTenantId();
-        showStatus(`Р—Р°РіСЂСѓР·РєР° РґРІРёР¶РµРЅРёР№...\nTenant ID: ${tenantId}`, "info");
+        showStatus(`Загрузка движений...\nTenant ID: ${tenantId}`, "info");
 
         const data = await API.get(`/stock/movements?${buildQuery()}`);
         movementsData = extractList(data, ["movements", "data", "rows"]).map(normalizeMovement);
@@ -590,16 +590,16 @@
         renderTable();
 
         showStatus(
-          `Р”Р°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶РµРЅС‹.\nTenant ID: ${tenantId}\nР—Р°РїРёСЃРµР№: ${movementsData.length}`,
+          `Данные загружены.\nTenant ID: ${tenantId}\nЗаписей: ${movementsData.length}`,
           "success"
         );
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="empty">РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…</td>
+            <td colspan="9" class="empty">Ошибка загрузки данных</td>
           </tr>
         `;
-        showStatus("РћС€РёР±РєР°: " + AppUI.translateError(err.message), "error");
+        showStatus("Ошибка: " + AppUI.translateError(err.message), "error");
       }
     }
 

@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL вЂ” РљР°Р±РёРЅРµС‚ РІР»Р°РґРµР»СЊС†Р°</title>
+  <title>BFC24 CONTROL — Кабинет владельца</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="/js/app-ui.js"></script>
   <style>
@@ -476,32 +476,32 @@
   <div class="page">
     <div class="hero">
       <div class="hero-left">
-        <h1>BFC24 CONTROL вЂ” РљР°Р±РёРЅРµС‚ РІР»Р°РґРµР»СЊС†Р°</h1>
-        <p>РЈРїСЂР°РІР»РµРЅРёРµ РєР»РёРµРЅС‚Р°РјРё SaaS, РґРѕСЃС‚СѓРїР°РјРё, СЃС‚Р°С‚СѓСЃР°РјРё РїРѕРґРїРёСЃРєРё, Р»РёРјРёС‚Р°РјРё Рё РјРѕРґСѓР»СЏРјРё</p>
+        <h1>BFC24 CONTROL — Кабинет владельца</h1>
+        <p>Управление клиентами SaaS, доступами, статусами подписки, лимитами и модулями</p>
       </div>
 
       <div class="hero-right">
-        <div class="owner-chip" id="ownerBadge">Р—Р°РіСЂСѓР·РєР°...</div>
-        <button class="btn-secondary" onclick="goToMenu()">Р’ РјРµРЅСЋ</button>
-        <button class="btn-danger" onclick="logout()">Р’С‹Р№С‚Рё</button>
+        <div class="owner-chip" id="ownerBadge">Загрузка...</div>
+        <button class="btn-secondary" onclick="goToMenu()">В меню</button>
+        <button class="btn-danger" onclick="logout()">Выйти</button>
       </div>
     </div>
 
     <div class="stats">
       <div class="stat-card">
-        <div class="stat-label">Р’СЃРµРіРѕ РєР»РёРµРЅС‚РѕРІ</div>
+        <div class="stat-label">Всего клиентов</div>
         <div class="stat-value" id="statTenants">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">РђРєС‚РёРІРЅС‹Рµ РїРѕРґРїРёСЃРєРё</div>
+        <div class="stat-label">Активные подписки</div>
         <div class="stat-value" id="statActiveSubs">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅРЅС‹Рµ РєР»РёРµРЅС‚С‹</div>
+        <div class="stat-label">Заблокированные клиенты</div>
         <div class="stat-value" id="statBlockedTenants">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Р’СЃРµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№</div>
+        <div class="stat-label">Всего пользователей</div>
         <div class="stat-value" id="statUsers">0</div>
       </div>
     </div>
@@ -513,8 +513,8 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <h2 class="card-title" id="tenantFormTitle">РќРѕРІС‹Р№ РєР»РёРµРЅС‚</h2>
-              <div class="card-subtitle">РЎРѕР·РґР°РЅРёРµ Рё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РєР»РёРµРЅС‚СЃРєРѕРіРѕ РєР°Р±РёРЅРµС‚Р°</div>
+              <h2 class="card-title" id="tenantFormTitle">Новый клиент</h2>
+              <div class="card-subtitle">Создание и редактирование клиентского кабинета</div>
             </div>
           </div>
 
@@ -522,13 +522,13 @@
             <input type="hidden" id="tenantId" />
 
             <div>
-              <label for="tenantName">РќР°Р·РІР°РЅРёРµ РєР»РёРµРЅС‚Р°</label>
-              <input id="tenantName" type="text" placeholder="РќР°РїСЂРёРјРµСЂ: РРџ РРІР°РЅРѕРІ / РњР°РіР°Р·РёРЅ Р®Р¶РЅС‹Р№" required />
+              <label for="tenantName">Название клиента</label>
+              <input id="tenantName" type="text" placeholder="Например: ИП Иванов / Магазин Южный" required />
             </div>
 
             <div class="grid-2">
               <div>
-                <label for="tenantPhone">РўРµР»РµС„РѕРЅ</label>
+                <label for="tenantPhone">Телефон</label>
                 <input id="tenantPhone" type="text" placeholder="+79999999999" />
               </div>
               <div>
@@ -539,63 +539,63 @@
 
             <div class="grid-3">
               <div>
-                <label for="tenantTariff">РўР°СЂРёС„</label>
+                <label for="tenantTariff">Тариф</label>
                 <input id="tenantTariff" type="text" value="basic" />
               </div>
               <div>
-                <label for="tenantSubscriptionStatus">РЎС‚Р°С‚СѓСЃ РїРѕРґРїРёСЃРєРё</label>
+                <label for="tenantSubscriptionStatus">Статус подписки</label>
                 <select id="tenantSubscriptionStatus">
-                  <option value="trial">РўРµСЃС‚</option>
-                  <option value="active">РђРєС‚РёРІРЅР°</option>
-                  <option value="expired">РСЃС‚РµРєР»Р°</option>
-                  <option value="blocked">Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅР°</option>
+                  <option value="trial">Тест</option>
+                  <option value="active">Активна</option>
+                  <option value="expired">Истекла</option>
+                  <option value="blocked">Заблокирована</option>
                 </select>
               </div>
               <div>
-                <label for="tenantCode">РљРѕРґ РєР»РёРµРЅС‚Р°</label>
-                <input id="tenantCode" type="text" placeholder="РјРѕР¶РЅРѕ РѕСЃС‚Р°РІРёС‚СЊ РїСѓСЃС‚С‹Рј" />
+                <label for="tenantCode">Код клиента</label>
+                <input id="tenantCode" type="text" placeholder="можно оставить пустым" />
               </div>
             </div>
 
             <div class="grid-3">
               <div>
-                <label for="tenantMaxSku">Р›РёРјРёС‚ SKU</label>
+                <label for="tenantMaxSku">Лимит SKU</label>
                 <input id="tenantMaxSku" type="number" min="0" value="1000" />
               </div>
               <div>
-                <label for="tenantMaxLocations">Р›РёРјРёС‚ РјРµСЃС‚ С…СЂР°РЅРµРЅРёСЏ</label>
+                <label for="tenantMaxLocations">Лимит мест хранения</label>
                 <input id="tenantMaxLocations" type="number" min="0" value="10" />
               </div>
               <div>
-                <label for="tenantBlockReason">РџСЂРёС‡РёРЅР° Р±Р»РѕРєРёСЂРѕРІРєРё</label>
-                <input id="tenantBlockReason" type="text" placeholder="РµСЃР»Рё РЅСѓР¶РЅР°" />
+                <label for="tenantBlockReason">Причина блокировки</label>
+                <input id="tenantBlockReason" type="text" placeholder="если нужна" />
               </div>
             </div>
 
             <div class="grid-2">
               <div>
-                <label for="tenantSubscriptionStart">Р”Р°С‚Р° РЅР°С‡Р°Р»Р° РїРѕРґРїРёСЃРєРё</label>
+                <label for="tenantSubscriptionStart">Дата начала подписки</label>
                 <input id="tenantSubscriptionStart" type="datetime-local" />
               </div>
               <div>
-                <label for="tenantSubscriptionEnd">Р”Р°С‚Р° РѕРєРѕРЅС‡Р°РЅРёСЏ РїРѕРґРїРёСЃРєРё</label>
+                <label for="tenantSubscriptionEnd">Дата окончания подписки</label>
                 <input id="tenantSubscriptionEnd" type="datetime-local" />
               </div>
             </div>
 
             <div>
-              <label for="tenantModules">РњРѕРґСѓР»Рё (С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ)</label>
+              <label for="tenantModules">Модули (через запятую)</label>
               <textarea id="tenantModules" placeholder="items, clients, locations, incoming, sales, stock, cash"></textarea>
             </div>
 
             <div>
-              <label for="tenantComment">РљРѕРјРјРµРЅС‚Р°СЂРёР№</label>
-              <textarea id="tenantComment" placeholder="Р’РЅСѓС‚СЂРµРЅРЅРёР№ РєРѕРјРјРµРЅС‚Р°СЂРёР№ РїРѕ РєР»РёРµРЅС‚Сѓ"></textarea>
+              <label for="tenantComment">Комментарий</label>
+              <textarea id="tenantComment" placeholder="Внутренний комментарий по клиенту"></textarea>
             </div>
 
             <div class="actions">
-              <button type="submit" class="btn-primary">РЎРѕС…СЂР°РЅРёС‚СЊ РєР»РёРµРЅС‚Р°</button>
-              <button type="button" class="btn-secondary" onclick="resetTenantForm()">РћС‡РёСЃС‚РёС‚СЊ С„РѕСЂРјСѓ</button>
+              <button type="submit" class="btn-primary">Сохранить клиента</button>
+              <button type="button" class="btn-secondary" onclick="resetTenantForm()">Очистить форму</button>
             </div>
           </form>
         </div>
@@ -603,8 +603,8 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <h2 class="card-title" id="userFormTitle">РќРѕРІС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ</h2>
-              <div class="card-subtitle">РЎРѕР·РґР°РЅРёРµ Р»РѕРіРёРЅР° РґР»СЏ РєР»РёРµРЅС‚Р° РёР»Рё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ</div>
+              <h2 class="card-title" id="userFormTitle">Новый пользователь</h2>
+              <div class="card-subtitle">Создание логина для клиента или редактирование существующего</div>
             </div>
           </div>
 
@@ -613,37 +613,37 @@
 
             <div class="grid-2">
               <div>
-                <label for="userTenantId">РљР»РёРµРЅС‚</label>
+                <label for="userTenantId">Клиент</label>
                 <select id="userTenantId"></select>
               </div>
               <div>
-                <label for="userRole">Р РѕР»СЊ</label>
+                <label for="userRole">Роль</label>
                 <select id="userRole">
-                  <option value="client">РљР»РёРµРЅС‚</option>
-                  <option value="owner">Р’Р»Р°РґРµР»РµС†</option>
+                  <option value="client">Клиент</option>
+                  <option value="owner">Владелец</option>
                 </select>
               </div>
             </div>
 
             <div class="grid-2">
               <div>
-                <label for="userFullName">РРјСЏ / Р¤РРћ</label>
-                <input id="userFullName" type="text" placeholder="РљР»РёРµРЅС‚ 1" required />
+                <label for="userFullName">Имя / ФИО</label>
+                <input id="userFullName" type="text" placeholder="Клиент 1" required />
               </div>
               <div>
-                <label for="userUsername">Р›РѕРіРёРЅ</label>
+                <label for="userUsername">Логин</label>
                 <input id="userUsername" type="text" placeholder="client1" required />
               </div>
             </div>
 
             <div>
-              <label for="userPassword">РџР°СЂРѕР»СЊ <span class="muted">(РґР»СЏ РЅРѕРІРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РѕР±СЏР·Р°С‚РµР»РµРЅ)</span></label>
+              <label for="userPassword">Пароль <span class="muted">(для нового пользователя обязателен)</span></label>
               <input id="userPassword" type="text" placeholder="12345" />
             </div>
 
             <div class="actions">
-              <button type="submit" class="btn-primary">РЎРѕС…СЂР°РЅРёС‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ</button>
-              <button type="button" class="btn-secondary" onclick="resetUserForm()">РћС‡РёСЃС‚РёС‚СЊ С„РѕСЂРјСѓ</button>
+              <button type="submit" class="btn-primary">Сохранить пользователя</button>
+              <button type="button" class="btn-secondary" onclick="resetUserForm()">Очистить форму</button>
             </div>
           </form>
         </div>
@@ -653,9 +653,9 @@
         <div class="card">
           <div class="toolbar">
             <div class="toolbar-left">
-              РЈРїСЂР°РІР»РµРЅРёРµ РєР°Р±РёРЅРµС‚Р°РјРё РєР»РёРµРЅС‚РѕРІ, СЃС‚Р°С‚СѓСЃР°РјРё РїРѕРґРїРёСЃРєРё, Р»РёРјРёС‚Р°РјРё Рё РґРѕСЃС‚СѓРїРѕРј
+              Управление кабинетами клиентов, статусами подписки, лимитами и доступом
             </div>
-            <button class="btn-secondary" onclick="loadTenants()">РћР±РЅРѕРІРёС‚СЊ</button>
+            <button class="btn-secondary" onclick="loadTenants()">Обновить</button>
           </div>
 
           <div class="table-wrap">
@@ -663,17 +663,17 @@
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>РљР»РёРµРЅС‚</th>
-                  <th>РЎС‚Р°С‚СѓСЃС‹</th>
-                  <th>РљРѕРЅС‚Р°РєС‚С‹</th>
-                  <th>РџРѕРґРїРёСЃРєР° Рё Р»РёРјРёС‚С‹</th>
-                  <th>РњРѕРґСѓР»Рё</th>
-                  <th>РџРѕР»СЊР·РѕРІР°С‚РµР»Рё</th>
-                  <th>Р”РµР№СЃС‚РІРёСЏ</th>
+                  <th>Клиент</th>
+                  <th>Статусы</th>
+                  <th>Контакты</th>
+                  <th>Подписка и лимиты</th>
+                  <th>Модули</th>
+                  <th>Пользователи</th>
+                  <th>Действия</th>
                 </tr>
               </thead>
               <tbody id="tenantsTableBody">
-                <tr><td colspan="8" class="empty">Р—Р°РіСЂСѓР·РєР°...</td></tr>
+                <tr><td colspan="8" class="empty">Загрузка...</td></tr>
               </tbody>
             </table>
           </div>
@@ -682,9 +682,9 @@
         <div class="card">
           <div class="toolbar">
             <div class="toolbar-left">
-              РџРѕР»СЊР·РѕРІР°С‚РµР»Рё, РєРѕС‚РѕСЂС‹Рј РІС‹РґР°РЅС‹ Р»РѕРіРёРЅС‹ РґР»СЏ РІС…РѕРґР° РІ СЃРёСЃС‚РµРјСѓ
+              Пользователи, которым выданы логины для входа в систему
             </div>
-            <button class="btn-secondary" onclick="loadUsers()">РћР±РЅРѕРІРёС‚СЊ</button>
+            <button class="btn-secondary" onclick="loadUsers()">Обновить</button>
           </div>
 
           <div class="table-wrap">
@@ -692,17 +692,17 @@
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Р›РѕРіРёРЅ</th>
-                  <th>РРјСЏ</th>
-                  <th>Р РѕР»СЊ</th>
-                  <th>РљР»РёРµРЅС‚</th>
-                  <th>РЎС‚Р°С‚СѓСЃС‹</th>
-                  <th>РџРѕСЃР»РµРґРЅРёР№ РІС…РѕРґ</th>
-                  <th>Р”РµР№СЃС‚РІРёСЏ</th>
+                  <th>Логин</th>
+                  <th>Имя</th>
+                  <th>Роль</th>
+                  <th>Клиент</th>
+                  <th>Статусы</th>
+                  <th>Последний вход</th>
+                  <th>Действия</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody">
-                <tr><td colspan="8" class="empty">Р—Р°РіСЂСѓР·РєР°...</td></tr>
+                <tr><td colspan="8" class="empty">Загрузка...</td></tr>
               </tbody>
             </table>
           </div>
@@ -719,11 +719,11 @@
     let usersCache = [];
 
     const Ui = window.AppUI || {
-      translateError: (v) => String(v || 'РћС€РёР±РєР°'),
+      translateError: (v) => String(v || 'Ошибка'),
       displayDateTime: (iso) => {
-        if (!iso) return 'вЂ”';
+        if (!iso) return '—';
         const d = new Date(iso);
-        if (Number.isNaN(d.getTime())) return 'вЂ”';
+        if (Number.isNaN(d.getTime())) return '—';
         return d.toLocaleString('ru-RU');
       },
       toDatetimeLocalValue: (iso) => {
@@ -785,18 +785,18 @@
     }
 
     function getSubscriptionPill(status) {
-      if (status === 'active') return pill('РџРѕРґРїРёСЃРєР° Р°РєС‚РёРІРЅР°', 'green');
-      if (status === 'trial') return pill('РўРµСЃС‚РѕРІС‹Р№ РґРѕСЃС‚СѓРї', 'yellow');
-      if (status === 'expired') return pill('РџРѕРґРїРёСЃРєР° РёСЃС‚РµРєР»Р°', 'red');
-      if (status === 'blocked') return pill('РџРѕРґРїРёСЃРєР° Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅР°', 'red');
-      return pill(status || 'вЂ”', 'gray');
+      if (status === 'active') return pill('Подписка активна', 'green');
+      if (status === 'trial') return pill('Тестовый доступ', 'yellow');
+      if (status === 'expired') return pill('Подписка истекла', 'red');
+      if (status === 'blocked') return pill('Подписка заблокирована', 'red');
+      return pill(status || '—', 'gray');
     }
 
     function getTenantStatusPill(status) {
-      if (status === 'active') return pill('РљР°Р±РёРЅРµС‚ Р°РєС‚РёРІРµРЅ', 'green');
-      if (status === 'blocked') return pill('РљР°Р±РёРЅРµС‚ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ', 'red');
-      if (status === 'archived') return pill('РђСЂС…РёРІ', 'gray');
-      return pill(status || 'вЂ”', 'gray');
+      if (status === 'active') return pill('Кабинет активен', 'green');
+      if (status === 'blocked') return pill('Кабинет заблокирован', 'red');
+      if (status === 'archived') return pill('Архив', 'gray');
+      return pill(status || '—', 'gray');
     }
 
     function getBoolPill(value, trueText, falseText) {
@@ -815,14 +815,14 @@
     }
 
     function renderDaysLeft(days, subscriptionStatus) {
-      if (days === null) return '<span class="muted">РћСЃС‚Р°Р»РѕСЃСЊ РґРЅРµР№: вЂ”</span>';
+      if (days === null) return '<span class="muted">Осталось дней: —</span>';
       if (subscriptionStatus === 'expired' || days < 0) {
-        return `<span class="sub-expired">РћСЃС‚Р°Р»РѕСЃСЊ РґРЅРµР№: ${days}</span>`;
+        return `<span class="sub-expired">Осталось дней: ${days}</span>`;
       }
       if (days <= 7) {
-        return `<span class="sub-warning">РћСЃС‚Р°Р»РѕСЃСЊ РґРЅРµР№: ${days}</span>`;
+        return `<span class="sub-warning">Осталось дней: ${days}</span>`;
       }
-      return `<span class="sub-ok">РћСЃС‚Р°Р»РѕСЃСЊ РґРЅРµР№: ${days}</span>`;
+      return `<span class="sub-ok">Осталось дней: ${days}</span>`;
     }
 
     async function api(path, options = {}) {
@@ -868,7 +868,7 @@
         currentUser = me.user || null;
 
         if (!currentUser || currentUser.role !== 'owner') {
-          showMessage('Р”РѕСЃС‚СѓРї СЂР°Р·СЂРµС€С‘РЅ С‚РѕР»СЊРєРѕ РІР»Р°РґРµР»СЊС†Сѓ СЃРёСЃС‚РµРјС‹.', 'error');
+          showMessage('Доступ разрешён только владельцу системы.', 'error');
           setTimeout(() => {
             window.location.href = '/index.html';
           }, 1200);
@@ -876,7 +876,7 @@
         }
 
         document.getElementById('ownerBadge').textContent =
-          `Р’Р»Р°РґРµР»РµС†: ${currentUser.full_name || currentUser.username}`;
+          `Владелец: ${currentUser.full_name || currentUser.username}`;
       } catch (error) {
         console.error('checkAccess error:', error);
         logout();
@@ -884,7 +884,7 @@
     }
 
     function fillTenantForm(tenant) {
-      document.getElementById('tenantFormTitle').textContent = `Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РєР»РёРµРЅС‚Р° #${tenant.id}`;
+      document.getElementById('tenantFormTitle').textContent = `Редактирование клиента #${tenant.id}`;
       document.getElementById('tenantId').value = tenant.id || '';
       document.getElementById('tenantName').value = tenant.name || '';
       document.getElementById('tenantPhone').value = tenant.phone || tenant.contact_phone || '';
@@ -903,7 +903,7 @@
     }
 
     function resetTenantForm() {
-      document.getElementById('tenantFormTitle').textContent = 'РќРѕРІС‹Р№ РєР»РёРµРЅС‚';
+      document.getElementById('tenantFormTitle').textContent = 'Новый клиент';
       document.getElementById('tenantId').value = '';
       document.getElementById('tenantName').value = '';
       document.getElementById('tenantPhone').value = '';
@@ -921,7 +921,7 @@
     }
 
     function fillUserForm(user) {
-      document.getElementById('userFormTitle').textContent = `Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ #${user.id}`;
+      document.getElementById('userFormTitle').textContent = `Редактирование пользователя #${user.id}`;
       document.getElementById('userId').value = user.id || '';
       document.getElementById('userTenantId').value = user.tenant_id || '';
       document.getElementById('userRole').value = user.role || 'client';
@@ -932,7 +932,7 @@
     }
 
     function resetUserForm() {
-      document.getElementById('userFormTitle').textContent = 'РќРѕРІС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ';
+      document.getElementById('userFormTitle').textContent = 'Новый пользователь';
       document.getElementById('userId').value = '';
       document.getElementById('userTenantId').value = tenantsCache[0]?.id || '';
       document.getElementById('userRole').value = 'client';
@@ -944,10 +944,10 @@
     function renderTenantSelectOptions() {
       const select = document.getElementById('userTenantId');
       const options = tenantsCache
-        .map(t => `<option value="${t.id}">#${Ui.escapeHtml(t.id)} вЂ” ${Ui.escapeHtml(t.name)}</option>`)
+        .map(t => `<option value="${t.id}">#${Ui.escapeHtml(t.id)} — ${Ui.escapeHtml(t.name)}</option>`)
         .join('');
 
-      select.innerHTML = options || '<option value="">РќРµС‚ РєР»РёРµРЅС‚РѕРІ</option>';
+      select.innerHTML = options || '<option value="">Нет клиентов</option>';
     }
 
     function updateStats() {
@@ -968,7 +968,7 @@
         updateStats();
       } catch (error) {
         console.error('loadTenants error:', error);
-        showMessage(`РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РєР»РёРµРЅС‚РѕРІ: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
+        showMessage(`Ошибка загрузки клиентов: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
       }
     }
 
@@ -980,7 +980,7 @@
         updateStats();
       } catch (error) {
         console.error('loadUsers error:', error);
-        showMessage(`РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
+        showMessage(`Ошибка загрузки пользователей: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
       }
     }
 
@@ -988,7 +988,7 @@
       const body = document.getElementById('tenantsTableBody');
 
       if (!tenantsCache.length) {
-        body.innerHTML = '<tr><td colspan="8" class="empty">РљР»РёРµРЅС‚С‹ РїРѕРєР° РЅРµ СЃРѕР·РґР°РЅС‹</td></tr>';
+        body.innerHTML = '<tr><td colspan="8" class="empty">Клиенты пока не созданы</td></tr>';
         return;
       }
 
@@ -1000,48 +1000,48 @@
           <tr>
             <td class="mono">${Ui.escapeHtml(t.id)}</td>
             <td>
-              <div><strong>${Ui.escapeHtml(t.name || 'вЂ”')}</strong></div>
-              <div class="muted mono">slug: ${Ui.escapeHtml(t.slug || 'вЂ”')}</div>
-              <div class="muted mono">code: ${Ui.escapeHtml(t.code || 'вЂ”')}</div>
+              <div><strong>${Ui.escapeHtml(t.name || '—')}</strong></div>
+              <div class="muted mono">slug: ${Ui.escapeHtml(t.slug || '—')}</div>
+              <div class="muted mono">code: ${Ui.escapeHtml(t.code || '—')}</div>
             </td>
             <td>
               <div class="status-stack">
                 ${getTenantStatusPill(t.status)}
                 ${getSubscriptionPill(t.subscription_status)}
-                ${getBoolPill(t.is_active, 'Р’РєР»СЋС‡С‘РЅ', 'Р’С‹РєР»СЋС‡РµРЅ')}
-                ${getBoolPill(t.is_blocked, 'Р‘Р»РѕРє РІРєР»СЋС‡С‘РЅ', 'РќРµ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ')}
+                ${getBoolPill(t.is_active, 'Включён', 'Выключен')}
+                ${getBoolPill(t.is_blocked, 'Блок включён', 'Не заблокирован')}
               </div>
-              <div class="muted">РџСЂРёС‡РёРЅР°: ${Ui.escapeHtml(t.block_reason || 'вЂ”')}</div>
+              <div class="muted">Причина: ${Ui.escapeHtml(t.block_reason || '—')}</div>
             </td>
             <td>
-              <div>${Ui.escapeHtml(t.phone || t.contact_phone || 'вЂ”')}</div>
-              <div>${Ui.escapeHtml(t.email || t.contact_email || 'вЂ”')}</div>
+              <div>${Ui.escapeHtml(t.phone || t.contact_phone || '—')}</div>
+              <div>${Ui.escapeHtml(t.email || t.contact_email || '—')}</div>
             </td>
             <td>
               <div class="sub-block">
-                <div><strong>РўР°СЂРёС„:</strong> ${Ui.escapeHtml(t.tariff_name || t.plan_code || 'вЂ”')}</div>
-                <div><strong>Р›РёРјРёС‚ SKU:</strong> ${Ui.escapeHtml(t.max_sku ?? 'вЂ”')}</div>
-                <div><strong>Р›РёРјРёС‚ РњРҐ:</strong> ${Ui.escapeHtml(t.max_locations ?? 'вЂ”')}</div>
-                <div><strong>РџРѕРґРїРёСЃРєР° СЃ:</strong> ${Ui.escapeHtml(Ui.displayDateTime(t.subscription_start_at))}</div>
-                <div><strong>РџРѕРґРїРёСЃРєР° РґРѕ:</strong> ${Ui.escapeHtml(Ui.displayDateTime(t.subscription_end_at))}</div>
+                <div><strong>Тариф:</strong> ${Ui.escapeHtml(t.tariff_name || t.plan_code || '—')}</div>
+                <div><strong>Лимит SKU:</strong> ${Ui.escapeHtml(t.max_sku ?? '—')}</div>
+                <div><strong>Лимит МХ:</strong> ${Ui.escapeHtml(t.max_locations ?? '—')}</div>
+                <div><strong>Подписка с:</strong> ${Ui.escapeHtml(Ui.displayDateTime(t.subscription_start_at))}</div>
+                <div><strong>Подписка до:</strong> ${Ui.escapeHtml(Ui.displayDateTime(t.subscription_end_at))}</div>
                 <div>${renderDaysLeft(daysLeft, t.subscription_status)}</div>
-                <div class="muted"><strong>РЎРѕР·РґР°РЅ:</strong> ${Ui.escapeHtml(Ui.displayDateTime(t.created_at))}</div>
+                <div class="muted"><strong>Создан:</strong> ${Ui.escapeHtml(Ui.displayDateTime(t.created_at))}</div>
               </div>
             </td>
             <td>
               ${modules.length
                 ? `<div class="list-soft">${modules.map(m => Ui.escapeHtml(m)).join('<br>')}</div>`
-                : '<span class="muted">вЂ”</span>'}
+                : '<span class="muted">—</span>'}
             </td>
             <td>${Ui.escapeHtml(t.users_count ?? 0)}</td>
             <td>
               <div class="actions">
-                <button class="btn-secondary btn-small" onclick="editTenant(${t.id})">Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ</button>
+                <button class="btn-secondary btn-small" onclick="editTenant(${t.id})">Редактировать</button>
                 <button class="btn-warning btn-small" onclick="toggleTenantActive(${t.id})">
-                  ${t.is_active ? 'Р’С‹РєР»СЋС‡РёС‚СЊ' : 'Р’РєР»СЋС‡РёС‚СЊ'}
+                  ${t.is_active ? 'Выключить' : 'Включить'}
                 </button>
                 <button class="btn-danger btn-small" onclick="toggleTenantBlock(${t.id})">
-                  ${t.is_blocked ? 'Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ' : 'Р—Р°Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ'}
+                  ${t.is_blocked ? 'Разблокировать' : 'Заблокировать'}
                 </button>
               </div>
             </td>
@@ -1054,37 +1054,37 @@
       const body = document.getElementById('usersTableBody');
 
       if (!usersCache.length) {
-        body.innerHTML = '<tr><td colspan="8" class="empty">РџРѕР»СЊР·РѕРІР°С‚РµР»Рё РїРѕРєР° РЅРµ СЃРѕР·РґР°РЅС‹</td></tr>';
+        body.innerHTML = '<tr><td colspan="8" class="empty">Пользователи пока не созданы</td></tr>';
         return;
       }
 
       body.innerHTML = usersCache.map(u => `
         <tr>
           <td class="mono">${Ui.escapeHtml(u.id)}</td>
-          <td class="mono">${Ui.escapeHtml(u.username || 'вЂ”')}</td>
-          <td>${Ui.escapeHtml(u.full_name || 'вЂ”')}</td>
-          <td>${u.role === 'owner' ? pill('Р’Р»Р°РґРµР»РµС†', 'yellow') : pill('РљР»РёРµРЅС‚', 'green')}</td>
+          <td class="mono">${Ui.escapeHtml(u.username || '—')}</td>
+          <td>${Ui.escapeHtml(u.full_name || '—')}</td>
+          <td>${u.role === 'owner' ? pill('Владелец', 'yellow') : pill('Клиент', 'green')}</td>
           <td>
-            <div>${Ui.escapeHtml(u.tenant_name || 'вЂ”')}</div>
+            <div>${Ui.escapeHtml(u.tenant_name || '—')}</div>
             <div class="muted mono">tenant_id: ${Ui.escapeHtml(u.tenant_id || 'null')}</div>
           </td>
           <td>
             <div class="status-stack">
-              ${getBoolPill(u.is_active, 'Р’РєР»СЋС‡С‘РЅ', 'Р’С‹РєР»СЋС‡РµРЅ')}
-              ${getBoolPill(u.is_blocked, 'Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ', 'РќРµ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ')}
+              ${getBoolPill(u.is_active, 'Включён', 'Выключен')}
+              ${getBoolPill(u.is_blocked, 'Заблокирован', 'Не заблокирован')}
             </div>
           </td>
           <td>${Ui.escapeHtml(Ui.displayDateTime(u.last_login_at))}</td>
           <td>
             <div class="actions">
-              <button class="btn-secondary btn-small" onclick="editUser(${u.id})">Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ</button>
+              <button class="btn-secondary btn-small" onclick="editUser(${u.id})">Редактировать</button>
               <button class="btn-warning btn-small" onclick="toggleUserActive(${u.id})">
-                ${u.is_active ? 'Р’С‹РєР»СЋС‡РёС‚СЊ' : 'Р’РєР»СЋС‡РёС‚СЊ'}
+                ${u.is_active ? 'Выключить' : 'Включить'}
               </button>
               <button class="btn-danger btn-small" onclick="toggleUserBlock(${u.id})">
-                ${u.is_blocked ? 'Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ' : 'Р—Р°Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ'}
+                ${u.is_blocked ? 'Разблокировать' : 'Заблокировать'}
               </button>
-              <button class="btn-success btn-small" onclick="resetUserPassword(${u.id})">РЎР±СЂРѕСЃ РїР°СЂРѕР»СЏ</button>
+              <button class="btn-success btn-small" onclick="resetUserPassword(${u.id})">Сброс пароля</button>
             </div>
           </td>
         </tr>
@@ -1133,13 +1133,13 @@
             method: 'PUT',
             body: JSON.stringify(payload)
           });
-          showMessage(`РљР»РёРµРЅС‚ #${tenantId} СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»С‘РЅ`, 'success');
+          showMessage(`Клиент #${tenantId} успешно обновлён`, 'success');
         } else {
           await api('/owner-admin/tenants', {
             method: 'POST',
             body: JSON.stringify(payload)
           });
-          showMessage('РљР»РёРµРЅС‚ СѓСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅ', 'success');
+          showMessage('Клиент успешно создан', 'success');
         }
 
         resetTenantForm();
@@ -1148,7 +1148,7 @@
       } catch (error) {
         console.error('saveTenant error:', error);
         showMessage(
-          `РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ РєР»РёРµРЅС‚Р°: ${Ui.translateError(error.payload?.details || error.payload?.error || error.message)}`,
+          `Ошибка сохранения клиента: ${Ui.translateError(error.payload?.details || error.payload?.error || error.message)}`,
           'error'
         );
       }
@@ -1183,13 +1183,13 @@
               method: 'POST',
               body: JSON.stringify({ password })
             });
-            showMessage(`РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ #${userId} РѕР±РЅРѕРІР»С‘РЅ, РїР°СЂРѕР»СЊ РёР·РјРµРЅС‘РЅ`, 'success');
+            showMessage(`Пользователь #${userId} обновлён, пароль изменён`, 'success');
           } else {
-            showMessage(`РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ #${userId} СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»С‘РЅ`, 'success');
+            showMessage(`Пользователь #${userId} успешно обновлён`, 'success');
           }
         } else {
           if (!password) {
-            showMessage('Р”Р»СЏ РЅРѕРІРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РЅСѓР¶РЅРѕ СѓРєР°Р·Р°С‚СЊ РїР°СЂРѕР»СЊ', 'error');
+            showMessage('Для нового пользователя нужно указать пароль', 'error');
             return;
           }
 
@@ -1200,7 +1200,7 @@
               password
             })
           });
-          showMessage('РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СѓСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅ', 'success');
+          showMessage('Пользователь успешно создан', 'success');
         }
 
         resetUserForm();
@@ -1208,7 +1208,7 @@
       } catch (error) {
         console.error('saveUser error:', error);
         showMessage(
-          `РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ: ${Ui.translateError(error.payload?.details || error.payload?.error || error.message)}`,
+          `Ошибка сохранения пользователя: ${Ui.translateError(error.payload?.details || error.payload?.error || error.message)}`,
           'error'
         );
       }
@@ -1220,11 +1220,11 @@
         await api(`/owner-admin/tenants/${id}/toggle-active`, {
           method: 'PATCH'
         });
-        showMessage(`РЎС‚Р°С‚СѓСЃ Р°РєС‚РёРІРЅРѕСЃС‚Рё РєР»РёРµРЅС‚Р° #${id} РёР·РјРµРЅС‘РЅ`, 'success');
+        showMessage(`Статус активности клиента #${id} изменён`, 'success');
         await loadTenants();
       } catch (error) {
         console.error('toggleTenantActive error:', error);
-        showMessage(`РћС€РёР±РєР° РёР·РјРµРЅРµРЅРёСЏ Р°РєС‚РёРІРЅРѕСЃС‚Рё РєР»РёРµРЅС‚Р°: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
+        showMessage(`Ошибка изменения активности клиента: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
       }
     }
 
@@ -1236,7 +1236,7 @@
       let reason = '';
 
       if (!isBlocked) {
-        reason = prompt('РЈРєР°Р¶Рё РїСЂРёС‡РёРЅСѓ Р±Р»РѕРєРёСЂРѕРІРєРё РєР»РёРµРЅС‚Р°:', 'Р СѓС‡РЅР°СЏ Р±Р»РѕРєРёСЂРѕРІРєР°') || '';
+        reason = prompt('Укажи причину блокировки клиента:', 'Ручная блокировка') || '';
       }
 
       try {
@@ -1244,11 +1244,11 @@
           method: 'PATCH',
           body: JSON.stringify({ block_reason: reason })
         });
-        showMessage(`РЎС‚Р°С‚СѓСЃ Р±Р»РѕРєРёСЂРѕРІРєРё РєР»РёРµРЅС‚Р° #${id} РёР·РјРµРЅС‘РЅ`, 'success');
+        showMessage(`Статус блокировки клиента #${id} изменён`, 'success');
         await loadTenants();
       } catch (error) {
         console.error('toggleTenantBlock error:', error);
-        showMessage(`РћС€РёР±РєР° Р±Р»РѕРєРёСЂРѕРІРєРё РєР»РёРµРЅС‚Р°: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
+        showMessage(`Ошибка блокировки клиента: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
       }
     }
 
@@ -1258,11 +1258,11 @@
         await api(`/owner-admin/users/${id}/toggle-active`, {
           method: 'PATCH'
         });
-        showMessage(`РЎС‚Р°С‚СѓСЃ Р°РєС‚РёРІРЅРѕСЃС‚Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ #${id} РёР·РјРµРЅС‘РЅ`, 'success');
+        showMessage(`Статус активности пользователя #${id} изменён`, 'success');
         await loadUsers();
       } catch (error) {
         console.error('toggleUserActive error:', error);
-        showMessage(`РћС€РёР±РєР° РёР·РјРµРЅРµРЅРёСЏ Р°РєС‚РёРІРЅРѕСЃС‚Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
+        showMessage(`Ошибка изменения активности пользователя: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
       }
     }
 
@@ -1272,17 +1272,17 @@
         await api(`/owner-admin/users/${id}/toggle-block`, {
           method: 'PATCH'
         });
-        showMessage(`РЎС‚Р°С‚СѓСЃ Р±Р»РѕРєРёСЂРѕРІРєРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ #${id} РёР·РјРµРЅС‘РЅ`, 'success');
+        showMessage(`Статус блокировки пользователя #${id} изменён`, 'success');
         await loadUsers();
       } catch (error) {
         console.error('toggleUserBlock error:', error);
-        showMessage(`РћС€РёР±РєР° Р±Р»РѕРєРёСЂРѕРІРєРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
+        showMessage(`Ошибка блокировки пользователя: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
       }
     }
 
     async function resetUserPassword(id) {
       clearMessage();
-      const password = prompt('Р’РІРµРґРёС‚Рµ РЅРѕРІС‹Р№ РїР°СЂРѕР»СЊ:');
+      const password = prompt('Введите новый пароль:');
       if (!password) return;
 
       try {
@@ -1290,10 +1290,10 @@
           method: 'POST',
           body: JSON.stringify({ password })
         });
-        showMessage(`РџР°СЂРѕР»СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ #${id} СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»С‘РЅ`, 'success');
+        showMessage(`Пароль пользователя #${id} успешно обновлён`, 'success');
       } catch (error) {
         console.error('resetUserPassword error:', error);
-        showMessage(`РћС€РёР±РєР° СЃРјРµРЅС‹ РїР°СЂРѕР»СЏ: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
+        showMessage(`Ошибка смены пароля: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
       }
     }
 
