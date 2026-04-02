@@ -349,15 +349,16 @@
     </div>
   </div>
 
-  <script>
-    const API_BASE = "http://localhost:3003";
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
 
+  <script>
     const token = localStorage.getItem("token");
     if (!token) {
       window.location.href = "/login.html";
     }
 
-    let authUser = null;
     let allItems = [];
     let allLocations = [];
     let selectedItem = null;
@@ -388,27 +389,6 @@
       window.location.href = "/login.html";
     }
 
-    function parseUser() {
-      try {
-        const raw = localStorage.getItem("user");
-        authUser = raw ? JSON.parse(raw) : null;
-      } catch {
-        authUser = null;
-      }
-    }
-
-    function getTenantId() {
-      if (authUser && authUser.tenant_id) return Number(authUser.tenant_id);
-      return 1;
-    }
-
-    function authHeaders() {
-      return {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      };
-    }
-
     function showStatus(el, text, type = "info") {
       el.className = "status show " + type;
       el.textContent = text;
@@ -417,15 +397,6 @@
     function hideStatus(el) {
       el.className = "status";
       el.textContent = "";
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
     }
 
     function extractList(data, keys) {
@@ -466,49 +437,6 @@
       .toLowerCase();
     }
 
-    async function apiGet(path) {
-      const res = await fetch(API_BASE + path, {
-        method: "GET",
-        headers: authHeaders()
-      });
-
-      const text = await res.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { raw: text };
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || ("HTTP " + res.status));
-      }
-
-      return data;
-    }
-
-    async function apiPost(path, body) {
-      const res = await fetch(API_BASE + path, {
-        method: "POST",
-        headers: authHeaders(),
-        body: JSON.stringify(body)
-      });
-
-      const text = await res.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { raw: text };
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || ("HTTP " + res.status));
-      }
-
-      return data;
-    }
-
     function renderSelectedItem() {
       if (!selectedItem) {
         els.selectedItemBox.classList.remove("active");
@@ -518,12 +446,12 @@
 
       els.selectedItemBox.classList.add("active");
       els.selectedItemBox.innerHTML = `
-        <div><strong>Выбран товар:</strong> ${escapeHtml(selectedItem.name || "Без названия")}</div>
+        <div><strong>Выбран товар:</strong> ${AppUI.escapeHtml(selectedItem.name || "Без названия")}</div>
         <div class="muted" style="margin-top:6px;">
-          ID: ${escapeHtml(String(selectedItem.id ?? ""))}
-          ${selectedItem.sku ? " | SKU: " + escapeHtml(selectedItem.sku) : ""}
-          ${selectedItem.barcode ? " | ШК: " + escapeHtml(selectedItem.barcode) : ""}
-          ${selectedItem.vendor_code ? " | Артикул: " + escapeHtml(selectedItem.vendor_code) : ""}
+          ID: ${AppUI.escapeHtml(String(selectedItem.id ?? ""))}
+          ${selectedItem.sku ? " | SKU: " + AppUI.escapeHtml(selectedItem.sku) : ""}
+          ${selectedItem.barcode ? " | ШК: " + AppUI.escapeHtml(selectedItem.barcode) : ""}
+          ${selectedItem.vendor_code ? " | Артикул: " + AppUI.escapeHtml(selectedItem.vendor_code) : ""}
         </div>
       `;
     }
@@ -541,13 +469,13 @@
       }
 
       els.itemResults.innerHTML = items.map(item => `
-        <div class="result-item" data-id="${escapeHtml(String(item.id))}">
-          <div class="result-title">${escapeHtml(item.name || "Без названия")}</div>
+        <div class="result-item" data-id="${AppUI.escapeHtml(String(item.id))}">
+          <div class="result-title">${AppUI.escapeHtml(item.name || "Без названия")}</div>
           <div class="result-sub">
-            ID: ${escapeHtml(String(item.id ?? ""))}
-            ${item.sku ? " | SKU: " + escapeHtml(item.sku) : ""}
-            ${item.barcode ? " | ШК: " + escapeHtml(item.barcode) : ""}
-            ${item.vendor_code ? " | Артикул: " + escapeHtml(item.vendor_code) : ""}
+            ID: ${AppUI.escapeHtml(String(item.id ?? ""))}
+            ${item.sku ? " | SKU: " + AppUI.escapeHtml(item.sku) : ""}
+            ${item.barcode ? " | ШК: " + AppUI.escapeHtml(item.barcode) : ""}
+            ${item.vendor_code ? " | Артикул: " + AppUI.escapeHtml(item.vendor_code) : ""}
           </div>
         </div>
       `).join("");
@@ -572,22 +500,22 @@
       els.locationId.innerHTML =
         `<option value="">Выберите МХ</option>` +
         allLocations.map(loc => `
-          <option value="${escapeHtml(String(loc.id))}">
-            ${escapeHtml(loc.name || "")}${loc.code ? " (" + escapeHtml(loc.code) + ")" : ""}
+          <option value="${AppUI.escapeHtml(String(loc.id))}">
+            ${AppUI.escapeHtml(loc.name || "")}${loc.code ? " (" + AppUI.escapeHtml(loc.code) + ")" : ""}
           </option>
         `).join("");
     }
 
     async function loadItems() {
-      const tenantId = getTenantId();
-      const data = await apiGet(`/items?tenant_id=${tenantId}`);
+      const tenantId = API.getTenantId();
+      const data = await API.get(`/items?tenant_id=${tenantId}`);
       allItems = extractList(data, ["items", "data", "rows"]).map(normalizeItem);
       els.itemsCount.textContent = String(allItems.length);
     }
 
     async function loadLocations() {
-      const tenantId = getTenantId();
-      const data = await apiGet(`/locations?tenant_id=${tenantId}`);
+      const tenantId = API.getTenantId();
+      const data = await API.get(`/locations?tenant_id=${tenantId}`);
       allLocations = extractList(data, ["locations", "data", "rows"]);
       els.locationsCount.textContent = String(allLocations.length);
       fillLocations();
@@ -602,7 +530,7 @@
         selectedItem = null;
         renderSelectedItem();
         els.itemResults.style.display = "none";
-        els.tenantValue.textContent = String(getTenantId());
+        els.tenantValue.textContent = String(API.getTenantId());
 
         await Promise.all([
           loadItems(),
@@ -615,7 +543,7 @@
           "success"
         );
       } catch (err) {
-        showStatus(els.pageStatus, "Ошибка загрузки данных: " + err.message, "error");
+        showStatus(els.pageStatus, "Ошибка загрузки данных: " + AppUI.translateError(err.message), "error");
       }
     }
 
@@ -639,7 +567,7 @@
       hideStatus(els.submitStatus);
 
       try {
-        const tenantId = getTenantId();
+        const tenantId = API.getTenantId();
 
         if (!selectedItem || !selectedItem.id) {
           throw new Error("Выбери товар из списка");
@@ -664,7 +592,7 @@
 
         showStatus(els.submitStatus, "Провожу приёмку...", "info");
 
-        const result = await apiPost("/stock/incoming", body);
+        const result = await API.post("/stock/incoming", body);
 
         showStatus(
           els.submitStatus,
@@ -680,7 +608,7 @@
         renderSelectedItem();
         els.itemResults.style.display = "none";
       } catch (err) {
-        showStatus(els.submitStatus, "Ошибка приёмки: " + err.message, "error");
+        showStatus(els.submitStatus, "Ошибка приёмки: " + AppUI.translateError(err.message), "error");
       }
     }
 
@@ -705,7 +633,6 @@
     }
 
     function bootstrap() {
-      parseUser();
       bindEvents();
       loadInitialData();
     }
