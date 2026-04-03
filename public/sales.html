@@ -400,11 +400,9 @@
     </div>
   </div>
 
-    <script src="/js/config.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/app-ui.js"></script>
-
-  <script>    const FALLBACK_TENANT_ID = 1;
+  <script>
+    const API_BASE = '';
+    const FALLBACK_TENANT_ID = 1;
 
     let authUser = null;
     let allItems = [];
@@ -479,6 +477,14 @@
       return FALLBACK_TENANT_ID;
     }
 
+    function authHeaders() {
+      const token = getToken();
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      };
+    }
+
     function extractList(data, keys) {
       if (Array.isArray(data)) return data;
       if (!data || typeof data !== 'object') return [];
@@ -490,11 +496,48 @@
       }
       return [];
     }
+
     async function apiGet(path) {
-      return ApiBridge.get(path);
+      const res = await fetch(API_BASE + path, {
+        method: 'GET',
+        headers: authHeaders()
+      });
+
+      const text = await res.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || data.message || ('HTTP ' + res.status));
+      }
+
+      return data;
     }
+
     async function apiPost(path, body) {
-      return ApiBridge.post(path, body);
+      const res = await fetch(API_BASE + path, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(body)
+      });
+
+      const text = await res.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || data.message || ('HTTP ' + res.status));
+      }
+
+      return data;
     }
 
     function normalizeItem(item) {
@@ -708,7 +751,7 @@
           'success'
         );
       } catch (err) {
-        showStatus(els.pageStatus, 'Ошибка загрузки данных: ' + Ui.translateError(err.message), 'error');
+        showStatus(els.pageStatus, 'Ошибка загрузки данных: ' + err.message, 'error');
       }
     }
 
@@ -803,7 +846,7 @@
         renderSelectedItem();
         els.itemResults.style.display = 'none';
       } catch (err) {
-        showStatus(els.submitStatus, 'Ошибка продажи: ' + Ui.translateError(err.message), 'error');
+        showStatus(els.submitStatus, 'Ошибка продажи: ' + err.message, 'error');
       }
     }
 
