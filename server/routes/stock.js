@@ -81,12 +81,15 @@ router.post(
         });
       }
 
-      if (purchase_price === undefined || Number(purchase_price) < 0) {
+      if (purchase_price === undefined || purchase_price === null || Number.isNaN(Number(purchase_price)) || Number(purchase_price) < 0) {
         return res.status(400).json({
           ok: false,
           error: "purchase_price_required",
         });
       }
+
+      const normalizedQty = Number(qty);
+      const normalizedPurchasePrice = Number(purchase_price);
 
       await client.query("BEGIN");
 
@@ -107,7 +110,7 @@ router.post(
       if (stockResult.rows.length > 0) {
         const stockId = stockResult.rows[0].id;
         const currentQty = Number(stockResult.rows[0].qty);
-        newQty = currentQty + Number(qty);
+        newQty = currentQty + normalizedQty;
 
         await client.query(
           `
@@ -118,7 +121,7 @@ router.post(
           [newQty, stockId]
         );
       } else {
-        newQty = Number(qty);
+        newQty = normalizedQty;
 
         await client.query(
           `
@@ -129,14 +132,21 @@ router.post(
         );
       }
 
-      // 🔥 СОЗДАНИЕ ПАРТИИ
       await client.query(
         `
         INSERT INTO core.item_batches
-        (tenant_id, item_id, batch_date, qty_total, qty_remaining, unit_cost)
-        VALUES ($1, $2, CURRENT_DATE, $3, $3, $4)
+        (
+          tenant_id,
+          item_id,
+          receipt_id,
+          batch_date,
+          qty_total,
+          qty_remaining,
+          unit_cost
+        )
+        VALUES ($1, $2, NULL, CURRENT_DATE, $3, $3, $4)
         `,
-        [tenantId, item_id, qty, purchase_price]
+        [tenantId, item_id, normalizedQty, normalizedPurchasePrice]
       );
 
       const movement = await client.query(
@@ -154,7 +164,7 @@ router.post(
         VALUES ($1, $2, $3, 'receipt', $4, $5, $6)
         RETURNING id
         `,
-        [tenantId, item_id, location_id, qty, comment || null, userId]
+        [tenantId, item_id, location_id, normalizedQty, comment || null, userId]
       );
 
       await client.query("COMMIT");
@@ -177,5 +187,75 @@ router.post(
     }
   }
 );
+
+router.get("/movements", authRequired, async (req, res) => {
+  try {
+    const tenantId = getEffectiveTenantId(req);
+
+    if (!tenantId) {
+      return res.status(400).json({
+        ok: false,
+        error: "tenant_not_defined",
+      });
+    }
+
+    const type = String(req.query.type || "").trim();
+    const dateFrom = String(req.query.date_from || "").trim();
+    const dateTo = String(req.query.date_to || "").trim();
+
+    const params = [tenantId];
+    let whereSql = `WHERE m.tenant_id = $1`;
+
+    if (type) {
+      params.push(type);
+      whereSql += ` AND m.movement_type = $${params.length}`;
+    }
+
+    if (dateFrom) {
+      params.push(dateFrom);
+      whereSql += ` AND m.created_at >= $${params.length}::date`;
+    }
+
+    if (dateTo) {
+      params.push(dateTo);
+      whereSql += ` AND m.created_at < ($${params.length}::date + INTERVAL '1 day')`;
+    }
+
+    const sql = `
+      SELECT
+        m.id,
+        m.movement_type,
+        m.qty,
+        m.comment,
+        m.created_at,
+        m.created_by,
+        i.name AS item_name,
+        i.sku,
+        l.name AS location_name,
+        u.username AS user_name
+      FROM core.movements m
+      JOIN core.items i ON i.id = m.item_id
+      LEFT JOIN core.locations l ON l.id = m.location_id
+      LEFT JOIN saas.users u ON u.id = m.created_by
+      ${whereSql}
+      ORDER BY m.id DESC
+      LIMIT 500
+    `;
+
+    const { rows } = await pool.query(sql, params);
+
+    return res.json({
+      ok: true,
+      movements: rows,
+    });
+  } catch (e) {
+    console.error("[GET /stock/movements] error:", e);
+    return res.status(500).json({
+      ok: false,
+      error: "movements_failed",
+      details: e.message,
+    });
+  }
+});
 
 module.exports = router;

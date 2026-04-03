@@ -285,7 +285,7 @@
 
     <div class="card">
       <h2 class="card-title">Новая приёмка</h2>
-      <div class="muted">Выбери товар, место хранения и количество для прихода на склад.</div>
+      <div class="muted">Выбери товар, место хранения, количество и цену закупки для прихода на склад.</div>
 
       <div class="stats">
         <div class="stat">
@@ -328,9 +328,15 @@
           </div>
 
           <div class="field">
-  <label for="purchase_price">Цена закупки</label>
-  <input id="purchase_price" type="number" min="0" step="0.01" />
-</div>
+            <label for="qty">Количество</label>
+            <input id="qty" type="number" min="1" step="1" value="1" />
+          </div>
+
+          <div class="field">
+            <label for="purchasePrice">Цена закупки</label>
+            <input id="purchasePrice" type="number" min="0" step="0.01" value="0" />
+            <div class="hint">Укажи закупочную цену за 1 единицу товара.</div>
+          </div>
 
           <div class="field full">
             <label for="comment">Комментарий</label>
@@ -408,7 +414,7 @@
       return fallback;
     }
 
-    const ApiBridge = {
+    const API = {
       getTenantId(fallback = 1) {
         if (window.API && typeof window.API.getTenantId === "function") {
           const tenantId = window.API.getTenantId();
@@ -464,6 +470,7 @@
       selectedItemBox: document.getElementById("selectedItemBox"),
       locationId: document.getElementById("locationId"),
       qty: document.getElementById("qty"),
+      purchasePrice: document.getElementById("purchasePrice"),
       comment: document.getElementById("comment"),
       itemsCount: document.getElementById("itemsCount"),
       locationsCount: document.getElementById("locationsCount"),
@@ -677,14 +684,19 @@
           throw new Error("Количество должно быть больше 0");
         }
 
+        const purchasePrice = Number(els.purchasePrice.value);
+        if (Number.isNaN(purchasePrice) || purchasePrice < 0) {
+          throw new Error("Цена закупки должна быть 0 или больше");
+        }
+
         const body = {
-  tenant_id: tenantId,
-  item_id: Number(selectedItem.id),
-  location_id: Number(els.locationId.value),
-  qty,
-  purchase_price: Number(document.getElementById("purchase_price").value),
-  comment: (els.comment.value || "").trim() || null
-};
+          tenant_id: tenantId,
+          item_id: Number(selectedItem.id),
+          location_id: Number(els.locationId.value),
+          qty,
+          purchase_price: purchasePrice,
+          comment: (els.comment.value || "").trim() || null
+        };
 
         showStatus(els.submitStatus, "Провожу приёмку...", "info");
 
@@ -697,6 +709,7 @@
         );
 
         els.qty.value = 1;
+        els.purchasePrice.value = 0;
         els.comment.value = "";
         els.locationId.value = "";
         els.itemSearch.value = "";
