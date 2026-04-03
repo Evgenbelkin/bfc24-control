@@ -275,7 +275,7 @@ router.post(
 router.put(
   "/:id",
   authRequired,
-  requireRole("owner", "admin", "client_owner", "client_manager"),
+  requireRole("owner", "admin", "client_owner", "client_manager", "client")
   async (req, res) => {
     try {
       const tenantId = getEffectiveTenantId(req);
