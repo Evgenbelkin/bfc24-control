@@ -64,6 +64,7 @@
       font-size:14px;
       font-weight:700;
       white-space:nowrap;
+      transition:.15s ease;
     }
 
     .btn-primary{
@@ -79,6 +80,11 @@
       background:#fff;
       color:var(--text);
       border:1px solid var(--line);
+    }
+
+    .btn-light:hover{
+      border-color:#cbd5e1;
+      background:#f8fafc;
     }
 
     .btn-success{
@@ -195,12 +201,15 @@
     .table-wrap{
       overflow:auto;
       margin-top:10px;
+      max-height:68vh;
+      border-radius:12px;
     }
 
     table{
       width:100%;
       min-width:1200px;
-      border-collapse:collapse;
+      border-collapse:separate;
+      border-spacing:0;
       background:#fff;
     }
 
@@ -210,6 +219,7 @@
       text-align:left;
       vertical-align:top;
       font-size:14px;
+      background:#fff;
     }
 
     th{
@@ -218,7 +228,8 @@
       color:#111827;
       position:sticky;
       top:0;
-      z-index:1;
+      z-index:10;
+      box-shadow:0 2px 0 #eef1f5;
     }
 
     tr:hover td{
@@ -314,7 +325,8 @@
       <div class="filters">
         <div class="field">
           <label for="searchInput">Поиск по клиенту / товару / комментарию</label>
-          <input id="searchInput" type="text" placeholder="Например: Иванов, Тест товар, реализация" />
+          <input id="searchInput" list="searchSuggestions" type="text" placeholder="Например: Иванов, Тест товар, реализация" autocomplete="off" />
+          <datalist id="searchSuggestions"></datalist>
         </div>
 
         <div class="field">
@@ -391,11 +403,12 @@
     </div>
   </div>
 
-    <script src="/js/config.js"></script>
+  <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
 
-  <script>    const FALLBACK_TENANT_ID = 1;
+  <script>
+    const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -419,12 +432,12 @@
     };
 
     async function requestFallback(method, path, body) {
-      const token = localStorage.getItem("token") || "";
+      const authToken = localStorage.getItem("token") || "";
       const response = await fetch(path, {
         method,
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: "Bearer " + token } : {})
+          ...(authToken ? { Authorization: "Bearer " + authToken } : {})
         },
         ...(body !== undefined ? { body: JSON.stringify(body) } : {})
       });
@@ -476,24 +489,6 @@
           return window.API.post(path, body);
         }
         return requestFallback("POST", path, body);
-      },
-      put(path, body) {
-        if (window.API && typeof window.API.put === "function") {
-          return window.API.put(path, body);
-        }
-        return requestFallback("PUT", path, body);
-      },
-      patch(path, body) {
-        if (window.API && typeof window.API.patch === "function") {
-          return window.API.patch(path, body);
-        }
-        return requestFallback("PATCH", path, body);
-      },
-      delete(path) {
-        if (window.API && typeof window.API.delete === "function") {
-          return window.API.delete(path);
-        }
-        return requestFallback("DELETE", path);
       }
     };
 
@@ -510,7 +505,8 @@
       openCount: document.getElementById("openCount"),
       partialCount: document.getElementById("partialCount"),
       paidCount: document.getElementById("paidCount"),
-      balanceTotal: document.getElementById("balanceTotal")
+      balanceTotal: document.getElementById("balanceTotal"),
+      searchSuggestions: document.getElementById("searchSuggestions")
     };
 
     function goBack() {
@@ -533,10 +529,10 @@
     }
 
     function getTenantId() {
-      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== '') {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
         return Number(authUser.tenant_id);
       }
-      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== 'undefined' ? FALLBACK_TENANT_ID : 1);
+      return ApiBridge.getTenantId(FALLBACK_TENANT_ID);
     }
 
     function showStatus(text, type = "info") {
@@ -587,9 +583,11 @@
       }
       return `<span class="badge badge-open">Открыт</span>`;
     }
+
     async function apiGet(path) {
       return ApiBridge.get(path);
     }
+
     async function apiPost(path, body) {
       return ApiBridge.post(path, body);
     }
@@ -629,6 +627,30 @@
         created_at:
           row.created_at || row.date || null
       };
+    }
+
+    function rebuildSuggestions() {
+      const values = new Set();
+
+      debtsData.forEach(row => {
+        [
+          row.counterparty_name,
+          row.item_name,
+          row.location_name,
+          row.comment
+        ].forEach(value => {
+          const text = String(value || "").trim();
+          if (text) values.add(text);
+        });
+      });
+
+      const items = Array.from(values)
+        .sort((a, b) => a.localeCompare(b, "ru"))
+        .slice(0, 200);
+
+      els.searchSuggestions.innerHTML = items
+        .map(value => `<option value="${escapeHtml(value)}"></option>`)
+        .join("");
     }
 
     function updateStats(rows) {
@@ -720,6 +742,7 @@
         const data = await apiGet(`/debts?tenant_id=${tenantId}`);
         debtsData = extractList(data, ["debts", "data", "rows"]).map(normalizeDebt);
 
+        rebuildSuggestions();
         renderTable();
 
         showStatus(`Данные загружены.\nTenant ID: ${tenantId}\nДолгов: ${debtsData.length}`, "success");

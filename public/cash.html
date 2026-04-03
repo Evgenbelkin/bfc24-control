@@ -63,6 +63,7 @@
       font-size:14px;
       font-weight:700;
       white-space:nowrap;
+      transition:.15s ease;
     }
 
     .btn-primary{
@@ -78,6 +79,17 @@
       background:#fff;
       color:var(--text);
       border:1px solid var(--line);
+    }
+
+    .btn-light:hover{
+      border-color:#cbd5e1;
+      background:#f8fafc;
+    }
+
+    .btn-period.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
     }
 
     .card{
@@ -102,7 +114,7 @@
 
     .filters{
       display:grid;
-      grid-template-columns:1.5fr 1fr 1fr auto;
+      grid-template-columns:1.4fr 1fr 1fr 1fr 1fr auto;
       gap:12px;
       align-items:end;
     }
@@ -112,6 +124,12 @@
       flex-direction:column;
       gap:7px;
       min-width:0;
+    }
+
+    .period-buttons{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
     }
 
     label{
@@ -189,12 +207,15 @@
     .table-wrap{
       overflow:auto;
       margin-top:10px;
+      max-height:68vh;
+      border-radius:12px;
     }
 
     table{
       width:100%;
       min-width:1150px;
-      border-collapse:collapse;
+      border-collapse:separate;
+      border-spacing:0;
       background:#fff;
     }
 
@@ -204,6 +225,7 @@
       text-align:left;
       vertical-align:top;
       font-size:14px;
+      background:#fff;
     }
 
     th{
@@ -212,7 +234,8 @@
       color:#111827;
       position:sticky;
       top:0;
-      z-index:1;
+      z-index:10;
+      box-shadow:0 2px 0 #eef1f5;
     }
 
     tr:hover td{
@@ -247,6 +270,12 @@
       padding:24px 12px;
     }
 
+    @media (max-width: 1180px){
+      .filters{
+        grid-template-columns:1fr 1fr 1fr;
+      }
+    }
+
     @media (max-width: 980px){
       .filters,
       .stats{
@@ -259,6 +288,11 @@
 
       .wrap{
         padding:16px 12px 32px;
+      }
+
+      .period-buttons{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
       }
     }
   </style>
@@ -300,6 +334,25 @@
             <option value="transfer">Перевод</option>
             <option value="consignment">Под реализацию</option>
           </select>
+        </div>
+
+        <div class="field">
+          <label>Быстрый период</label>
+          <div class="period-buttons">
+            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn">Сегодня</button>
+            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn">Неделя</button>
+            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn">Месяц</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="dateFrom">Дата от</label>
+          <input id="dateFrom" type="date" />
+        </div>
+
+        <div class="field">
+          <label for="dateTo">Дата до</label>
+          <input id="dateTo" type="date" />
         </div>
 
         <div class="field">
@@ -359,11 +412,12 @@
     </div>
   </div>
 
-    <script src="/js/config.js"></script>
+  <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
 
-  <script>    const FALLBACK_TENANT_ID = 1;
+  <script>
+    const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -387,12 +441,12 @@
     };
 
     async function requestFallback(method, path, body) {
-      const token = localStorage.getItem("token") || "";
+      const authToken = localStorage.getItem("token") || "";
       const response = await fetch(path, {
         method,
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: "Bearer " + token } : {})
+          ...(authToken ? { Authorization: "Bearer " + authToken } : {})
         },
         ...(body !== undefined ? { body: JSON.stringify(body) } : {})
       });
@@ -438,45 +492,22 @@
           return window.API.get(path);
         }
         return requestFallback("GET", path);
-      },
-      post(path, body) {
-        if (window.API && typeof window.API.post === "function") {
-          return window.API.post(path, body);
-        }
-        return requestFallback("POST", path, body);
-      },
-      put(path, body) {
-        if (window.API && typeof window.API.put === "function") {
-          return window.API.put(path, body);
-        }
-        return requestFallback("PUT", path, body);
-      },
-      patch(path, body) {
-        if (window.API && typeof window.API.patch === "function") {
-          return window.API.patch(path, body);
-        }
-        return requestFallback("PATCH", path, body);
-      },
-      delete(path) {
-        if (window.API && typeof window.API.delete === "function") {
-          return window.API.delete(path);
-        }
-        return requestFallback("DELETE", path);
       }
     };
 
     let authUser = null;
     let cashData = [];
-    let summaryData = {
-      income_total: 0,
-      expense_total: 0,
-      balance: 0
-    };
+    let activePeriod = "";
 
     const els = {
       searchInput: document.getElementById("searchInput"),
       typeFilter: document.getElementById("typeFilter"),
       paymentFilter: document.getElementById("paymentFilter"),
+      dateFrom: document.getElementById("dateFrom"),
+      dateTo: document.getElementById("dateTo"),
+      periodTodayBtn: document.getElementById("periodTodayBtn"),
+      periodWeekBtn: document.getElementById("periodWeekBtn"),
+      periodMonthBtn: document.getElementById("periodMonthBtn"),
       refreshBtn: document.getElementById("refreshBtn"),
       tbody: document.getElementById("tbody"),
       pageStatus: document.getElementById("pageStatus"),
@@ -506,10 +537,10 @@
     }
 
     function getTenantId() {
-      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== '') {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
         return Number(authUser.tenant_id);
       }
-      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== 'undefined' ? FALLBACK_TENANT_ID : 1);
+      return ApiBridge.getTenantId(FALLBACK_TENANT_ID);
     }
 
     function showStatus(text, type = "info") {
@@ -565,6 +596,7 @@
       }
       return `<span class="badge badge-income">Доход</span>`;
     }
+
     async function apiGet(path) {
       return ApiBridge.get(path);
     }
@@ -591,6 +623,70 @@
       };
     }
 
+    function toDateInputValue(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function setActivePeriod(period) {
+      activePeriod = period;
+      els.periodTodayBtn.classList.toggle("active", period === "today");
+      els.periodWeekBtn.classList.toggle("active", period === "week");
+      els.periodMonthBtn.classList.toggle("active", period === "month");
+    }
+
+    function setPeriod(period) {
+      const now = new Date();
+      const todayValue = toDateInputValue(now);
+
+      if (period === "today") {
+        els.dateFrom.value = todayValue;
+        els.dateTo.value = todayValue;
+      } else if (period === "week") {
+        const from = new Date(now);
+        from.setDate(from.getDate() - 6);
+        els.dateFrom.value = toDateInputValue(from);
+        els.dateTo.value = todayValue;
+      } else if (period === "month") {
+        const from = new Date(now);
+        from.setMonth(from.getMonth() - 1);
+        els.dateFrom.value = toDateInputValue(from);
+        els.dateTo.value = todayValue;
+      }
+
+      setActivePeriod(period);
+      renderTable();
+    }
+
+    function clearActivePeriod() {
+      setActivePeriod("");
+    }
+
+    function isInDateRange(row) {
+      const from = els.dateFrom.value;
+      const to = els.dateTo.value;
+
+      if (!from && !to) return true;
+      if (!row.created_at) return false;
+
+      const rowDate = new Date(row.created_at);
+      if (Number.isNaN(rowDate.getTime())) return false;
+
+      if (from) {
+        const fromDate = new Date(`${from}T00:00:00`);
+        if (rowDate < fromDate) return false;
+      }
+
+      if (to) {
+        const toDate = new Date(`${to}T23:59:59.999`);
+        if (rowDate > toDate) return false;
+      }
+
+      return true;
+    }
+
     function getFilteredRows() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
       const type = els.typeFilter.value;
@@ -599,6 +695,7 @@
       return cashData
         .filter(row => !type || row.transaction_type === type)
         .filter(row => !payment || row.payment_method === payment)
+        .filter(row => isInDateRange(row))
         .filter(row => {
           if (!search) return true;
           const text = [
@@ -615,9 +712,15 @@
     }
 
     function updateStats(rows) {
-      const income = Number(summaryData.income_total || 0);
-      const expense = Number(summaryData.expense_total || 0);
-      const balance = Number(summaryData.balance || 0);
+      const income = rows
+        .filter(row => row.transaction_type === "income")
+        .reduce((sum, row) => sum + Number(row.amount || 0), 0);
+
+      const expense = rows
+        .filter(row => row.transaction_type === "expense")
+        .reduce((sum, row) => sum + Number(row.amount || 0), 0);
+
+      const balance = income - expense;
 
       els.rowsCount.textContent = String(rows.length);
       els.incomeTotal.textContent = formatMoney(income);
@@ -658,17 +761,8 @@
         const tenantId = getTenantId();
         showStatus(`Загрузка денег...\nTenant ID: ${tenantId}`, "info");
 
-        const [cashRes, summaryRes] = await Promise.all([
-          apiGet(`/cash?tenant_id=${tenantId}`),
-          apiGet(`/cash/summary?tenant_id=${tenantId}`)
-        ]);
-
+        const cashRes = await apiGet(`/cash?tenant_id=${tenantId}`);
         cashData = extractList(cashRes, ["cash", "data", "rows"]).map(normalizeCashRow);
-        summaryData = summaryRes.summary || summaryRes.data || summaryRes || {
-          income_total: 0,
-          expense_total: 0,
-          balance: 0
-        };
 
         renderTable();
 
@@ -690,6 +784,21 @@
       els.searchInput.addEventListener("input", renderTable);
       els.typeFilter.addEventListener("change", renderTable);
       els.paymentFilter.addEventListener("change", renderTable);
+
+      els.dateFrom.addEventListener("change", () => {
+        clearActivePeriod();
+        renderTable();
+      });
+
+      els.dateTo.addEventListener("change", () => {
+        clearActivePeriod();
+        renderTable();
+      });
+
+      els.periodTodayBtn.addEventListener("click", () => setPeriod("today"));
+      els.periodWeekBtn.addEventListener("click", () => setPeriod("week"));
+      els.periodMonthBtn.addEventListener("click", () => setPeriod("month"));
+
       els.refreshBtn.addEventListener("click", loadData);
     }
 
