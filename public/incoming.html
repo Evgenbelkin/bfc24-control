@@ -328,9 +328,9 @@
           </div>
 
           <div class="field">
-            <label for="qty">Количество</label>
-            <input id="qty" type="number" min="1" step="1" value="1" />
-          </div>
+  <label for="purchase_price">Цена закупки</label>
+  <input id="purchase_price" type="number" min="0" step="0.01" />
+</div>
 
           <div class="field full">
             <label for="comment">Комментарий</label>
@@ -678,12 +678,13 @@
         }
 
         const body = {
-          tenant_id: tenantId,
-          item_id: Number(selectedItem.id),
-          location_id: Number(els.locationId.value),
-          qty,
-          comment: (els.comment.value || "").trim() || null
-        };
+  tenant_id: tenantId,
+  item_id: Number(selectedItem.id),
+  location_id: Number(els.locationId.value),
+  qty,
+  purchase_price: Number(document.getElementById("purchase_price").value),
+  comment: (els.comment.value || "").trim() || null
+};
 
         showStatus(els.submitStatus, "Провожу приёмку...", "info");
 

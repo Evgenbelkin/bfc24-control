@@ -72,12 +72,19 @@ router.post(
         });
       }
 
-      const { item_id, location_id, qty, comment } = req.body;
+      const { item_id, location_id, qty, comment, purchase_price } = req.body;
 
       if (!item_id || !location_id || !qty || Number(qty) <= 0) {
         return res.status(400).json({
           ok: false,
           error: "item_id_location_id_qty_required",
+        });
+      }
+
+      if (purchase_price === undefined || Number(purchase_price) < 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "purchase_price_required",
         });
       }
 
@@ -122,6 +129,16 @@ router.post(
         );
       }
 
+      // 🔥 СОЗДАНИЕ ПАРТИИ
+      await client.query(
+        `
+        INSERT INTO core.item_batches
+        (tenant_id, item_id, batch_date, qty_total, qty_remaining, unit_cost)
+        VALUES ($1, $2, CURRENT_DATE, $3, $3, $4)
+        `,
+        [tenantId, item_id, qty, purchase_price]
+      );
+
       const movement = await client.query(
         `
         INSERT INTO core.movements
@@ -160,75 +177,5 @@ router.post(
     }
   }
 );
-
-router.get("/movements", authRequired, async (req, res) => {
-  try {
-    const tenantId = getEffectiveTenantId(req);
-
-    if (!tenantId) {
-      return res.status(400).json({
-        ok: false,
-        error: "tenant_not_defined",
-      });
-    }
-
-    const type = String(req.query.type || "").trim();
-    const dateFrom = String(req.query.date_from || "").trim();
-    const dateTo = String(req.query.date_to || "").trim();
-
-    const params = [tenantId];
-    let whereSql = `WHERE m.tenant_id = $1`;
-
-    if (type) {
-      params.push(type);
-      whereSql += ` AND m.movement_type = $${params.length}`;
-    }
-
-    if (dateFrom) {
-      params.push(dateFrom);
-      whereSql += ` AND m.created_at >= $${params.length}::date`;
-    }
-
-    if (dateTo) {
-      params.push(dateTo);
-      whereSql += ` AND m.created_at < ($${params.length}::date + INTERVAL '1 day')`;
-    }
-
-    const sql = `
-      SELECT
-        m.id,
-        m.movement_type,
-        m.qty,
-        m.comment,
-        m.created_at,
-        m.created_by,
-        i.name AS item_name,
-        i.sku,
-        l.name AS location_name,
-        u.username AS user_name
-      FROM core.movements m
-      JOIN core.items i ON i.id = m.item_id
-      LEFT JOIN core.locations l ON l.id = m.location_id
-      LEFT JOIN saas.users u ON u.id = m.created_by
-      ${whereSql}
-      ORDER BY m.id DESC
-      LIMIT 500
-    `;
-
-    const { rows } = await pool.query(sql, params);
-
-    return res.json({
-      ok: true,
-      movements: rows,
-    });
-  } catch (e) {
-    console.error("[GET /stock/movements] error:", e);
-    return res.status(500).json({
-      ok: false,
-      error: "movements_failed",
-      details: e.message,
-    });
-  }
-});
 
 module.exports = router;
