@@ -7,6 +7,38 @@ const {
 
 const router = express.Router();
 
+const CATEGORY_LABELS = {
+  rent: "Аренда",
+  salary: "Зарплата",
+  purchase: "Закупка",
+  delivery: "Доставка",
+  ads: "Реклама",
+  utilities: "Коммунальные",
+  other: "Прочее",
+};
+
+function parseExpenseComment(rawComment) {
+  const source = String(rawComment || "");
+  const match = source.match(/^\[#category=([a-z_]+)\]\s*/i);
+
+  if (!match) {
+    return {
+      category: "",
+      category_label: "",
+      clean_comment: source,
+    };
+  }
+
+  const category = String(match[1] || "").trim().toLowerCase();
+  const cleanComment = source.replace(/^\[#category=([a-z_]+)\]\s*/i, "").trim();
+
+  return {
+    category,
+    category_label: CATEGORY_LABELS[category] || category,
+    clean_comment: cleanComment,
+  };
+}
+
 /**
  * GET /cash
  * Фильтры:
@@ -78,9 +110,19 @@ router.get("/", authRequired, async (req, res) => {
 
     const { rows } = await pool.query(sql, params);
 
+    const cash = rows.map((row) => {
+      const parsed = parseExpenseComment(row.comment);
+
+      return {
+        ...row,
+        category: row.transaction_type === "expense" ? parsed.category_label : "",
+        comment: parsed.clean_comment,
+      };
+    });
+
     return res.json({
       ok: true,
-      cash: rows,
+      cash,
     });
   } catch (e) {
     console.error("[GET /cash] error:", e);

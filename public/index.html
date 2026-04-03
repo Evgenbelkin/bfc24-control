@@ -519,6 +519,27 @@
         <div class="card__footer">Открыть модуль</div>
       </div>
 
+      <div class="card" onclick="window.location.href='/expenses.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="14" y="16" width="36" height="32" rx="4" stroke-width="2.4"/>
+                <path class="stroke-main" d="M22 24H42" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M22 32H34" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M40 38H48" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M44 34V42" stroke-width="2.8" stroke-linecap="round"/>
+                <circle class="stroke-accent" cx="44" cy="38" r="8" stroke-width="2.4"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3>Расходы</h3>
+          <div class="muted">Учёт аренды, зарплаты, закупки и других расходов</div>
+        </div>
+        <div class="card__footer">Открыть модуль</div>
+      </div>
+
       <div class="card" onclick="window.location.href='/debts.html'">
         <div class="card__content">
           <div class="card__top">
@@ -560,7 +581,7 @@
     </div>
   </div>
 
-    <script src="/js/config.js"></script>
+  <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
 
@@ -726,9 +747,9 @@
           } catch (_) {}
         }
 
-        const data = window.API && typeof window.API.get === 'function'
-          ? await window.API.get('/auth/me')
-          : await requestFallback('GET', '/auth/me');
+        const data = window.API && typeof window.API.get === "function"
+          ? await window.API.get("/auth/me")
+          : await requestFallback("GET", "/auth/me");
 
         if (!data) {
           localStorage.removeItem("token");

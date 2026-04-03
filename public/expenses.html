@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>BFC24 CONTROL — Расходы</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:#dfe3eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1360px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+      white-space:nowrap;
+      transition:.15s ease;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .btn-primary:hover{
+      background:var(--primary-hover);
+    }
+
+    .btn-light{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-light:hover{
+      border-color:#cbd5e1;
+      background:#f8fafc;
+    }
+
+    .btn-success{
+      background:var(--success);
+      color:#fff;
+    }
+
+    .btn-success:hover{
+      filter:brightness(.96);
+    }
+
+    .btn-danger{
+      background:var(--danger);
+      color:#fff;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid #eef1f5;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:16px;
+    }
+
+    .card-title{
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 14px;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr 1fr;
+      gap:12px;
+      align-items:end;
+    }
+
+    .filters{
+      display:grid;
+      grid-template-columns:1.3fr 1fr 1fr 1fr 1fr auto;
+      gap:12px;
+      align-items:end;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      min-width:0;
+    }
+
+    .period-buttons{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .btn-period.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    input, select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus, select:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    .form-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+
+    .status.show{display:block}
+    .status.error{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+    .status.success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .status.info{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .stat{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      margin-top:10px;
+      max-height:68vh;
+      border-radius:12px;
+    }
+
+    table{
+      width:100%;
+      min-width:1050px;
+      border-collapse:separate;
+      border-spacing:0;
+      background:#fff;
+    }
+
+    th, td{
+      border-bottom:1px solid #eef1f5;
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+      background:#fff;
+    }
+
+    th{
+      background:#f8fafc;
+      font-weight:700;
+      color:#111827;
+      position:sticky;
+      top:0;
+      z-index:10;
+      box-shadow:0 2px 0 #eef1f5;
+    }
+
+    tr:hover td{
+      background:#fbfdff;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid transparent;
+    }
+
+    .badge-expense{
+      color:#991b1b;
+      background:#fef2f2;
+      border-color:#fecaca;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:24px 12px;
+    }
+
+    @media (max-width: 1180px){
+      .form-grid,
+      .filters{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media (max-width: 980px){
+      .form-grid,
+      .filters,
+      .stats{
+        grid-template-columns:1fr;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .wrap{
+        padding:16px 12px 32px;
+      }
+
+      .period-buttons{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">Расходы</div>
+      <div class="top-actions">
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Добавить расход</h2>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="amountInput">Сумма</label>
+          <input id="amountInput" type="number" min="0.01" step="0.01" placeholder="Например: 1500" />
+        </div>
+
+        <div class="field">
+          <label for="categoryInput">Категория</label>
+          <select id="categoryInput">
+            <option value="">Выбери категорию</option>
+            <option value="rent">Аренда</option>
+            <option value="salary">Зарплата</option>
+            <option value="purchase">Закупка</option>
+            <option value="delivery">Доставка</option>
+            <option value="ads">Реклама</option>
+            <option value="utilities">Коммунальные</option>
+            <option value="other">Прочее</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="paymentMethodInput">Способ оплаты</label>
+          <select id="paymentMethodInput">
+            <option value="cash">Наличные</option>
+            <option value="card">Карта</option>
+            <option value="transfer">Перевод</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="expenseDateInput">Дата расхода</label>
+          <input id="expenseDateInput" type="date" />
+        </div>
+
+        <div class="field" style="grid-column:1 / -1;">
+          <label for="commentInput">Комментарий</label>
+          <input id="commentInput" type="text" placeholder="Например: аренда контейнера за апрель" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-success" id="saveBtn">Сохранить расход</button>
+        <button type="button" class="btn btn-light" id="clearBtn">Очистить</button>
+      </div>
+
+      <div id="formStatus" class="status info"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Фильтры и история расходов</h2>
+
+      <div class="filters">
+        <div class="field">
+          <label for="searchInput">Поиск по комментарию / категории / пользователю</label>
+          <input id="searchInput" type="text" placeholder="Например: аренда, зарплата, admin" />
+        </div>
+
+        <div class="field">
+          <label for="categoryFilter">Категория</label>
+          <select id="categoryFilter">
+            <option value="">Все</option>
+            <option value="rent">Аренда</option>
+            <option value="salary">Зарплата</option>
+            <option value="purchase">Закупка</option>
+            <option value="delivery">Доставка</option>
+            <option value="ads">Реклама</option>
+            <option value="utilities">Коммунальные</option>
+            <option value="other">Прочее</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="paymentFilter">Способ оплаты</label>
+          <select id="paymentFilter">
+            <option value="">Все</option>
+            <option value="cash">Наличные</option>
+            <option value="card">Карта</option>
+            <option value="transfer">Перевод</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Быстрый период</label>
+          <div class="period-buttons">
+            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn">Сегодня</button>
+            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn">Неделя</button>
+            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn">Месяц</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="dateFrom">Дата от</label>
+          <input id="dateFrom" type="date" />
+        </div>
+
+        <div class="field">
+          <label for="dateTo">Дата до</label>
+          <input id="dateTo" type="date" />
+        </div>
+
+        <div class="field">
+          <label>&nbsp;</label>
+          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Записей</div>
+          <div class="stat-value" id="rowsCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Сумма расходов</div>
+          <div class="stat-value" id="expenseTotal">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Средний расход</div>
+          <div class="stat-value" id="avgExpense">0</div>
+        </div>
+      </div>
+
+      <div id="pageStatus" class="status info"></div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Тип</th>
+              <th>Сумма</th>
+              <th>Категория</th>
+              <th>Оплата</th>
+              <th>Комментарий</th>
+              <th>Создал</th>
+              <th>Дата</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td colspan="8" class="empty">Загрузка данных...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+
+  <script>
+    const FALLBACK_TENANT_ID = 1;
+
+    const CATEGORY_LABELS = {
+      rent: "Аренда",
+      salary: "Зарплата",
+      purchase: "Закупка",
+      delivery: "Доставка",
+      ads: "Реклама",
+      utilities: "Коммунальные",
+      other: "Прочее"
+    };
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/login.html";
+    }
+
+    const Ui = window.AppUI || {
+      escapeHtml: (value) => String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;"),
+      translateError: (value) => String(value || "Ошибка"),
+      displayDateTime: (value) => {
+        if (!value) return "";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleString("ru-RU");
+      }
+    };
+
+    async function requestFallback(method, path, body) {
+      const authToken = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(authToken ? { Authorization: "Bearer " + authToken } : {})
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
+
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+
+      return data;
+    }
+
+    function getTenantIdFromStorage(fallback = 1) {
+      try {
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
+      } catch {}
+      return fallback;
+    }
+
+    const ApiBridge = {
+      getTenantId(fallback = 1) {
+        if (window.API && typeof window.API.getTenantId === "function") {
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
+        }
+        return getTenantIdFromStorage(fallback);
+      },
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      },
+      post(path, body) {
+        if (window.API && typeof window.API.post === "function") {
+          return window.API.post(path, body);
+        }
+        return requestFallback("POST", path, body);
+      }
+    };
+
+    let authUser = null;
+    let expensesData = [];
+    let activePeriod = "";
+
+    const els = {
+      amountInput: document.getElementById("amountInput"),
+      categoryInput: document.getElementById("categoryInput"),
+      paymentMethodInput: document.getElementById("paymentMethodInput"),
+      expenseDateInput: document.getElementById("expenseDateInput"),
+      commentInput: document.getElementById("commentInput"),
+      saveBtn: document.getElementById("saveBtn"),
+      clearBtn: document.getElementById("clearBtn"),
+      formStatus: document.getElementById("formStatus"),
+
+      searchInput: document.getElementById("searchInput"),
+      categoryFilter: document.getElementById("categoryFilter"),
+      paymentFilter: document.getElementById("paymentFilter"),
+      dateFrom: document.getElementById("dateFrom"),
+      dateTo: document.getElementById("dateTo"),
+      periodTodayBtn: document.getElementById("periodTodayBtn"),
+      periodWeekBtn: document.getElementById("periodWeekBtn"),
+      periodMonthBtn: document.getElementById("periodMonthBtn"),
+      refreshBtn: document.getElementById("refreshBtn"),
+
+      tbody: document.getElementById("tbody"),
+      pageStatus: document.getElementById("pageStatus"),
+      rowsCount: document.getElementById("rowsCount"),
+      expenseTotal: document.getElementById("expenseTotal"),
+      avgExpense: document.getElementById("avgExpense")
+    };
+
+    function goBack() {
+      window.location.href = "/index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
+
+    function parseUser() {
+      try {
+        const raw = localStorage.getItem("user");
+        authUser = raw ? JSON.parse(raw) : null;
+      } catch {
+        authUser = null;
+      }
+    }
+
+    function getTenantId() {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
+        return Number(authUser.tenant_id);
+      }
+      return ApiBridge.getTenantId(FALLBACK_TENANT_ID);
+    }
+
+    function showStatus(el, text, type = "info") {
+      el.className = "status show " + type;
+      el.textContent = text;
+    }
+
+    function hideStatus(el) {
+      el.className = "status";
+      el.textContent = "";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function extractList(data, keys) {
+      if (Array.isArray(data)) return data;
+      if (!data || typeof data !== "object") return [];
+
+      for (const key of keys) {
+        if (Array.isArray(data[key])) return data[key];
+      }
+
+      for (const value of Object.values(data)) {
+        if (Array.isArray(value)) return value;
+      }
+
+      return [];
+    }
+
+    function formatMoney(value) {
+      const n = Number(value || 0);
+      if (!Number.isFinite(n)) return "0";
+      return n % 1 === 0 ? String(n) : n.toFixed(2);
+    }
+
+    function formatDate(value) {
+      return Ui.displayDateTime(value);
+    }
+
+    function paymentLabel(value) {
+      if (value === "cash") return "Наличные";
+      if (value === "card") return "Карта";
+      if (value === "transfer") return "Перевод";
+      return value || "";
+    }
+
+    function toDateInputValue(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function setDefaultExpenseDate() {
+      els.expenseDateInput.value = toDateInputValue(new Date());
+    }
+
+    function setActivePeriod(period) {
+      activePeriod = period;
+      els.periodTodayBtn.classList.toggle("active", period === "today");
+      els.periodWeekBtn.classList.toggle("active", period === "week");
+      els.periodMonthBtn.classList.toggle("active", period === "month");
+    }
+
+    function setPeriod(period) {
+      const now = new Date();
+      const todayValue = toDateInputValue(now);
+
+      if (period === "today") {
+        els.dateFrom.value = todayValue;
+        els.dateTo.value = todayValue;
+      } else if (period === "week") {
+        const from = new Date(now);
+        from.setDate(from.getDate() - 6);
+        els.dateFrom.value = toDateInputValue(from);
+        els.dateTo.value = todayValue;
+      } else if (period === "month") {
+        const from = new Date(now);
+        from.setMonth(from.getMonth() - 1);
+        els.dateFrom.value = toDateInputValue(from);
+        els.dateTo.value = todayValue;
+      }
+
+      setActivePeriod(period);
+      renderTable();
+    }
+
+    function clearActivePeriod() {
+      setActivePeriod("");
+    }
+
+    function isInDateRange(row) {
+      const from = els.dateFrom.value;
+      const to = els.dateTo.value;
+
+      if (!from && !to) return true;
+      if (!row.created_at) return false;
+
+      const rowDate = new Date(row.created_at);
+      if (Number.isNaN(rowDate.getTime())) return false;
+
+      if (from) {
+        const fromDate = new Date(`${from}T00:00:00`);
+        if (rowDate < fromDate) return false;
+      }
+
+      if (to) {
+        const toDate = new Date(`${to}T23:59:59.999`);
+        if (rowDate > toDate) return false;
+      }
+
+      return true;
+    }
+
+    function normalizeExpenseRow(row) {
+      return {
+        id: row.id,
+        amount: Number(row.amount || 0),
+        category: String(row.category || "").trim().toLowerCase(),
+        category_label: row.category_label || CATEGORY_LABELS[String(row.category || "").trim().toLowerCase()] || "",
+        payment_method: row.payment_method || "",
+        comment: row.comment || "",
+        created_by_username: row.created_by_username || "",
+        created_at: row.created_at || null
+      };
+    }
+
+    function clearForm() {
+      els.amountInput.value = "";
+      els.categoryInput.value = "";
+      els.paymentMethodInput.value = "cash";
+      setDefaultExpenseDate();
+      els.commentInput.value = "";
+      hideStatus(els.formStatus);
+    }
+
+    function getFilteredRows() {
+      const search = (els.searchInput.value || "").trim().toLowerCase();
+      const category = (els.categoryFilter.value || "").trim().toLowerCase();
+      const payment = els.paymentFilter.value;
+
+      return expensesData
+        .filter(row => !category || row.category === category)
+        .filter(row => !payment || row.payment_method === payment)
+        .filter(row => isInDateRange(row))
+        .filter(row => {
+          if (!search) return true;
+
+          const text = [
+            row.category_label,
+            row.comment,
+            row.created_by_username,
+            paymentLabel(row.payment_method)
+          ].join(" ").toLowerCase();
+
+          return text.includes(search);
+        });
+    }
+
+    function updateStats(rows) {
+      const total = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const average = rows.length ? total / rows.length : 0;
+
+      els.rowsCount.textContent = String(rows.length);
+      els.expenseTotal.textContent = formatMoney(total);
+      els.avgExpense.textContent = formatMoney(average);
+    }
+
+    function renderTable() {
+      const rows = getFilteredRows();
+      updateStats(rows);
+
+      if (!rows.length) {
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty">Нет данных</td>
+          </tr>
+        `;
+        return;
+      }
+
+      els.tbody.innerHTML = rows.map(row => `
+        <tr>
+          <td>${escapeHtml(row.id)}</td>
+          <td><span class="badge badge-expense">Расход</span></td>
+          <td>${escapeHtml(formatMoney(row.amount))}</td>
+          <td>${escapeHtml(row.category_label)}</td>
+          <td>${escapeHtml(paymentLabel(row.payment_method))}</td>
+          <td>${escapeHtml(row.comment)}</td>
+          <td>${escapeHtml(row.created_by_username || "-")}</td>
+          <td>${escapeHtml(formatDate(row.created_at))}</td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadData() {
+      try {
+        const tenantId = getTenantId();
+        showStatus(els.pageStatus, `Загрузка расходов...\nTenant ID: ${tenantId}`, "info");
+
+        const data = await ApiBridge.get(`/expenses?tenant_id=${tenantId}`);
+        expensesData = extractList(data, ["expenses", "data", "rows"]).map(normalizeExpenseRow);
+
+        renderTable();
+
+        showStatus(
+          els.pageStatus,
+          `Данные загружены.\nTenant ID: ${tenantId}\nРасходов: ${expensesData.length}`,
+          "success"
+        );
+      } catch (err) {
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty">Ошибка загрузки данных</td>
+          </tr>
+        `;
+        showStatus(els.pageStatus, "Ошибка: " + Ui.translateError(err.message), "error");
+      }
+    }
+
+    async function saveExpense() {
+      try {
+        const tenantId = getTenantId();
+        const amount = Number(els.amountInput.value || 0);
+        const category = String(els.categoryInput.value || "").trim();
+        const paymentMethod = String(els.paymentMethodInput.value || "").trim();
+        const expenseDate = String(els.expenseDateInput.value || "").trim();
+        const comment = String(els.commentInput.value || "").trim();
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+          throw new Error("Укажи корректную сумму расхода");
+        }
+
+        if (!category) {
+          throw new Error("Выбери категорию расхода");
+        }
+
+        if (!paymentMethod) {
+          throw new Error("Выбери способ оплаты");
+        }
+
+        showStatus(els.formStatus, "Сохраняю расход...", "info");
+
+        await ApiBridge.post("/expenses", {
+          tenant_id: tenantId,
+          amount,
+          category,
+          payment_method: paymentMethod,
+          expense_date: expenseDate || null,
+          comment: comment || null
+        });
+
+        showStatus(els.formStatus, "Расход успешно сохранён", "success");
+        clearForm();
+        await loadData();
+      } catch (err) {
+        showStatus(els.formStatus, "Ошибка: " + Ui.translateError(err.message), "error");
+      }
+    }
+
+    function bindEvents() {
+      els.saveBtn.addEventListener("click", saveExpense);
+      els.clearBtn.addEventListener("click", clearForm);
+
+      els.searchInput.addEventListener("input", renderTable);
+      els.categoryFilter.addEventListener("change", renderTable);
+      els.paymentFilter.addEventListener("change", renderTable);
+
+      els.dateFrom.addEventListener("change", () => {
+        clearActivePeriod();
+        renderTable();
+      });
+
+      els.dateTo.addEventListener("change", () => {
+        clearActivePeriod();
+        renderTable();
+      });
+
+      els.periodTodayBtn.addEventListener("click", () => setPeriod("today"));
+      els.periodWeekBtn.addEventListener("click", () => setPeriod("week"));
+      els.periodMonthBtn.addEventListener("click", () => setPeriod("month"));
+
+      els.refreshBtn.addEventListener("click", loadData);
+    }
+
+    function bootstrap() {
+      parseUser();
+      setDefaultExpenseDate();
+      bindEvents();
+      loadData();
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>
