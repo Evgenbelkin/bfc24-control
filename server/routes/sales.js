@@ -11,7 +11,7 @@ const router = express.Router();
 router.post(
   "/sell",
   authRequired,
-  requireRole("owner", "admin", "client_owner", "client_manager"),
+  requireRole("owner", "admin", "client_owner", "client_manager", "client"),
   async (req, res) => {
     const client = await pool.connect();
 
