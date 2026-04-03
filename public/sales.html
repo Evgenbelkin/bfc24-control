@@ -400,9 +400,107 @@
     </div>
   </div>
 
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+
   <script>
-    const API_BASE = '';
     const FALLBACK_TENANT_ID = 1;
+
+    const Ui = window.AppUI || {
+      escapeHtml: (value) => String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;"),
+      translateError: (value) => String(value || "Ошибка"),
+      displayDateTime: (value) => {
+        if (!value) return "";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleString("ru-RU");
+      }
+    };
+
+    async function requestFallback(method, path, body) {
+      const token = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
+
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+
+      return data;
+    }
+
+    function getTenantIdFromStorage(fallback = 1) {
+      try {
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
+      } catch {}
+      return fallback;
+    }
+
+    const ApiBridge = {
+      getTenantId(fallback = 1) {
+        if (window.API && typeof window.API.getTenantId === "function") {
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
+        }
+        return getTenantIdFromStorage(fallback);
+      },
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      },
+      post(path, body) {
+        if (window.API && typeof window.API.post === "function") {
+          return window.API.post(path, body);
+        }
+        return requestFallback("POST", path, body);
+      },
+      put(path, body) {
+        if (window.API && typeof window.API.put === "function") {
+          return window.API.put(path, body);
+        }
+        return requestFallback("PUT", path, body);
+      },
+      patch(path, body) {
+        if (window.API && typeof window.API.patch === "function") {
+          return window.API.patch(path, body);
+        }
+        return requestFallback("PATCH", path, body);
+      },
+      delete(path) {
+        if (window.API && typeof window.API.delete === "function") {
+          return window.API.delete(path);
+        }
+        return requestFallback("DELETE", path);
+      }
+    };
 
     let authUser = null;
     let allItems = [];
@@ -412,52 +510,48 @@
     let selectedItem = null;
 
     const els = {
-      tenantId: document.getElementById('tenantId'),
-      paymentMethod: document.getElementById('paymentMethod'),
-      itemSearch: document.getElementById('itemSearch'),
-      itemResults: document.getElementById('itemResults'),
-      selectedItemBox: document.getElementById('selectedItemBox'),
-      locationId: document.getElementById('locationId'),
-      counterpartyId: document.getElementById('counterpartyId'),
-      qty: document.getElementById('qty'),
-      price: document.getElementById('price'),
-      comment: document.getElementById('comment'),
-      itemsCount: document.getElementById('itemsCount'),
-      locationsCount: document.getElementById('locationsCount'),
-      clientsCount: document.getElementById('clientsCount'),
-      stockCount: document.getElementById('stockCount'),
-      pageStatus: document.getElementById('pageStatus'),
-      submitStatus: document.getElementById('submitStatus'),
-      saleForm: document.getElementById('saleForm')
+      tenantId: document.getElementById("tenantId"),
+      paymentMethod: document.getElementById("paymentMethod"),
+      itemSearch: document.getElementById("itemSearch"),
+      itemResults: document.getElementById("itemResults"),
+      selectedItemBox: document.getElementById("selectedItemBox"),
+      locationId: document.getElementById("locationId"),
+      counterpartyId: document.getElementById("counterpartyId"),
+      qty: document.getElementById("qty"),
+      price: document.getElementById("price"),
+      comment: document.getElementById("comment"),
+      itemsCount: document.getElementById("itemsCount"),
+      locationsCount: document.getElementById("locationsCount"),
+      clientsCount: document.getElementById("clientsCount"),
+      stockCount: document.getElementById("stockCount"),
+      pageStatus: document.getElementById("pageStatus"),
+      submitStatus: document.getElementById("submitStatus"),
+      saleForm: document.getElementById("saleForm")
     };
 
-    function getToken() {
-      return localStorage.getItem('token') || '';
-    }
-
-    function showStatus(el, text, type = 'info') {
-      el.className = 'status show ' + type;
+    function showStatus(el, text, type = "info") {
+      el.className = "status show " + type;
       el.textContent = text;
     }
 
     function hideStatus(el) {
-      el.className = 'status';
-      el.textContent = '';
+      el.className = "status";
+      el.textContent = "";
     }
 
     function goBack() {
-      window.location.href = '/index.html';
+      window.location.href = "/index.html";
     }
 
     function logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login.html';
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
     }
 
     function parseUser() {
       try {
-        const raw = localStorage.getItem('user');
+        const raw = localStorage.getItem("user");
         authUser = raw ? JSON.parse(raw) : null;
       } catch {
         authUser = null;
@@ -466,88 +560,49 @@
 
     function getTenantId() {
       const rawFromInput = Number(els.tenantId.value);
+
       if (Number.isFinite(rawFromInput) && rawFromInput > 0) {
         return rawFromInput;
       }
 
-      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== '') {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
         return Number(authUser.tenant_id);
       }
 
-      return FALLBACK_TENANT_ID;
-    }
-
-    function authHeaders() {
-      const token = getToken();
-      return {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      };
+      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== "undefined" ? FALLBACK_TENANT_ID : 1);
     }
 
     function extractList(data, keys) {
       if (Array.isArray(data)) return data;
-      if (!data || typeof data !== 'object') return [];
+      if (!data || typeof data !== "object") return [];
+
       for (const key of keys) {
         if (Array.isArray(data[key])) return data[key];
       }
+
       for (const value of Object.values(data)) {
         if (Array.isArray(value)) return value;
       }
+
       return [];
     }
 
     async function apiGet(path) {
-      const res = await fetch(API_BASE + path, {
-        method: 'GET',
-        headers: authHeaders()
-      });
-
-      const text = await res.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { raw: text };
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || ('HTTP ' + res.status));
-      }
-
-      return data;
+      return ApiBridge.get(path);
     }
 
     async function apiPost(path, body) {
-      const res = await fetch(API_BASE + path, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(body)
-      });
-
-      const text = await res.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { raw: text };
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || ('HTTP ' + res.status));
-      }
-
-      return data;
+      return ApiBridge.post(path, body);
     }
 
     function normalizeItem(item) {
       return {
         id: item.id,
         tenant_id: item.tenant_id,
-        name: item.name || item.item_name || '',
-        sku: item.sku || '',
-        barcode: item.barcode || '',
-        vendor_code: item.vendor_code || item.article || '',
+        name: item.name || item.item_name || "",
+        sku: item.sku || "",
+        barcode: item.barcode || "",
+        vendor_code: item.vendor_code || item.article || "",
         price: Number(item.price || item.sale_price || 0),
         raw: item
       };
@@ -568,9 +623,9 @@
         item.barcode,
         item.vendor_code
       ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
     }
 
     function getCurrentStockQty() {
@@ -581,17 +636,17 @@
 
     function renderSelectedItem() {
       if (!selectedItem) {
-        els.selectedItemBox.classList.remove('active');
-        els.selectedItemBox.innerHTML = '';
+        els.selectedItemBox.classList.remove("active");
+        els.selectedItemBox.innerHTML = "";
         return;
       }
 
       const stockQty = getCurrentStockQty();
-      let stockInfo = '';
+      let stockInfo = "";
 
       if (stockQty !== null) {
         stockInfo = `
-          <div class="selected-stock ${stockQty <= 0 ? 'zero' : ''}">
+          <div class="selected-stock ${stockQty <= 0 ? "zero" : ""}">
             Остаток на выбранном МХ: ${stockQty}
           </div>
         `;
@@ -603,14 +658,14 @@
         `;
       }
 
-      els.selectedItemBox.classList.add('active');
+      els.selectedItemBox.classList.add("active");
       els.selectedItemBox.innerHTML = `
-        <div><strong>Выбран товар:</strong> ${escapeHtml(selectedItem.name || 'Без названия')}</div>
+        <div><strong>Выбран товар:</strong> ${escapeHtml(selectedItem.name || "Без названия")}</div>
         <div class="muted" style="margin-top:6px;">
-          ID: ${escapeHtml(String(selectedItem.id ?? ''))}
-          ${selectedItem.sku ? ' | SKU: ' + escapeHtml(selectedItem.sku) : ''}
-          ${selectedItem.barcode ? ' | ШК: ' + escapeHtml(selectedItem.barcode) : ''}
-          ${selectedItem.vendor_code ? ' | Артикул: ' + escapeHtml(selectedItem.vendor_code) : ''}
+          ID: ${escapeHtml(String(selectedItem.id ?? ""))}
+          ${selectedItem.sku ? " | SKU: " + escapeHtml(selectedItem.sku) : ""}
+          ${selectedItem.barcode ? " | ШК: " + escapeHtml(selectedItem.barcode) : ""}
+          ${selectedItem.vendor_code ? " | Артикул: " + escapeHtml(selectedItem.vendor_code) : ""}
         </div>
         ${stockInfo}
       `;
@@ -624,32 +679,33 @@
             <div class="result-sub">Проверь название, штрихкод, SKU или артикул.</div>
           </div>
         `;
-        els.itemResults.style.display = 'block';
+        els.itemResults.style.display = "block";
         return;
       }
 
-      els.itemResults.innerHTML = items.map(item => `
+      els.itemResults.innerHTML = items.map((item) => `
         <div class="result-item" data-id="${escapeHtml(String(item.id))}">
-          <div class="result-title">${escapeHtml(item.name || 'Без названия')}</div>
+          <div class="result-title">${escapeHtml(item.name || "Без названия")}</div>
           <div class="result-sub">
-            ID: ${escapeHtml(String(item.id ?? ''))}
-            ${item.sku ? ' | SKU: ' + escapeHtml(item.sku) : ''}
-            ${item.barcode ? ' | ШК: ' + escapeHtml(item.barcode) : ''}
-            ${item.vendor_code ? ' | Артикул: ' + escapeHtml(item.vendor_code) : ''}
+            ID: ${escapeHtml(String(item.id ?? ""))}
+            ${item.sku ? " | SKU: " + escapeHtml(item.sku) : ""}
+            ${item.barcode ? " | ШК: " + escapeHtml(item.barcode) : ""}
+            ${item.vendor_code ? " | Артикул: " + escapeHtml(item.vendor_code) : ""}
           </div>
         </div>
-      `).join('');
+      `).join("");
 
-      els.itemResults.style.display = 'block';
+      els.itemResults.style.display = "block";
 
-      els.itemResults.querySelectorAll('.result-item[data-id]').forEach(node => {
-        node.addEventListener('click', () => {
+      els.itemResults.querySelectorAll(".result-item[data-id]").forEach((node) => {
+        node.addEventListener("click", () => {
           const id = String(node.dataset.id);
-          const found = allItems.find(x => String(x.id) === id);
+          const found = allItems.find((x) => String(x.id) === id);
+
           if (found) {
             selectedItem = found;
-            els.itemSearch.value = found.name || '';
-            els.itemResults.style.display = 'none';
+            els.itemSearch.value = found.name || "";
+            els.itemResults.style.display = "none";
             renderSelectedItem();
 
             if (!Number(els.price.value) && Number(found.price) > 0) {
@@ -662,29 +718,28 @@
 
     function fillLocations() {
       els.locationId.innerHTML = `<option value="">Выберите МХ</option>` +
-        allLocations.map(loc => `
+        allLocations.map((loc) => `
           <option value="${escapeHtml(String(loc.id))}">
-            ${escapeHtml(loc.name || '')}${loc.code ? ' (' + escapeHtml(loc.code) + ')' : ''}
+            ${escapeHtml(loc.name || "")}${loc.code ? " (" + escapeHtml(loc.code) + ")" : ""}
           </option>
-        `).join('');
+        `).join("");
     }
 
     function fillClients() {
       els.counterpartyId.innerHTML = `<option value="">Без клиента</option>` +
-        allClients.map(client => `
+        allClients.map((client) => `
           <option value="${escapeHtml(String(client.id))}">
-            ${escapeHtml(client.name || '')}
+            ${escapeHtml(client.name || "")}
           </option>
-        `).join('');
+        `).join("");
     }
 
     async function loadItems() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error('Укажи tenant_id');
+      if (!tenantId) throw new Error("Укажи tenant_id");
 
       const data = await apiGet(`/items?tenant_id=${tenantId}`);
-      const items = extractList(data, ['items', 'data', 'rows'])
-        .map(normalizeItem);
+      const items = extractList(data, ["items", "data", "rows"]).map(normalizeItem);
 
       allItems = items;
       els.itemsCount.textContent = String(allItems.length);
@@ -692,33 +747,33 @@
 
     async function loadLocations() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error('Укажи tenant_id');
+      if (!tenantId) throw new Error("Укажи tenant_id");
 
       const data = await apiGet(`/locations?tenant_id=${tenantId}`);
-      allLocations = extractList(data, ['locations', 'data', 'rows']);
+      allLocations = extractList(data, ["locations", "data", "rows"]);
       els.locationsCount.textContent = String(allLocations.length);
       fillLocations();
     }
 
     async function loadClients() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error('Укажи tenant_id');
+      if (!tenantId) throw new Error("Укажи tenant_id");
 
       const data = await apiGet(`/clients?tenant_id=${tenantId}`);
-      allClients = extractList(data, ['clients', 'counterparties', 'data', 'rows']);
+      allClients = extractList(data, ["clients", "counterparties", "data", "rows"]);
       els.clientsCount.textContent = String(allClients.length);
       fillClients();
     }
 
     async function loadStock() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error('Укажи tenant_id');
+      if (!tenantId) throw new Error("Укажи tenant_id");
 
       const data = await apiGet(`/stock?tenant_id=${tenantId}`);
-      const rows = extractList(data, ['stock', 'data', 'rows']).map(normalizeStockRow);
+      const rows = extractList(data, ["stock", "data", "rows"]).map(normalizeStockRow);
 
       stockMap = {};
-      rows.forEach(row => {
+      rows.forEach((row) => {
         if (row.item_id === null || row.location_id === null) return;
         const key = `${row.item_id}_${row.location_id}`;
         stockMap[key] = row.qty;
@@ -731,10 +786,10 @@
       hideStatus(els.pageStatus);
 
       try {
-        showStatus(els.pageStatus, 'Загрузка данных...', 'info');
+        showStatus(els.pageStatus, "Загрузка данных...", "info");
         selectedItem = null;
         renderSelectedItem();
-        els.itemResults.style.display = 'none';
+        els.itemResults.style.display = "none";
 
         await Promise.all([
           loadItems(),
@@ -748,35 +803,35 @@
         showStatus(
           els.pageStatus,
           `Данные загружены.\nТоваров: ${allItems.length}, МХ: ${allLocations.length}, клиентов: ${allClients.length}, остатков: ${els.stockCount.textContent}`,
-          'success'
+          "success"
         );
       } catch (err) {
-        showStatus(els.pageStatus, 'Ошибка загрузки данных: ' + err.message, 'error');
+        showStatus(els.pageStatus, "Ошибка загрузки данных: " + Ui.translateError(err.message), "error");
       }
     }
 
     function onItemSearchInput() {
-      const q = (els.itemSearch.value || '').trim().toLowerCase();
+      const q = (els.itemSearch.value || "").trim().toLowerCase();
 
       if (!q) {
-        els.itemResults.style.display = 'none';
+        els.itemResults.style.display = "none";
         return;
       }
 
       const filtered = allItems
-        .filter(item => itemSearchText(item).includes(q))
+        .filter((item) => itemSearchText(item).includes(q))
         .slice(0, 30);
 
       renderItemResults(filtered);
     }
 
     function escapeHtml(value) {
-      return String(value)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
     async function handleSubmit(e) {
@@ -785,19 +840,19 @@
 
       try {
         const tenantId = getTenantId();
-        if (!tenantId) throw new Error('Укажи tenant_id');
-        if (!selectedItem || !selectedItem.id) throw new Error('Выбери товар из списка');
-        if (!els.locationId.value) throw new Error('Выбери место хранения');
+        if (!tenantId) throw new Error("Укажи tenant_id");
+        if (!selectedItem || !selectedItem.id) throw new Error("Выбери товар из списка");
+        if (!els.locationId.value) throw new Error("Выбери место хранения");
 
         const qty = Number(els.qty.value);
-        if (!Number.isFinite(qty) || qty <= 0) throw new Error('Количество должно быть больше 0');
+        if (!Number.isFinite(qty) || qty <= 0) throw new Error("Количество должно быть больше 0");
 
         const price = Number(els.price.value || 0);
-        if (!Number.isFinite(price) || price < 0) throw new Error('Цена не может быть отрицательной');
+        if (!Number.isFinite(price) || price < 0) throw new Error("Цена не может быть отрицательной");
 
         const stockQty = getCurrentStockQty();
         if (stockQty === null) {
-          throw new Error('Не удалось определить остаток по выбранному месту хранения');
+          throw new Error("Не удалось определить остаток по выбранному месту хранения");
         }
 
         if (qty > stockQty) {
@@ -815,64 +870,64 @@
           price,
           amount,
           payment_method: paymentMethod,
-          comment: (els.comment.value || '').trim() || null
+          comment: (els.comment.value || "").trim() || null
         };
 
         if (els.counterpartyId.value) {
           body.counterparty_id = Number(els.counterpartyId.value);
         }
 
-        showStatus(els.submitStatus, 'Провожу продажу...', 'info');
+        showStatus(els.submitStatus, "Провожу продажу...", "info");
 
-        const result = await apiPost('/sales/sell', body);
+        const result = await apiPost("/sales/sell", body);
 
         await loadStock();
         renderSelectedItem();
 
         showStatus(
           els.submitStatus,
-          'Продажа успешно проведена.\n\n' + JSON.stringify(result, null, 2),
-          'success'
+          "Продажа успешно проведена.\n\n" + JSON.stringify(result, null, 2),
+          "success"
         );
 
         els.qty.value = 1;
         els.price.value = 0;
-        els.comment.value = '';
-        els.paymentMethod.value = 'cash';
-        els.counterpartyId.value = '';
-        els.locationId.value = '';
-        els.itemSearch.value = '';
+        els.comment.value = "";
+        els.paymentMethod.value = "cash";
+        els.counterpartyId.value = "";
+        els.locationId.value = "";
+        els.itemSearch.value = "";
         selectedItem = null;
         renderSelectedItem();
-        els.itemResults.style.display = 'none';
+        els.itemResults.style.display = "none";
       } catch (err) {
-        showStatus(els.submitStatus, 'Ошибка продажи: ' + err.message, 'error');
+        showStatus(els.submitStatus, "Ошибка продажи: " + Ui.translateError(err.message), "error");
       }
     }
 
     function bindEvents() {
-      els.itemSearch.addEventListener('input', onItemSearchInput);
+      els.itemSearch.addEventListener("input", onItemSearchInput);
 
-      els.itemSearch.addEventListener('focus', () => {
+      els.itemSearch.addEventListener("focus", () => {
         if (els.itemSearch.value.trim()) {
           onItemSearchInput();
         }
       });
 
-      els.locationId.addEventListener('change', () => {
+      els.locationId.addEventListener("change", () => {
         renderSelectedItem();
       });
 
-      document.addEventListener('click', (e) => {
-        const inAutocomplete = e.target.closest('.autocomplete');
+      document.addEventListener("click", (e) => {
+        const inAutocomplete = e.target.closest(".autocomplete");
         if (!inAutocomplete) {
-          els.itemResults.style.display = 'none';
+          els.itemResults.style.display = "none";
         }
       });
 
-      els.saleForm.addEventListener('submit', handleSubmit);
+      els.saleForm.addEventListener("submit", handleSubmit);
 
-      els.tenantId.addEventListener('change', () => {
+      els.tenantId.addEventListener("change", () => {
         loadInitialData();
       });
     }
@@ -880,8 +935,9 @@
     function bootstrap() {
       parseUser();
 
-      if (!getToken()) {
-        window.location.href = '/login.html';
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "/login.html";
         return;
       }
 
