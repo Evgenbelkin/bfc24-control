@@ -54,6 +54,55 @@ router.get("/", authRequired, async (req, res) => {
   }
 });
 
+router.get("/batches", authRequired, async (req, res) => {
+  try {
+    const tenantId = getEffectiveTenantId(req);
+
+    if (!tenantId) {
+      return res.status(400).json({
+        ok: false,
+        error: "tenant_not_defined",
+      });
+    }
+
+    const sql = `
+      SELECT
+        b.id,
+        b.tenant_id,
+        b.item_id,
+        b.receipt_id,
+        b.batch_date,
+        b.qty_total,
+        b.qty_remaining,
+        b.unit_cost,
+        (b.qty_remaining * b.unit_cost) AS total_sum,
+        i.name AS item_name,
+        i.sku,
+        i.barcode
+      FROM core.item_batches b
+      JOIN core.items i
+        ON i.id = b.item_id
+       AND i.tenant_id = b.tenant_id
+      WHERE b.tenant_id = $1
+      ORDER BY b.batch_date ASC, b.id ASC
+    `;
+
+    const { rows } = await pool.query(sql, [tenantId]);
+
+    return res.json({
+      ok: true,
+      batches: rows,
+    });
+  } catch (e) {
+    console.error("[GET /stock/batches] error:", e);
+    return res.status(500).json({
+      ok: false,
+      error: "batches_failed",
+      details: e.message,
+    });
+  }
+});
+
 router.post(
   "/incoming",
   authRequired,
@@ -81,7 +130,12 @@ router.post(
         });
       }
 
-      if (purchase_price === undefined || purchase_price === null || Number.isNaN(Number(purchase_price)) || Number(purchase_price) < 0) {
+      if (
+        purchase_price === undefined ||
+        purchase_price === null ||
+        Number.isNaN(Number(purchase_price)) ||
+        Number(purchase_price) < 0
+      ) {
         return res.status(400).json({
           ok: false,
           error: "purchase_price_required",

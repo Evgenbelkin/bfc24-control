@@ -320,9 +320,36 @@
         </table>
       </div>
     </div>
+
+    <div class="card">
+      <h2 class="card-title">Партии товаров</h2>
+      <div class="muted">Показываются партии закупки для FIFO, капитализации и контроля себестоимости.</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Товар</th>
+              <th>Артикул / SKU</th>
+              <th>Штрихкод</th>
+              <th>Дата партии</th>
+              <th>Кол-во в партии</th>
+              <th>Остаток партии</th>
+              <th>Цена закупки</th>
+              <th>Сумма остатка</th>
+            </tr>
+          </thead>
+          <tbody id="batchesTbody">
+            <tr>
+              <td colspan="8" class="empty">Загрузка партий...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-    <script src="/js/config.js"></script>
+  <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
 
@@ -431,12 +458,14 @@
     let stockData = [];
     let itemsData = [];
     let locationsData = [];
+    let batchesData = [];
 
     const els = {
       searchInput: document.getElementById("searchInput"),
       locationFilter: document.getElementById("locationFilter"),
       refreshBtn: document.getElementById("refreshBtn"),
       tbody: document.getElementById("tbody"),
+      batchesTbody: document.getElementById("batchesTbody"),
       pageStatus: document.getElementById("pageStatus"),
       rowsCount: document.getElementById("rowsCount"),
       itemsCount: document.getElementById("itemsCount"),
@@ -501,6 +530,13 @@
         return [];
       }
 
+      if (type === "batches") {
+        if (Array.isArray(data.batches)) return data.batches;
+        if (Array.isArray(data.data)) return data.data;
+        if (Array.isArray(data.rows)) return data.rows;
+        return [];
+      }
+
       if (Array.isArray(data.data)) return data.data;
       if (Array.isArray(data.rows)) return data.rows;
       return [];
@@ -514,6 +550,18 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
+
+    function formatNumber(value, digits = 0) {
+      const num = Number(value || 0);
+      if (digits > 0) {
+        return num.toFixed(digits);
+      }
+      if (Number.isInteger(num)) {
+        return String(num);
+      }
+      return num.toFixed(3);
+    }
+
     async function apiGet(path) {
       return ApiBridge.get(path);
     }
@@ -575,6 +623,7 @@
             item.vendor_code ||
             item.article ||
             item.code ||
+            stockRow.sku ||
             "",
           barcode:
             item.barcode ||
@@ -625,8 +674,8 @@
       els.rowsCount.textContent = String(rows.length);
       els.itemsCount.textContent = String(itemsData.length);
       els.locationsCount.textContent = String(locationsData.length);
-      els.qtyTotal.textContent = String(rows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
-      els.qtyGrandTotal.textContent = String(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
+      els.qtyTotal.textContent = formatNumber(rows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
+      els.qtyGrandTotal.textContent = formatNumber(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
 
       if (!rows.length) {
         els.tbody.innerHTML = `
@@ -643,7 +692,55 @@
           <td>${escapeHtml(row.sku)}</td>
           <td>${escapeHtml(row.barcode)}</td>
           <td>${escapeHtml(row.location_display)}</td>
-          <td class="qty">${escapeHtml(row.qty)}</td>
+          <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderBatches() {
+      const search = (els.searchInput.value || "").trim().toLowerCase();
+
+      const rows = batchesData
+        .filter(row => {
+          if (!search) return true;
+          const text = [
+            row.item_name,
+            row.sku,
+            row.barcode,
+            row.batch_date
+          ].join(" ").toLowerCase();
+
+          return text.includes(search);
+        })
+        .sort((a, b) => {
+          const byItem = String(a.item_name || "").localeCompare(String(b.item_name || ""), "ru");
+          if (byItem !== 0) return byItem;
+
+          const byDate = String(a.batch_date || "").localeCompare(String(b.batch_date || ""), "ru");
+          if (byDate !== 0) return byDate;
+
+          return Number(a.id || 0) - Number(b.id || 0);
+        });
+
+      if (!rows.length) {
+        els.batchesTbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty">Нет партий по выбранному фильтру</td>
+          </tr>
+        `;
+        return;
+      }
+
+      els.batchesTbody.innerHTML = rows.map(row => `
+        <tr>
+          <td>${escapeHtml(row.item_name || "Без названия")}</td>
+          <td>${escapeHtml(row.sku || "")}</td>
+          <td>${escapeHtml(row.barcode || "")}</td>
+          <td>${escapeHtml(row.batch_date || "")}</td>
+          <td class="qty">${escapeHtml(formatNumber(row.qty_total))}</td>
+          <td class="qty">${escapeHtml(formatNumber(row.qty_remaining))}</td>
+          <td>${escapeHtml(formatNumber(row.unit_cost, 2))}</td>
+          <td>${escapeHtml(formatNumber(row.total_sum, 2))}</td>
         </tr>
       `).join("");
     }
@@ -654,21 +751,24 @@
 
         const tenantId = getTenantId();
 
-        const [stockRes, itemsRes, locationsRes] = await Promise.all([
+        const [stockRes, itemsRes, locationsRes, batchesRes] = await Promise.all([
           apiGet(`/stock?tenant_id=${tenantId}`),
           apiGet(`/items?tenant_id=${tenantId}`),
-          apiGet(`/locations?tenant_id=${tenantId}`)
+          apiGet(`/locations?tenant_id=${tenantId}`),
+          apiGet(`/stock/batches?tenant_id=${tenantId}`)
         ]);
 
         stockData = normalize(stockRes, "stock");
         itemsData = normalize(itemsRes, "items");
         locationsData = normalize(locationsRes, "locations");
+        batchesData = normalize(batchesRes, "batches");
 
         renderLocationFilter();
         renderTable();
+        renderBatches();
 
         showStatus(
-          `Данные загружены.\nСтрок остатков: ${stockData.length}\nТоваров: ${itemsData.length}\nМХ: ${locationsData.length}`,
+          `Данные загружены.\nСтрок остатков: ${stockData.length}\nТоваров: ${itemsData.length}\nМХ: ${locationsData.length}\nПартий: ${batchesData.length}`,
           "success"
         );
       } catch (err) {
@@ -677,12 +777,20 @@
             <td colspan="5" class="empty">Ошибка загрузки данных</td>
           </tr>
         `;
+        els.batchesTbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty">Ошибка загрузки партий</td>
+          </tr>
+        `;
         showStatus("Ошибка: " + Ui.translateError(err.message), "error");
       }
     }
 
     function bindEvents() {
-      els.searchInput.addEventListener("input", renderTable);
+      els.searchInput.addEventListener("input", () => {
+        renderTable();
+        renderBatches();
+      });
       els.locationFilter.addEventListener("change", renderTable);
       els.refreshBtn.addEventListener("click", loadData);
     }
