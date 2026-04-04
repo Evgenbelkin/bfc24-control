@@ -34,48 +34,54 @@ router.get("/summary", async (req, res) => {
         SELECT
           tenant_id,
           COUNT(*) AS sales_7d
-        FROM core.sales
+        FROM core.movements
         WHERE created_at >= NOW() - INTERVAL '7 days'
+          AND movement_type = 'sale'
         GROUP BY tenant_id
       ),
       sales_30d AS (
         SELECT
           tenant_id,
           COUNT(*) AS sales_30d
-        FROM core.sales
+        FROM core.movements
         WHERE created_at >= NOW() - INTERVAL '30 days'
+          AND movement_type = 'sale'
         GROUP BY tenant_id
       ),
       receipts_7d AS (
         SELECT
           tenant_id,
           COUNT(*) AS receipts_7d
-        FROM core.receipts
+        FROM core.movements
         WHERE created_at >= NOW() - INTERVAL '7 days'
+          AND movement_type = 'receipt'
         GROUP BY tenant_id
       ),
       receipts_30d AS (
         SELECT
           tenant_id,
           COUNT(*) AS receipts_30d
-        FROM core.receipts
+        FROM core.movements
         WHERE created_at >= NOW() - INTERVAL '30 days'
+          AND movement_type = 'receipt'
         GROUP BY tenant_id
       ),
       writeoffs_7d AS (
         SELECT
           tenant_id,
           COUNT(*) AS writeoffs_7d
-        FROM core.writeoffs
+        FROM core.movements
         WHERE created_at >= NOW() - INTERVAL '7 days'
+          AND movement_type = 'writeoff'
         GROUP BY tenant_id
       ),
       writeoffs_30d AS (
         SELECT
           tenant_id,
           COUNT(*) AS writeoffs_30d
-        FROM core.writeoffs
+        FROM core.movements
         WHERE created_at >= NOW() - INTERVAL '30 days'
+          AND movement_type = 'writeoff'
         GROUP BY tenant_id
       ),
       cash_income_7d AS (
