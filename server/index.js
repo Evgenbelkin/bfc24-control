@@ -17,6 +17,7 @@ const debtRoutes = require("./routes/debts");
 const cashRoutes = require("./routes/cash");
 const expensesRoutes = require("./routes/expenses");
 const ownerAdminRoutes = require("./routes/owner-admin");
+const ownerActivityRoutes = require('./routes/owner-activity');
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use("/debts", debtRoutes);
 app.use("/cash", cashRoutes);
 app.use("/expenses", expensesRoutes);
 app.use("/owner-admin", ownerAdminRoutes);
+app.use('/owner-activity', authRequired, requireRole('owner'), ownerActivityRoutes);
 
 app.get("/", (req, res) => {
   const menuPath = path.join(PUBLIC_DIR, "menu.html");
