@@ -1,8 +1,8 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const pool = require('../db');
+const pool = require("../db");
 
-router.get('/summary', async (req, res) => {
+router.get("/summary", async (req, res) => {
   try {
     const sql = `
       WITH last_logins AS (
@@ -77,6 +77,42 @@ router.get('/summary', async (req, res) => {
         FROM core.writeoffs
         WHERE created_at >= NOW() - INTERVAL '30 days'
         GROUP BY tenant_id
+      ),
+      cash_income_7d AS (
+        SELECT
+          tenant_id,
+          COUNT(*) AS cash_income_7d
+        FROM core.cash_transactions
+        WHERE created_at >= NOW() - INTERVAL '7 days'
+          AND transaction_type = 'income'
+        GROUP BY tenant_id
+      ),
+      cash_income_30d AS (
+        SELECT
+          tenant_id,
+          COUNT(*) AS cash_income_30d
+        FROM core.cash_transactions
+        WHERE created_at >= NOW() - INTERVAL '30 days'
+          AND transaction_type = 'income'
+        GROUP BY tenant_id
+      ),
+      cash_expense_7d AS (
+        SELECT
+          tenant_id,
+          COUNT(*) AS cash_expense_7d
+        FROM core.cash_transactions
+        WHERE created_at >= NOW() - INTERVAL '7 days'
+          AND transaction_type = 'expense'
+        GROUP BY tenant_id
+      ),
+      cash_expense_30d AS (
+        SELECT
+          tenant_id,
+          COUNT(*) AS cash_expense_30d
+        FROM core.cash_transactions
+        WHERE created_at >= NOW() - INTERVAL '30 days'
+          AND transaction_type = 'expense'
+        GROUP BY tenant_id
       )
       SELECT
         t.id,
@@ -89,6 +125,16 @@ router.get('/summary', async (req, res) => {
         t.is_active,
         t.is_blocked,
         t.status,
+        t.max_sku,
+        t.max_locations,
+        t.contact_name,
+        t.contact_phone,
+        t.contact_email,
+        t.phone,
+        t.email,
+        t.code,
+        t.comment,
+        t.enabled_modules,
         COALESCE(ll.users_count, 0) AS users_count,
         ll.last_login_at,
         COALESCE(a7.activity_7d, 0) AS activity_7d,
@@ -99,6 +145,10 @@ router.get('/summary', async (req, res) => {
         COALESCE(r30.receipts_30d, 0) AS receipts_30d,
         COALESCE(w7.writeoffs_7d, 0) AS writeoffs_7d,
         COALESCE(w30.writeoffs_30d, 0) AS writeoffs_30d,
+        COALESCE(ci7.cash_income_7d, 0) AS cash_income_7d,
+        COALESCE(ci30.cash_income_30d, 0) AS cash_income_30d,
+        COALESCE(ce7.cash_expense_7d, 0) AS cash_expense_7d,
+        COALESCE(ce30.cash_expense_30d, 0) AS cash_expense_30d,
         CASE
           WHEN t.is_blocked = TRUE
             OR t.is_active = FALSE
@@ -122,6 +172,10 @@ router.get('/summary', async (req, res) => {
       LEFT JOIN receipts_30d r30 ON r30.tenant_id = t.id
       LEFT JOIN writeoffs_7d w7 ON w7.tenant_id = t.id
       LEFT JOIN writeoffs_30d w30 ON w30.tenant_id = t.id
+      LEFT JOIN cash_income_7d ci7 ON ci7.tenant_id = t.id
+      LEFT JOIN cash_income_30d ci30 ON ci30.tenant_id = t.id
+      LEFT JOIN cash_expense_7d ce7 ON ce7.tenant_id = t.id
+      LEFT JOIN cash_expense_30d ce30 ON ce30.tenant_id = t.id
       ORDER BY t.id DESC;
     `;
 
@@ -132,15 +186,15 @@ router.get('/summary', async (req, res) => {
       summary: rows
     });
   } catch (error) {
-    console.error('[GET /owner-activity/summary] error:', error);
+    console.error("[GET /owner-activity/summary] error:", error);
     return res.status(500).json({
       ok: false,
-      error: 'failed_to_load_owner_activity_summary'
+      error: "failed_to_load_owner_activity_summary"
     });
   }
 });
 
-router.get('/tenant/:tenantId/events', async (req, res) => {
+router.get("/tenant/:tenantId/events", async (req, res) => {
   try {
     const tenantId = Number(req.params.tenantId);
     const limit = Math.min(Math.max(Number(req.query.limit || 50), 1), 200);
@@ -148,7 +202,7 @@ router.get('/tenant/:tenantId/events', async (req, res) => {
     if (!Number.isInteger(tenantId) || tenantId <= 0) {
       return res.status(400).json({
         ok: false,
-        error: 'invalid_tenant_id'
+        error: "invalid_tenant_id"
       });
     }
 
@@ -180,10 +234,10 @@ router.get('/tenant/:tenantId/events', async (req, res) => {
       events: rows
     });
   } catch (error) {
-    console.error('[GET /owner-activity/tenant/:tenantId/events] error:', error);
+    console.error("[GET /owner-activity/tenant/:tenantId/events] error:", error);
     return res.status(500).json({
       ok: false,
-      error: 'failed_to_load_tenant_activity_events'
+      error: "failed_to_load_tenant_activity_events"
     });
   }
 });

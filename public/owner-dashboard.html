@@ -307,6 +307,18 @@
       resize: vertical;
     }
 
+    .select {
+      appearance: auto;
+      color-scheme: dark;
+      background-color: #1f2746;
+      color: #ecf2ff;
+    }
+
+    .select option {
+      background: #1f2746;
+      color: #ecf2ff;
+    }
+
     .filter-input {
       max-width: 320px;
     }
@@ -487,12 +499,6 @@
       gap: 12px;
     }
 
-    .form-grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-    }
-
     .field {
       display: flex;
       flex-direction: column;
@@ -582,8 +588,7 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .form-grid,
-      .form-grid-3 {
+      .form-grid {
         grid-template-columns: 1fr;
       }
 
@@ -648,12 +653,12 @@
       <div class="kpi-card">
         <div class="kpi-label">Активные подписки</div>
         <div class="kpi-value" id="kpiSubsActive">0</div>
-        <div class="kpi-sub">subscription_status = active / trial</div>
+        <div class="kpi-sub">Активные и пробные клиенты</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Заблокированные клиенты</div>
         <div class="kpi-value" id="kpiBlocked">0</div>
-        <div class="kpi-sub">is_blocked / blocked / expired</div>
+        <div class="kpi-sub">Блокировки и просроченные подписки</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Всего пользователей</div>
@@ -677,31 +682,31 @@
         <div class="panel-header">
           <div>
             <h2 class="panel-title">Сводка по активности клиентов</h2>
-            <div class="panel-subtitle">Считается по `last_login_at` и `saas.activity_log`.</div>
+            <div class="panel-subtitle">Входы и реальные события по работе клиента.</div>
           </div>
           <div class="inline-badges">
-            <span class="badge badge-success">🟢 active</span>
-            <span class="badge badge-warning">🟡 warning</span>
-            <span class="badge badge-danger">🔴 blocked</span>
-            <span class="badge badge-info">⚪ inactive</span>
+            <span class="badge badge-success">🟢 активен</span>
+            <span class="badge badge-warning">🟡 внимание</span>
+            <span class="badge badge-danger">🔴 заблокирован</span>
+            <span class="badge badge-info">⚪ нет активности</span>
           </div>
         </div>
         <div class="panel-body">
           <div class="activity-grid">
             <div class="activity-mini">
-              <div class="activity-mini-label">Клиенты active</div>
+              <div class="activity-mini-label">Клиенты активны</div>
               <div class="activity-mini-value" id="miniActive">0</div>
             </div>
             <div class="activity-mini">
-              <div class="activity-mini-label">Клиенты warning</div>
+              <div class="activity-mini-label">Клиенты внимание</div>
               <div class="activity-mini-value" id="miniWarning">0</div>
             </div>
             <div class="activity-mini">
-              <div class="activity-mini-label">Клиенты inactive</div>
+              <div class="activity-mini-label">Клиенты без активности</div>
               <div class="activity-mini-value" id="miniInactive">0</div>
             </div>
             <div class="activity-mini">
-              <div class="activity-mini-label">Клиенты blocked</div>
+              <div class="activity-mini-label">Клиенты заблокированы</div>
               <div class="activity-mini-value" id="miniBlocked">0</div>
             </div>
           </div>
@@ -740,9 +745,8 @@
           </div>
 
           <div class="footer-note">
-            Активность клиентов сейчас строится на событиях из:
-            продажи, приёмки, списания, cash income/expense.  
-            При желании дальше расширим до CRUD-активности по товарам, местам хранения, клиентам и другим сущностям.
+            Активность клиентов сейчас считается по продажам, приёмкам, списаниям,
+            денежным доходам и расходам, а также по последнему входу в систему.
           </div>
         </div>
       </section>
@@ -753,7 +757,7 @@
         <div class="panel-header">
           <div>
             <h2 class="panel-title" id="tenantFormTitle">Новый клиент</h2>
-            <div class="panel-subtitle">Создание и редактирование tenant в SaaS.</div>
+            <div class="panel-subtitle">Создание и редактирование клиента SaaS.</div>
           </div>
           <div class="row-actions">
             <button class="row-btn" id="btnTenantCancelEdit" style="display:none;">Отменить редактирование</button>
@@ -775,28 +779,28 @@
 
               <div class="field">
                 <label for="tenantTariffName">Тариф</label>
-                <input class="input" id="tenantTariffName" placeholder="basic" value="basic" />
+                <input class="input" id="tenantTariffName" placeholder="Базовый" value="Базовый" />
               </div>
               <div class="field">
-                <label for="tenantPlanCode">Plan code</label>
+                <label for="tenantPlanCode">Код тарифа</label>
                 <input class="input" id="tenantPlanCode" placeholder="basic" value="basic" />
               </div>
 
               <div class="field">
                 <label for="tenantSubscriptionStatus">Статус подписки</label>
                 <select class="select" id="tenantSubscriptionStatus">
-                  <option value="trial">trial</option>
-                  <option value="active">active</option>
-                  <option value="expired">expired</option>
-                  <option value="blocked">blocked</option>
+                  <option value="trial">Пробный период</option>
+                  <option value="active">Активна</option>
+                  <option value="expired">Истекла</option>
+                  <option value="blocked">Заблокирована</option>
                 </select>
               </div>
               <div class="field">
                 <label for="tenantStatus">Статус записи</label>
                 <select class="select" id="tenantStatus">
-                  <option value="active">active</option>
-                  <option value="blocked">blocked</option>
-                  <option value="archived">archived</option>
+                  <option value="active">Активна</option>
+                  <option value="blocked">Заблокирована</option>
+                  <option value="archived">В архиве</option>
                 </select>
               </div>
 
@@ -880,7 +884,7 @@
         <div class="panel-header">
           <div>
             <h2 class="panel-title" id="userFormTitle">Новый пользователь</h2>
-            <div class="panel-subtitle">Создание и редактирование user в SaaS.</div>
+            <div class="panel-subtitle">Создание и редактирование пользователя SaaS.</div>
           </div>
           <div class="row-actions">
             <button class="row-btn" id="btnUserCancelEdit" style="display:none;">Отменить редактирование</button>
@@ -898,8 +902,8 @@
               <div class="field">
                 <label for="userRole">Роль</label>
                 <select class="select" id="userRole">
-                  <option value="client">client</option>
-                  <option value="owner">owner</option>
+                  <option value="client">Клиент</option>
+                  <option value="owner">Владелец</option>
                 </select>
               </div>
 
@@ -932,7 +936,7 @@
       <div class="panel-header">
         <div>
           <h2 class="panel-title">Клиенты SaaS</h2>
-          <div class="panel-subtitle">Полный список tenant с подпиской, лимитами и активностью.</div>
+          <div class="panel-subtitle">Полный список клиентов, подписок, лимитов и активности.</div>
         </div>
         <input class="input filter-input" id="tenantSearch" placeholder="Поиск по клиенту, slug, email, телефону..." />
       </div>
@@ -1084,10 +1088,6 @@
       return localStorage.getItem("token");
     }
 
-    function setToken(token) {
-      localStorage.setItem("token", token);
-    }
-
     function clearAuth() {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -1168,11 +1168,45 @@
       return Math.ceil((end - now) / (1000 * 60 * 60 * 24));
     }
 
+    function mapRole(role) {
+      const v = String(role || "").toLowerCase();
+      if (v === "owner") return "Владелец";
+      if (v === "client") return "Клиент";
+      return role || "—";
+    }
+
+    function mapActivityStatus(status) {
+      const v = String(status || "").toLowerCase();
+      if (v === "active") return "активен";
+      if (v === "warning") return "внимание";
+      if (v === "blocked") return "заблокирован";
+      if (v === "inactive") return "нет активности";
+      return status || "—";
+    }
+
+    function mapSubscriptionStatus(status) {
+      const v = String(status || "").toLowerCase();
+      if (v === "trial") return "Пробный период";
+      if (v === "active") return "Активна";
+      if (v === "expired") return "Истекла";
+      if (v === "blocked") return "Заблокирована";
+      return status || "—";
+    }
+
+    function mapTenantStatus(status) {
+      const v = String(status || "").toLowerCase();
+      if (v === "active") return "Активна";
+      if (v === "blocked") return "Заблокирована";
+      if (v === "archived") return "В архиве";
+      return status || "—";
+    }
+
     function activityBadge(status) {
-      if (status === "active") return `<span class="badge badge-success">🟢 active</span>`;
-      if (status === "warning") return `<span class="badge badge-warning">🟡 warning</span>`;
-      if (status === "blocked") return `<span class="badge badge-danger">🔴 blocked</span>`;
-      return `<span class="badge badge-info">⚪ inactive</span>`;
+      const v = String(status || "").toLowerCase();
+      if (v === "active") return `<span class="badge badge-success">🟢 активен</span>`;
+      if (v === "warning") return `<span class="badge badge-warning">🟡 внимание</span>`;
+      if (v === "blocked") return `<span class="badge badge-danger">🔴 заблокирован</span>`;
+      return `<span class="badge badge-info">⚪ нет активности</span>`;
     }
 
     function boolBadge(value, textTrue, textFalse) {
@@ -1209,7 +1243,10 @@
     }
 
     function showError(error) {
-      const text = window.translateError ? translateError(error?.error || error?.message || error) : (error?.error || error?.message || String(error));
+      console.error("[owner-dashboard] error payload:", error);
+      const text = window.translateError
+        ? translateError(error?.error || error?.message || error)
+        : (error?.error || error?.message || String(error));
       alert(text || "Произошла ошибка");
     }
 
@@ -1222,7 +1259,7 @@
       }
 
       el.currentUserName.textContent = `${me.full_name || me.username || "Пользователь"}`;
-      el.currentUserSub.textContent = `${me.role || "role"}${me.username ? " · @" + me.username : ""}`;
+      el.currentUserSub.textContent = `${mapRole(me.role)}${me.username ? " · @" + me.username : ""}`;
     }
 
     function fillTenantSelect() {
@@ -1270,7 +1307,7 @@
         `<span class="chip">Пользователей: <b>${totalUsers}</b></span>`,
         `<span class="chip">События 7 дней: <b>${activity7}</b></span>`,
         `<span class="chip">События 30 дней: <b>${activity30}</b></span>`,
-        `<span class="chip">Подписок active/trial: <b>${activeSubs}</b></span>`,
+        `<span class="chip">Подписок активных/пробных: <b>${activeSubs}</b></span>`,
         `<span class="chip">Проблемных клиентов: <b>${blocked}</b></span>`
       ].join("");
     }
@@ -1301,8 +1338,8 @@
             </td>
             <td>
               <div class="stack">
-                <div>7 дней: <span class="strong">${safeText(a.activity_7d ?? 0)}</span></div>
-                <div>30 дней: <span class="strong">${safeText(a.activity_30d ?? 0)}</span></div>
+                <div>За 7 дней: <span class="strong">${safeText(a.activity_7d ?? 0)}</span></div>
+                <div>За 30 дней: <span class="strong">${safeText(a.activity_30d ?? 0)}</span></div>
               </div>
             </td>
             <td>
@@ -1310,6 +1347,8 @@
                 <div>Продажи: <span class="strong">${safeText(a.sales_7d ?? 0)}</span> / ${safeText(a.sales_30d ?? 0)}</div>
                 <div>Приёмки: <span class="strong">${safeText(a.receipts_7d ?? 0)}</span> / ${safeText(a.receipts_30d ?? 0)}</div>
                 <div>Списания: <span class="strong">${safeText(a.writeoffs_7d ?? 0)}</span> / ${safeText(a.writeoffs_30d ?? 0)}</div>
+                <div>Доходы: <span class="strong">${safeText(a.cash_income_7d ?? 0)}</span> / ${safeText(a.cash_income_30d ?? 0)}</div>
+                <div>Расходы: <span class="strong">${safeText(a.cash_expense_7d ?? 0)}</span> / ${safeText(a.cash_expense_30d ?? 0)}</div>
               </div>
             </td>
             <td>${activityBadge(a.activity_status || "inactive")}</td>
@@ -1360,12 +1399,12 @@
             ? `<span class="badge badge-danger">заблокирован</span>`
             : `<span class="badge badge-success">не заблокирован</span>`,
           tenant.subscription_status === "expired"
-            ? `<span class="badge badge-danger">подписка expired</span>`
+            ? `<span class="badge badge-danger">подписка истекла</span>`
             : tenant.subscription_status === "blocked"
-              ? `<span class="badge badge-danger">подписка blocked</span>`
+              ? `<span class="badge badge-danger">подписка заблокирована</span>`
               : tenant.subscription_status === "trial"
-                ? `<span class="badge badge-warning">подписка trial</span>`
-                : `<span class="badge badge-success">подписка ${safeText(tenant.subscription_status || "active")}</span>`
+                ? `<span class="badge badge-warning">пробный период</span>`
+                : `<span class="badge badge-success">подписка активна</span>`
         ].join("");
 
         const contactLines = [
@@ -1378,7 +1417,10 @@
 
         const subscriptionInfo = `
           <div class="stack">
-            <div><span class="strong">Тариф:</span> ${safeText(tenant.tariff_name || "basic")}</div>
+            <div><span class="strong">Тариф:</span> ${safeText(tenant.tariff_name || "—")}</div>
+            <div><span class="strong">Код тарифа:</span> ${safeText(tenant.plan_code || "—")}</div>
+            <div><span class="strong">Подписка:</span> ${safeText(mapSubscriptionStatus(tenant.subscription_status))}</div>
+            <div><span class="strong">Статус:</span> ${safeText(mapTenantStatus(tenant.status))}</div>
             <div><span class="strong">Начало:</span> ${safeText(dt(tenant.subscription_start_at))}</div>
             <div><span class="strong">Окончание:</span> ${safeText(dt(tenant.subscription_end_at))}</div>
             <div><span class="strong">Осталось дней:</span> ${subscriptionDaysLeft === null ? "—" : safeText(subscriptionDaysLeft)}</div>
@@ -1390,10 +1432,12 @@
           <div class="stack">
             <div>${activityBadge(a.activity_status || "inactive")}</div>
             <div class="muted small">Последний вход: ${safeText(dt(a.last_login_at))}</div>
-            <div class="muted small">События 7/30: ${safeText(a.activity_7d ?? 0)} / ${safeText(a.activity_30d ?? 0)}</div>
-            <div class="muted small">Продажи 7/30: ${safeText(a.sales_7d ?? 0)} / ${safeText(a.sales_30d ?? 0)}</div>
-            <div class="muted small">Приёмки 7/30: ${safeText(a.receipts_7d ?? 0)} / ${safeText(a.receipts_30d ?? 0)}</div>
-            <div class="muted small">Списания 7/30: ${safeText(a.writeoffs_7d ?? 0)} / ${safeText(a.writeoffs_30d ?? 0)}</div>
+            <div class="muted small">События 7 / 30: ${safeText(a.activity_7d ?? 0)} / ${safeText(a.activity_30d ?? 0)}</div>
+            <div class="muted small">Продажи 7 / 30: ${safeText(a.sales_7d ?? 0)} / ${safeText(a.sales_30d ?? 0)}</div>
+            <div class="muted small">Приёмки 7 / 30: ${safeText(a.receipts_7d ?? 0)} / ${safeText(a.receipts_30d ?? 0)}</div>
+            <div class="muted small">Списания 7 / 30: ${safeText(a.writeoffs_7d ?? 0)} / ${safeText(a.writeoffs_30d ?? 0)}</div>
+            <div class="muted small">Доходы 7 / 30: ${safeText(a.cash_income_7d ?? 0)} / ${safeText(a.cash_income_30d ?? 0)}</div>
+            <div class="muted small">Расходы 7 / 30: ${safeText(a.cash_expense_7d ?? 0)} / ${safeText(a.cash_expense_30d ?? 0)}</div>
           </div>
         `;
 
@@ -1468,7 +1512,7 @@
               </div>
             </td>
             <td>${safeText(user.full_name || "—")}</td>
-            <td><span class="badge badge-info">${safeText(user.role || "—")}</span></td>
+            <td><span class="badge badge-info">${safeText(mapRole(user.role))}</span></td>
             <td>
               ${tenant
                 ? `<div class="stack">
@@ -1508,7 +1552,7 @@
       el.tenantId.value = "";
       el.tenantName.value = "";
       el.tenantSlug.value = "";
-      el.tenantTariffName.value = "basic";
+      el.tenantTariffName.value = "Базовый";
       el.tenantPlanCode.value = "basic";
       el.tenantSubscriptionStatus.value = "trial";
       el.tenantStatus.value = "active";
@@ -1604,7 +1648,7 @@
       const payload = {
         name: el.tenantName.value.trim(),
         slug: el.tenantSlug.value.trim() || slugify(el.tenantName.value),
-        tariff_name: el.tenantTariffName.value.trim() || "basic",
+        tariff_name: el.tenantTariffName.value.trim() || "Базовый",
         plan_code: el.tenantPlanCode.value.trim() || "basic",
         subscription_status: el.tenantSubscriptionStatus.value,
         status: el.tenantStatus.value,
@@ -1678,7 +1722,7 @@
       }
 
       if (!id && !payload.tenant_id && payload.role !== "owner") {
-        alert("Для client-пользователя нужно выбрать клиента");
+        alert("Для пользователя-клиента нужно выбрать клиента");
         return;
       }
 
@@ -1721,7 +1765,7 @@
       el.tenantId.value = tenant.id ?? "";
       el.tenantName.value = tenant.name ?? "";
       el.tenantSlug.value = tenant.slug ?? "";
-      el.tenantTariffName.value = tenant.tariff_name ?? "basic";
+      el.tenantTariffName.value = tenant.tariff_name ?? "Базовый";
       el.tenantPlanCode.value = tenant.plan_code ?? "basic";
       el.tenantSubscriptionStatus.value = tenant.subscription_status ?? "trial";
       el.tenantStatus.value = tenant.status ?? "active";
