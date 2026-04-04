@@ -3,1360 +3,1901 @@
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Кабинет владельца</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="/js/app-ui.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
     :root {
-      --bg: #f4f7fb;
-      --panel: #ffffff;
-      --panel-soft: #f8fbff;
-      --line: #e2e8f0;
-      --text: #0f172a;
-      --muted: #64748b;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --success: #16a34a;
-      --success-soft: #eaf8ee;
-      --danger: #dc2626;
-      --danger-soft: #feecec;
-      --warning: #d97706;
-      --warning-soft: #fff4e6;
-      --gray-soft: #eef2f7;
-      --shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
-      --radius-xl: 24px;
-      --radius-lg: 18px;
-      --radius-md: 14px;
+      --bg: #0b1020;
+      --panel: #121933;
+      --panel-2: #182245;
+      --panel-3: #1f2b57;
+      --text: #ecf2ff;
+      --muted: #9fb0d3;
+      --line: rgba(255,255,255,0.08);
+      --line-2: rgba(255,255,255,0.14);
+      --accent: #5aa8ff;
+      --accent-2: #7b68ff;
+      --success: #19c37d;
+      --warning: #f5b942;
+      --danger: #ff5f73;
+      --shadow: 0 18px 40px rgba(0,0,0,0.30);
+      --radius: 20px;
+      --radius-sm: 14px;
+      --input-bg: rgba(255,255,255,0.05);
+      --chip-bg: rgba(255,255,255,0.07);
+      --sticky-bg: rgba(18,25,51,0.95);
     }
 
     * {
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
-      font-family: Inter, Arial, sans-serif;
+      padding: 0;
       background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 280px),
-        radial-gradient(circle at top right, rgba(22, 163, 74, 0.06), transparent 240px),
-        var(--bg);
+        radial-gradient(circle at top left, rgba(90,168,255,0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(123,104,255,0.16), transparent 24%),
+        linear-gradient(180deg, #09101f 0%, #0d1430 100%);
       color: var(--text);
+      font-family: Inter, Arial, sans-serif;
+      min-height: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
     }
 
     .page {
       max-width: 1680px;
       margin: 0 auto;
-      padding: 28px;
+      padding: 24px;
     }
 
-    .hero {
+    .topbar {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 20px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-
-    .hero-left h1 {
-      margin: 0;
-      font-size: 38px;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-    }
-
-    .hero-left p {
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 16px;
-    }
-
-    .hero-right {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .owner-chip {
-      background: rgba(37, 99, 235, 0.1);
-      color: #1e3a8a;
-      border: 1px solid rgba(37, 99, 235, 0.14);
-      padding: 12px 16px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
-      margin-bottom: 22px;
-    }
-
-    .stat-card {
-      background: linear-gradient(180deg, #ffffff, #f8fbff);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius-xl);
-      padding: 18px 18px 16px;
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .stat-value {
-      font-size: 30px;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 460px 1fr;
-      gap: 22px;
-      align-items: start;
-    }
-
-    .left-col,
-    .right-col {
-      display: grid;
-      gap: 22px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      padding: 22px;
-    }
-
-    .card-header {
-      display: flex;
+      align-items: center;
       justify-content: space-between;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
       align-items: center;
       gap: 14px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
     }
 
-    .card-title {
+    .brand-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      flex: 0 0 auto;
+    }
+
+    .brand-logo svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+
+    .brand-text h1 {
+      margin: 0 0 4px;
+      font-size: 28px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-text p {
       margin: 0;
-      font-size: 24px;
-      letter-spacing: -0.02em;
-    }
-
-    .card-subtitle {
-      margin: 6px 0 0;
       color: var(--muted);
       font-size: 14px;
     }
 
-    .message {
-      display: none;
-      margin-bottom: 18px;
-      padding: 15px 16px;
-      border-radius: 16px;
-      font-size: 14px;
+    .userbox {
+      min-width: 280px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .userbox-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .userbox-value {
+      font-size: 15px;
       font-weight: 700;
-      border: 1px solid transparent;
     }
 
-    .message.show {
-      display: block;
-    }
-
-    .message.success {
-      background: var(--success-soft);
-      color: #166534;
-      border-color: #bbf7d0;
-    }
-
-    .message.error {
-      background: var(--danger-soft);
-      color: #991b1b;
-      border-color: #fecaca;
-    }
-
-    .form-grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
-    }
-
-    label {
-      display: block;
+    .userbox-sub {
+      margin-top: 4px;
+      color: var(--muted);
       font-size: 13px;
-      font-weight: 800;
-      margin-bottom: 7px;
-      color: #334155;
-    }
-
-    input,
-    textarea,
-    select {
-      width: 100%;
-      border: 1px solid #d7deea;
-      background: #fff;
-      border-radius: 15px;
-      padding: 13px 14px;
-      font-size: 14px;
-      color: var(--text);
-      outline: none;
-      transition: 0.15s ease;
-    }
-
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: rgba(37, 99, 235, 0.6);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 2px;
-    }
-
-    button {
-      border: none;
-      cursor: pointer;
-      border-radius: 14px;
-      padding: 11px 16px;
-      font-size: 14px;
-      font-weight: 800;
-      transition: 0.15s ease;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
-
-    .btn-secondary {
-      background: #eef2f7;
-      color: #0f172a;
-    }
-
-    .btn-secondary:hover {
-      background: #e2e8f0;
-    }
-
-    .btn-success {
-      background: var(--success);
-      color: #fff;
-    }
-
-    .btn-success:hover {
-      filter: brightness(0.95);
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: #fff;
-    }
-
-    .btn-danger:hover {
-      filter: brightness(0.95);
-    }
-
-    .btn-warning {
-      background: var(--warning);
-      color: #fff;
-    }
-
-    .btn-warning:hover {
-      filter: brightness(0.95);
-    }
-
-    .btn-small {
-      padding: 8px 12px;
-      font-size: 13px;
-      border-radius: 12px;
     }
 
     .toolbar {
       display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      cursor: default;
+      opacity: 0.6;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .btn-danger {
+      background: rgba(255,95,115,0.12);
+      color: #ffd7dc;
+      border: 1px solid rgba(255,95,115,0.22);
+    }
+
+    .btn-success {
+      background: rgba(25,195,125,0.14);
+      color: #d9fff0;
+      border: 1px solid rgba(25,195,125,0.22);
+    }
+
+    .btn-warning {
+      background: rgba(245,185,66,0.16);
+      color: #fff0c8;
+      border: 1px solid rgba(245,185,66,0.24);
+    }
+
+    .grid-kpi {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .kpi-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      min-height: 116px;
+    }
+
+    .kpi-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .kpi-sub {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.035));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
+      gap: 12px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
       flex-wrap: wrap;
     }
 
-    .toolbar-left {
+    .panel-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .panel-subtitle {
       color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .panel-body {
+      padding: 18px 20px 20px;
+    }
+
+    .status-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--chip-bg);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .input, .select, .textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--line-2);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
       font-size: 14px;
+      outline: none;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #95a5c7;
+    }
+
+    .textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    .filter-input {
+      max-width: 320px;
     }
 
     .table-wrap {
       overflow: auto;
       border: 1px solid var(--line);
-      border-radius: 20px;
-      background: #fff;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1440px;
+      min-width: 1180px;
     }
 
-    th,
-    td {
-      padding: 14px 12px;
+    th, td {
       text-align: left;
       vertical-align: top;
-      border-bottom: 1px solid #edf2f7;
+      padding: 14px 14px;
+      border-bottom: 1px solid var(--line);
       font-size: 14px;
     }
 
     th {
-      background: #f8fbff;
-      color: #475569;
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
       position: sticky;
       top: 0;
       z-index: 1;
+      background: var(--sticky-bg);
+      color: #d7e5ff;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      backdrop-filter: blur(10px);
     }
 
     tr:hover td {
-      background: #fcfdff;
-    }
-
-    .mono {
-      font-family: Consolas, monospace;
-      font-size: 13px;
+      background: rgba(255,255,255,0.03);
     }
 
     .muted {
       color: var(--muted);
     }
 
-    .pill {
+    .small {
+      font-size: 12px;
+    }
+
+    .strong {
+      font-weight: 800;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .inline-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      padding: 6px 11px;
+      gap: 6px;
+      padding: 6px 10px;
       border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
       font-size: 12px;
       font-weight: 800;
       white-space: nowrap;
-      border: 1px solid transparent;
     }
 
-    .pill-green {
-      background: var(--success-soft);
-      color: #166534;
-      border-color: #bbf7d0;
+    .badge-success {
+      background: rgba(25,195,125,0.14);
+      border-color: rgba(25,195,125,0.26);
+      color: #d8fff1;
     }
 
-    .pill-red {
-      background: var(--danger-soft);
-      color: #991b1b;
-      border-color: #fecaca;
+    .badge-warning {
+      background: rgba(245,185,66,0.16);
+      border-color: rgba(245,185,66,0.28);
+      color: #fff1cc;
     }
 
-    .pill-yellow {
-      background: var(--warning-soft);
-      color: #9a5505;
-      border-color: #fed7aa;
+    .badge-danger {
+      background: rgba(255,95,115,0.16);
+      border-color: rgba(255,95,115,0.28);
+      color: #ffd9df;
     }
 
-    .pill-gray {
-      background: var(--gray-soft);
-      color: #475569;
-      border-color: #d8e0ea;
+    .badge-info {
+      background: rgba(90,168,255,0.16);
+      border-color: rgba(90,168,255,0.28);
+      color: #dcebff;
     }
 
-    .status-stack {
+    .row-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 8px;
     }
 
-    .list-soft {
-      background: var(--panel-soft);
+    .row-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .row-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .row-btn-danger {
+      border-color: rgba(255,95,115,0.24);
+      background: rgba(255,95,115,0.10);
+      color: #ffdce1;
+    }
+
+    .row-btn-success {
+      border-color: rgba(25,195,125,0.24);
+      background: rgba(25,195,125,0.10);
+      color: #d9fff0;
+    }
+
+    .row-btn-warning {
+      border-color: rgba(245,185,66,0.24);
+      background: rgba(245,185,66,0.12);
+      color: #fff1cc;
+    }
+
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .activity-mini {
       border: 1px solid var(--line);
       border-radius: 16px;
       padding: 14px;
-      font-size: 14px;
-      color: #334155;
+      background: rgba(255,255,255,0.04);
     }
 
-    .sub-block {
+    .activity-mini-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .activity-mini-value {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .forms-grid {
       display: grid;
-      gap: 4px;
-      line-height: 1.35;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
     }
 
-    .sub-expired {
-      color: #991b1b;
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
       font-weight: 700;
     }
 
-    .sub-warning {
-      color: #9a5505;
-      font-weight: 700;
+    .field.full {
+      grid-column: 1 / -1;
     }
 
-    .sub-ok {
-      color: #166534;
-      font-weight: 700;
+    .helper {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .modules-box {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .module-option {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+    }
+
+    .module-option input {
+      transform: scale(1.15);
     }
 
     .empty {
       padding: 24px;
-      text-align: center;
       color: var(--muted);
-      font-size: 14px;
+      text-align: center;
+      border: 1px dashed var(--line-2);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
     }
 
-    @media (max-width: 1300px) {
+    .footer-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 1400px) {
+      .grid-kpi {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
       .layout {
         grid-template-columns: 1fr;
       }
 
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
+      .forms-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modules-box {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 920px) {
       .page {
-        padding: 14px;
+        padding: 16px;
       }
 
-      .hero-left h1 {
-        font-size: 29px;
+      .grid-kpi {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .grid-2,
-      .grid-3,
-      .stats {
+      .activity-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .form-grid,
+      .form-grid-3 {
         grid-template-columns: 1fr;
+      }
+
+      .modules-box {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .grid-kpi,
+      .activity-grid,
+      .modules-box {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: stretch;
+      }
+
+      .userbox {
+        width: 100%;
       }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <div class="hero">
-      <div class="hero-left">
-        <h1>BFC24 CONTROL — Кабинет владельца</h1>
-        <p>Управление клиентами SaaS, доступами, статусами подписки, лимитами и модулями</p>
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2l8 4.5v11L12 22l-8-4.5v-11L12 2zm0 2.2L6 7v8l6 3.4 6-3.4V7l-6-2.8zm-3 4.3h6a1 1 0 110 2H9a1 1 0 110-2zm0 4h6a1 1 0 110 2H9a1 1 0 110-2z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>BFC24 CONTROL — Кабинет владельца</h1>
+          <p>Управление клиентами SaaS, пользователями, подписками и активностью.</p>
+        </div>
       </div>
 
-      <div class="hero-right">
-        <div class="owner-chip" id="ownerBadge">Загрузка...</div>
-        <button class="btn-secondary" onclick="goToMenu()">В меню</button>
-        <button class="btn-danger" onclick="logout()">Выйти</button>
+      <div class="userbox">
+        <div class="userbox-label">Текущий пользователь</div>
+        <div class="userbox-value" id="currentUserName">Загрузка...</div>
+        <div class="userbox-sub" id="currentUserSub">Проверяем сессию</div>
       </div>
     </div>
 
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-label">Всего клиентов</div>
-        <div class="stat-value" id="statTenants">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Активные подписки</div>
-        <div class="stat-value" id="statActiveSubs">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Заблокированные клиенты</div>
-        <div class="stat-value" id="statBlockedTenants">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Всего пользователей</div>
-        <div class="stat-value" id="statUsers">0</div>
-      </div>
+    <div class="toolbar">
+      <button class="btn btn-primary" id="btnRefresh">Обновить данные</button>
+      <button class="btn btn-secondary" id="btnScrollTenants">К клиентам</button>
+      <button class="btn btn-secondary" id="btnScrollUsers">К пользователям</button>
+      <button class="btn btn-secondary" id="btnScrollForms">К формам</button>
+      <button class="btn btn-danger" id="btnLogout">Выйти</button>
     </div>
 
-    <div id="globalMessage" class="message"></div>
+    <div class="grid-kpi" id="kpiGrid">
+      <div class="kpi-card">
+        <div class="kpi-label">Всего клиентов</div>
+        <div class="kpi-value" id="kpiTenants">0</div>
+        <div class="kpi-sub">Все записи в кабинете владельца</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Активные подписки</div>
+        <div class="kpi-value" id="kpiSubsActive">0</div>
+        <div class="kpi-sub">subscription_status = active / trial</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Заблокированные клиенты</div>
+        <div class="kpi-value" id="kpiBlocked">0</div>
+        <div class="kpi-sub">is_blocked / blocked / expired</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Всего пользователей</div>
+        <div class="kpi-value" id="kpiUsers">0</div>
+        <div class="kpi-sub">Учётные записи входа</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Активность за 7 дней</div>
+        <div class="kpi-value" id="kpiActivity7">0</div>
+        <div class="kpi-sub">Сумма событий по всем клиентам</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Активность за 30 дней</div>
+        <div class="kpi-value" id="kpiActivity30">0</div>
+        <div class="kpi-sub">Сумма событий по всем клиентам</div>
+      </div>
+    </div>
 
     <div class="layout">
-      <div class="left-col">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title" id="tenantFormTitle">Новый клиент</h2>
-              <div class="card-subtitle">Создание и редактирование клиентского кабинета</div>
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Сводка по активности клиентов</h2>
+            <div class="panel-subtitle">Считается по `last_login_at` и `saas.activity_log`.</div>
+          </div>
+          <div class="inline-badges">
+            <span class="badge badge-success">🟢 active</span>
+            <span class="badge badge-warning">🟡 warning</span>
+            <span class="badge badge-danger">🔴 blocked</span>
+            <span class="badge badge-info">⚪ inactive</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="activity-grid">
+            <div class="activity-mini">
+              <div class="activity-mini-label">Клиенты active</div>
+              <div class="activity-mini-value" id="miniActive">0</div>
+            </div>
+            <div class="activity-mini">
+              <div class="activity-mini-label">Клиенты warning</div>
+              <div class="activity-mini-value" id="miniWarning">0</div>
+            </div>
+            <div class="activity-mini">
+              <div class="activity-mini-label">Клиенты inactive</div>
+              <div class="activity-mini-value" id="miniInactive">0</div>
+            </div>
+            <div class="activity-mini">
+              <div class="activity-mini-label">Клиенты blocked</div>
+              <div class="activity-mini-value" id="miniBlocked">0</div>
             </div>
           </div>
 
-          <form id="tenantForm" class="form-grid" onsubmit="saveTenant(event)">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Клиент</th>
+                  <th>Последний вход</th>
+                  <th>Активность</th>
+                  <th>Операции</th>
+                  <th>Статус активности</th>
+                </tr>
+              </thead>
+              <tbody id="activityTableBody">
+                <tr>
+                  <td colspan="5" class="muted">Загрузка...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Быстрая сводка по платформе</h2>
+            <div class="panel-subtitle">Ключевые показатели владельца.</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="status-line" id="summaryChips">
+            <span class="chip">Загрузка...</span>
+          </div>
+
+          <div class="footer-note">
+            Активность клиентов сейчас строится на событиях из:
+            продажи, приёмки, списания, cash income/expense.  
+            При желании дальше расширим до CRUD-активности по товарам, местам хранения, клиентам и другим сущностям.
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="forms-grid" id="formsSection">
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title" id="tenantFormTitle">Новый клиент</h2>
+            <div class="panel-subtitle">Создание и редактирование tenant в SaaS.</div>
+          </div>
+          <div class="row-actions">
+            <button class="row-btn" id="btnTenantCancelEdit" style="display:none;">Отменить редактирование</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <form id="tenantForm">
             <input type="hidden" id="tenantId" />
 
-            <div>
-              <label for="tenantName">Название клиента</label>
-              <input id="tenantName" type="text" placeholder="Например: ИП Иванов / Магазин Южный" required />
-            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="tenantName">Название клиента</label>
+                <input class="input" id="tenantName" placeholder="Например: BFC24 TEST" required />
+              </div>
+              <div class="field">
+                <label for="tenantSlug">Slug</label>
+                <input class="input" id="tenantSlug" placeholder="bfc24-test" required />
+              </div>
 
-            <div class="grid-2">
-              <div>
-                <label for="tenantPhone">Телефон</label>
-                <input id="tenantPhone" type="text" placeholder="+79999999999" />
+              <div class="field">
+                <label for="tenantTariffName">Тариф</label>
+                <input class="input" id="tenantTariffName" placeholder="basic" value="basic" />
               </div>
-              <div>
-                <label for="tenantEmail">Email</label>
-                <input id="tenantEmail" type="text" placeholder="client@test.ru" />
+              <div class="field">
+                <label for="tenantPlanCode">Plan code</label>
+                <input class="input" id="tenantPlanCode" placeholder="basic" value="basic" />
               </div>
-            </div>
 
-            <div class="grid-3">
-              <div>
-                <label for="tenantTariff">Тариф</label>
-                <input id="tenantTariff" type="text" value="basic" />
-              </div>
-              <div>
+              <div class="field">
                 <label for="tenantSubscriptionStatus">Статус подписки</label>
-                <select id="tenantSubscriptionStatus">
-                  <option value="trial">Тест</option>
-                  <option value="active">Активна</option>
-                  <option value="expired">Истекла</option>
-                  <option value="blocked">Заблокирована</option>
+                <select class="select" id="tenantSubscriptionStatus">
+                  <option value="trial">trial</option>
+                  <option value="active">active</option>
+                  <option value="expired">expired</option>
+                  <option value="blocked">blocked</option>
                 </select>
               </div>
-              <div>
-                <label for="tenantCode">Код клиента</label>
-                <input id="tenantCode" type="text" placeholder="можно оставить пустым" />
+              <div class="field">
+                <label for="tenantStatus">Статус записи</label>
+                <select class="select" id="tenantStatus">
+                  <option value="active">active</option>
+                  <option value="blocked">blocked</option>
+                  <option value="archived">archived</option>
+                </select>
               </div>
-            </div>
 
-            <div class="grid-3">
-              <div>
+              <div class="field">
+                <label for="tenantStartAt">Начало подписки</label>
+                <input class="input" id="tenantStartAt" type="datetime-local" />
+              </div>
+              <div class="field">
+                <label for="tenantEndAt">Конец подписки</label>
+                <input class="input" id="tenantEndAt" type="datetime-local" />
+              </div>
+
+              <div class="field">
                 <label for="tenantMaxSku">Лимит SKU</label>
-                <input id="tenantMaxSku" type="number" min="0" value="1000" />
+                <input class="input" id="tenantMaxSku" type="number" min="0" value="1000" />
               </div>
-              <div>
+              <div class="field">
                 <label for="tenantMaxLocations">Лимит мест хранения</label>
-                <input id="tenantMaxLocations" type="number" min="0" value="10" />
+                <input class="input" id="tenantMaxLocations" type="number" min="0" value="10" />
               </div>
-              <div>
-                <label for="tenantBlockReason">Причина блокировки</label>
-                <input id="tenantBlockReason" type="text" placeholder="если нужна" />
+
+              <div class="field">
+                <label for="tenantContactName">Контактное лицо</label>
+                <input class="input" id="tenantContactName" placeholder="Имя" />
+              </div>
+              <div class="field">
+                <label for="tenantContactPhone">Телефон</label>
+                <input class="input" id="tenantContactPhone" placeholder="+7..." />
+              </div>
+
+              <div class="field">
+                <label for="tenantContactEmail">Email</label>
+                <input class="input" id="tenantContactEmail" placeholder="mail@example.com" />
+              </div>
+              <div class="field">
+                <label for="tenantCode">Код клиента</label>
+                <input class="input" id="tenantCode" placeholder="BFC24-001" />
+              </div>
+
+              <div class="field">
+                <label for="tenantPhone">Доп. телефон</label>
+                <input class="input" id="tenantPhone" placeholder="+7..." />
+              </div>
+              <div class="field">
+                <label for="tenantEmail">Доп. email</label>
+                <input class="input" id="tenantEmail" placeholder="mail@example.com" />
+              </div>
+
+              <div class="field full">
+                <label>Включённые модули</label>
+                <div class="modules-box" id="tenantModulesBox">
+                  <label class="module-option"><input type="checkbox" value="items" /> Товары</label>
+                  <label class="module-option"><input type="checkbox" value="clients" /> Клиенты</label>
+                  <label class="module-option"><input type="checkbox" value="locations" /> Места хранения</label>
+                  <label class="module-option"><input type="checkbox" value="incoming" /> Приёмка</label>
+                  <label class="module-option"><input type="checkbox" value="sales" /> Продажа</label>
+                  <label class="module-option"><input type="checkbox" value="writeoff" /> Списание</label>
+                  <label class="module-option"><input type="checkbox" value="stock" /> Остатки</label>
+                  <label class="module-option"><input type="checkbox" value="movements" /> Движения</label>
+                  <label class="module-option"><input type="checkbox" value="cash" /> Деньги</label>
+                  <label class="module-option"><input type="checkbox" value="debts" /> Долги</label>
+                  <label class="module-option"><input type="checkbox" value="expenses" /> Расходы</label>
+                </div>
+              </div>
+
+              <div class="field full">
+                <label for="tenantComment">Комментарий</label>
+                <textarea class="textarea" id="tenantComment" placeholder="Внутренний комментарий"></textarea>
               </div>
             </div>
 
-            <div class="grid-2">
-              <div>
-                <label for="tenantSubscriptionStart">Дата начала подписки</label>
-                <input id="tenantSubscriptionStart" type="datetime-local" />
-              </div>
-              <div>
-                <label for="tenantSubscriptionEnd">Дата окончания подписки</label>
-                <input id="tenantSubscriptionEnd" type="datetime-local" />
-              </div>
-            </div>
-
-            <div>
-              <label for="tenantModules">Модули (через запятую)</label>
-              <textarea id="tenantModules" placeholder="items, clients, locations, incoming, sales, stock, cash"></textarea>
-            </div>
-
-            <div>
-              <label for="tenantComment">Комментарий</label>
-              <textarea id="tenantComment" placeholder="Внутренний комментарий по клиенту"></textarea>
-            </div>
-
-            <div class="actions">
-              <button type="submit" class="btn-primary">Сохранить клиента</button>
-              <button type="button" class="btn-secondary" onclick="resetTenantForm()">Очистить форму</button>
+            <div class="toolbar" style="margin-top:16px; margin-bottom:0;">
+              <button class="btn btn-primary" type="submit" id="btnTenantSave">Сохранить клиента</button>
+              <button class="btn btn-secondary" type="button" id="btnTenantReset">Очистить форму</button>
             </div>
           </form>
         </div>
+      </section>
 
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title" id="userFormTitle">Новый пользователь</h2>
-              <div class="card-subtitle">Создание логина для клиента или редактирование существующего</div>
-            </div>
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title" id="userFormTitle">Новый пользователь</h2>
+            <div class="panel-subtitle">Создание и редактирование user в SaaS.</div>
           </div>
-
-          <form id="userForm" class="form-grid" onsubmit="saveUser(event)">
+          <div class="row-actions">
+            <button class="row-btn" id="btnUserCancelEdit" style="display:none;">Отменить редактирование</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <form id="userForm">
             <input type="hidden" id="userId" />
 
-            <div class="grid-2">
-              <div>
+            <div class="form-grid">
+              <div class="field">
                 <label for="userTenantId">Клиент</label>
-                <select id="userTenantId"></select>
+                <select class="select" id="userTenantId" required></select>
               </div>
-              <div>
+              <div class="field">
                 <label for="userRole">Роль</label>
-                <select id="userRole">
-                  <option value="client">Клиент</option>
-                  <option value="owner">Владелец</option>
+                <select class="select" id="userRole">
+                  <option value="client">client</option>
+                  <option value="owner">owner</option>
                 </select>
               </div>
-            </div>
 
-            <div class="grid-2">
-              <div>
-                <label for="userFullName">Имя / ФИО</label>
-                <input id="userFullName" type="text" placeholder="Клиент 1" required />
-              </div>
-              <div>
+              <div class="field">
                 <label for="userUsername">Логин</label>
-                <input id="userUsername" type="text" placeholder="client1" required />
+                <input class="input" id="userUsername" placeholder="client1" required />
+              </div>
+              <div class="field">
+                <label for="userFullName">ФИО / имя</label>
+                <input class="input" id="userFullName" placeholder="Иван Иванов" required />
+              </div>
+
+              <div class="field full">
+                <label for="userPassword">Пароль</label>
+                <input class="input" id="userPassword" type="password" placeholder="Для нового пользователя обязателен" />
+                <div class="helper">При редактировании можно оставить пустым, если менять пароль не нужно.</div>
               </div>
             </div>
 
-            <div>
-              <label for="userPassword">Пароль <span class="muted">(для нового пользователя обязателен)</span></label>
-              <input id="userPassword" type="text" placeholder="12345" />
-            </div>
-
-            <div class="actions">
-              <button type="submit" class="btn-primary">Сохранить пользователя</button>
-              <button type="button" class="btn-secondary" onclick="resetUserForm()">Очистить форму</button>
+            <div class="toolbar" style="margin-top:16px; margin-bottom:0;">
+              <button class="btn btn-primary" type="submit" id="btnUserSave">Сохранить пользователя</button>
+              <button class="btn btn-secondary" type="button" id="btnUserReset">Очистить форму</button>
             </div>
           </form>
         </div>
-      </div>
-
-      <div class="right-col">
-        <div class="card">
-          <div class="toolbar">
-            <div class="toolbar-left">
-              Управление кабинетами клиентов, статусами подписки, лимитами и доступом
-            </div>
-            <button class="btn-secondary" onclick="loadTenants()">Обновить</button>
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Клиент</th>
-                  <th>Статусы</th>
-                  <th>Контакты</th>
-                  <th>Подписка и лимиты</th>
-                  <th>Модули</th>
-                  <th>Пользователи</th>
-                  <th>Действия</th>
-                </tr>
-              </thead>
-              <tbody id="tenantsTableBody">
-                <tr><td colspan="8" class="empty">Загрузка...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="toolbar">
-            <div class="toolbar-left">
-              Пользователи, которым выданы логины для входа в систему
-            </div>
-            <button class="btn-secondary" onclick="loadUsers()">Обновить</button>
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Логин</th>
-                  <th>Имя</th>
-                  <th>Роль</th>
-                  <th>Клиент</th>
-                  <th>Статусы</th>
-                  <th>Последний вход</th>
-                  <th>Действия</th>
-                </tr>
-              </thead>
-              <tbody id="usersTableBody">
-                <tr><td colspan="8" class="empty">Загрузка...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
+
+    <section class="panel" id="tenantsSection" style="margin-bottom:18px;">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Клиенты SaaS</h2>
+          <div class="panel-subtitle">Полный список tenant с подпиской, лимитами и активностью.</div>
+        </div>
+        <input class="input filter-input" id="tenantSearch" placeholder="Поиск по клиенту, slug, email, телефону..." />
+      </div>
+      <div class="panel-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID / Клиент</th>
+                <th>Статусы</th>
+                <th>Контакты</th>
+                <th>Подписка и лимиты</th>
+                <th>Активность</th>
+                <th>Модули</th>
+                <th>Пользователи</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="tenantsTableBody">
+              <tr>
+                <td colspan="8" class="muted">Загрузка...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="usersSection">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Пользователи SaaS</h2>
+          <div class="panel-subtitle">Учётные записи входа, привязанные к клиентам.</div>
+        </div>
+        <input class="input filter-input" id="userSearch" placeholder="Поиск по логину, имени, клиенту..." />
+      </div>
+      <div class="panel-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID / Логин</th>
+                <th>Имя</th>
+                <th>Роль</th>
+                <th>Клиент</th>
+                <th>Статусы</th>
+                <th>Последний вход</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr>
+                <td colspan="7" class="muted">Загрузка...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   </div>
 
-    <script src="/js/config.js"></script>
+  <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
 
-  <script>    const Ui = window.AppUI || {
-      escapeHtml: (value) => String(value ?? "")
+  <script>
+    const state = {
+      me: null,
+      tenants: [],
+      users: [],
+      activitySummary: [],
+      tenantSearch: "",
+      userSearch: "",
+      editingTenantId: null,
+      editingUserId: null
+    };
+
+    const el = {
+      currentUserName: document.getElementById("currentUserName"),
+      currentUserSub: document.getElementById("currentUserSub"),
+
+      btnRefresh: document.getElementById("btnRefresh"),
+      btnLogout: document.getElementById("btnLogout"),
+      btnScrollTenants: document.getElementById("btnScrollTenants"),
+      btnScrollUsers: document.getElementById("btnScrollUsers"),
+      btnScrollForms: document.getElementById("btnScrollForms"),
+
+      kpiTenants: document.getElementById("kpiTenants"),
+      kpiSubsActive: document.getElementById("kpiSubsActive"),
+      kpiBlocked: document.getElementById("kpiBlocked"),
+      kpiUsers: document.getElementById("kpiUsers"),
+      kpiActivity7: document.getElementById("kpiActivity7"),
+      kpiActivity30: document.getElementById("kpiActivity30"),
+
+      miniActive: document.getElementById("miniActive"),
+      miniWarning: document.getElementById("miniWarning"),
+      miniInactive: document.getElementById("miniInactive"),
+      miniBlocked: document.getElementById("miniBlocked"),
+
+      summaryChips: document.getElementById("summaryChips"),
+      activityTableBody: document.getElementById("activityTableBody"),
+      tenantsTableBody: document.getElementById("tenantsTableBody"),
+      usersTableBody: document.getElementById("usersTableBody"),
+
+      tenantSearch: document.getElementById("tenantSearch"),
+      userSearch: document.getElementById("userSearch"),
+
+      tenantForm: document.getElementById("tenantForm"),
+      tenantFormTitle: document.getElementById("tenantFormTitle"),
+      tenantId: document.getElementById("tenantId"),
+      tenantName: document.getElementById("tenantName"),
+      tenantSlug: document.getElementById("tenantSlug"),
+      tenantTariffName: document.getElementById("tenantTariffName"),
+      tenantPlanCode: document.getElementById("tenantPlanCode"),
+      tenantSubscriptionStatus: document.getElementById("tenantSubscriptionStatus"),
+      tenantStatus: document.getElementById("tenantStatus"),
+      tenantStartAt: document.getElementById("tenantStartAt"),
+      tenantEndAt: document.getElementById("tenantEndAt"),
+      tenantMaxSku: document.getElementById("tenantMaxSku"),
+      tenantMaxLocations: document.getElementById("tenantMaxLocations"),
+      tenantContactName: document.getElementById("tenantContactName"),
+      tenantContactPhone: document.getElementById("tenantContactPhone"),
+      tenantContactEmail: document.getElementById("tenantContactEmail"),
+      tenantCode: document.getElementById("tenantCode"),
+      tenantPhone: document.getElementById("tenantPhone"),
+      tenantEmail: document.getElementById("tenantEmail"),
+      tenantComment: document.getElementById("tenantComment"),
+      tenantModulesBox: document.getElementById("tenantModulesBox"),
+      btnTenantReset: document.getElementById("btnTenantReset"),
+      btnTenantCancelEdit: document.getElementById("btnTenantCancelEdit"),
+
+      userForm: document.getElementById("userForm"),
+      userFormTitle: document.getElementById("userFormTitle"),
+      userId: document.getElementById("userId"),
+      userTenantId: document.getElementById("userTenantId"),
+      userRole: document.getElementById("userRole"),
+      userUsername: document.getElementById("userUsername"),
+      userFullName: document.getElementById("userFullName"),
+      userPassword: document.getElementById("userPassword"),
+      btnUserReset: document.getElementById("btnUserReset"),
+      btnUserCancelEdit: document.getElementById("btnUserCancelEdit"),
+
+      tenantsSection: document.getElementById("tenantsSection"),
+      usersSection: document.getElementById("usersSection"),
+      formsSection: document.getElementById("formsSection")
+    };
+
+    function getToken() {
+      return localStorage.getItem("token");
+    }
+
+    function setToken(token) {
+      localStorage.setItem("token", token);
+    }
+
+    function clearAuth() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
+
+    function safeText(value) {
+      if (window.escapeHtml) return escapeHtml(String(value ?? ""));
+      return String(value ?? "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;"),
-      translateError: (value) => String(value || "Ошибка"),
-      displayDateTime: (value) => {
-        if (!value) return "";
+        .replaceAll('"', "&quot;");
+    }
+
+    function dt(value) {
+      if (!value) return "—";
+      if (window.displayDateTime) return displayDateTime(value);
+      try {
+        return new Date(value).toLocaleString("ru-RU");
+      } catch (_) {
+        return value;
+      }
+    }
+
+    function toLocalValue(value) {
+      if (!value) return "";
+      if (window.toDatetimeLocalValue) return toDatetimeLocalValue(value);
+      try {
         const d = new Date(value);
-        if (Number.isNaN(d.getTime())) return String(value);
-        return d.toLocaleString("ru-RU");
+        const p = (n) => String(n).padStart(2, "0");
+        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+      } catch (_) {
+        return "";
       }
-    };
+    }
 
-    async function requestFallback(method, path, body) {
-      const token = localStorage.getItem("token") || "";
-      const response = await fetch(path, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: "Bearer " + token } : {})
-        },
-        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+    function parseModules(value) {
+      if (!value) return [];
+      if (Array.isArray(value)) return value;
+      try {
+        const parsed = typeof value === "string" ? JSON.parse(value) : value;
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function getCheckedModules() {
+      return Array.from(el.tenantModulesBox.querySelectorAll('input[type="checkbox"]:checked'))
+        .map((input) => input.value);
+    }
+
+    function setCheckedModules(modules) {
+      const set = new Set(modules || []);
+      el.tenantModulesBox.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+        input.checked = set.has(input.value);
       });
-
-      const text = await response.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { raw: text };
-      }
-
-      if (!response.ok || data.ok === false) {
-        throw new Error(data.error || data.message || ("HTTP " + response.status));
-      }
-
-      return data;
     }
 
-    function getTenantIdFromStorage(fallback = 1) {
-      try {
-        const raw = localStorage.getItem("user");
-        const user = raw ? JSON.parse(raw) : null;
-        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
-          return Number(user.tenant_id);
-        }
-      } catch {}
-      return fallback;
+    function slugify(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/ё/g, "е")
+        .replace(/[^a-zа-я0-9]+/gi, "-")
+        .replace(/^-+|-+$/g, "");
     }
 
-    const ApiBridge = {
-      getTenantId(fallback = 1) {
-        if (window.API && typeof window.API.getTenantId === "function") {
-          const tenantId = window.API.getTenantId();
-          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
-            return Number(tenantId);
-          }
-        }
-        return getTenantIdFromStorage(fallback);
-      },
-      get(path) {
-        if (window.API && typeof window.API.get === "function") {
-          return window.API.get(path);
-        }
-        return requestFallback("GET", path);
-      },
-      post(path, body) {
-        if (window.API && typeof window.API.post === "function") {
-          return window.API.post(path, body);
-        }
-        return requestFallback("POST", path, body);
-      },
-      put(path, body) {
-        if (window.API && typeof window.API.put === "function") {
-          return window.API.put(path, body);
-        }
-        return requestFallback("PUT", path, body);
-      },
-      patch(path, body) {
-        if (window.API && typeof window.API.patch === "function") {
-          return window.API.patch(path, body);
-        }
-        return requestFallback("PATCH", path, body);
-      },
-      delete(path) {
-        if (window.API && typeof window.API.delete === "function") {
-          return window.API.delete(path);
-        }
-        return requestFallback("DELETE", path);
-      }
-    };
-
-    let authToken = localStorage.getItem('token') || '';
-    let currentUser = null;
-    let tenantsCache = [];
-    let usersCache = [];
-
-    function goToMenu() {
-      window.location.href = '/index.html';
+    function numberValue(v, fallback = 0) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : fallback;
     }
 
-    function logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login.html';
+    function daysLeft(endAt) {
+      if (!endAt) return null;
+      const end = new Date(endAt).getTime();
+      const now = Date.now();
+      return Math.ceil((end - now) / (1000 * 60 * 60 * 24));
     }
 
-    function showMessage(text, type = 'success') {
-      const box = document.getElementById('globalMessage');
-      box.textContent = text;
-      box.className = `message show ${type}`;
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    function activityBadge(status) {
+      if (status === "active") return `<span class="badge badge-success">🟢 active</span>`;
+      if (status === "warning") return `<span class="badge badge-warning">🟡 warning</span>`;
+      if (status === "blocked") return `<span class="badge badge-danger">🔴 blocked</span>`;
+      return `<span class="badge badge-info">⚪ inactive</span>`;
     }
 
-    function clearMessage() {
-      const box = document.getElementById('globalMessage');
-      box.textContent = '';
-      box.className = 'message';
+    function boolBadge(value, textTrue, textFalse) {
+      return value
+        ? `<span class="badge badge-success">${safeText(textTrue)}</span>`
+        : `<span class="badge badge-info">${safeText(textFalse)}</span>`;
     }
 
-    function modulesToString(modules) {
-      if (!Array.isArray(modules)) return '';
-      return modules.join(', ');
+    function buildTenantMapWithActivity() {
+      const activityMap = new Map(
+        state.activitySummary.map((item) => [String(item.id), item])
+      );
+
+      return state.tenants.map((tenant) => {
+        const activity = activityMap.get(String(tenant.id)) || {};
+        return { ...tenant, activity };
+      });
     }
 
-    function stringToModules(text) {
-      return String(text || '')
-        .split(',')
-        .map(v => v.trim())
-        .filter(Boolean);
+    async function apiGet(url) {
+      return API.get(url);
     }
 
-    function pill(text, type = 'gray') {
-      return `<span class="pill pill-${type}">${Ui.escapeHtml(text)}</span>`;
+    async function apiPost(url, body) {
+      return API.post(url, body);
     }
 
-    function getSubscriptionPill(status) {
-      if (status === 'active') return pill('Подписка активна', 'green');
-      if (status === 'trial') return pill('Тестовый доступ', 'yellow');
-      if (status === 'expired') return pill('Подписка истекла', 'red');
-      if (status === 'blocked') return pill('Подписка заблокирована', 'red');
-      return pill(status || '—', 'gray');
+    async function apiPut(url, body) {
+      return API.put(url, body);
     }
 
-    function getTenantStatusPill(status) {
-      if (status === 'active') return pill('Кабинет активен', 'green');
-      if (status === 'blocked') return pill('Кабинет заблокирован', 'red');
-      if (status === 'archived') return pill('Архив', 'gray');
-      return pill(status || '—', 'gray');
+    async function apiPatch(url, body) {
+      return API.patch(url, body);
     }
 
-    function getBoolPill(value, trueText, falseText) {
-      return value ? pill(trueText, 'green') : pill(falseText, 'gray');
+    function showError(error) {
+      const text = window.translateError ? translateError(error?.error || error?.message || error) : (error?.error || error?.message || String(error));
+      alert(text || "Произошла ошибка");
     }
 
-    function calcDaysLeft(iso) {
-      if (!iso) return null;
-      const now = new Date();
-      const end = new Date(iso);
-      if (Number.isNaN(end.getTime())) return null;
-
-      const diffMs = end.getTime() - now.getTime();
-      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      return diffDays;
-    }
-
-    function renderDaysLeft(days, subscriptionStatus) {
-      if (days === null) return '<span class="muted">Осталось дней: —</span>';
-      if (subscriptionStatus === 'expired' || days < 0) {
-        return `<span class="sub-expired">Осталось дней: ${days}</span>`;
-      }
-      if (days <= 7) {
-        return `<span class="sub-warning">Осталось дней: ${days}</span>`;
-      }
-      return `<span class="sub-ok">Осталось дней: ${days}</span>`;
-    }
-
-    async function api(path, options = {}) {
-      const method = String(options.method || 'GET').toUpperCase();
-      const body = options.body ? JSON.parse(options.body) : undefined;
-
-      if (method === 'GET') return ApiBridge.get(path);
-      if (method === 'POST') return ApiBridge.post(path, body);
-      if (method === 'PUT') return ApiBridge.put(path, body);
-      if (method === 'PATCH') return ApiBridge.patch(path, body);
-      if (method === 'DELETE') return ApiBridge.delete(path);
-
-      return requestFallback(method, path, body);
-    }
-
-    async function checkAccess() {
-      if (!authToken) {
-        window.location.href = '/login.html';
+    function fillCurrentUser() {
+      const me = state.me;
+      if (!me) {
+        el.currentUserName.textContent = "Нет данных";
+        el.currentUserSub.textContent = "Сессия не определена";
         return;
       }
 
-      try {
-        const me = await api('/auth/me');
-        currentUser = me.user || null;
+      el.currentUserName.textContent = `${me.full_name || me.username || "Пользователь"}`;
+      el.currentUserSub.textContent = `${me.role || "role"}${me.username ? " · @" + me.username : ""}`;
+    }
 
-        if (!currentUser || currentUser.role !== 'owner') {
-          showMessage('Доступ разрешён только владельцу системы.', 'error');
-          setTimeout(() => {
-            window.location.href = '/index.html';
-          }, 1200);
-          return;
-        }
+    function fillTenantSelect() {
+      const options = [
+        `<option value="">Выберите клиента</option>`,
+        ...state.tenants.map((tenant) => {
+          return `<option value="${safeText(tenant.id)}">${safeText(tenant.name)} (#${safeText(tenant.id)})</option>`;
+        })
+      ];
+      el.userTenantId.innerHTML = options.join("");
+    }
 
-        document.getElementById('ownerBadge').textContent =
-          `Владелец: ${currentUser.full_name || currentUser.username}`;
-      } catch (error) {
-        console.error('checkAccess error:', error);
-        logout();
+    function renderKpis() {
+      const tenants = buildTenantMapWithActivity();
+      const totalTenants = tenants.length;
+      const totalUsers = state.users.length;
+      const activeSubs = tenants.filter((t) => ["active", "trial"].includes(String(t.subscription_status || "").toLowerCase())).length;
+      const blocked = tenants.filter((t) => {
+        const subscriptionStatus = String(t.subscription_status || "").toLowerCase();
+        const activityStatus = String(t.activity?.activity_status || "").toLowerCase();
+        return t.is_blocked || t.is_active === false || subscriptionStatus === "blocked" || subscriptionStatus === "expired" || activityStatus === "blocked";
+      }).length;
+      const activity7 = tenants.reduce((sum, t) => sum + numberValue(t.activity?.activity_7d, 0), 0);
+      const activity30 = tenants.reduce((sum, t) => sum + numberValue(t.activity?.activity_30d, 0), 0);
+
+      el.kpiTenants.textContent = totalTenants;
+      el.kpiSubsActive.textContent = activeSubs;
+      el.kpiBlocked.textContent = blocked;
+      el.kpiUsers.textContent = totalUsers;
+      el.kpiActivity7.textContent = activity7;
+      el.kpiActivity30.textContent = activity30;
+
+      const activeCount = tenants.filter((t) => t.activity?.activity_status === "active").length;
+      const warningCount = tenants.filter((t) => t.activity?.activity_status === "warning").length;
+      const inactiveCount = tenants.filter((t) => t.activity?.activity_status === "inactive").length;
+      const blockedCount = tenants.filter((t) => t.activity?.activity_status === "blocked").length;
+
+      el.miniActive.textContent = activeCount;
+      el.miniWarning.textContent = warningCount;
+      el.miniInactive.textContent = inactiveCount;
+      el.miniBlocked.textContent = blockedCount;
+
+      el.summaryChips.innerHTML = [
+        `<span class="chip">Клиентов: <b>${totalTenants}</b></span>`,
+        `<span class="chip">Пользователей: <b>${totalUsers}</b></span>`,
+        `<span class="chip">События 7 дней: <b>${activity7}</b></span>`,
+        `<span class="chip">События 30 дней: <b>${activity30}</b></span>`,
+        `<span class="chip">Подписок active/trial: <b>${activeSubs}</b></span>`,
+        `<span class="chip">Проблемных клиентов: <b>${blocked}</b></span>`
+      ].join("");
+    }
+
+    function renderActivityTable() {
+      const tenants = buildTenantMapWithActivity();
+
+      if (!tenants.length) {
+        el.activityTableBody.innerHTML = `<tr><td colspan="5"><div class="empty">Нет данных по активности</div></td></tr>`;
+        return;
       }
-    }
 
-    function fillTenantForm(tenant) {
-      document.getElementById('tenantFormTitle').textContent = `Редактирование клиента #${tenant.id}`;
-      document.getElementById('tenantId').value = tenant.id || '';
-      document.getElementById('tenantName').value = tenant.name || '';
-      document.getElementById('tenantPhone').value = tenant.phone || tenant.contact_phone || '';
-      document.getElementById('tenantEmail').value = tenant.email || tenant.contact_email || '';
-      document.getElementById('tenantTariff').value = tenant.tariff_name || tenant.plan_code || 'basic';
-      document.getElementById('tenantSubscriptionStatus').value = tenant.subscription_status || 'trial';
-      document.getElementById('tenantCode').value = tenant.code || '';
-      document.getElementById('tenantMaxSku').value = tenant.max_sku ?? 1000;
-      document.getElementById('tenantMaxLocations').value = tenant.max_locations ?? 10;
-      document.getElementById('tenantBlockReason').value = tenant.block_reason || '';
-      document.getElementById('tenantSubscriptionStart').value = Ui.toDatetimeLocalValue(tenant.subscription_start_at);
-      document.getElementById('tenantSubscriptionEnd').value = Ui.toDatetimeLocalValue(tenant.subscription_end_at);
-      document.getElementById('tenantModules').value = modulesToString(tenant.enabled_modules || []);
-      document.getElementById('tenantComment').value = tenant.comment || '';
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function resetTenantForm() {
-      document.getElementById('tenantFormTitle').textContent = 'Новый клиент';
-      document.getElementById('tenantId').value = '';
-      document.getElementById('tenantName').value = '';
-      document.getElementById('tenantPhone').value = '';
-      document.getElementById('tenantEmail').value = '';
-      document.getElementById('tenantTariff').value = 'basic';
-      document.getElementById('tenantSubscriptionStatus').value = 'trial';
-      document.getElementById('tenantCode').value = '';
-      document.getElementById('tenantMaxSku').value = 1000;
-      document.getElementById('tenantMaxLocations').value = 10;
-      document.getElementById('tenantBlockReason').value = '';
-      document.getElementById('tenantSubscriptionStart').value = '';
-      document.getElementById('tenantSubscriptionEnd').value = '';
-      document.getElementById('tenantModules').value = '';
-      document.getElementById('tenantComment').value = '';
-    }
-
-    function fillUserForm(user) {
-      document.getElementById('userFormTitle').textContent = `Редактирование пользователя #${user.id}`;
-      document.getElementById('userId').value = user.id || '';
-      document.getElementById('userTenantId').value = user.tenant_id || '';
-      document.getElementById('userRole').value = user.role || 'client';
-      document.getElementById('userFullName').value = user.full_name || '';
-      document.getElementById('userUsername').value = user.username || '';
-      document.getElementById('userPassword').value = '';
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function resetUserForm() {
-      document.getElementById('userFormTitle').textContent = 'Новый пользователь';
-      document.getElementById('userId').value = '';
-      document.getElementById('userTenantId').value = tenantsCache[0]?.id || '';
-      document.getElementById('userRole').value = 'client';
-      document.getElementById('userFullName').value = '';
-      document.getElementById('userUsername').value = '';
-      document.getElementById('userPassword').value = '';
-    }
-
-    function renderTenantSelectOptions() {
-      const select = document.getElementById('userTenantId');
-      const options = tenantsCache
-        .map(t => `<option value="${t.id}">#${Ui.escapeHtml(t.id)} — ${Ui.escapeHtml(t.name)}</option>`)
-        .join('');
-
-      select.innerHTML = options || '<option value="">Нет клиентов</option>';
-    }
-
-    function updateStats() {
-      document.getElementById('statTenants').textContent = tenantsCache.length;
-      document.getElementById('statActiveSubs').textContent =
-        tenantsCache.filter(t => t.subscription_status === 'active').length;
-      document.getElementById('statBlockedTenants').textContent =
-        tenantsCache.filter(t => t.is_blocked).length;
-      document.getElementById('statUsers').textContent = usersCache.length;
-    }
-
-    async function loadTenants() {
-      try {
-        const data = await api('/owner-admin/tenants');
-        tenantsCache = data.tenants || [];
-        renderTenantSelectOptions();
-        renderTenantsTable();
-        updateStats();
-      } catch (error) {
-        console.error('loadTenants error:', error);
-        showMessage(`Ошибка загрузки клиентов: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
-      }
-    }
-
-    async function loadUsers() {
-      try {
-        const data = await api('/owner-admin/users');
-        usersCache = data.users || [];
-        renderUsersTable();
-        updateStats();
-      } catch (error) {
-        console.error('loadUsers error:', error);
-        showMessage(`Ошибка загрузки пользователей: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
-      }
+      el.activityTableBody.innerHTML = tenants.map((tenant) => {
+        const a = tenant.activity || {};
+        return `
+          <tr>
+            <td>
+              <div class="stack">
+                <div class="strong">#${safeText(tenant.id)} — ${safeText(tenant.name)}</div>
+                <div class="muted small">${safeText(tenant.slug || "—")}</div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <div>${safeText(dt(a.last_login_at))}</div>
+                <div class="muted small">${a.last_login_at ? "последняя активная сессия" : "ещё не входил"}</div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <div>7 дней: <span class="strong">${safeText(a.activity_7d ?? 0)}</span></div>
+                <div>30 дней: <span class="strong">${safeText(a.activity_30d ?? 0)}</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <div>Продажи: <span class="strong">${safeText(a.sales_7d ?? 0)}</span> / ${safeText(a.sales_30d ?? 0)}</div>
+                <div>Приёмки: <span class="strong">${safeText(a.receipts_7d ?? 0)}</span> / ${safeText(a.receipts_30d ?? 0)}</div>
+                <div>Списания: <span class="strong">${safeText(a.writeoffs_7d ?? 0)}</span> / ${safeText(a.writeoffs_30d ?? 0)}</div>
+              </div>
+            </td>
+            <td>${activityBadge(a.activity_status || "inactive")}</td>
+          </tr>
+        `;
+      }).join("");
     }
 
     function renderTenantsTable() {
-      const body = document.getElementById('tenantsTableBody');
+      const q = state.tenantSearch.trim().toLowerCase();
+      const rows = buildTenantMapWithActivity().filter((tenant) => {
+        if (!q) return true;
+        const haystack = [
+          tenant.id,
+          tenant.name,
+          tenant.slug,
+          tenant.contact_name,
+          tenant.contact_phone,
+          tenant.contact_email,
+          tenant.phone,
+          tenant.email,
+          tenant.code,
+          tenant.tariff_name,
+          tenant.subscription_status
+        ].map((v) => String(v || "").toLowerCase()).join(" ");
+        return haystack.includes(q);
+      });
 
-      if (!tenantsCache.length) {
-        body.innerHTML = '<tr><td colspan="8" class="empty">Клиенты пока не созданы</td></tr>';
+      if (!rows.length) {
+        el.tenantsTableBody.innerHTML = `<tr><td colspan="8"><div class="empty">Клиенты не найдены</div></td></tr>`;
         return;
       }
 
-      body.innerHTML = tenantsCache.map(t => {
-        const modules = Array.isArray(t.enabled_modules) ? t.enabled_modules : [];
-        const daysLeft = calcDaysLeft(t.subscription_end_at);
+      const usersCountMap = state.users.reduce((map, user) => {
+        const key = String(user.tenant_id || "");
+        map.set(key, (map.get(key) || 0) + 1);
+        return map;
+      }, new Map());
+
+      el.tenantsTableBody.innerHTML = rows.map((tenant) => {
+        const modules = parseModules(tenant.enabled_modules);
+        const a = tenant.activity || {};
+        const subscriptionDaysLeft = daysLeft(tenant.subscription_end_at);
+
+        const statusBadges = [
+          boolBadge(tenant.is_active !== false, "активен", "не активен"),
+          tenant.is_blocked
+            ? `<span class="badge badge-danger">заблокирован</span>`
+            : `<span class="badge badge-success">не заблокирован</span>`,
+          tenant.subscription_status === "expired"
+            ? `<span class="badge badge-danger">подписка expired</span>`
+            : tenant.subscription_status === "blocked"
+              ? `<span class="badge badge-danger">подписка blocked</span>`
+              : tenant.subscription_status === "trial"
+                ? `<span class="badge badge-warning">подписка trial</span>`
+                : `<span class="badge badge-success">подписка ${safeText(tenant.subscription_status || "active")}</span>`
+        ].join("");
+
+        const contactLines = [
+          tenant.contact_name ? `<div>${safeText(tenant.contact_name)}</div>` : "",
+          tenant.contact_phone ? `<div class="muted small">${safeText(tenant.contact_phone)}</div>` : "",
+          tenant.contact_email ? `<div class="muted small">${safeText(tenant.contact_email)}</div>` : "",
+          tenant.phone ? `<div class="muted small">доп. тел.: ${safeText(tenant.phone)}</div>` : "",
+          tenant.email ? `<div class="muted small">доп. email: ${safeText(tenant.email)}</div>` : ""
+        ].filter(Boolean).join("") || "—";
+
+        const subscriptionInfo = `
+          <div class="stack">
+            <div><span class="strong">Тариф:</span> ${safeText(tenant.tariff_name || "basic")}</div>
+            <div><span class="strong">Начало:</span> ${safeText(dt(tenant.subscription_start_at))}</div>
+            <div><span class="strong">Окончание:</span> ${safeText(dt(tenant.subscription_end_at))}</div>
+            <div><span class="strong">Осталось дней:</span> ${subscriptionDaysLeft === null ? "—" : safeText(subscriptionDaysLeft)}</div>
+            <div><span class="strong">SKU:</span> ${safeText(tenant.max_sku ?? "—")} · <span class="strong">МХ:</span> ${safeText(tenant.max_locations ?? "—")}</div>
+          </div>
+        `;
+
+        const activityInfo = `
+          <div class="stack">
+            <div>${activityBadge(a.activity_status || "inactive")}</div>
+            <div class="muted small">Последний вход: ${safeText(dt(a.last_login_at))}</div>
+            <div class="muted small">События 7/30: ${safeText(a.activity_7d ?? 0)} / ${safeText(a.activity_30d ?? 0)}</div>
+            <div class="muted small">Продажи 7/30: ${safeText(a.sales_7d ?? 0)} / ${safeText(a.sales_30d ?? 0)}</div>
+            <div class="muted small">Приёмки 7/30: ${safeText(a.receipts_7d ?? 0)} / ${safeText(a.receipts_30d ?? 0)}</div>
+            <div class="muted small">Списания 7/30: ${safeText(a.writeoffs_7d ?? 0)} / ${safeText(a.writeoffs_30d ?? 0)}</div>
+          </div>
+        `;
+
+        const modulesHtml = modules.length
+          ? `<div class="inline-badges">${modules.map((m) => `<span class="badge">${safeText(m)}</span>`).join("")}</div>`
+          : `<span class="muted">—</span>`;
+
+        const usersCount = usersCountMap.get(String(tenant.id)) || 0;
 
         return `
           <tr>
-            <td class="mono">${Ui.escapeHtml(t.id)}</td>
             <td>
-              <div><strong>${Ui.escapeHtml(t.name || '—')}</strong></div>
-              <div class="muted mono">slug: ${Ui.escapeHtml(t.slug || '—')}</div>
-              <div class="muted mono">code: ${Ui.escapeHtml(t.code || '—')}</div>
-            </td>
-            <td>
-              <div class="status-stack">
-                ${getTenantStatusPill(t.status)}
-                ${getSubscriptionPill(t.subscription_status)}
-                ${getBoolPill(t.is_active, 'Включён', 'Выключен')}
-                ${getBoolPill(t.is_blocked, 'Блок включён', 'Не заблокирован')}
+              <div class="stack">
+                <div class="strong">#${safeText(tenant.id)} — ${safeText(tenant.name)}</div>
+                <div class="muted small">slug: ${safeText(tenant.slug || "—")}</div>
+                <div class="muted small">code: ${safeText(tenant.code || "—")}</div>
               </div>
-              <div class="muted">Причина: ${Ui.escapeHtml(t.block_reason || '—')}</div>
             </td>
+            <td><div class="inline-badges">${statusBadges}</div></td>
+            <td>${contactLines}</td>
+            <td>${subscriptionInfo}</td>
+            <td>${activityInfo}</td>
+            <td>${modulesHtml}</td>
             <td>
-              <div>${Ui.escapeHtml(t.phone || t.contact_phone || '—')}</div>
-              <div>${Ui.escapeHtml(t.email || t.contact_email || '—')}</div>
-            </td>
-            <td>
-              <div class="sub-block">
-                <div><strong>Тариф:</strong> ${Ui.escapeHtml(t.tariff_name || t.plan_code || '—')}</div>
-                <div><strong>Лимит SKU:</strong> ${Ui.escapeHtml(t.max_sku ?? '—')}</div>
-                <div><strong>Лимит МХ:</strong> ${Ui.escapeHtml(t.max_locations ?? '—')}</div>
-                <div><strong>Подписка с:</strong> ${Ui.escapeHtml(Ui.displayDateTime(t.subscription_start_at))}</div>
-                <div><strong>Подписка до:</strong> ${Ui.escapeHtml(Ui.displayDateTime(t.subscription_end_at))}</div>
-                <div>${renderDaysLeft(daysLeft, t.subscription_status)}</div>
-                <div class="muted"><strong>Создан:</strong> ${Ui.escapeHtml(Ui.displayDateTime(t.created_at))}</div>
+              <div class="stack">
+                <div class="strong">${safeText(usersCount)}</div>
+                <div class="muted small">пользователей</div>
               </div>
             </td>
             <td>
-              ${modules.length
-                ? `<div class="list-soft">${modules.map(m => Ui.escapeHtml(m)).join('<br>')}</div>`
-                : '<span class="muted">—</span>'}
-            </td>
-            <td>${Ui.escapeHtml(t.users_count ?? 0)}</td>
-            <td>
-              <div class="actions">
-                <button class="btn-secondary btn-small" onclick="editTenant(${t.id})">Редактировать</button>
-                <button class="btn-warning btn-small" onclick="toggleTenantActive(${t.id})">
-                  ${t.is_active ? 'Выключить' : 'Включить'}
-                </button>
-                <button class="btn-danger btn-small" onclick="toggleTenantBlock(${t.id})">
-                  ${t.is_blocked ? 'Разблокировать' : 'Заблокировать'}
-                </button>
+              <div class="row-actions">
+                <button class="row-btn" onclick="editTenant('${safeText(tenant.id)}')">Редактировать</button>
+                <button class="row-btn row-btn-warning" onclick="toggleTenantActive('${safeText(tenant.id)}')">${tenant.is_active === false ? "Включить" : "Выключить"}</button>
+                <button class="row-btn ${tenant.is_blocked ? "row-btn-success" : "row-btn-danger"}" onclick="toggleTenantBlock('${safeText(tenant.id)}')">${tenant.is_blocked ? "Разблокировать" : "Блокировать"}</button>
               </div>
             </td>
           </tr>
         `;
-      }).join('');
+      }).join("");
     }
 
     function renderUsersTable() {
-      const body = document.getElementById('usersTableBody');
+      const tenantsById = new Map(state.tenants.map((t) => [String(t.id), t]));
+      const q = state.userSearch.trim().toLowerCase();
 
-      if (!usersCache.length) {
-        body.innerHTML = '<tr><td colspan="8" class="empty">Пользователи пока не созданы</td></tr>';
+      const rows = state.users.filter((user) => {
+        if (!q) return true;
+        const tenant = tenantsById.get(String(user.tenant_id || ""));
+        const haystack = [
+          user.id,
+          user.username,
+          user.full_name,
+          user.role,
+          tenant?.name,
+          tenant?.slug
+        ].map((v) => String(v || "").toLowerCase()).join(" ");
+        return haystack.includes(q);
+      });
+
+      if (!rows.length) {
+        el.usersTableBody.innerHTML = `<tr><td colspan="7"><div class="empty">Пользователи не найдены</div></td></tr>`;
         return;
       }
 
-      body.innerHTML = usersCache.map(u => `
-        <tr>
-          <td class="mono">${Ui.escapeHtml(u.id)}</td>
-          <td class="mono">${Ui.escapeHtml(u.username || '—')}</td>
-          <td>${Ui.escapeHtml(u.full_name || '—')}</td>
-          <td>${u.role === 'owner' ? pill('Владелец', 'yellow') : pill('Клиент', 'green')}</td>
-          <td>
-            <div>${Ui.escapeHtml(u.tenant_name || '—')}</div>
-            <div class="muted mono">tenant_id: ${Ui.escapeHtml(u.tenant_id || 'null')}</div>
-          </td>
-          <td>
-            <div class="status-stack">
-              ${getBoolPill(u.is_active, 'Включён', 'Выключен')}
-              ${getBoolPill(u.is_blocked, 'Заблокирован', 'Не заблокирован')}
-            </div>
-          </td>
-          <td>${Ui.escapeHtml(Ui.displayDateTime(u.last_login_at))}</td>
-          <td>
-            <div class="actions">
-              <button class="btn-secondary btn-small" onclick="editUser(${u.id})">Редактировать</button>
-              <button class="btn-warning btn-small" onclick="toggleUserActive(${u.id})">
-                ${u.is_active ? 'Выключить' : 'Включить'}
-              </button>
-              <button class="btn-danger btn-small" onclick="toggleUserBlock(${u.id})">
-                ${u.is_blocked ? 'Разблокировать' : 'Заблокировать'}
-              </button>
-              <button class="btn-success btn-small" onclick="resetUserPassword(${u.id})">Сброс пароля</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
+      el.usersTableBody.innerHTML = rows.map((user) => {
+        const tenant = tenantsById.get(String(user.tenant_id || ""));
+        return `
+          <tr>
+            <td>
+              <div class="stack">
+                <div class="strong">#${safeText(user.id)} — ${safeText(user.username || "—")}</div>
+              </div>
+            </td>
+            <td>${safeText(user.full_name || "—")}</td>
+            <td><span class="badge badge-info">${safeText(user.role || "—")}</span></td>
+            <td>
+              ${tenant
+                ? `<div class="stack">
+                    <div class="strong">${safeText(tenant.name)}</div>
+                    <div class="muted small">#${safeText(tenant.id)} · ${safeText(tenant.slug || "")}</div>
+                  </div>`
+                : `<span class="muted">—</span>`}
+            </td>
+            <td>
+              <div class="inline-badges">
+                ${user.is_active === false
+                  ? `<span class="badge badge-danger">не активен</span>`
+                  : `<span class="badge badge-success">активен</span>`}
+                ${user.is_blocked
+                  ? `<span class="badge badge-danger">заблокирован</span>`
+                  : `<span class="badge badge-success">не заблокирован</span>`}
+              </div>
+            </td>
+            <td>${safeText(dt(user.last_login_at))}</td>
+            <td>
+              <div class="row-actions">
+                <button class="row-btn" onclick="editUser('${safeText(user.id)}')">Редактировать</button>
+                <button class="row-btn row-btn-warning" onclick="toggleUserActive('${safeText(user.id)}')">${user.is_active === false ? "Включить" : "Выключить"}</button>
+                <button class="row-btn ${user.is_blocked ? "row-btn-success" : "row-btn-danger"}" onclick="toggleUserBlock('${safeText(user.id)}')">${user.is_blocked ? "Разблокировать" : "Блокировать"}</button>
+                <button class="row-btn row-btn-warning" onclick="resetUserPassword('${safeText(user.id)}')">Сбросить пароль</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
     }
 
-    function editTenant(id) {
-      const tenant = tenantsCache.find(t => String(t.id) === String(id));
-      if (!tenant) return;
-      fillTenantForm(tenant);
+    function resetTenantForm() {
+      state.editingTenantId = null;
+      el.tenantFormTitle.textContent = "Новый клиент";
+      el.btnTenantCancelEdit.style.display = "none";
+      el.tenantId.value = "";
+      el.tenantName.value = "";
+      el.tenantSlug.value = "";
+      el.tenantTariffName.value = "basic";
+      el.tenantPlanCode.value = "basic";
+      el.tenantSubscriptionStatus.value = "trial";
+      el.tenantStatus.value = "active";
+      el.tenantStartAt.value = "";
+      el.tenantEndAt.value = "";
+      el.tenantMaxSku.value = "1000";
+      el.tenantMaxLocations.value = "10";
+      el.tenantContactName.value = "";
+      el.tenantContactPhone.value = "";
+      el.tenantContactEmail.value = "";
+      el.tenantCode.value = "";
+      el.tenantPhone.value = "";
+      el.tenantEmail.value = "";
+      el.tenantComment.value = "";
+      setCheckedModules([]);
     }
 
-    function editUser(id) {
-      const user = usersCache.find(u => String(u.id) === String(id));
-      if (!user) return;
-      fillUserForm(user);
+    function resetUserForm() {
+      state.editingUserId = null;
+      el.userFormTitle.textContent = "Новый пользователь";
+      el.btnUserCancelEdit.style.display = "none";
+      el.userId.value = "";
+      el.userTenantId.value = "";
+      el.userRole.value = "client";
+      el.userUsername.value = "";
+      el.userFullName.value = "";
+      el.userPassword.value = "";
+    }
+
+    async function loadMe() {
+      const data = await apiGet("/auth/me");
+      if (!data?.ok || !data.user) {
+        throw new Error(data?.error || "failed_to_load_auth_me");
+      }
+
+      if (data.user.role !== "owner") {
+        window.location.href = "/index.html";
+        return;
+      }
+
+      state.me = data.user;
+      fillCurrentUser();
+    }
+
+    async function loadTenants() {
+      const data = await apiGet("/owner-admin/tenants");
+      if (!data?.ok) throw new Error(data?.error || "failed_to_load_tenants");
+      state.tenants = Array.isArray(data.tenants) ? data.tenants : [];
+    }
+
+    async function loadUsers() {
+      const data = await apiGet("/owner-admin/users");
+      if (!data?.ok) throw new Error(data?.error || "failed_to_load_users");
+      state.users = Array.isArray(data.users) ? data.users : [];
+    }
+
+    async function loadActivitySummary() {
+      const data = await apiGet("/owner-activity/summary");
+      if (!data?.ok) throw new Error(data?.error || "failed_to_load_owner_activity_summary");
+      state.activitySummary = Array.isArray(data.summary) ? data.summary : [];
+    }
+
+    async function refreshAll() {
+      try {
+        el.btnRefresh.disabled = true;
+        el.btnRefresh.textContent = "Обновляем...";
+
+        await loadMe();
+        await Promise.all([
+          loadTenants(),
+          loadUsers(),
+          loadActivitySummary()
+        ]);
+
+        fillTenantSelect();
+        renderKpis();
+        renderActivityTable();
+        renderTenantsTable();
+        renderUsersTable();
+      } catch (error) {
+        console.error("[owner-dashboard] refreshAll error:", error);
+        showError(error);
+      } finally {
+        el.btnRefresh.disabled = false;
+        el.btnRefresh.textContent = "Обновить данные";
+      }
     }
 
     async function saveTenant(event) {
       event.preventDefault();
-      clearMessage();
 
-      const tenantId = document.getElementById('tenantId').value.trim();
-
+      const id = el.tenantId.value.trim();
       const payload = {
-        name: document.getElementById('tenantName').value.trim(),
-        phone: document.getElementById('tenantPhone').value.trim(),
-        email: document.getElementById('tenantEmail').value.trim(),
-        tariff_name: document.getElementById('tenantTariff').value.trim() || 'basic',
-        subscription_status: document.getElementById('tenantSubscriptionStatus').value,
-        code: document.getElementById('tenantCode').value.trim() || null,
-        max_sku: Number(document.getElementById('tenantMaxSku').value || 0),
-        max_locations: Number(document.getElementById('tenantMaxLocations').value || 0),
-        block_reason: document.getElementById('tenantBlockReason').value.trim() || null,
-        subscription_start_at: document.getElementById('tenantSubscriptionStart').value || null,
-        subscription_end_at: document.getElementById('tenantSubscriptionEnd').value || null,
-        enabled_modules: stringToModules(document.getElementById('tenantModules').value),
-        comment: document.getElementById('tenantComment').value.trim() || null,
-        is_active: true,
-        is_blocked: false
+        name: el.tenantName.value.trim(),
+        slug: el.tenantSlug.value.trim() || slugify(el.tenantName.value),
+        tariff_name: el.tenantTariffName.value.trim() || "basic",
+        plan_code: el.tenantPlanCode.value.trim() || "basic",
+        subscription_status: el.tenantSubscriptionStatus.value,
+        status: el.tenantStatus.value,
+        subscription_start_at: el.tenantStartAt.value ? new Date(el.tenantStartAt.value).toISOString() : null,
+        subscription_end_at: el.tenantEndAt.value ? new Date(el.tenantEndAt.value).toISOString() : null,
+        max_sku: numberValue(el.tenantMaxSku.value, 1000),
+        max_locations: numberValue(el.tenantMaxLocations.value, 10),
+        contact_name: el.tenantContactName.value.trim() || null,
+        contact_phone: el.tenantContactPhone.value.trim() || null,
+        contact_email: el.tenantContactEmail.value.trim() || null,
+        code: el.tenantCode.value.trim() || null,
+        phone: el.tenantPhone.value.trim() || null,
+        email: el.tenantEmail.value.trim() || null,
+        comment: el.tenantComment.value.trim() || null,
+        enabled_modules: getCheckedModules()
       };
 
+      if (!payload.name) {
+        alert("Название клиента обязательно");
+        return;
+      }
+
+      if (!payload.slug) {
+        alert("Slug обязателен");
+        return;
+      }
+
       try {
-        if (tenantId) {
-          await api(`/owner-admin/tenants/${tenantId}`, {
-            method: 'PUT',
-            body: JSON.stringify(payload)
-          });
-          showMessage(`Клиент #${tenantId} успешно обновлён`, 'success');
+        if (id) {
+          const result = await apiPut(`/owner-admin/tenants/${id}`, payload);
+          if (!result?.ok) throw result;
+          alert("Клиент обновлён");
         } else {
-          await api('/owner-admin/tenants', {
-            method: 'POST',
-            body: JSON.stringify(payload)
-          });
-          showMessage('Клиент успешно создан', 'success');
+          const result = await apiPost("/owner-admin/tenants", payload);
+          if (!result?.ok) throw result;
+          alert("Клиент создан");
         }
 
         resetTenantForm();
-        await loadTenants();
-        await loadUsers();
+        await refreshAll();
       } catch (error) {
-        console.error('saveTenant error:', error);
-        showMessage(
-          `Ошибка сохранения клиента: ${Ui.translateError(error.payload?.details || error.payload?.error || error.message)}`,
-          'error'
-        );
+        console.error("[owner-dashboard] saveTenant error:", error);
+        showError(error);
       }
     }
 
     async function saveUser(event) {
       event.preventDefault();
-      clearMessage();
 
-      const userId = document.getElementById('userId').value.trim();
-      const password = document.getElementById('userPassword').value.trim();
-
-      const role = document.getElementById('userRole').value;
-      const tenantIdRaw = document.getElementById('userTenantId').value;
-
+      const id = el.userId.value.trim();
       const payload = {
-        tenant_id: role === 'owner' ? null : Number(tenantIdRaw),
-        username: document.getElementById('userUsername').value.trim(),
-        full_name: document.getElementById('userFullName').value.trim(),
-        role
+        tenant_id: el.userTenantId.value ? Number(el.userTenantId.value) : null,
+        role: el.userRole.value,
+        username: el.userUsername.value.trim(),
+        full_name: el.userFullName.value.trim()
       };
 
+      if (!payload.username) {
+        alert("Логин обязателен");
+        return;
+      }
+
+      if (!payload.full_name) {
+        alert("Имя обязательно");
+        return;
+      }
+
+      if (!id && !el.userPassword.value.trim()) {
+        alert("Для нового пользователя пароль обязателен");
+        return;
+      }
+
+      if (!id && !payload.tenant_id && payload.role !== "owner") {
+        alert("Для client-пользователя нужно выбрать клиента");
+        return;
+      }
+
       try {
-        if (userId) {
-          await api(`/owner-admin/users/${userId}`, {
-            method: 'PUT',
-            body: JSON.stringify(payload)
-          });
+        if (id) {
+          const updatePayload = { ...payload };
+          const result = await apiPut(`/owner-admin/users/${id}`, updatePayload);
+          if (!result?.ok) throw result;
 
-          if (password) {
-            await api(`/owner-admin/users/${userId}/reset-password`, {
-              method: 'POST',
-              body: JSON.stringify({ password })
+          if (el.userPassword.value.trim()) {
+            const resetResult = await apiPost(`/owner-admin/users/${id}/reset-password`, {
+              password: el.userPassword.value.trim()
             });
-            showMessage(`Пользователь #${userId} обновлён, пароль изменён`, 'success');
-          } else {
-            showMessage(`Пользователь #${userId} успешно обновлён`, 'success');
-          }
-        } else {
-          if (!password) {
-            showMessage('Для нового пользователя нужно указать пароль', 'error');
-            return;
+            if (!resetResult?.ok) throw resetResult;
           }
 
-          await api('/owner-admin/users', {
-            method: 'POST',
-            body: JSON.stringify({
-              ...payload,
-              password
-            })
-          });
-          showMessage('Пользователь успешно создан', 'success');
+          alert("Пользователь обновлён");
+        } else {
+          payload.password = el.userPassword.value.trim();
+          const result = await apiPost("/owner-admin/users", payload);
+          if (!result?.ok) throw result;
+          alert("Пользователь создан");
         }
 
         resetUserForm();
-        await loadUsers();
+        await refreshAll();
       } catch (error) {
-        console.error('saveUser error:', error);
-        showMessage(
-          `Ошибка сохранения пользователя: ${Ui.translateError(error.payload?.details || error.payload?.error || error.message)}`,
-          'error'
-        );
+        console.error("[owner-dashboard] saveUser error:", error);
+        showError(error);
       }
     }
 
-    async function toggleTenantActive(id) {
-      clearMessage();
-      try {
-        await api(`/owner-admin/tenants/${id}/toggle-active`, {
-          method: 'PATCH'
-        });
-        showMessage(`Статус активности клиента #${id} изменён`, 'success');
-        await loadTenants();
-      } catch (error) {
-        console.error('toggleTenantActive error:', error);
-        showMessage(`Ошибка изменения активности клиента: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
-      }
-    }
+    window.editTenant = function editTenant(id) {
+      const tenant = state.tenants.find((item) => String(item.id) === String(id));
+      if (!tenant) return;
 
-    async function toggleTenantBlock(id) {
-      clearMessage();
+      state.editingTenantId = String(id);
+      el.tenantFormTitle.textContent = `Редактирование клиента #${tenant.id}`;
+      el.btnTenantCancelEdit.style.display = "inline-flex";
+      el.tenantId.value = tenant.id ?? "";
+      el.tenantName.value = tenant.name ?? "";
+      el.tenantSlug.value = tenant.slug ?? "";
+      el.tenantTariffName.value = tenant.tariff_name ?? "basic";
+      el.tenantPlanCode.value = tenant.plan_code ?? "basic";
+      el.tenantSubscriptionStatus.value = tenant.subscription_status ?? "trial";
+      el.tenantStatus.value = tenant.status ?? "active";
+      el.tenantStartAt.value = toLocalValue(tenant.subscription_start_at);
+      el.tenantEndAt.value = toLocalValue(tenant.subscription_end_at);
+      el.tenantMaxSku.value = tenant.max_sku ?? 1000;
+      el.tenantMaxLocations.value = tenant.max_locations ?? 10;
+      el.tenantContactName.value = tenant.contact_name ?? "";
+      el.tenantContactPhone.value = tenant.contact_phone ?? "";
+      el.tenantContactEmail.value = tenant.contact_email ?? "";
+      el.tenantCode.value = tenant.code ?? "";
+      el.tenantPhone.value = tenant.phone ?? "";
+      el.tenantEmail.value = tenant.email ?? "";
+      el.tenantComment.value = tenant.comment ?? "";
+      setCheckedModules(parseModules(tenant.enabled_modules));
 
-      const tenant = tenantsCache.find(t => String(t.id) === String(id));
-      const isBlocked = tenant?.is_blocked;
-      let reason = '';
+      el.formsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
 
-      if (!isBlocked) {
-        reason = prompt('Укажи причину блокировки клиента:', 'Ручная блокировка') || '';
-      }
+    window.editUser = function editUser(id) {
+      const user = state.users.find((item) => String(item.id) === String(id));
+      if (!user) return;
 
-      try {
-        await api(`/owner-admin/tenants/${id}/toggle-block`, {
-          method: 'PATCH',
-          body: JSON.stringify({ block_reason: reason })
-        });
-        showMessage(`Статус блокировки клиента #${id} изменён`, 'success');
-        await loadTenants();
-      } catch (error) {
-        console.error('toggleTenantBlock error:', error);
-        showMessage(`Ошибка блокировки клиента: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
-      }
-    }
+      state.editingUserId = String(id);
+      el.userFormTitle.textContent = `Редактирование пользователя #${user.id}`;
+      el.btnUserCancelEdit.style.display = "inline-flex";
+      el.userId.value = user.id ?? "";
+      el.userTenantId.value = user.tenant_id ?? "";
+      el.userRole.value = user.role ?? "client";
+      el.userUsername.value = user.username ?? "";
+      el.userFullName.value = user.full_name ?? "";
+      el.userPassword.value = "";
 
-    async function toggleUserActive(id) {
-      clearMessage();
-      try {
-        await api(`/owner-admin/users/${id}/toggle-active`, {
-          method: 'PATCH'
-        });
-        showMessage(`Статус активности пользователя #${id} изменён`, 'success');
-        await loadUsers();
-      } catch (error) {
-        console.error('toggleUserActive error:', error);
-        showMessage(`Ошибка изменения активности пользователя: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
-      }
-    }
+      el.formsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
 
-    async function toggleUserBlock(id) {
-      clearMessage();
-      try {
-        await api(`/owner-admin/users/${id}/toggle-block`, {
-          method: 'PATCH'
-        });
-        showMessage(`Статус блокировки пользователя #${id} изменён`, 'success');
-        await loadUsers();
-      } catch (error) {
-        console.error('toggleUserBlock error:', error);
-        showMessage(`Ошибка блокировки пользователя: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
-      }
-    }
-
-    async function resetUserPassword(id) {
-      clearMessage();
-      const password = prompt('Введите новый пароль:');
-      if (!password) return;
+    window.toggleTenantActive = async function toggleTenantActive(id) {
+      if (!confirm("Переключить активность клиента?")) return;
 
       try {
-        await api(`/owner-admin/users/${id}/reset-password`, {
-          method: 'POST',
-          body: JSON.stringify({ password })
-        });
-        showMessage(`Пароль пользователя #${id} успешно обновлён`, 'success');
+        const result = await apiPatch(`/owner-admin/tenants/${id}/toggle-active`, {});
+        if (!result?.ok) throw result;
+        await refreshAll();
       } catch (error) {
-        console.error('resetUserPassword error:', error);
-        showMessage(`Ошибка смены пароля: ${Ui.translateError(error.payload?.error || error.message)}`, 'error');
+        console.error("[owner-dashboard] toggleTenantActive error:", error);
+        showError(error);
       }
+    };
+
+    window.toggleTenantBlock = async function toggleTenantBlock(id) {
+      try {
+        const tenant = state.tenants.find((t) => String(t.id) === String(id));
+        const isBlocked = !!tenant?.is_blocked;
+
+        let payload = {};
+        if (!isBlocked) {
+          const reason = prompt("Укажи причину блокировки клиента", "manual_block_by_owner");
+          if (reason === null) return;
+          payload = { reason: reason.trim() || "manual_block_by_owner" };
+        }
+
+        const result = await apiPatch(`/owner-admin/tenants/${id}/toggle-block`, payload);
+        if (!result?.ok) throw result;
+        await refreshAll();
+      } catch (error) {
+        console.error("[owner-dashboard] toggleTenantBlock error:", error);
+        showError(error);
+      }
+    };
+
+    window.toggleUserActive = async function toggleUserActive(id) {
+      if (!confirm("Переключить активность пользователя?")) return;
+
+      try {
+        const result = await apiPatch(`/owner-admin/users/${id}/toggle-active`, {});
+        if (!result?.ok) throw result;
+        await refreshAll();
+      } catch (error) {
+        console.error("[owner-dashboard] toggleUserActive error:", error);
+        showError(error);
+      }
+    };
+
+    window.toggleUserBlock = async function toggleUserBlock(id) {
+      if (!confirm("Переключить блокировку пользователя?")) return;
+
+      try {
+        const result = await apiPatch(`/owner-admin/users/${id}/toggle-block`, {});
+        if (!result?.ok) throw result;
+        await refreshAll();
+      } catch (error) {
+        console.error("[owner-dashboard] toggleUserBlock error:", error);
+        showError(error);
+      }
+    };
+
+    window.resetUserPassword = async function resetUserPassword(id) {
+      const password = prompt("Введите новый пароль");
+      if (password === null) return;
+      if (!password.trim()) {
+        alert("Пароль не может быть пустым");
+        return;
+      }
+
+      try {
+        const result = await apiPost(`/owner-admin/users/${id}/reset-password`, {
+          password: password.trim()
+        });
+        if (!result?.ok) throw result;
+        alert("Пароль обновлён");
+      } catch (error) {
+        console.error("[owner-dashboard] resetUserPassword error:", error);
+        showError(error);
+      }
+    };
+
+    function bindEvents() {
+      el.btnRefresh.addEventListener("click", refreshAll);
+
+      el.btnLogout.addEventListener("click", () => {
+        clearAuth();
+        window.location.href = "/login.html";
+      });
+
+      el.btnScrollTenants.addEventListener("click", () => {
+        el.tenantsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      el.btnScrollUsers.addEventListener("click", () => {
+        el.usersSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      el.btnScrollForms.addEventListener("click", () => {
+        el.formsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      el.tenantSearch.addEventListener("input", (e) => {
+        state.tenantSearch = e.target.value || "";
+        renderTenantsTable();
+      });
+
+      el.userSearch.addEventListener("input", (e) => {
+        state.userSearch = e.target.value || "";
+        renderUsersTable();
+      });
+
+      el.tenantName.addEventListener("input", () => {
+        if (!state.editingTenantId && !el.tenantSlug.value.trim()) {
+          el.tenantSlug.value = slugify(el.tenantName.value);
+        }
+      });
+
+      el.tenantForm.addEventListener("submit", saveTenant);
+      el.userForm.addEventListener("submit", saveUser);
+
+      el.btnTenantReset.addEventListener("click", resetTenantForm);
+      el.btnUserReset.addEventListener("click", resetUserForm);
+
+      el.btnTenantCancelEdit.addEventListener("click", resetTenantForm);
+      el.btnUserCancelEdit.addEventListener("click", resetUserForm);
     }
 
-    async function init() {
-      await checkAccess();
-      await loadTenants();
-      await loadUsers();
+    async function bootstrap() {
+      const token = getToken();
+      if (!token) {
+        window.location.href = "/login.html";
+        return;
+      }
+
+      bindEvents();
       resetTenantForm();
       resetUserForm();
+      await refreshAll();
     }
 
-    init();
+    bootstrap();
   </script>
 </body>
 </html>
