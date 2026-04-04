@@ -96,13 +96,25 @@ router.get("/", authRequired, async (req, res) => {
         ct.payment_method,
         ct.counterparty_id,
         cp.name AS counterparty_name,
+        ct.sale_id,
+        sale_items_info.item_name,
         ct.comment,
         ct.created_by,
         u.username AS created_by_username,
         ct.created_at
       FROM core.cash_transactions ct
-      LEFT JOIN core.counterparties cp ON cp.id = ct.counterparty_id
-      LEFT JOIN saas.users u ON u.id = ct.created_by
+      LEFT JOIN core.counterparties cp
+        ON cp.id = ct.counterparty_id
+      LEFT JOIN saas.users u
+        ON u.id = ct.created_by
+      LEFT JOIN LATERAL (
+        SELECT
+          string_agg(DISTINCT i.name, ', ' ORDER BY i.name) AS item_name
+        FROM core.sale_items si
+        JOIN core.items i
+          ON i.id = si.item_id
+        WHERE si.sale_id = ct.sale_id
+      ) AS sale_items_info ON TRUE
       ${whereSql}
       ORDER BY ct.id DESC
       LIMIT 500
