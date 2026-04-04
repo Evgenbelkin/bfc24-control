@@ -110,6 +110,76 @@ router.post(
         [newQty, stockId]
       );
 
+      const saleResult = await client.query(
+        `
+        INSERT INTO core.sales
+        (
+          tenant_id,
+          counterparty_id,
+          comment,
+          created_by
+        )
+        VALUES ($1, $2, $3, $4)
+        RETURNING id
+        `,
+        [
+          tenantId,
+          counterparty_id || null,
+          comment || (payment_method === "consignment" ? "Продажа под реализацию" : "Продажа товара"),
+          userId,
+        ]
+      );
+
+      const saleId = saleResult.rows[0].id;
+
+      const itemResult = await client.query(
+        `
+        SELECT id, sale_price
+        FROM core.items
+        WHERE tenant_id = $1
+          AND id = $2
+        LIMIT 1
+        `,
+        [tenantId, item_id]
+      );
+
+      if (itemResult.rows.length === 0) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          ok: false,
+          error: "item_not_found",
+        });
+      }
+
+      const itemSalePrice = Number(itemResult.rows[0].sale_price || 0);
+      const lineAmount =
+        Number(amount) > 0
+          ? Number(amount)
+          : Number((sellQty * itemSalePrice).toFixed(2));
+
+      await client.query(
+        `
+        INSERT INTO core.sale_items
+        (
+          tenant_id,
+          sale_id,
+          item_id,
+          qty,
+          price,
+          line_amount
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
+        `,
+        [
+          tenantId,
+          saleId,
+          item_id,
+          sellQty,
+          itemSalePrice,
+          lineAmount,
+        ]
+      );
+
       const movement = await client.query(
         `
         INSERT INTO core.movements
@@ -152,13 +222,14 @@ router.post(
             status,
             comment
           )
-          VALUES ($1, $2, NULL, $3, 0, $3, 'open', $4)
+          VALUES ($1, $2, $3, $4, 0, $4, 'open', $5)
           RETURNING id
           `,
           [
             tenantId,
             counterparty_id,
-            Number(amount),
+            saleId,
+            Number(lineAmount),
             comment || "Продажа под реализацию",
           ]
         );
@@ -174,16 +245,18 @@ router.post(
             amount,
             payment_method,
             counterparty_id,
+            sale_id,
             comment,
             created_by
           )
-          VALUES ($1, 'income', $2, $3, $4, $5, $6)
+          VALUES ($1, 'income', $2, $3, $4, $5, $6, $7)
           `,
           [
             tenantId,
-            Number(amount),
+            Number(lineAmount),
             payment_method,
             counterparty_id || null,
+            saleId,
             comment || "Продажа товара",
             userId,
           ]
@@ -194,9 +267,10 @@ router.post(
 
       return res.json({
         ok: true,
-        new_qty: newQty,
+        sale_id: saleId,
         movement_id: movementId,
         debt_id: debtId,
+        new_qty: newQty,
       });
     } catch (e) {
       await client.query("ROLLBACK");
