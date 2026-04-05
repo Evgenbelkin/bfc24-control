@@ -8,6 +8,18 @@ const {
 
 const router = express.Router();
 
+function toNumber(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function normalizeText(value) {
+  if (value === null || value === undefined) return null;
+  const s = String(value).trim();
+  return s.length ? s : null;
+}
+
 router.get("/", authRequired, async (req, res) => {
   try {
     const tenantId = getEffectiveTenantId(req);
@@ -49,7 +61,6 @@ router.get("/", authRequired, async (req, res) => {
     return res.status(500).json({
       ok: false,
       error: "stock_list_failed",
-      details: e.message,
     });
   }
 });
@@ -76,6 +87,8 @@ router.get("/batches", authRequired, async (req, res) => {
         b.qty_remaining,
         b.unit_cost,
         (b.qty_remaining * b.unit_cost) AS total_sum,
+        b.created_at,
+        b.updated_at,
         i.name AS item_name,
         i.sku,
         i.barcode
@@ -98,7 +111,6 @@ router.get("/batches", authRequired, async (req, res) => {
     return res.status(500).json({
       ok: false,
       error: "batches_failed",
-      details: e.message,
     });
   }
 });
@@ -121,112 +133,213 @@ router.post(
         });
       }
 
-      const { item_id, location_id, qty, comment, purchase_price } = req.body;
+      const itemId = toNumber(req.body.item_id);
+      const locationId = toNumber(req.body.location_id);
+      const qty = toNumber(req.body.qty);
+      const purchasePrice = toNumber(req.body.purchase_price);
+      const batchDate = normalizeText(req.body.batch_date);
+      const comment = normalizeText(req.body.comment);
 
-      if (!item_id || !location_id || !qty || Number(qty) <= 0) {
+      if (!itemId || itemId <= 0) {
         return res.status(400).json({
           ok: false,
-          error: "item_id_location_id_qty_required",
+          error: "invalid_item_id",
         });
       }
 
-      if (
-        purchase_price === undefined ||
-        purchase_price === null ||
-        Number.isNaN(Number(purchase_price)) ||
-        Number(purchase_price) < 0
-      ) {
+      if (!locationId || locationId <= 0) {
         return res.status(400).json({
           ok: false,
-          error: "purchase_price_required",
+          error: "invalid_location_id",
         });
       }
 
-      const normalizedQty = Number(qty);
-      const normalizedPurchasePrice = Number(purchase_price);
+      if (!qty || qty <= 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_qty",
+        });
+      }
+
+      if (purchasePrice === null || purchasePrice < 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_purchase_price",
+        });
+      }
+
+      if (batchDate && !/^\d{4}-\d{2}-\d{2}$/.test(batchDate)) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_batch_date",
+        });
+      }
 
       await client.query("BEGIN");
 
-      const stockResult = await client.query(
+      const { rows: itemRows } = await client.query(
         `
-        SELECT id, qty
-        FROM core.stock
-        WHERE tenant_id = $1
-          AND item_id = $2
-          AND location_id = $3
-        FOR UPDATE
+          SELECT id, is_active
+          FROM core.items
+          WHERE tenant_id = $1
+            AND id = $2
+          LIMIT 1
         `,
-        [tenantId, item_id, location_id]
+        [tenantId, itemId]
       );
 
-      let newQty = 0;
-
-      if (stockResult.rows.length > 0) {
-        const stockId = stockResult.rows[0].id;
-        const currentQty = Number(stockResult.rows[0].qty);
-        newQty = currentQty + normalizedQty;
-
-        await client.query(
-          `
-          UPDATE core.stock
-          SET qty = $1
-          WHERE id = $2
-          `,
-          [newQty, stockId]
-        );
-      } else {
-        newQty = normalizedQty;
-
-        await client.query(
-          `
-          INSERT INTO core.stock (tenant_id, item_id, location_id, qty)
-          VALUES ($1, $2, $3, $4)
-          `,
-          [tenantId, item_id, location_id, newQty]
-        );
+      if (!itemRows.length) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({
+          ok: false,
+          error: "item_not_found",
+        });
       }
 
-      await client.query(
+      if (itemRows[0].is_active === false) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          ok: false,
+          error: "item_inactive",
+        });
+      }
+
+      const { rows: locationRows } = await client.query(
         `
-        INSERT INTO core.item_batches
-        (
-          tenant_id,
-          item_id,
-          receipt_id,
-          batch_date,
-          qty_total,
-          qty_remaining,
-          unit_cost
-        )
-        VALUES ($1, $2, NULL, CURRENT_DATE, $3, $3, $4)
+          SELECT id, is_active
+          FROM core.locations
+          WHERE tenant_id = $1
+            AND id = $2
+          LIMIT 1
         `,
-        [tenantId, item_id, normalizedQty, normalizedPurchasePrice]
+        [tenantId, locationId]
       );
 
-      const movement = await client.query(
+      if (!locationRows.length) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({
+          ok: false,
+          error: "location_not_found",
+        });
+      }
+
+      if (locationRows[0].is_active === false) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          ok: false,
+          error: "location_inactive",
+        });
+      }
+
+      const { rows: receiptRows } = await client.query(
         `
-        INSERT INTO core.movements
-        (
-          tenant_id,
-          item_id,
-          location_id,
-          movement_type,
-          qty,
-          comment,
-          created_by
-        )
-        VALUES ($1, $2, $3, 'receipt', $4, $5, $6)
-        RETURNING id
+          INSERT INTO core.receipts
+          (
+            tenant_id,
+            location_id,
+            comment,
+            created_by
+          )
+          VALUES ($1, $2, $3, $4)
+          RETURNING *
         `,
-        [tenantId, item_id, location_id, normalizedQty, comment || null, userId]
+        [tenantId, locationId, comment, userId]
       );
+
+      const receipt = receiptRows[0];
+
+      const { rows: receiptItemRows } = await client.query(
+        `
+          INSERT INTO core.receipt_items
+          (
+            tenant_id,
+            receipt_id,
+            item_id,
+            qty,
+            purchase_price
+          )
+          VALUES ($1, $2, $3, $4, $5)
+          RETURNING *
+        `,
+        [tenantId, receipt.id, itemId, qty, purchasePrice]
+      );
+
+      const receiptItem = receiptItemRows[0];
+
+      const effectiveBatchDate = batchDate || new Date().toISOString().slice(0, 10);
+
+      const { rows: batchRows } = await client.query(
+        `
+          INSERT INTO core.item_batches
+          (
+            tenant_id,
+            item_id,
+            receipt_id,
+            batch_date,
+            qty_total,
+            qty_remaining,
+            unit_cost
+          )
+          VALUES ($1, $2, $3, $4::date, $5, $5, $6)
+          RETURNING *
+        `,
+        [tenantId, itemId, receipt.id, effectiveBatchDate, qty, purchasePrice]
+      );
+
+      const batch = batchRows[0];
+
+      const { rows: stockRows } = await client.query(
+        `
+          INSERT INTO core.stock
+          (
+            tenant_id,
+            item_id,
+            location_id,
+            qty
+          )
+          VALUES ($1, $2, $3, $4)
+          ON CONFLICT ON CONSTRAINT stock_tenant_item_location_uk
+          DO UPDATE SET
+            qty = core.stock.qty + EXCLUDED.qty,
+            updated_at = NOW()
+          RETURNING *
+        `,
+        [tenantId, itemId, locationId, qty]
+      );
+
+      const stock = stockRows[0];
+
+      const { rows: movementRows } = await client.query(
+        `
+          INSERT INTO core.movements
+          (
+            tenant_id,
+            item_id,
+            location_id,
+            movement_type,
+            qty,
+            ref_type,
+            ref_id,
+            comment,
+            created_by
+          )
+          VALUES ($1, $2, $3, 'receipt', $4, 'receipt', $5, $6, $7)
+          RETURNING *
+        `,
+        [tenantId, itemId, locationId, qty, receipt.id, comment, userId]
+      );
+
+      const movement = movementRows[0];
 
       await client.query("COMMIT");
 
       return res.json({
         ok: true,
-        new_qty: newQty,
-        movement_id: movement.rows[0].id,
+        receipt,
+        receipt_item: receiptItem,
+        batch,
+        stock,
+        movement,
       });
     } catch (e) {
       await client.query("ROLLBACK");
@@ -234,7 +347,6 @@ router.post(
       return res.status(500).json({
         ok: false,
         error: "incoming_failed",
-        details: e.message,
       });
     } finally {
       client.release();
@@ -280,6 +392,8 @@ router.get("/movements", authRequired, async (req, res) => {
         m.id,
         m.movement_type,
         m.qty,
+        m.ref_type,
+        m.ref_id,
         m.comment,
         m.created_at,
         m.created_by,
@@ -307,7 +421,6 @@ router.get("/movements", authRequired, async (req, res) => {
     return res.status(500).json({
       ok: false,
       error: "movements_failed",
-      details: e.message,
     });
   }
 });
