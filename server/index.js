@@ -1,12 +1,14 @@
 require("dotenv").config();
 
+if (!process.env.JWT_SECRET || !String(process.env.JWT_SECRET).trim()) {
+  throw new Error("JWT_SECRET is required");
+}
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
 const pool = require("./db");
-
-// 🔐 ВАЖНО — вот это у тебя отсутствовало
 const { authRequired, requireRole } = require("./middleware/auth");
 
 // routes
@@ -29,7 +31,26 @@ const app = express();
 const PORT = Number(process.env.PORT || 3003);
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
 
-app.use(cors());
+const ALLOWED_ORIGINS = new Set([
+  "https://dev.app.bfc-24.ru",
+  "https://app.bfc-24.ru",
+  "http://localhost:3003",
+  "http://localhost:3004",
+  "http://127.0.0.1:3003",
+  "http://127.0.0.1:3004",
+]);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (ALLOWED_ORIGINS.has(origin)) return callback(null, true);
+      return callback(new Error("cors_not_allowed"));
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -47,13 +68,13 @@ app.get("/ping", async (req, res) => {
 
     res.json({
       ok: true,
-      db: db.rows[0]
+      db: db.rows[0],
     });
   } catch (e) {
     console.error("[GET /ping] error:", e);
     res.status(500).json({
       ok: false,
-      error: e.message
+      error: "ping_failed",
     });
   }
 });
@@ -72,7 +93,7 @@ app.use("/expenses", expensesRoutes);
 app.use("/owner-admin", ownerAdminRoutes);
 app.use("/reports", reportsRoutes);
 
-// 👉 новый модуль активности (ТОЛЬКО owner)
+// owner only
 app.use("/owner-activity", authRequired, requireRole("owner"), ownerActivityRoutes);
 
 // главная страница
@@ -92,7 +113,7 @@ app.use((req, res) => {
   res.status(404).json({
     ok: false,
     error: "not_found",
-    path: req.originalUrl
+    path: req.originalUrl,
   });
 });
 
@@ -100,10 +121,16 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("[UNHANDLED ERROR]", err);
 
+  if (err && err.message === "cors_not_allowed") {
+    return res.status(403).json({
+      ok: false,
+      error: "cors_not_allowed",
+    });
+  }
+
   res.status(500).json({
     ok: false,
     error: "internal_server_error",
-    details: err.message
   });
 });
 
