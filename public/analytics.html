@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    /* ── Дизайн-токены (совместимы с app.css) ─────────────────────────────── */
     :root {
       --bg-color:   #e9eef6;
       --bg-accent:  #dde7f5;
@@ -17,39 +16,32 @@
       --text-main:  #0f172a;
       --text-muted: #64748b;
       --text-soft:  #94a3b8;
-
       --accent:       #2563eb;
       --accent-hover: #1d4ed8;
       --accent-soft:  #eaf2ff;
-
       --success:    #16a34a;
       --success-bg: #dcfce7;
       --warning:    #d97706;
       --warning-bg: #fef3c7;
       --danger:     #dc2626;
       --danger-bg:  #fee2e2;
-
       --border:        #dbe4f0;
       --border-strong: #c7d4e5;
-
       --shadow-xs: 0 1px 2px rgba(15,23,42,.04);
       --shadow-sm: 0 2px 6px rgba(15,23,42,.06);
       --shadow-md: 0 8px 22px rgba(15,23,42,.08);
       --shadow-lg: 0 18px 42px rgba(15,23,42,.14);
-
       --radius-sm: 10px;
       --radius-md: 14px;
       --radius-lg: 18px;
-      --radius-xl: 22px;
-
       --container:  1240px;
       --transition: .18s ease;
+      --chart-rev: #2563eb;
+      --chart-net: #16a34a;
+      --chart-neg: #dc2626;
     }
-
     *, *::before, *::after { box-sizing: border-box; }
-
     html, body { margin: 0; padding: 0; min-height: 100%; }
-
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: radial-gradient(circle at top left, #f8fbff 0%, var(--bg-color) 42%, var(--bg-accent) 100%);
@@ -58,545 +50,246 @@
       line-height: 1.45;
     }
 
-    /* ── Обёртка ──────────────────────────────────────────────────────────── */
-    .shell {
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 28px 18px 56px;
-    }
+    /* ── Shell ── */
+    .shell { max-width: var(--container); margin: 0 auto; padding: 28px 18px 56px; }
 
-    /* ── Шапка ────────────────────────────────────────────────────────────── */
-    .page-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
+    /* ── Header ── */
+    .page-header { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-bottom:24px; flex-wrap:wrap; }
+    .page-title  { margin:0 0 4px; font-size:clamp(26px,4vw,40px); font-weight:800; letter-spacing:-.03em; line-height:1.05; }
+    .page-subtitle { margin:0; color:var(--text-muted); font-size:15px; }
+    .header-right { display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex-shrink:0; }
 
-    .page-title {
-      margin: 0 0 4px;
-      font-size: clamp(26px, 4vw, 40px);
-      font-weight: 800;
-      letter-spacing: -.03em;
-      line-height: 1.05;
-    }
-
-    .page-subtitle {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: 15px;
-    }
-
-    .header-right {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      flex-shrink: 0;
-    }
-
-    /* ── Кнопки ───────────────────────────────────────────────────────────── */
+    /* ── Buttons ── */
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      min-height: 42px;
-      padding: 0 16px;
-      border: 1px solid transparent;
-      border-radius: var(--radius-sm);
-      font: 600 14px/1 'Inter', sans-serif;
-      cursor: pointer;
-      text-decoration: none;
-      transition: transform var(--transition), background var(--transition), box-shadow var(--transition);
-      white-space: nowrap;
+      display:inline-flex; align-items:center; gap:7px; min-height:42px;
+      padding:0 16px; border:1px solid transparent; border-radius:var(--radius-sm);
+      font:600 14px/1 'Inter',sans-serif; cursor:pointer; text-decoration:none;
+      transition:transform var(--transition), background var(--transition), box-shadow var(--transition);
+      white-space:nowrap;
     }
-    .btn:hover  { transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
+    .btn:hover  { transform:translateY(-1px); }
+    .btn:active { transform:translateY(0); }
+    .btn-primary   { background:var(--accent); color:#fff; box-shadow:0 6px 18px rgba(37,99,235,.22); }
+    .btn-primary:hover { background:var(--accent-hover); }
+    .btn-secondary { background:var(--surface); color:var(--text-main); border-color:var(--border); box-shadow:var(--shadow-xs); }
+    .btn-secondary:hover { border-color:var(--border-strong); }
 
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 6px 18px rgba(37,99,235,.22);
-    }
-    .btn-primary:hover { background: var(--accent-hover); }
-
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--text-main);
-      border-color: var(--border);
-      box-shadow: var(--shadow-xs);
-    }
-    .btn-secondary:hover { border-color: var(--border-strong); }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--accent);
-      border-color: transparent;
-    }
-    .btn-ghost:hover { background: var(--accent-soft); }
-
-    /* ── Фильтр-бар ───────────────────────────────────────────────────────── */
+    /* ── Filter bar ── */
     .filter-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: flex-end;
-      padding: 18px 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 24px;
+      display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;
+      padding:18px 20px; background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); margin-bottom:24px;
     }
-
-    .filter-field {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
+    .filter-field { display:flex; flex-direction:column; gap:5px; }
     .filter-field label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      letter-spacing: .03em;
-      text-transform: uppercase;
+      font-size:12px; font-weight:600; color:var(--text-muted);
+      letter-spacing:.03em; text-transform:uppercase;
     }
-
     .filter-field input[type="date"],
     .filter-field input[type="number"] {
-      min-height: 40px;
-      padding: 0 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: #fff;
-      color: var(--text-main);
-      font: 14px 'Inter', sans-serif;
-      outline: none;
-      transition: border-color var(--transition), box-shadow var(--transition);
-      box-shadow: var(--shadow-xs);
+      min-height:40px; padding:0 12px; border:1px solid var(--border);
+      border-radius:var(--radius-sm); background:#fff; color:var(--text-main);
+      font:14px 'Inter',sans-serif; outline:none;
+      transition:border-color var(--transition), box-shadow var(--transition);
+      box-shadow:var(--shadow-xs);
     }
-    .filter-field input[type="date"]:focus,
-    .filter-field input[type="number"]:focus {
-      border-color: rgba(37,99,235,.5);
-      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
-    }
-
-    /* Подсветка поля tenant_id когда оно заполнено из URL */
-    #tenant-id-input.from-url {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    /* Разделитель в фильтре */
-    .filter-divider {
-      width: 1px;
-      align-self: stretch;
-      background: var(--border);
-      margin: 0 4px;
-    }
-    @media (max-width: 768px) { .filter-divider { display: none; } }
-
-    .filter-actions {
-      display: flex;
-      gap: 8px;
-      align-items: flex-end;
-      margin-left: auto;
-    }
-
-    .period-presets {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
+    .filter-field input:focus { border-color:rgba(37,99,235,.5); box-shadow:0 0 0 3px rgba(37,99,235,.12); }
+    #tenant-id-input.from-url { border-color:var(--accent); background:var(--accent-soft); color:var(--accent); font-weight:600; }
+    .filter-divider { width:1px; align-self:stretch; background:var(--border); margin:0 4px; }
+    .filter-actions { display:flex; gap:8px; align-items:flex-end; margin-left:auto; }
+    .period-presets { display:flex; gap:6px; flex-wrap:wrap; }
     .preset-btn {
-      min-height: 32px;
-      padding: 0 11px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: #fff;
-      font: 500 12px 'Inter', sans-serif;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all var(--transition);
+      min-height:32px; padding:0 11px; border:1px solid var(--border);
+      border-radius:999px; background:#fff; font:500 12px 'Inter',sans-serif;
+      color:var(--text-muted); cursor:pointer; transition:all var(--transition);
     }
-    .preset-btn:hover,
-    .preset-btn.active {
-      background: var(--accent-soft);
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .preset-btn:hover, .preset-btn.active { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
 
-    /* ── Статус-бар загрузки ──────────────────────────────────────────────── */
+    /* ── Loader / alerts ── */
     .load-bar {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 18px;
-      background: var(--accent-soft);
-      border: 1px solid rgba(37,99,235,.2);
-      border-radius: var(--radius-md);
-      color: var(--accent);
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 20px;
+      display:none; align-items:center; gap:10px; padding:14px 18px;
+      background:var(--accent-soft); border:1px solid rgba(37,99,235,.2);
+      border-radius:var(--radius-md); color:var(--accent);
+      font-size:14px; font-weight:500; margin-bottom:20px;
     }
-    .load-bar.visible { display: flex; }
+    .load-bar.visible { display:flex; }
     .spinner {
-      width: 18px; height: 18px;
-      border: 2px solid rgba(37,99,235,.3);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      flex-shrink: 0;
+      width:18px; height:18px; border:2px solid rgba(37,99,235,.3);
+      border-top-color:var(--accent); border-radius:50%;
+      animation:spin .7s linear infinite; flex-shrink:0;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-    /* ── Алерт ────────────────────────────────────────────────────────────── */
     .alert {
-      display: none;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 13px 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid transparent;
-      margin-bottom: 20px;
-      font-size: 14px;
+      display:none; align-items:flex-start; gap:10px; padding:13px 16px;
+      border-radius:var(--radius-md); border:1px solid transparent;
+      margin-bottom:20px; font-size:14px;
     }
-    .alert.visible    { display: flex; }
-    .alert-danger     { background: var(--danger-bg);  border-color: #fca5a5; color: #991b1b; }
-    .alert-warning    { background: var(--warning-bg); border-color: #fde68a; color: #92400e; }
-    .alert-info       { background: var(--accent-soft); border-color: #bfdbfe; color: #1e40af; }
-    .alert-icon       { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .alert.visible { display:flex; }
+    .alert-danger  { background:var(--danger-bg);  border-color:#fca5a5; color:#991b1b; }
+    .alert-warning { background:var(--warning-bg); border-color:#fde68a; color:#92400e; }
+    .alert-info    { background:var(--accent-soft); border-color:#bfdbfe; color:#1e40af; }
+    .alert-icon    { font-size:16px; flex-shrink:0; margin-top:1px; }
 
-    /* ── Секции ───────────────────────────────────────────────────────────── */
-    .section { margin-bottom: 28px; }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
+    /* ── Sections ── */
+    .section { margin-bottom:32px; }
+    .section-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
     .section-icon {
-      width: 34px; height: 34px;
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
+      width:34px; height:34px; border-radius:9px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:16px; flex-shrink:0;
     }
-    .icon-blue   { background: var(--accent-soft); }
-    .icon-green  { background: var(--success-bg);  }
-    .icon-amber  { background: var(--warning-bg);  }
-    .icon-red    { background: var(--danger-bg);   }
+    .icon-blue   { background:var(--accent-soft); }
+    .icon-green  { background:var(--success-bg);  }
+    .icon-amber  { background:var(--warning-bg);  }
+    .icon-red    { background:var(--danger-bg);   }
+    .section-title { font-size:17px; font-weight:700; letter-spacing:-.02em; margin:0; }
+    .section-note  { font-size:13px; color:var(--text-muted); margin:0 0 0 auto; }
 
-    .section-title {
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: -.02em;
-      margin: 0;
-    }
-
-    .section-note {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin: 0 0 0 auto;
-    }
-
-    /* ── KPI-сетка ────────────────────────────────────────────────────────── */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
-    }
-
+    /* ── KPI grid ── */
+    .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
     .kpi-card {
-      position: relative;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      padding: 20px;
-      overflow: hidden;
-      transition: box-shadow var(--transition), transform var(--transition);
+      position:relative; background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:20px;
+      overflow:hidden; transition:box-shadow var(--transition), transform var(--transition);
     }
-    .kpi-card:hover {
-      box-shadow: var(--shadow-lg);
-      transform: translateY(-2px);
-    }
-
-    /* Цветная полоска слева */
+    .kpi-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-2px); }
     .kpi-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 4px;
-      border-radius: 4px 0 0 4px;
+      content:''; position:absolute; left:0; top:0; bottom:0;
+      width:4px; border-radius:4px 0 0 4px;
     }
-    .kpi-card.c-blue::before   { background: var(--accent); }
-    .kpi-card.c-green::before  { background: var(--success); }
-    .kpi-card.c-amber::before  { background: var(--warning); }
-    .kpi-card.c-red::before    { background: var(--danger); }
-    .kpi-card.c-purple::before { background: #7c3aed; }
-    .kpi-card.c-teal::before   { background: #0d9488; }
-
-    .kpi-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      margin-bottom: 10px;
-    }
-
-    .kpi-value {
-      font-size: clamp(22px, 2.5vw, 32px);
-      font-weight: 800;
-      letter-spacing: -.03em;
-      line-height: 1.1;
-      color: var(--text-main);
-    }
-    .kpi-value.positive { color: var(--success); }
-    .kpi-value.negative { color: var(--danger);  }
-
-    .kpi-sub {
-      margin-top: 6px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
+    .kpi-card.c-blue::before   { background:var(--accent); }
+    .kpi-card.c-green::before  { background:var(--success); }
+    .kpi-card.c-amber::before  { background:var(--warning); }
+    .kpi-card.c-red::before    { background:var(--danger); }
+    .kpi-card.c-purple::before { background:#7c3aed; }
+    .kpi-card.c-teal::before   { background:#0d9488; }
+    .kpi-card.c-orange::before { background:#ea580c; }
+    .kpi-label { font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:10px; }
+    .kpi-value { font-size:clamp(22px,2.5vw,32px); font-weight:800; letter-spacing:-.03em; line-height:1.1; color:var(--text-main); }
+    .kpi-value.positive { color:var(--success); }
+    .kpi-value.negative { color:var(--danger); }
+    .kpi-sub   { margin-top:6px; font-size:12px; color:var(--text-muted); }
     .kpi-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      margin-top: 8px;
+      display:inline-flex; align-items:center; gap:4px;
+      padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; margin-top:8px;
     }
-    .badge-green  { background: var(--success-bg); color: #166534; }
-    .badge-red    { background: var(--danger-bg);  color: #991b1b; }
-    .badge-amber  { background: var(--warning-bg); color: #92400e; }
+    .badge-green  { background:var(--success-bg); color:#166534; }
+    .badge-red    { background:var(--danger-bg);  color:#991b1b; }
+    .badge-amber  { background:var(--warning-bg); color:#92400e; }
 
-    /* ── P&L подробнее: вертикальная воронка ──────────────────────────────── */
-    .pnl-funnel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-    }
+    /* ── P&L funnel ── */
+    .pnl-funnel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); overflow:hidden; }
+    .pnl-row { display:flex; align-items:center; padding:14px 20px; gap:16px; border-bottom:1px solid var(--border); transition:background var(--transition); }
+    .pnl-row:last-child { border-bottom:none; }
+    .pnl-row:hover { background:var(--surface-2); }
+    .pnl-row.total .pnl-label  { font-weight:700; font-size:15px; }
+    .pnl-row.total .pnl-amount { font-size:17px; }
+    .pnl-dot    { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .pnl-label  { flex:1; font-size:14px; font-weight:500; }
+    .pnl-label small { display:block; font-size:12px; font-weight:400; color:var(--text-muted); margin-top:1px; }
+    .pnl-bar-wrap { flex:2; height:6px; background:var(--border); border-radius:3px; overflow:hidden; min-width:80px; }
+    .pnl-bar    { height:100%; border-radius:3px; transition:width .5s ease; }
+    .pnl-amount { font-size:15px; font-weight:700; text-align:right; min-width:130px; font-variant-numeric:tabular-nums; }
 
-    .pnl-row {
-      display: flex;
-      align-items: center;
-      padding: 14px 20px;
-      gap: 16px;
-      border-bottom: 1px solid var(--border);
-      transition: background var(--transition);
-    }
-    .pnl-row:last-child { border-bottom: none; }
-    .pnl-row:hover { background: var(--surface-2); }
+    /* ── Expenses ── */
+    .expense-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
+    .exp-pill     { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px 16px; box-shadow:var(--shadow-xs); display:flex; flex-direction:column; gap:5px; }
+    .exp-label    { font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
+    .exp-val      { font-size:18px; font-weight:700; }
 
-    .pnl-row.divider {
-      background: #f7faff;
-      padding-top: 10px;
-      padding-bottom: 10px;
+    /* ── Chart ── */
+    .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:20px 20px 12px; }
+    .chart-legend { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:14px; }
+    .chart-legend-item { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text-muted); }
+    .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .chart-svg-wrap { width:100%; overflow-x:auto; overflow-y:hidden; }
+    .chart-svg-wrap svg { display:block; min-width:320px; }
+    .chart-tooltip {
+      position:fixed; pointer-events:none; background:var(--text-main); color:#fff;
+      padding:8px 12px; border-radius:9px; font-size:12px; font-weight:500;
+      line-height:1.6; white-space:nowrap; z-index:9999;
+      opacity:0; transform:translateY(4px); transition:opacity .12s, transform .12s;
     }
+    .chart-tooltip.visible { opacity:1; transform:translateY(0); }
 
-    .pnl-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .pnl-label {
-      flex: 1;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-main);
-    }
-
-    .pnl-label small {
-      display: block;
-      font-size: 12px;
-      font-weight: 400;
-      color: var(--text-muted);
-      margin-top: 1px;
-    }
-
-    .pnl-bar-wrap {
-      flex: 2;
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden;
-      min-width: 80px;
-    }
-    .pnl-bar { height: 100%; border-radius: 3px; transition: width .5s ease; }
-
-    .pnl-amount {
-      font-size: 15px;
-      font-weight: 700;
-      text-align: right;
-      min-width: 130px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .pnl-row.total .pnl-label { font-weight: 700; font-size: 15px; }
-    .pnl-row.total .pnl-amount { font-size: 17px; }
-
-    /* ── Расходы разбивка ─────────────────────────────────────────────────── */
-    .expense-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-    }
-
-    .exp-pill {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 14px 16px;
-      box-shadow: var(--shadow-xs);
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .exp-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-    .exp-val {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-main);
-    }
-
-    /* ── Out-of-sync таблица ──────────────────────────────────────────────── */
-    .table-wrap {
-      width: 100%;
-      overflow-x: auto;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      background: #fff;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 540px;
-    }
-
+    /* ── Tables ── */
+    .table-wrap { width:100%; overflow-x:auto; border-radius:var(--radius-md); border:1px solid var(--border); background:#fff; }
+    table { width:100%; border-collapse:collapse; min-width:540px; }
     thead th {
-      position: sticky; top: 0; z-index: 1;
-      background: #f7faff;
-      text-align: left;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      padding: 11px 14px;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
+      position:sticky; top:0; z-index:1; background:#f7faff;
+      text-align:left; font-size:12px; font-weight:700; color:var(--text-muted);
+      text-transform:uppercase; letter-spacing:.04em;
+      padding:11px 14px; border-bottom:1px solid var(--border); white-space:nowrap;
     }
+    thead th.r { text-align:right; }
+    tbody td { padding:11px 14px; border-bottom:1px solid #edf2f8; font-size:14px; vertical-align:middle; }
+    tbody td.r { text-align:right; font-variant-numeric:tabular-nums; }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr:hover { background:#f9fbff; }
+    tfoot td { padding:11px 14px; font-size:13px; font-weight:700; border-top:2px solid var(--border); background:#f7faff; }
+    tfoot td.r { text-align:right; font-variant-numeric:tabular-nums; }
+    .cell-muted   { color:var(--text-muted); }
+    .cell-danger  { color:var(--danger); font-weight:600; }
+    .cell-warning { color:var(--warning); font-weight:600; }
+    .cell-success { color:var(--success); font-weight:600; }
 
-    tbody td {
-      padding: 11px 14px;
-      border-bottom: 1px solid #edf2f8;
-      font-size: 14px;
-      vertical-align: middle;
-    }
+    /* ── Rank badge ── */
+    .rank-badge { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; font-size:11px; font-weight:700; }
+    .rank-1 { background:#fef3c7; color:#92400e; }
+    .rank-2 { background:#e2e8f0; color:#475569; }
+    .rank-3 { background:#fee2e2; color:#991b1b; }
+    .rank-n { background:#f1f5f9; color:#64748b; }
 
-    tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: #f9fbff; }
+    /* ── Margin mini bar ── */
+    .margin-mini { display:flex; align-items:center; gap:6px; }
+    .margin-mini-bar { flex:1; height:5px; background:var(--border); border-radius:3px; overflow:hidden; min-width:40px; }
+    .margin-mini-fill { height:100%; border-radius:3px; }
+    .margin-mini-val { font-size:12px; font-weight:700; min-width:38px; text-align:right; }
 
-    .cell-muted   { color: var(--text-muted); }
-    .cell-danger  { color: var(--danger); font-weight: 600; }
-    .cell-warning { color: var(--warning); font-weight: 600; }
+    /* ── Progress bar (debts) ── */
+    .progress-wrap { height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin-top:8px; }
+    .progress-fill { height:100%; border-radius:3px; transition:width .6s ease; }
 
-    /* ── Пустое состояние ─────────────────────────────────────────────────── */
-    .empty-state {
-      text-align: center;
-      padding: 36px 20px;
-      color: var(--text-muted);
-      background: linear-gradient(180deg, #fbfdff 0%, #f5f9ff 100%);
-      border: 1px dashed var(--border-strong);
-      border-radius: var(--radius-lg);
-    }
-    .empty-state-icon { font-size: 36px; margin-bottom: 10px; }
-    .empty-state-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-main);
-      margin: 0 0 4px;
-    }
-    .empty-state-text { font-size: 14px; margin: 0; }
+    /* ── Misc ── */
+    .margin-track { height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:6px; }
+    .margin-fill  { height:100%; border-radius:4px; transition:width .6s ease; }
+    .debt-overdue { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; background:var(--danger-bg); color:#991b1b; }
 
-    /* ── Skeleton-loader ──────────────────────────────────────────────────── */
-    .skeleton {
-      background: linear-gradient(90deg, #e8edf5 25%, #f4f7fc 50%, #e8edf5 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-      border-radius: 8px;
-    }
-    @keyframes shimmer { to { background-position: -200% 0; } }
+    /* ── Empty state ── */
+    .empty-state { text-align:center; padding:36px 20px; color:var(--text-muted); background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%); border:1px dashed var(--border-strong); border-radius:var(--radius-lg); }
+    .empty-state-icon  { font-size:36px; margin-bottom:10px; }
+    .empty-state-title { font-size:16px; font-weight:700; color:var(--text-main); margin:0 0 4px; }
+    .empty-state-text  { font-size:14px; margin:0; }
 
-    .sk-kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
-    }
-    .sk-kpi {
-      height: 100px;
-      border-radius: var(--radius-lg);
-    }
-    .sk-funnel { height: 280px; border-radius: var(--radius-lg); }
+    /* ── Skeletons ── */
+    .skeleton { background:linear-gradient(90deg,#e8edf5 25%,#f4f7fc 50%,#e8edf5 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
+    @keyframes shimmer { to { background-position:-200% 0; } }
+    .sk-kpi    { height:100px; border-radius:var(--radius-lg); }
+    .sk-funnel { height:280px; border-radius:var(--radius-lg); }
+    .sk-chart  { height:230px; border-radius:var(--radius-lg); }
+    .sk-table  { height:240px; border-radius:var(--radius-lg); }
 
-    /* ── Прогресс-бар маржи ───────────────────────────────────────────────── */
-    .margin-track {
-      height: 8px;
-      background: var(--border);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 6px;
+    /* ── Responsive ── */
+    @media (max-width:768px) {
+      .shell { padding:16px 12px 40px; }
+      .page-header { flex-direction:column; }
+      .filter-bar { flex-direction:column; align-items:stretch; }
+      .filter-actions { margin-left:0; }
+      .filter-divider { display:none; }
+      .pnl-bar-wrap { display:none; }
+      .kpi-grid { grid-template-columns:repeat(2,1fr); }
     }
-    .margin-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width .6s ease;
-    }
-
-    /* ── Responsive ───────────────────────────────────────────────────────── */
-    @media (max-width: 768px) {
-      .shell { padding: 16px 12px 40px; }
-      .page-header { flex-direction: column; }
-      .filter-bar { flex-direction: column; align-items: stretch; }
-      .filter-actions { margin-left: 0; }
-      .pnl-bar-wrap { display: none; }
-      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 480px) {
-      .kpi-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width:480px) { .kpi-grid { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
 
+<div class="chart-tooltip" id="chart-tooltip"></div>
+
 <div class="shell">
 
-  <!-- ── Шапка ──────────────────────────────────────────────────────────── -->
+  <!-- Шапка -->
   <div class="page-header">
     <div>
       <h1 class="page-title">📊 Аналитика</h1>
@@ -611,28 +304,20 @@
     </div>
   </div>
 
-  <!-- ── Фильтр ─────────────────────────────────────────────────────────── -->
+  <!-- Фильтр -->
   <div class="filter-bar">
-    <!-- ── Tenant ID (owner-режим) ──────────────────────────────────────── -->
     <div class="filter-field" id="tenant-field">
       <label>Tenant ID</label>
-      <input
-        type="number"
-        id="tenant-id-input"
-        placeholder="напр. 3"
-        min="1"
-        step="1"
-        style="width:110px"
-      />
+      <input type="number" id="tenant-id-input" placeholder="напр. 3" min="1" step="1" style="width:110px"/>
     </div>
     <div class="filter-divider"></div>
     <div class="filter-field">
       <label>С даты</label>
-      <input type="date" id="date-from" />
+      <input type="date" id="date-from"/>
     </div>
     <div class="filter-field">
       <label>По дату</label>
-      <input type="date" id="date-to" />
+      <input type="date" id="date-to"/>
     </div>
     <div class="filter-field">
       <label>Быстрый период</label>
@@ -650,633 +335,614 @@
     </div>
   </div>
 
-  <!-- ── Статус ──────────────────────────────────────────────────────────── -->
-  <div class="load-bar" id="load-bar">
-    <div class="spinner"></div>
-    <span id="load-text">Загрузка данных…</span>
-  </div>
-
-  <div class="alert alert-danger" id="alert-error">
-    <span class="alert-icon">⚠️</span>
-    <span id="alert-text">Ошибка загрузки</span>
-  </div>
-
+  <!-- Статус -->
+  <div class="load-bar" id="load-bar"><div class="spinner"></div><span id="load-text">Загрузка…</span></div>
+  <div class="alert alert-danger" id="alert-error"><span class="alert-icon">⚠️</span><span id="alert-text">Ошибка</span></div>
   <div class="alert alert-warning" id="alert-auth">
     <span class="alert-icon">🔒</span>
     Сессия истекла. <a href="/login.html" style="color:inherit;font-weight:700;margin-left:4px">Войти снова</a>
   </div>
-
-  <!-- Показывается когда tenant_id не определён -->
   <div class="alert alert-warning" id="alert-no-tenant" style="flex-direction:column;gap:8px">
     <div style="display:flex;align-items:center;gap:10px">
       <span class="alert-icon">⚠️</span>
-      <span>
-        <strong>Не выбран клиент (tenant_id).</strong>
-        Укажите Tenant ID в поле фильтра выше и нажмите «Применить» —
-        или откройте страницу с параметром <code>?tenant_id=X</code> в URL.
-      </span>
+      <span><strong>Не выбран клиент (tenant_id).</strong> Укажите Tenant ID в поле фильтра выше и нажмите «Применить» — или откройте страницу с параметром <code>?tenant_id=X</code> в URL.</span>
     </div>
-    <div style="font-size:13px;color:#92400e;padding-left:26px">
-      Например: <code>analytics.html?tenant_id=3</code>
-    </div>
+    <div style="font-size:13px;color:#92400e;padding-left:26px">Например: <code>analytics.html?tenant_id=3</code></div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!--  Блок 1 — P&L                                                        -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ════ Блок 1 — P&L ════ -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-blue">💰</div>
-      <h2 class="section-title">P&L — Прибыли и убытки</h2>
+      <h2 class="section-title">P&amp;L — Прибыли и убытки</h2>
       <span class="section-note" id="pnl-period-note"></span>
     </div>
-
-    <!-- KPI-карточки -->
     <div class="kpi-grid" id="pnl-kpi-grid">
-      <!-- skeleton -->
-      <div class="skeleton sk-kpi"></div>
-      <div class="skeleton sk-kpi"></div>
-      <div class="skeleton sk-kpi"></div>
-      <div class="skeleton sk-kpi"></div>
-      <div class="skeleton sk-kpi"></div>
-      <div class="skeleton sk-kpi"></div>
+      <div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div>
+      <div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div>
+      <div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div>
     </div>
-
-    <!-- Воронка P&L -->
-    <div style="margin-top:16px" id="pnl-funnel-wrap">
-      <div class="skeleton sk-funnel"></div>
-    </div>
-
-    <!-- Расходы разбивка -->
+    <div style="margin-top:16px" id="pnl-funnel-wrap"><div class="skeleton sk-funnel"></div></div>
     <div style="margin-top:16px" id="expenses-wrap"></div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!--  Блок 2 — Склад                                                       -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ════ Блок 2 — Динамика ════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-blue">📈</div>
+      <h2 class="section-title">Динамика по дням</h2>
+      <span class="section-note" id="chart-note"></span>
+    </div>
+    <div id="chart-wrap"><div class="skeleton sk-chart"></div></div>
+  </div>
+
+  <!-- ════ Блок 3 — Топ товаров ════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-amber">🏆</div>
+      <h2 class="section-title">Топ товаров</h2>
+      <span class="section-note" id="top-note">по выручке</span>
+    </div>
+    <div id="top-items-wrap"><div class="skeleton sk-table"></div></div>
+  </div>
+
+  <!-- ════ Блок 4 — Долги ════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-red">💳</div>
+      <h2 class="section-title">Долги и реализация</h2>
+      <span class="section-note">Актуально на сейчас</span>
+    </div>
+    <div class="kpi-grid" id="debts-kpi-grid">
+      <div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div>
+      <div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div>
+    </div>
+    <div style="margin-top:16px" id="debts-table-wrap"><div class="skeleton sk-table" style="height:180px"></div></div>
+  </div>
+
+  <!-- ════ Блок 5 — Склад ════ -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-green">📦</div>
       <h2 class="section-title">Состояние склада</h2>
       <span class="section-note">Актуально на сейчас</span>
     </div>
-
     <div class="kpi-grid" id="stock-kpi-grid">
-      <div class="skeleton sk-kpi"></div>
-      <div class="skeleton sk-kpi"></div>
-      <div class="skeleton sk-kpi"></div>
+      <div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!--  Блок 3 — Проблемы (out-of-sync)                                     -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <div class="section" id="sync-section">
+  <!-- ════ Блок 6 — Расхождения ════ -->
+  <div class="section">
     <div class="section-header">
       <div class="section-icon icon-red">🔴</div>
       <h2 class="section-title">Расхождения остатков</h2>
       <span class="section-note">stock vs batches</span>
     </div>
-    <div id="sync-body">
-      <div class="skeleton" style="height:60px;border-radius:var(--radius-md)"></div>
-    </div>
+    <div id="sync-body"><div class="skeleton" style="height:60px;border-radius:var(--radius-md)"></div></div>
   </div>
 
 </div><!-- /shell -->
 
-<!-- ════════════════════════════════════════════════════════════════════════ -->
 <script>
 "use strict";
 
-/* ── Конфиг ─────────────────────────────────────────────────────────────── */
-const API_BASE = "";   // пусто = текущий хост (как в config.js)
+/* ══════════════════════════════════════════════════════════
+   УТИЛИТЫ
+   ══════════════════════════════════════════════════════════ */
+const API_BASE = "";
+function getToken() { return localStorage.getItem("token") || ""; }
+function getUser()  { try { return JSON.parse(localStorage.getItem("user")); } catch { return null; } }
 
-/* ── Утилиты ────────────────────────────────────────────────────────────── */
-function getToken() {
-  return localStorage.getItem("token") || "";
-}
-
-function getUser() {
-  try { return JSON.parse(localStorage.getItem("user")); } catch { return null; }
-}
-
-/**
- * Возвращает tenant_id по приоритету:
- *  1. Поле #tenant-id-input (заполнено вручную или из URL)
- *  2. localStorage.user.tenant_id
- *  3. null — запросы делать нельзя
- */
 function getEffectiveTenantId() {
-  // 1. Поле ввода (туда уже мог быть подставлен URL-параметр при init)
-  const fieldVal = document.getElementById("tenant-id-input").value.trim();
-  if (fieldVal !== "") {
-    const n = Number(fieldVal);
-    if (Number.isInteger(n) && n > 0) return n;
-  }
-
-  // 2. localStorage
+  /* Приоритет: 1) поле ввода  2) localStorage  3) null */
+  const fv = document.getElementById("tenant-id-input").value.trim();
+  if (fv !== "") { const n = Number(fv); if (Number.isInteger(n) && n > 0) return n; }
   const u = getUser();
-  if (u && u.tenant_id != null && u.tenant_id !== "") {
-    const n = Number(u.tenant_id);
-    if (Number.isInteger(n) && n > 0) return n;
-  }
-
-  // 3. Нет tenant_id
+  if (u && u.tenant_id != null && u.tenant_id !== "") { const n = Number(u.tenant_id); if (Number.isInteger(n) && n > 0) return n; }
   return null;
 }
 
-function fmt(n, digits = 0) {
-  if (n === null || n === undefined || isNaN(Number(n))) return "—";
-  return new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  }).format(Number(n));
+function fmt(n, d=0) {
+  if (n == null || isNaN(+n)) return "—";
+  return new Intl.NumberFormat("ru-RU",{minimumFractionDigits:d,maximumFractionDigits:d}).format(+n);
 }
-
 function fmtMoney(n) {
-  if (n === null || n === undefined || isNaN(Number(n))) return "—";
-  return new Intl.NumberFormat("ru-RU", {
-    style: "decimal",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Number(n));
+  if (n == null || isNaN(+n)) return "—";
+  return new Intl.NumberFormat("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2}).format(+n);
 }
+function esc(v) { return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function sign(n)  { return +n >= 0 ? "positive" : "negative"; }
+function mClr(p)  { return +p >= 30 ? "#16a34a" : +p >= 15 ? "#d97706" : "#dc2626"; }
 
-function esc(v) {
-  return String(v ?? "")
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
+/* ══════════════════════════════════════════════════════════
+   AUTH + TENANT INIT
+   ══════════════════════════════════════════════════════════ */
+(function(){ if (!getToken()) window.location.href = "/login.html"; })();
 
-function sign(n) {
-  return Number(n) >= 0 ? "positive" : "negative";
-}
-
-function marginColor(pct) {
-  const p = Number(pct);
-  if (p >= 30) return "#16a34a";
-  if (p >= 15) return "#d97706";
-  return "#dc2626";
-}
-
-/* ── Auth ───────────────────────────────────────────────────────────────── */
-(function checkAuth() {
-  if (!getToken()) window.location.href = "/login.html";
-})();
-
-/* ── Инициализация tenant_id из URL ─────────────────────────────────────── */
-(function initTenantFromUrl() {
-  const params   = new URLSearchParams(window.location.search);
-  const urlTenant = params.get("tenant_id");
-  const input    = document.getElementById("tenant-id-input");
-
-  if (urlTenant && Number.isInteger(Number(urlTenant)) && Number(urlTenant) > 0) {
-    // Подставляем в поле и визуально помечаем источник
-    input.value = urlTenant;
-    input.classList.add("from-url");
-    input.title = "tenant_id получен из URL-параметра";
+(function initTenant(){
+  const p   = new URLSearchParams(window.location.search);
+  const ut  = p.get("tenant_id");
+  const inp = document.getElementById("tenant-id-input");
+  if (ut && Number.isInteger(+ut) && +ut > 0) {
+    inp.value = ut; inp.classList.add("from-url"); inp.title = "tenant_id из URL";
   } else {
-    // Если owner — поле пустое (owner вводит вручную).
-    // Если client — подставляем из localStorage (только для удобства отображения,
-    // реальный приоритет разрешается в getEffectiveTenantId).
     const u = getUser();
-    if (u && u.tenant_id != null && u.tenant_id !== "") {
-      input.value = Number(u.tenant_id);
-      // Для клиента поле read-only — нельзя смотреть чужие данные
-      if (u.role === "client") {
-        input.readOnly = true;
-        input.style.opacity = ".6";
-        input.title = "Ваш tenant_id (изменение недоступно)";
-      }
+    if (u && u.tenant_id != null) {
+      inp.value = +u.tenant_id;
+      if (u.role === "client") { inp.readOnly = true; inp.style.opacity = ".6"; inp.title = "Ваш tenant_id"; }
     }
   }
-
-  // При ручном изменении поля снимаем метку "из URL"
-  input.addEventListener("input", () => {
-    input.classList.remove("from-url");
-    input.title = "";
-  });
+  inp.addEventListener("input", () => { inp.classList.remove("from-url"); inp.title = ""; });
 })();
 
-/* ── Фильтр / пресеты ───────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   ФИЛЬТР / ПРЕСЕТЫ
+   ══════════════════════════════════════════════════════════ */
 const $from = document.getElementById("date-from");
 const $to   = document.getElementById("date-to");
 
-function isoDate(d) {
-  return d.toISOString().split("T")[0];
+function isoDate(d){ return d.toISOString().split("T")[0]; }
+function applyPreset(p){
+  const now = new Date(), today = isoDate(now);
+  if (p==="7")     { const d=new Date(); d.setDate(d.getDate()-6);   $from.value=isoDate(d); $to.value=today; }
+  else if(p==="30"){ const d=new Date(); d.setDate(d.getDate()-29);  $from.value=isoDate(d); $to.value=today; }
+  else if(p==="90"){ const d=new Date(); d.setDate(d.getDate()-89);  $from.value=isoDate(d); $to.value=today; }
+  else if(p==="month"){ $from.value=isoDate(new Date(now.getFullYear(),now.getMonth(),1)); $to.value=today; }
+  else if(p==="year") { $from.value=`${now.getFullYear()}-01-01`; $to.value=today; }
 }
-
-function applyPreset(preset) {
-  const now   = new Date();
-  const today = isoDate(now);
-
-  if (preset === "7")  {
-    const d = new Date(); d.setDate(d.getDate() - 6);
-    $from.value = isoDate(d); $to.value = today;
-  } else if (preset === "30") {
-    const d = new Date(); d.setDate(d.getDate() - 29);
-    $from.value = isoDate(d); $to.value = today;
-  } else if (preset === "90") {
-    const d = new Date(); d.setDate(d.getDate() - 89);
-    $from.value = isoDate(d); $to.value = today;
-  } else if (preset === "month") {
-    const d = new Date(now.getFullYear(), now.getMonth(), 1);
-    $from.value = isoDate(d); $to.value = today;
-  } else if (preset === "year") {
-    $from.value = `${now.getFullYear()}-01-01`; $to.value = today;
-  }
-}
-
-// По умолчанию 30 дней
 applyPreset("30");
-
-document.querySelectorAll(".preset-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    applyPreset(btn.dataset.preset);
-    loadAll();
+document.querySelectorAll(".preset-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active"); applyPreset(btn.dataset.preset); loadAll();
   });
 });
+function clearFilter(){ $from.value=""; $to.value=""; document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active")); loadAll(); }
 
-function clearFilter() {
-  $from.value = ""; $to.value = "";
-  document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
-  loadAll();
-}
-
-/* ── API ────────────────────────────────────────────────────────────────── */
-async function apiFetch(path) {
-  const res = await fetch(API_BASE + path, {
-    headers: { Authorization: "Bearer " + getToken() },
-  });
-
-  if (res.status === 401 || res.status === 403) {
-    document.getElementById("alert-auth").classList.add("visible");
-    throw new Error("unauthorized");
-  }
-
+/* ══════════════════════════════════════════════════════════
+   API
+   ══════════════════════════════════════════════════════════ */
+async function apiFetch(path){
+  const res = await fetch(API_BASE+path,{headers:{Authorization:"Bearer "+getToken()}});
+  if (res.status===401||res.status===403){ document.getElementById("alert-auth").classList.add("visible"); throw new Error("unauthorized"); }
   const data = await res.json();
-  if (!res.ok || data.ok === false) {
-    throw new Error(data.error || "HTTP " + res.status);
-  }
+  if (!res.ok||data.ok===false) throw new Error(data.error||"HTTP "+res.status);
   return data;
 }
 
-function buildQuery() {
-  const params = new URLSearchParams();
-
-  // tenant_id — всегда берём из getEffectiveTenantId (уже с приоритетами)
-  const tenantId = getEffectiveTenantId();
-  if (tenantId) params.set("tenant_id", tenantId);
-
-  if ($from.value) params.set("date_from", $from.value);
-  if ($to.value)   params.set("date_to",   $to.value);
-
-  return params.toString();
+function buildQuery(extra={}){
+  const p=new URLSearchParams();
+  const tid=getEffectiveTenantId();
+  if (tid)         p.set("tenant_id",tid);
+  if ($from.value) p.set("date_from",$from.value);
+  if ($to.value)   p.set("date_to",$to.value);
+  Object.entries(extra).forEach(([k,v])=>p.set(k,v));
+  return p.toString();
+}
+function buildTenantOnly(){
+  const p=new URLSearchParams();
+  const tid=getEffectiveTenantId();
+  if (tid) p.set("tenant_id",tid);
+  return p.toString();
 }
 
-/* ── Отображение состояний ───────────────────────────────────────────────── */
-function showLoader(text = "Загрузка…") {
-  const bar = document.getElementById("load-bar");
-  document.getElementById("load-text").textContent = text;
-  bar.classList.add("visible");
+/* ══════════════════════════════════════════════════════════
+   UI STATE
+   ══════════════════════════════════════════════════════════ */
+function showLoader(t="Загрузка…"){
+  document.getElementById("load-text").textContent=t;
+  document.getElementById("load-bar").classList.add("visible");
   document.getElementById("alert-error").classList.remove("visible");
 }
+function hideLoader(){ document.getElementById("load-bar").classList.remove("visible"); }
+function showError(m){ document.getElementById("alert-text").textContent=m; document.getElementById("alert-error").classList.add("visible"); }
 
-function hideLoader() {
-  document.getElementById("load-bar").classList.remove("visible");
+const DATA_BLOCKS = [
+  "pnl-kpi-grid","pnl-funnel-wrap","expenses-wrap",
+  "chart-wrap","top-items-wrap",
+  "debts-kpi-grid","debts-table-wrap",
+  "stock-kpi-grid","sync-body",
+];
+
+function checkTenant(){
+  const has = getEffectiveTenantId() !== null;
+  document.getElementById("alert-no-tenant").classList.toggle("visible",!has);
+  DATA_BLOCKS.forEach(id=>{ const el=document.getElementById(id); if(el) el.style.visibility=has?"":"hidden"; });
+  return has;
 }
 
-function showError(msg) {
-  const el = document.getElementById("alert-error");
-  document.getElementById("alert-text").textContent = msg;
-  el.classList.add("visible");
+function updateSubtitle(){
+  const u=getUser(), tid=getEffectiveTenantId();
+  const parts=["Финансовый отчёт","BFC24 CONTROL"];
+  if (u?.company_name) parts.push(u.company_name);
+  if (tid) parts.push(`Tenant #${tid}`);
+  if ($from.value&&$to.value) parts.push(`${$from.value} — ${$to.value}`);
+  else if ($from.value) parts.push(`с ${$from.value}`);
+  else if ($to.value)   parts.push(`по ${$to.value}`);
+  document.getElementById("subtitle").textContent=parts.join(" · ");
 }
 
-/**
- * Показывает/скрывает предупреждение "Не выбран клиент".
- * Возвращает true если tenant_id есть и можно делать запросы.
- */
-function checkTenant() {
-  const id     = getEffectiveTenantId();
-  const alert  = document.getElementById("alert-no-tenant");
-  const hasId  = id !== null;
-
-  alert.classList.toggle("visible", !hasId);
-
-  // Скрываем/показываем содержимое аналитики
-  ["pnl-kpi-grid", "pnl-funnel-wrap", "expenses-wrap",
-   "stock-kpi-grid", "sync-body"].forEach(elId => {
-    const el = document.getElementById(elId);
-    if (el) el.style.visibility = hasId ? "" : "hidden";
-  });
-
-  return hasId;
+function showSkeletons(){
+  document.getElementById("pnl-kpi-grid").innerHTML    = Array(6).fill('<div class="skeleton sk-kpi"></div>').join("");
+  document.getElementById("pnl-funnel-wrap").innerHTML = '<div class="skeleton sk-funnel"></div>';
+  document.getElementById("expenses-wrap").innerHTML   = "";
+  document.getElementById("chart-wrap").innerHTML      = '<div class="skeleton sk-chart"></div>';
+  document.getElementById("top-items-wrap").innerHTML  = '<div class="skeleton sk-table"></div>';
+  document.getElementById("debts-kpi-grid").innerHTML  = Array(4).fill('<div class="skeleton sk-kpi"></div>').join("");
+  document.getElementById("debts-table-wrap").innerHTML= '<div class="skeleton sk-table" style="height:180px"></div>';
+  document.getElementById("stock-kpi-grid").innerHTML  = Array(3).fill('<div class="skeleton sk-kpi"></div>').join("");
+  document.getElementById("sync-body").innerHTML       = '<div class="skeleton" style="height:60px;border-radius:var(--radius-md)"></div>';
 }
 
-/* ── Рендер P&L KPI-карточек ────────────────────────────────────────────── */
-function renderPnlKpi(pnl) {
-  const margin = Number(pnl.gross_margin_pct) || 0;
-  const netMargin = Number(pnl.net_margin_pct) || 0;
+function blockError(id,title,msg){
+  const el=document.getElementById(id);
+  if (el) el.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">❌</div><div class="empty-state-title">${esc(title)}</div><p class="empty-state-text">${esc(msg)}</p></div>`;
+}
 
-  const cards = [
-    {
-      color: "c-blue",
-      label: "Выручка",
-      value: fmtMoney(pnl.revenue),
-      sub: pnl.total_discount > 0
-        ? `Скидки: ${fmtMoney(pnl.total_discount)}`
-        : `Продаж: ${fmt(pnl.sales_count)}`,
-    },
-    {
-      color: "c-amber",
-      label: "Себестоимость продаж",
-      value: fmtMoney(pnl.cogs),
-      sub: `FIFO · ${fmt(pnl.line_items_count)} поз.`,
-    },
-    {
-      color: pnl.gross_profit >= 0 ? "c-green" : "c-red",
-      label: "Валовая прибыль",
-      value: fmtMoney(pnl.gross_profit),
-      valueClass: sign(pnl.gross_profit),
-      badge: { text: `${margin.toFixed(1)}%`, cls: margin >= 15 ? "badge-green" : "badge-red" },
-    },
-    {
-      color: "c-red",
-      label: "Операционные расходы",
-      value: fmtMoney(pnl.operating_expenses),
-      sub: "Аренда, ЗП, реклама…",
-    },
-    {
-      color: pnl.net_profit >= 0 ? "c-green" : "c-red",
-      label: "Чистая прибыль",
-      value: fmtMoney(pnl.net_profit),
-      valueClass: sign(pnl.net_profit),
-      badge: {
-        text: `${netMargin.toFixed(1)}%`,
-        cls: netMargin >= 10 ? "badge-green" : netMargin >= 0 ? "badge-amber" : "badge-red",
-      },
-    },
-    {
-      color: "c-purple",
-      label: "Маржа валовая",
-      value: `${margin.toFixed(2)}%`,
-      extra: `<div class="margin-track"><div class="margin-fill" style="width:${Math.min(Math.max(margin, 0), 100)}%;background:${marginColor(margin)}"></div></div>`,
-      sub: `Чистая маржа: ${netMargin.toFixed(2)}%`,
-    },
-  ];
-
-  return cards.map(c => `
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — P&L KPI
+   ══════════════════════════════════════════════════════════ */
+function renderPnlKpi(pnl){
+  const gm=+(pnl.gross_margin_pct||0), nm=+(pnl.net_margin_pct||0);
+  return [
+    {color:"c-blue",  label:"Выручка",               value:fmtMoney(pnl.revenue),
+     sub: +pnl.total_discount>0 ? `Скидки: ${fmtMoney(pnl.total_discount)}` : `Продаж: ${fmt(pnl.sales_count)}`},
+    {color:"c-amber", label:"Себестоимость продаж",   value:fmtMoney(pnl.cogs), sub:`FIFO · ${fmt(pnl.line_items_count)} поз.`},
+    {color:+pnl.gross_profit>=0?"c-green":"c-red", label:"Валовая прибыль",
+     value:fmtMoney(pnl.gross_profit), vc:sign(pnl.gross_profit),
+     badge:{text:`${gm.toFixed(1)}%`, cls:gm>=15?"badge-green":"badge-red"}},
+    {color:"c-red",   label:"Операционные расходы",   value:fmtMoney(pnl.operating_expenses), sub:"Аренда, ЗП, реклама…"},
+    {color:+pnl.net_profit>=0?"c-green":"c-red", label:"Чистая прибыль",
+     value:fmtMoney(pnl.net_profit), vc:sign(pnl.net_profit),
+     badge:{text:`${nm.toFixed(1)}%`, cls:nm>=10?"badge-green":nm>=0?"badge-amber":"badge-red"}},
+    {color:"c-purple",label:"Маржа валовая",          value:`${gm.toFixed(2)}%`,
+     extra:`<div class="margin-track"><div class="margin-fill" style="width:${Math.min(Math.max(gm,0),100)}%;background:${mClr(gm)}"></div></div>`,
+     sub:`Чистая маржа: ${nm.toFixed(2)}%`},
+  ].map(c=>`
     <div class="kpi-card ${esc(c.color)}">
       <div class="kpi-label">${esc(c.label)}</div>
-      <div class="kpi-value ${c.valueClass || ""}">${c.value}</div>
-      ${c.extra || ""}
-      ${c.badge ? `<div class="kpi-badge ${c.badge.cls}">${c.badge.text}</div>` : ""}
-      ${c.sub ? `<div class="kpi-sub">${esc(c.sub)}</div>` : ""}
-    </div>
-  `).join("");
+      <div class="kpi-value ${c.vc||""}">${c.value}</div>
+      ${c.extra||""}
+      ${c.badge?`<div class="kpi-badge ${c.badge.cls}">${c.badge.text}</div>`:""}
+      ${c.sub?`<div class="kpi-sub">${esc(c.sub)}</div>`:""}
+    </div>`).join("");
 }
 
-/* ── Рендер воронки P&L ─────────────────────────────────────────────────── */
-function renderPnlFunnel(pnl) {
-  const rev  = Number(pnl.revenue) || 1; // делитель
-  const rows = [
-    {
-      dot: "#2563eb",
-      label: "Выручка",
-      sub: `${fmt(pnl.sales_count)} продаж`,
-      amount: pnl.revenue,
-      pct: 100,
-      barColor: "#2563eb",
-    },
-    {
-      dot: "#94a3b8",
-      label: "Скидки",
-      sub: "от выручки",
-      amount: -pnl.total_discount,
-      pct: Math.min((pnl.total_discount / rev) * 100, 100),
-      barColor: "#94a3b8",
-    },
-    {
-      dot: "#d97706",
-      label: "Себестоимость продаж",
-      sub: "COGS по FIFO",
-      amount: -pnl.cogs,
-      pct: Math.min((pnl.cogs / rev) * 100, 100),
-      barColor: "#f59e0b",
-      isDivider: true,
-    },
-    {
-      dot: pnl.gross_profit >= 0 ? "#16a34a" : "#dc2626",
-      label: "Валовая прибыль",
-      sub: `Маржа ${Number(pnl.gross_margin_pct).toFixed(1)}%`,
-      amount: pnl.gross_profit,
-      pct: Math.min(Math.abs(pnl.gross_profit / rev) * 100, 100),
-      barColor: pnl.gross_profit >= 0 ? "#22c55e" : "#ef4444",
-      isTotal: true,
-    },
-    {
-      dot: "#dc2626",
-      label: "Операционные расходы",
-      sub: "Аренда, ЗП, прочее",
-      amount: -pnl.operating_expenses,
-      pct: Math.min((pnl.operating_expenses / rev) * 100, 100),
-      barColor: "#f87171",
-      isDivider: true,
-    },
-    {
-      dot: pnl.net_profit >= 0 ? "#0d9488" : "#dc2626",
-      label: "Чистая прибыль",
-      sub: `Маржа ${Number(pnl.net_margin_pct).toFixed(1)}%`,
-      amount: pnl.net_profit,
-      pct: Math.min(Math.abs(pnl.net_profit / rev) * 100, 100),
-      barColor: pnl.net_profit >= 0 ? "#14b8a6" : "#ef4444",
-      isTotal: true,
-    },
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — P&L ВОРОНКА
+   ══════════════════════════════════════════════════════════ */
+function renderPnlFunnel(pnl){
+  const rev=+(pnl.revenue)||1;
+  const rows=[
+    {dot:"#2563eb",label:"Выручка",sub:`${fmt(pnl.sales_count)} продаж`,amount:pnl.revenue,pct:100,bar:"#2563eb"},
+    {dot:"#94a3b8",label:"Скидки",sub:"от выручки",amount:-pnl.total_discount,pct:Math.min(+pnl.total_discount/rev*100,100),bar:"#94a3b8"},
+    {dot:"#d97706",label:"Себестоимость продаж",sub:"COGS по FIFO",amount:-pnl.cogs,pct:Math.min(+pnl.cogs/rev*100,100),bar:"#f59e0b"},
+    {dot:+pnl.gross_profit>=0?"#16a34a":"#dc2626",label:"Валовая прибыль",sub:`Маржа ${+(pnl.gross_margin_pct||0).toFixed(1)}%`,
+     amount:pnl.gross_profit,pct:Math.min(Math.abs(+pnl.gross_profit/rev)*100,100),bar:+pnl.gross_profit>=0?"#22c55e":"#ef4444",total:true},
+    {dot:"#dc2626",label:"Операционные расходы",sub:"Аренда, ЗП, прочее",amount:-pnl.operating_expenses,pct:Math.min(+pnl.operating_expenses/rev*100,100),bar:"#f87171"},
+    {dot:+pnl.net_profit>=0?"#0d9488":"#dc2626",label:"Чистая прибыль",sub:`Маржа ${+(pnl.net_margin_pct||0).toFixed(1)}%`,
+     amount:pnl.net_profit,pct:Math.min(Math.abs(+pnl.net_profit/rev)*100,100),bar:+pnl.net_profit>=0?"#14b8a6":"#ef4444",total:true},
   ];
-
-  const html = rows.map(r => `
-    <div class="pnl-row ${r.isDivider ? "" : ""} ${r.isTotal ? "total" : ""}">
+  return `<div class="pnl-funnel">${rows.map(r=>`
+    <div class="pnl-row ${r.total?"total":""}">
       <div class="pnl-dot" style="background:${r.dot}"></div>
-      <div class="pnl-label">
-        ${esc(r.label)}
-        <small>${esc(r.sub)}</small>
+      <div class="pnl-label">${esc(r.label)}<small>${esc(r.sub)}</small></div>
+      <div class="pnl-bar-wrap"><div class="pnl-bar" style="width:${r.pct.toFixed(1)}%;background:${r.bar}"></div></div>
+      <div class="pnl-amount" style="color:${+r.amount<0&&!r.total?"var(--danger)":"var(--text-main)"}">
+        ${+r.amount>=0?"+":""}${fmtMoney(r.amount)}
       </div>
-      <div class="pnl-bar-wrap">
-        <div class="pnl-bar" style="width:${r.pct.toFixed(1)}%;background:${r.barColor}"></div>
-      </div>
-      <div class="pnl-amount" style="color:${Number(r.amount) < 0 && !r.isTotal ? "var(--danger)" : "var(--text-main)"}">
-        ${Number(r.amount) >= 0 ? "+" : ""}${fmtMoney(r.amount)}
-      </div>
-    </div>
-  `).join("");
-
-  return `<div class="pnl-funnel">${html}</div>`;
+    </div>`).join("")}</div>`;
 }
 
-/* ── Рендер разбивки расходов ────────────────────────────────────────────── */
-function renderExpenses(pnl) {
-  const bd = pnl.expenses_breakdown || {};
-  const LABELS = {
-    rent: "Аренда", salary: "Зарплата", delivery: "Доставка",
-    ads: "Реклама", utilities: "Коммунальные", other: "Прочее",
-    uncategorized: "Без категории",
-  };
-
-  const pills = Object.entries(LABELS)
-    .filter(([k]) => Number(bd[k]) > 0)
-    .map(([k, label]) => `
-      <div class="exp-pill">
-        <div class="exp-label">${esc(label)}</div>
-        <div class="exp-val">${fmtMoney(bd[k])}</div>
-      </div>
-    `).join("");
-
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — РАСХОДЫ
+   ══════════════════════════════════════════════════════════ */
+function renderExpenses(pnl){
+  const bd=pnl.expenses_breakdown||{};
+  const LABELS={rent:"Аренда",salary:"Зарплата",delivery:"Доставка",ads:"Реклама",utilities:"Коммунальные",other:"Прочее",uncategorized:"Без категории"};
+  const pills=Object.entries(LABELS).filter(([k])=>+(bd[k]||0)>0)
+    .map(([k,l])=>`<div class="exp-pill"><div class="exp-label">${esc(l)}</div><div class="exp-val">${fmtMoney(bd[k])}</div></div>`).join("");
   if (!pills) return "";
-
-  return `
-    <div style="margin-top:12px">
-      <div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">
-        Расходы по категориям
-      </div>
-      <div class="expense-grid">${pills}</div>
-    </div>
-  `;
+  return `<div style="margin-top:12px"><div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">Расходы по категориям</div><div class="expense-grid">${pills}</div></div>`;
 }
 
-/* ── Рендер склада ───────────────────────────────────────────────────────── */
-function renderStockKpi(sv) {
-  const tot = sv.totals || {};
-  const cards = [
-    {
-      color: "c-teal",
-      label: "Стоимость остатков (FIFO)",
-      value: fmtMoney(tot.stock_cost_value),
-      sub: `${fmt(tot.total_skus)} SKU на складе`,
-    },
-    {
-      color: "c-green",
-      label: "Потенциальная выручка",
-      value: fmtMoney(tot.stock_sale_value),
-      sub: "По цене продажи",
-    },
-    {
-      color: "c-purple",
-      label: "Потенциальная прибыль",
-      value: fmtMoney(tot.potential_profit),
-      valueClass: "positive",
-      sub: "Продать весь склад",
-    },
-  ];
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — SVG-ГРАФИК (pnl-daily)
+   Чистый SVG, без внешних библиотек.
+   Две линии: выручка и чистая прибыль.
+   ══════════════════════════════════════════════════════════ */
+function renderChart(daily){
+  if (!daily||!daily.length) return `
+    <div class="empty-state"><div class="empty-state-icon">📉</div>
+    <div class="empty-state-title">Нет данных за период</div>
+    <p class="empty-state-text">Попробуйте расширить диапазон дат.</p></div>`;
 
-  return cards.map(c => `
-    <div class="kpi-card ${esc(c.color)}">
-      <div class="kpi-label">${esc(c.label)}</div>
-      <div class="kpi-value ${c.valueClass || ""}">${c.value}</div>
-      ${c.sub ? `<div class="kpi-sub">${esc(c.sub)}</div>` : ""}
+  /* Размеры */
+  const VW=900, PL=64, PR=16, PT=12, PB=34;
+  const CW=VW-PL-PR, CH=190, VH=CH+PT+PB;
+
+  const revenues = daily.map(d=>+d.revenue);
+  const profits  = daily.map(d=>+d.net_profit);
+  const allVals  = [...revenues,...profits];
+  const dMin = Math.min(0,...allVals);
+  const dMax = Math.max(...allVals,1);
+  const span = dMax-dMin||1;
+  const n    = daily.length;
+
+  function px(i){ return PL + (n>1 ? i*(CW/(n-1)) : CW/2); }
+  function py(v){ return PT+CH - ((v-dMin)/span)*CH; }
+  function pts(arr){ return arr.map((v,i)=>`${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" "); }
+
+  /* Y-grid */
+  const YTICKS=5;
+  const yGrid = Array.from({length:YTICKS+1},(_,i)=>{ const v=dMin+(span/YTICKS)*i; return {v,y:py(v)}; });
+
+  /* X-labels */
+  const maxL = Math.min(10,n);
+  const step = Math.max(1,Math.floor(n/maxL));
+  const xLbls = daily.map((d,i)=>({i,date:d.date})).filter((_,i)=>i%step===0||i===n-1);
+
+  /* Area path */
+  const z = py(0).toFixed(1);
+  const areaPath = `M ${px(0).toFixed(1)},${z} `+revenues.map((v,i)=>`L ${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" ")+` L ${px(n-1).toFixed(1)},${z} Z`;
+
+  /* Ширина колонки для hit-зон */
+  const colW = n>1 ? CW/(n-1) : CW;
+
+  /* Форматы */
+  function fmtAxis(v){ const a=Math.abs(v); if(a>=1e6) return (v/1e6).toFixed(1)+"M"; if(a>=1000) return (v/1000).toFixed(0)+"k"; return v.toFixed(0); }
+  function fmtD(iso){ const[,m,d]=iso.split("-"); return `${d}.${m}`; }
+
+  const uid = "cs"+Date.now();
+
+  const svg = `
+  <div class="chart-card">
+    <div class="chart-legend">
+      <div class="chart-legend-item"><div class="legend-dot" style="background:var(--chart-rev)"></div>Выручка</div>
+      <div class="chart-legend-item"><div class="legend-dot" style="background:var(--chart-net)"></div>Чистая прибыль</div>
     </div>
-  `).join("");
+    <div class="chart-svg-wrap">
+      <svg id="${uid}" viewBox="0 0 ${VW} ${VH}" width="100%" style="height:${VH}px;cursor:crosshair">
+        <defs>
+          <linearGradient id="gr-${uid}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#2563eb" stop-opacity=".14"/>
+            <stop offset="100%" stop-color="#2563eb" stop-opacity=".01"/>
+          </linearGradient>
+          <clipPath id="cl-${uid}"><rect x="${PL}" y="${PT}" width="${CW}" height="${CH}"/></clipPath>
+        </defs>
+
+        ${yGrid.map(t=>`
+          <line x1="${PL}" y1="${t.y.toFixed(1)}" x2="${VW-PR}" y2="${t.y.toFixed(1)}"
+                stroke="#dbe4f0" stroke-width="1" ${t.v===0?"":'stroke-dasharray="4 3"'}/>
+          <text x="${PL-6}" y="${t.y.toFixed(1)}" text-anchor="end" dominant-baseline="middle"
+                font-size="11" font-family="Inter,sans-serif" fill="#94a3b8">${fmtAxis(t.v)}</text>`).join("")}
+
+        <line x1="${PL}" y1="${z}" x2="${VW-PR}" y2="${z}" stroke="#94a3b8" stroke-width="1"/>
+
+        <path d="${areaPath}" fill="url(#gr-${uid})" clip-path="url(#cl-${uid})"/>
+
+        <polyline points="${pts(revenues)}" fill="none" stroke="var(--chart-rev)"
+                  stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"
+                  clip-path="url(#cl-${uid})"/>
+
+        <polyline points="${pts(profits)}" fill="none" stroke="var(--chart-net)"
+                  stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+                  clip-path="url(#cl-${uid})"/>
+
+        ${n<=60 ? revenues.map((v,i)=>`<circle cx="${px(i).toFixed(1)}" cy="${py(v).toFixed(1)}" r="3"
+            fill="#fff" stroke="var(--chart-rev)" stroke-width="2" pointer-events="none" clip-path="url(#cl-${uid})"/>`).join("") : ""}
+        ${n<=60 ? profits.map((v,i)=>`<circle cx="${px(i).toFixed(1)}" cy="${py(v).toFixed(1)}" r="2.5"
+            fill="#fff" stroke="${v>=0?"var(--chart-net)":"var(--chart-neg)"}" stroke-width="2"
+            pointer-events="none" clip-path="url(#cl-${uid})"/>`).join("") : ""}
+
+        <line id="cur-${uid}" x1="0" y1="${PT}" x2="0" y2="${PT+CH}" stroke="var(--chart-rev)"
+              stroke-width="1" stroke-dasharray="4 3" opacity="0" pointer-events="none"/>
+
+        ${daily.map((d,i)=>{
+          const cx=px(i), hw=colW/2;
+          return `<rect class="chit" x="${(cx-hw).toFixed(1)}" y="${PT}" width="${colW.toFixed(1)}" height="${CH}"
+            fill="transparent"
+            data-date="${esc(d.date)}"
+            data-rev="${d.revenue}" data-net="${d.net_profit}"
+            data-gp="${d.gross_profit}" data-exp="${d.expenses}"
+            data-cx="${cx.toFixed(1)}"/>`;
+        }).join("")}
+
+        ${xLbls.map(l=>`<text x="${px(l.i).toFixed(1)}" y="${PT+CH+20}" text-anchor="middle"
+            font-size="10" font-family="Inter,sans-serif" fill="#94a3b8">${fmtD(l.date)}</text>`).join("")}
+      </svg>
+    </div>
+  </div>`;
+
+  setTimeout(()=>{
+    const el  = document.getElementById(uid);
+    const tt  = document.getElementById("chart-tooltip");
+    const cur = document.getElementById("cur-"+uid);
+    if (!el||!tt||!cur) return;
+    el.querySelectorAll(".chit").forEach(r=>{
+      r.addEventListener("mouseenter",e=>{
+        const d=e.currentTarget.dataset;
+        cur.setAttribute("x1",d.cx); cur.setAttribute("x2",d.cx); cur.setAttribute("opacity","1");
+        tt.innerHTML=`<strong>${esc(d.date)}</strong><br>Выручка:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${fmtMoney(d.rev)}<br>Вал. прибыль:&nbsp;${fmtMoney(d.gp)}<br>Расходы:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${fmtMoney(d.exp)}<br>Чист. прибыль:${fmtMoney(d.net)}`;
+        tt.classList.add("visible");
+      });
+      r.addEventListener("mousemove",e=>{ tt.style.left=(e.clientX+14)+"px"; tt.style.top=(e.clientY-10)+"px"; });
+      r.addEventListener("mouseleave",()=>{ tt.classList.remove("visible"); cur.setAttribute("opacity","0"); });
+    });
+  }, 0);
+
+  return svg;
 }
 
-/* ── Рендер out-of-sync ──────────────────────────────────────────────────── */
-function renderSyncCheck(sv) {
-  const check = sv.sync_check || { ok: true, out_of_sync: [] };
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — ТОП ТОВАРОВ
+   ══════════════════════════════════════════════════════════ */
+function renderTopItems(data){
+  const items=data.items||[];
+  if (!items.length) return `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">Нет продаж за период</div><p class="empty-state-text">Попробуйте расширить диапазон дат.</p></div>`;
 
-  if (check.ok) {
-    return `
-      <div class="empty-state" style="border-style:solid;border-color:var(--success-bg);background:linear-gradient(180deg,#f0fdf4 0%,#dcfce7 100%)">
-        <div class="empty-state-icon">✅</div>
-        <div class="empty-state-title" style="color:var(--success)">Всё синхронизировано</div>
-        <p class="empty-state-text">Остатки stock совпадают с партиями item_batches.</p>
-      </div>
-    `;
-  }
-
-  const rows = check.out_of_sync.map(r => {
-    const diff = Number(r.diff);
-    return `
-      <tr>
-        <td><span style="font-weight:600">${esc(r.item_name)}</span></td>
-        <td class="cell-muted">${r.item_id}</td>
-        <td>${fmt(r.qty_in_stock, 3)}</td>
-        <td>${fmt(r.qty_in_batches, 3)}</td>
-        <td class="${diff > 0 ? "cell-warning" : "cell-danger"}">
-          ${diff > 0 ? "+" : ""}${fmt(diff, 3)}
-        </td>
-        <td>
-          <span class="kpi-badge ${Math.abs(diff) > 1 ? "badge-red" : "badge-amber"}">
-            ${Math.abs(diff) > 1 ? "⚠ Серьёзное" : "△ Малое"}
-          </span>
-        </td>
-      </tr>
-    `;
+  const tot=data.totals||{};
+  const rows=items.map(it=>{
+    const rc=it.rank===1?"rank-1":it.rank===2?"rank-2":it.rank===3?"rank-3":"rank-n";
+    const m=+it.margin_pct, mc=mClr(m);
+    return `<tr>
+      <td><span class="rank-badge ${rc}">${it.rank}</span></td>
+      <td>
+        <div style="font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(it.item_name)}">${esc(it.item_name)}</div>
+        ${it.sku?`<div style="font-size:12px;color:var(--text-muted)">${esc(it.sku)}</div>`:""}
+      </td>
+      <td class="r">${fmt(it.qty_sold,0)}&nbsp;<span style="font-size:11px;color:var(--text-muted)">${esc(it.unit||"шт")}</span></td>
+      <td class="r" style="font-weight:700">${fmtMoney(it.revenue)}</td>
+      <td class="r cell-muted">${fmtMoney(it.cogs)}</td>
+      <td class="r ${+it.gross_profit>=0?"cell-success":"cell-danger"}">${fmtMoney(it.gross_profit)}</td>
+      <td>
+        <div class="margin-mini">
+          <div class="margin-mini-bar"><div class="margin-mini-fill" style="width:${Math.min(Math.max(m,0),100)}%;background:${mc}"></div></div>
+          <span class="margin-mini-val" style="color:${mc}">${m.toFixed(1)}%</span>
+        </div>
+      </td>
+    </tr>`;
   }).join("");
 
+  const tm=+(tot.margin_pct||0);
+  return `<div class="table-wrap"><table>
+    <thead><tr>
+      <th style="width:36px">#</th><th>Товар</th>
+      <th class="r">Кол-во</th><th class="r">Выручка</th>
+      <th class="r">Себест.</th><th class="r">Вал. прибыль</th>
+      <th style="min-width:120px">Маржа</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr>
+      <td colspan="2">Итого топ-${items.length}</td>
+      <td class="r">${fmt(tot.qty_sold,0)}</td>
+      <td class="r">${fmtMoney(tot.revenue)}</td>
+      <td class="r">${fmtMoney(tot.cogs)}</td>
+      <td class="r ${+(tot.gross_profit||0)>=0?"cell-success":"cell-danger"}">${fmtMoney(tot.gross_profit)}</td>
+      <td><span style="font-weight:700;color:${mClr(tm)}">${tm.toFixed(1)}%</span></td>
+    </tr></tfoot>
+  </table></div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — ДОЛГИ KPI
+   ══════════════════════════════════════════════════════════ */
+function renderDebtsKpi(s){
+  const cr=+(s.collection_rate_pct||0);
+  return [
+    {color:"c-red",    label:"Непогашенный остаток",     value:fmtMoney(s.total_balance_amount), sub:`Начальная сумма: ${fmtMoney(s.total_initial_amount)}`},
+    {color:"c-orange", label:"Просрочено",                value:fmt(s.overdue_count),
+     sub:+s.overdue_amount>0?`На сумму: ${fmtMoney(s.overdue_amount)}`:"Без просроченных",
+     badge:+s.overdue_count>0?{text:"⚠ Требует внимания",cls:"badge-red"}:{text:"✓ OK",cls:"badge-green"}},
+    {color:"c-amber",  label:"Открытых / частичных",     value:`${fmt(s.open_count)} / ${fmt(s.partial_count)}`, sub:`Всего долгов: ${fmt(s.total_count)}`},
+    {color:"c-green",  label:"Собрано",                  value:fmtMoney(s.total_paid_amount),
+     extra:`<div class="progress-wrap"><div class="progress-fill" style="width:${Math.min(cr,100).toFixed(1)}%;background:var(--success)"></div></div>`,
+     sub:`${cr.toFixed(1)}% от общей суммы`},
+  ].map(c=>`
+    <div class="kpi-card ${esc(c.color)}">
+      <div class="kpi-label">${esc(c.label)}</div>
+      <div class="kpi-value">${c.value}</div>
+      ${c.extra||""}
+      ${c.badge?`<div class="kpi-badge ${c.badge.cls}">${c.badge.text}</div>`:""}
+      ${c.sub?`<div class="kpi-sub">${esc(c.sub)}</div>`:""}
+    </div>`).join("");
+}
+
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — ТАБЛИЦА ДОЛГОВ
+   ══════════════════════════════════════════════════════════ */
+function renderDebtsTable(list){
+  if (!list||!list.length) return `
+    <div class="empty-state" style="border-style:solid;border-color:var(--success-bg);background:linear-gradient(180deg,#f0fdf4 0%,#dcfce7 100%)">
+      <div class="empty-state-icon">✅</div>
+      <div class="empty-state-title" style="color:var(--success)">Нет открытых долгов</div>
+      <p class="empty-state-text">Все реализации оплачены.</p>
+    </div>`;
+
+  const rows=list.map(d=>{
+    const pp=+d.initial_amount>0?Math.min(+d.paid_amount/+d.initial_amount*100,100):0;
+    return `<tr>
+      <td>
+        <div style="font-weight:600">${esc(d.counterparty_name||"—")}</div>
+        ${d.comment?`<div style="font-size:12px;color:var(--text-muted)">${esc(d.comment)}</div>`:""}
+      </td>
+      <td class="r">${fmtMoney(d.initial_amount)}</td>
+      <td class="r">${fmtMoney(d.paid_amount)}</td>
+      <td class="r" style="font-weight:700;color:var(--danger)">${fmtMoney(d.balance_amount)}</td>
+      <td>
+        <div class="progress-wrap" style="min-width:70px"><div class="progress-fill" style="width:${pp.toFixed(1)}%;background:var(--success)"></div></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${pp.toFixed(0)}% оплачено</div>
+      </td>
+      <td>
+        ${d.is_overdue
+          ? `<span class="debt-overdue">⚠ ${d.overdue_days} дн</span>`
+          : d.due_date
+            ? `<span style="font-size:12px;color:var(--text-muted)">${esc(d.due_date)}</span>`
+            : `<span class="cell-muted">—</span>`}
+      </td>
+    </tr>`;
+  }).join("");
+
+  return `<div class="table-wrap"><table>
+    <thead><tr>
+      <th>Контрагент</th><th class="r">Долг</th><th class="r">Оплачено</th>
+      <th class="r">Остаток</th><th style="min-width:110px">Прогресс</th><th>Срок / просрочка</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — СКЛАД
+   ══════════════════════════════════════════════════════════ */
+function renderStockKpi(sv){
+  const t=sv.totals||{};
+  return [
+    {color:"c-teal",  label:"Стоимость остатков (FIFO)", value:fmtMoney(t.stock_cost_value), sub:`${fmt(t.total_skus)} SKU на складе`},
+    {color:"c-green", label:"Потенциальная выручка",      value:fmtMoney(t.stock_sale_value), sub:"По цене продажи"},
+    {color:"c-purple",label:"Потенциальная прибыль",      value:fmtMoney(t.potential_profit), sub:"Продать весь склад"},
+  ].map(c=>`<div class="kpi-card ${esc(c.color)}"><div class="kpi-label">${esc(c.label)}</div><div class="kpi-value">${c.value}</div><div class="kpi-sub">${esc(c.sub)}</div></div>`).join("");
+}
+
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — OUT-OF-SYNC
+   ══════════════════════════════════════════════════════════ */
+function renderSyncCheck(sv){
+  const ch=sv.sync_check||{ok:true,out_of_sync:[]};
+  if (ch.ok) return `
+    <div class="empty-state" style="border-style:solid;border-color:var(--success-bg);background:linear-gradient(180deg,#f0fdf4 0%,#dcfce7 100%)">
+      <div class="empty-state-icon">✅</div>
+      <div class="empty-state-title" style="color:var(--success)">Всё синхронизировано</div>
+      <p class="empty-state-text">Остатки stock совпадают с партиями item_batches.</p>
+    </div>`;
+  const rows=ch.out_of_sync.map(r=>{
+    const diff=+r.diff;
+    return `<tr>
+      <td><span style="font-weight:600">${esc(r.item_name)}</span></td>
+      <td class="cell-muted">${r.item_id}</td>
+      <td>${fmt(r.qty_in_stock,3)}</td>
+      <td>${fmt(r.qty_in_batches,3)}</td>
+      <td class="${diff>0?"cell-warning":"cell-danger"}">${diff>0?"+":""}${fmt(diff,3)}</td>
+      <td><span class="kpi-badge ${Math.abs(diff)>1?"badge-red":"badge-amber"}">${Math.abs(diff)>1?"⚠ Серьёзное":"△ Малое"}</span></td>
+    </tr>`;
+  }).join("");
   return `
     <div class="alert alert-warning visible" style="margin-bottom:14px">
       <span class="alert-icon">⚠️</span>
-      Обнаружено расхождений: <strong>${check.out_of_sync.length}</strong>.
-      Остаток в <code>core.stock</code> не совпадает с <code>core.item_batches</code>.
-      Требуется инвентаризация.
+      Обнаружено расхождений: <strong>${ch.out_of_sync.length}</strong>. Требуется инвентаризация.
     </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Товар</th>
-            <th>ID</th>
-            <th>В stock</th>
-            <th>В batches</th>
-            <th>Разница</th>
-            <th>Степень</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-  `;
+    <div class="table-wrap"><table>
+      <thead><tr><th>Товар</th><th>ID</th><th>В stock</th><th>В batches</th><th>Разница</th><th>Степень</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
 }
 
-/* ── Обновление subtitle ──────────────────────────────────────────────────── */
-function updateSubtitle() {
-  const user     = getUser();
-  const company  = user?.company_name || "";
-  const tenantId = getEffectiveTenantId();
-  const from     = $from.value;
-  const to       = $to.value;
-
-  let parts = ["Финансовый отчёт", "BFC24 CONTROL"];
-  if (company)  parts.push(company);
-  if (tenantId) parts.push(`Tenant #${tenantId}`);
-  if (from && to)    parts.push(`${from} — ${to}`);
-  else if (from)     parts.push(`с ${from}`);
-  else if (to)       parts.push(`по ${to}`);
-
-  document.getElementById("subtitle").textContent = parts.join(" · ");
-}
-
-/* ── Скелетоны ───────────────────────────────────────────────────────────── */
-function showSkeletons() {
-  document.getElementById("pnl-kpi-grid").innerHTML =
-    Array(6).fill('<div class="skeleton sk-kpi"></div>').join("");
-  document.getElementById("pnl-funnel-wrap").innerHTML =
-    '<div class="skeleton sk-funnel"></div>';
-  document.getElementById("expenses-wrap").innerHTML = "";
-  document.getElementById("stock-kpi-grid").innerHTML =
-    Array(3).fill('<div class="skeleton sk-kpi"></div>').join("");
-  document.getElementById("sync-body").innerHTML =
-    '<div class="skeleton" style="height:60px;border-radius:var(--radius-md)"></div>';
-}
-
-/* ── Главная загрузка ────────────────────────────────────────────────────── */
-async function loadAll() {
-  // ── Проверяем tenant_id до любых запросов ─────────────────────────────
-  if (!checkTenant()) {
-    hideLoader();
-    updateSubtitle();
-    return;
-  }
+/* ══════════════════════════════════════════════════════════
+   ГЛАВНАЯ ЗАГРУЗКА
+   ══════════════════════════════════════════════════════════ */
+async function loadAll(){
+  if (!checkTenant()){ hideLoader(); updateSubtitle(); return; }
 
   showLoader("Загрузка данных…");
   showSkeletons();
@@ -1284,78 +950,78 @@ async function loadAll() {
   document.getElementById("alert-error").classList.remove("visible");
   document.getElementById("alert-auth").classList.remove("visible");
 
-  const q = buildQuery();
-  const pnlPath = `/reports/pnl?${q}`;
-  const svPath  = `/reports/stock-value?${q}`;
+  const q    = buildQuery();
+  const qTop = buildQuery({limit:10});
+  const qTid = buildTenantOnly();          // долги и склад — без фильтра дат
 
-  try {
-    // Параллельные запросы
-    const [pnlRes, svRes] = await Promise.allSettled([
-      apiFetch(pnlPath),
-      apiFetch(svPath),
-    ]);
+  const [pnlR, dailyR, topR, debtsR, svR] = await Promise.allSettled([
+    apiFetch(`/reports/pnl?${q}`),
+    apiFetch(`/reports/pnl-daily?${q}`),
+    apiFetch(`/reports/top-items?${qTop}`),
+    apiFetch(`/reports/debts-summary?${qTid}`),
+    apiFetch(`/reports/stock-value?${qTid}`),
+  ]);
 
-    // ── P&L ───────────────────────────────────────────────────────────────
-    if (pnlRes.status === "fulfilled") {
-      const pnl = pnlRes.value.pnl;
-
-      // Период
-      const period = pnlRes.value.period;
-      const from = period?.date_from || $from.value;
-      const to   = period?.date_to   || $to.value;
-      document.getElementById("pnl-period-note").textContent =
-        from && to ? `${from} — ${to}` : from ? `с ${from}` : "";
-
-      document.getElementById("pnl-kpi-grid").innerHTML = renderPnlKpi(pnl);
-      document.getElementById("pnl-funnel-wrap").innerHTML = renderPnlFunnel(pnl);
-      document.getElementById("expenses-wrap").innerHTML = renderExpenses(pnl);
-    } else {
-      const err = pnlRes.reason;
-      if (err.message !== "unauthorized") {
-        document.getElementById("pnl-kpi-grid").innerHTML =
-          `<div class="empty-state" style="grid-column:1/-1">
-            <div class="empty-state-icon">❌</div>
-            <div class="empty-state-title">Ошибка P&L</div>
-            <p class="empty-state-text">${esc(err.message)}</p>
-          </div>`;
-        document.getElementById("pnl-funnel-wrap").innerHTML = "";
-      }
-    }
-
-    // ── Склад + sync ───────────────────────────────────────────────────────
-    if (svRes.status === "fulfilled") {
-      document.getElementById("stock-kpi-grid").innerHTML = renderStockKpi(svRes.value);
-      document.getElementById("sync-body").innerHTML = renderSyncCheck(svRes.value);
-    } else {
-      const err = svRes.reason;
-      if (err.message !== "unauthorized") {
-        document.getElementById("stock-kpi-grid").innerHTML =
-          `<div class="empty-state" style="grid-column:1/-1">
-            <div class="empty-state-icon">❌</div>
-            <div class="empty-state-title">Ошибка загрузки склада</div>
-            <p class="empty-state-text">${esc(err.message)}</p>
-          </div>`;
-        document.getElementById("sync-body").innerHTML = "";
-      }
-    }
-
-    // Общая ошибка если оба упали
-    if (pnlRes.status === "rejected" && svRes.status === "rejected") {
-      showError(`Не удалось загрузить данные: ${pnlRes.reason?.message || "Ошибка сервера"}`);
-    }
-
-  } catch (err) {
-    if (err.message !== "unauthorized") {
-      showError("Ошибка соединения с сервером: " + err.message);
-    }
-  } finally {
-    hideLoader();
+  /* P&L */
+  if (pnlR.status==="fulfilled"){
+    const pnl=pnlR.value.pnl, per=pnlR.value.period;
+    const from=per?.date_from||$from.value, to=per?.date_to||$to.value;
+    document.getElementById("pnl-period-note").textContent = from&&to?`${from} — ${to}`:from?`с ${from}`:"";
+    document.getElementById("pnl-kpi-grid").innerHTML    = renderPnlKpi(pnl);
+    document.getElementById("pnl-funnel-wrap").innerHTML = renderPnlFunnel(pnl);
+    document.getElementById("expenses-wrap").innerHTML   = renderExpenses(pnl);
+  } else if (pnlR.reason?.message!=="unauthorized"){
+    blockError("pnl-kpi-grid","Ошибка P&L",pnlR.reason?.message||"");
+    document.getElementById("pnl-funnel-wrap").innerHTML="";
   }
+
+  /* Динамика */
+  if (dailyR.status==="fulfilled"){
+    const d=dailyR.value.daily||[];
+    document.getElementById("chart-note").textContent=`${d.length} дн.`;
+    document.getElementById("chart-wrap").innerHTML=renderChart(d);
+  } else if (dailyR.reason?.message!=="unauthorized"){
+    document.getElementById("chart-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">Ошибка динамики</div><p class="empty-state-text">${esc(dailyR.reason?.message||"")}</p></div>`;
+  }
+
+  /* Топ товаров */
+  if (topR.status==="fulfilled"){
+    document.getElementById("top-note").textContent=`топ ${topR.value.limit||10} по выручке`;
+    document.getElementById("top-items-wrap").innerHTML=renderTopItems(topR.value);
+  } else if (topR.reason?.message!=="unauthorized"){
+    document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">Ошибка топ товаров</div><p class="empty-state-text">${esc(topR.reason?.message||"")}</p></div>`;
+  }
+
+  /* Долги */
+  if (debtsR.status==="fulfilled"){
+    const s=debtsR.value.summary||{};
+    document.getElementById("debts-kpi-grid").innerHTML=renderDebtsKpi(s);
+    document.getElementById("debts-table-wrap").innerHTML=
+      `<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Топ открытых долгов</div>`+
+      renderDebtsTable(debtsR.value.top_open_debts||[]);
+  } else if (debtsR.reason?.message!=="unauthorized"){
+    blockError("debts-kpi-grid","Ошибка долгов",debtsR.reason?.message||"");
+    document.getElementById("debts-table-wrap").innerHTML="";
+  }
+
+  /* Склад + sync */
+  if (svR.status==="fulfilled"){
+    document.getElementById("stock-kpi-grid").innerHTML=renderStockKpi(svR.value);
+    document.getElementById("sync-body").innerHTML=renderSyncCheck(svR.value);
+  } else if (svR.reason?.message!=="unauthorized"){
+    blockError("stock-kpi-grid","Ошибка склада",svR.reason?.message||"");
+    document.getElementById("sync-body").innerHTML="";
+  }
+
+  /* Общая ошибка */
+  if ([pnlR,dailyR,topR,debtsR,svR].every(r=>r.status==="rejected")&&pnlR.reason?.message!=="unauthorized")
+    showError("Не удалось загрузить данные: "+(pnlR.reason?.message||"Ошибка сервера"));
+
+  hideLoader();
 }
 
-/* ── Запуск ──────────────────────────────────────────────────────────────── */
+/* Запуск */
 loadAll();
 </script>
-
 </body>
 </html>
