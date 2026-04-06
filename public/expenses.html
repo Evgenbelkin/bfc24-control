@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" translate="no">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Расходы</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
 
   <style>
     :root{
@@ -319,6 +320,11 @@
         grid-template-columns:repeat(3,1fr);
       }
     }
+  
+    .lang-switcher{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+    .lang-btn{padding:8px 10px;border-radius:10px;border:1px solid #cbd5e1;background:#eef2f7;color:#111827;cursor:pointer;font-size:12px;font-weight:700;line-height:1;}
+    .lang-btn.active{background:#2563eb;color:#fff;border-color:#2563eb;}
+
   </style>
 </head>
 <body>
@@ -326,6 +332,7 @@
     <div class="topbar">
       <div class="title">Расходы</div>
       <div class="top-actions">
+        <div id="langSwitcher" class="lang-switcher"></div>
         <button class="btn btn-light" onclick="goBack()">Назад</button>
         <button class="btn btn-light" onclick="logout()">Выйти</button>
       </div>
@@ -484,6 +491,7 @@
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
 
   <script>
     const FALLBACK_TENANT_ID = 1;
@@ -930,11 +938,16 @@
     function bootstrap() {
       parseUser();
       setDefaultExpenseDate();
+      i18n.applyTranslations();
+      i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
       loadData();
     }
 
     bootstrap();
   </script>
+
+
+
 </body>
 </html>

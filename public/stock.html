@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" translate="no">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL — Остатки</title>
+  <meta name="google" content="notranslate" />
+  <title data-i18n="stock_page_title">BFC24 CONTROL — Остатки</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -223,6 +224,33 @@
       padding:24px 12px;
     }
 
+
+    .lang-switcher{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .lang-btn{
+      min-width:60px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      background:#eef2f7;
+      color:#111827;
+      cursor:pointer;
+      font-size:12px;
+      font-weight:700;
+      line-height:1.2;
+    }
+
+    .lang-btn.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
     @media (max-width: 900px){
       .filters,
       .stats{
@@ -242,54 +270,55 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Остатки</div>
+      <div class="title" data-i18n="stock_title">Остатки</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <div id="langSwitcher" class="lang-switcher"></div>
+        <button class="btn btn-light" onclick="goBack()" data-i18n="back">Назад</button>
+        <button class="btn btn-light" onclick="logout()" data-i18n="logout">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтры</h2>
+      <h2 class="card-title" data-i18n="filters">Фильтры</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск по товару / артикулу / штрихкоду</label>
-          <input id="searchInput" type="text" placeholder="Например: Тест, SaaS, SKU, barcode" />
+          <label for="searchInput" data-i18n="stock_search_label">Поиск по товару / артикулу / штрихкоду</label>
+          <input id="searchInput" type="text" data-i18n-placeholder="stock_search_placeholder" placeholder="Например: Тест, SaaS, SKU, barcode" />
         </div>
 
         <div class="field">
-          <label for="locationFilter">Место хранения</label>
+          <label for="locationFilter" data-i18n="storage_location">Место хранения</label>
           <select id="locationFilter">
-            <option value="">Все МХ</option>
+            <option value="" data-i18n="all_locations">Все МХ</option>
           </select>
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="refresh">Обновить</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Строк остатков</div>
+          <div class="stat-label" data-i18n="stock_rows">Строк остатков</div>
           <div class="stat-value" id="rowsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Товаров</div>
+          <div class="stat-label" data-i18n="items">Товаров</div>
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Мест хранения</div>
+          <div class="stat-label" data-i18n="locations">Мест хранения</div>
           <div class="stat-value" id="locationsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Сумма по фильтру</div>
+          <div class="stat-label" data-i18n="filtered_total">Сумма по фильтру</div>
           <div class="stat-value" id="qtyTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Общая сумма</div>
+          <div class="stat-label" data-i18n="grand_total">Общая сумма</div>
           <div class="stat-value" id="qtyGrandTotal">0</div>
         </div>
       </div>
@@ -298,23 +327,23 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Текущие остатки</h2>
-      <div class="muted">Показываются фактические остатки по товарам и местам хранения.</div>
+      <h2 class="card-title" data-i18n="current_stock">Текущие остатки</h2>
+      <div class="muted" data-i18n="current_stock_desc">Показываются фактические остатки по товарам и местам хранения.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Товар</th>
-              <th>Артикул / SKU</th>
-              <th>Штрихкод</th>
-              <th>Место хранения</th>
-              <th>Количество</th>
+              <th data-i18n="item">Товар</th>
+              <th data-i18n="article_sku">Артикул / SKU</th>
+              <th data-i18n="barcode">Штрихкод</th>
+              <th data-i18n="storage_location">Место хранения</th>
+              <th data-i18n="quantity">Количество</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="5" class="empty">Загрузка данных...</td>
+              <td colspan="5" class="empty" data-i18n="loading_data">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -322,26 +351,26 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Партии товаров</h2>
-      <div class="muted">Показываются партии закупки для FIFO, капитализации и контроля себестоимости.</div>
+      <h2 class="card-title" data-i18n="item_batches">Партии товаров</h2>
+      <div class="muted" data-i18n="item_batches_desc">Показываются партии закупки для FIFO, капитализации и контроля себестоимости.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Товар</th>
-              <th>Артикул / SKU</th>
-              <th>Штрихкод</th>
-              <th>Дата партии</th>
-              <th>Кол-во в партии</th>
-              <th>Остаток партии</th>
-              <th>Цена закупки</th>
-              <th>Сумма остатка</th>
+              <th data-i18n="item">Товар</th>
+              <th data-i18n="article_sku">Артикул / SKU</th>
+              <th data-i18n="barcode">Штрихкод</th>
+              <th data-i18n="batch_date">Дата партии</th>
+              <th data-i18n="batch_qty">Кол-во в партии</th>
+              <th data-i18n="batch_balance">Остаток партии</th>
+              <th data-i18n="purchase_price">Цена закупки</th>
+              <th data-i18n="balance_amount">Сумма остатка</th>
             </tr>
           </thead>
           <tbody id="batchesTbody">
             <tr>
-              <td colspan="8" class="empty">Загрузка партий...</td>
+              <td colspan="8" class="empty" data-i18n="loading_batches">Загрузка партий...</td>
             </tr>
           </tbody>
         </table>
@@ -352,6 +381,8 @@
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+  
 
   <script>
     const token = localStorage.getItem("token");
@@ -366,7 +397,7 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;"),
-      translateError: (value) => String(value || "Ошибка"),
+      translateError: (value) => String(value || (window.i18n ? i18n.t("error_generic") : "Ошибка")),
       displayDateTime: (value) => {
         if (!value) return "";
         const d = new Date(value);
@@ -576,7 +607,7 @@
         })
         .join("");
 
-      els.locationFilter.innerHTML = `<option value="">Все МХ</option>` + options;
+      els.locationFilter.innerHTML = `<option value="" data-i18n="all_locations">Все МХ</option>` + options;
     }
 
     function buildRows() {
@@ -680,7 +711,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="empty">Нет остатков по выбранному фильтру</td>
+            <td colspan="5" class="empty">${escapeHtml(i18n.t("no_stock_for_filter"))}</td>
           </tr>
         `;
         return;
@@ -688,7 +719,7 @@
 
       els.tbody.innerHTML = rows.map(row => `
         <tr>
-          <td>${escapeHtml(row.item_name || "Без названия")}</td>
+          <td>${escapeHtml(row.item_name || i18n.t("unnamed"))}</td>
           <td>${escapeHtml(row.sku)}</td>
           <td>${escapeHtml(row.barcode)}</td>
           <td>${escapeHtml(row.location_display)}</td>
@@ -725,7 +756,7 @@
       if (!rows.length) {
         els.batchesTbody.innerHTML = `
           <tr>
-            <td colspan="8" class="empty">Нет партий по выбранному фильтру</td>
+            <td colspan="8" class="empty">${escapeHtml(i18n.t("no_batches_for_filter"))}</td>
           </tr>
         `;
         return;
@@ -733,7 +764,7 @@
 
       els.batchesTbody.innerHTML = rows.map(row => `
         <tr>
-          <td>${escapeHtml(row.item_name || "Без названия")}</td>
+          <td>${escapeHtml(row.item_name || i18n.t("unnamed"))}</td>
           <td>${escapeHtml(row.sku || "")}</td>
           <td>${escapeHtml(row.barcode || "")}</td>
           <td>${escapeHtml(row.batch_date || "")}</td>
@@ -747,7 +778,7 @@
 
     async function loadData() {
       try {
-        showStatus("Загрузка остатков...", "info");
+        showStatus(i18n.t("stock_loading"), "info");
 
         const tenantId = getTenantId();
 
@@ -768,21 +799,21 @@
         renderBatches();
 
         showStatus(
-          `Данные загружены.\nСтрок остатков: ${stockData.length}\nТоваров: ${itemsData.length}\nМХ: ${locationsData.length}\nПартий: ${batchesData.length}`,
+          `${i18n.t("data_loaded")}\n${i18n.t("rows_count")}: ${stockData.length}\n${i18n.t("items")}: ${itemsData.length}\n${i18n.t("locations")}: ${locationsData.length}\n${i18n.t("batches_count")}: ${batchesData.length}`,
           "success"
         );
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="empty">Ошибка загрузки данных</td>
+            <td colspan="5" class="empty">${escapeHtml(i18n.t("load_error"))}</td>
           </tr>
         `;
         els.batchesTbody.innerHTML = `
           <tr>
-            <td colspan="8" class="empty">Ошибка загрузки партий</td>
+            <td colspan="8" class="empty">${escapeHtml(i18n.t("load_error"))}</td>
           </tr>
         `;
-        showStatus("Ошибка: " + Ui.translateError(err.message), "error");
+        showStatus(i18n.t("load_error") + ": " + Ui.translateError(err.message), "error");
       }
     }
 
@@ -802,6 +833,9 @@
     }
 
     bootstrap();
+  
+    i18n.applyTranslations();
+    i18n.renderLanguageSwitcher("langSwitcher");
   </script>
 </body>
 </html>

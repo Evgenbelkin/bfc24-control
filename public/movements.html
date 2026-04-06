@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" translate="no">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL — Движения товара</title>
+  <meta name="google" content="notranslate" />
+  <title data-i18n="movements_page_title">BFC24 CONTROL — Движения товара</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -303,79 +304,104 @@
         padding:16px 12px 32px;
       }
     }
+  
+    .lang-switcher{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .lang-btn{
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      background:#eef2f7;
+      color:#111827;
+      cursor:pointer;
+      font-size:12px;
+      font-weight:700;
+      line-height:1.2;
+    }
+    .lang-btn.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Движения товара</div>
+      <div class="title" data-i18n="movements_title">Движения товара</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <div id="langSwitcher" class="lang-switcher"></div>
+        <button class="btn btn-light" onclick="goBack()" data-i18n="back">Назад</button>
+        <button class="btn btn-light" onclick="logout()" data-i18n="logout">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтры</h2>
+      <h2 class="card-title" data-i18n="filters">Фильтры</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск по товару / SKU / МХ / комментарию / пользователю</label>
-          <input id="searchInput" type="text" placeholder="Например: Кабель, SKU-001, Контейнер 1, admin" />
+          <label for="searchInput" data-i18n="search_label">Поиск по товару / SKU / МХ / комментарию / пользователю</label>
+          <input id="searchInput" type="text" data-i18n-placeholder="search_placeholder" placeholder="Например: Кабель, SKU-001, Контейнер 1, admin" />
         </div>
 
         <div class="field">
-          <label for="typeFilter">Тип движения</label>
+          <label for="typeFilter" data-i18n="movement_type">Тип движения</label>
           <select id="typeFilter">
-            <option value="">Все</option>
-            <option value="receipt">Приёмка</option>
-            <option value="sale">Продажа</option>
-            <option value="writeoff">Списание</option>
-            <option value="adjustment">Корректировка</option>
-            <option value="transfer_in">Перемещение вход</option>
-            <option value="transfer_out">Перемещение выход</option>
+            <option value="" data-i18n="all">Все</option>
+            <option value="receipt" data-i18n="type_receipt">Приёмка</option>
+            <option value="sale" data-i18n="type_sale">Продажа</option>
+            <option value="writeoff" data-i18n="type_writeoff">Списание</option>
+            <option value="adjustment" data-i18n="type_adjustment">Корректировка</option>
+            <option value="transfer_in" data-i18n="type_transfer_in">Перемещение вход</option>
+            <option value="transfer_out" data-i18n="type_transfer_out">Перемещение выход</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="dateFrom">Дата с</label>
+          <label for="dateFrom" data-i18n="date_from">Дата с</label>
           <input id="dateFrom" type="date" />
         </div>
 
         <div class="field">
-          <label for="dateTo">Дата по</label>
+          <label for="dateTo" data-i18n="date_to">Дата по</label>
           <input id="dateTo" type="date" />
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="refresh">Обновить</button>
         </div>
       </div>
 
       <div class="quick-range">
-        <button type="button" class="btn-quick" onclick="setToday()">Сегодня</button>
-        <button type="button" class="btn-quick" onclick="setLastDays(7)">7 дней</button>
-        <button type="button" class="btn-quick" onclick="setLastDays(30)">30 дней</button>
-        <button type="button" class="btn-quick" onclick="setCurrentMonth()">Этот месяц</button>
-        <button type="button" class="btn-quick" onclick="clearDates()">Всё время</button>
+        <button type="button" class="btn-quick" onclick="setToday()" data-i18n="today">Сегодня</button>
+        <button type="button" class="btn-quick" onclick="setLastDays(7)" data-i18n="last_7_days">7 дней</button>
+        <button type="button" class="btn-quick" onclick="setLastDays(30)" data-i18n="last_30_days">30 дней</button>
+        <button type="button" class="btn-quick" onclick="setCurrentMonth()" data-i18n="this_month">Этот месяц</button>
+        <button type="button" class="btn-quick" onclick="clearDates()" data-i18n="all_time">Всё время</button>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Записей</div>
+          <div class="stat-label" data-i18n="records">Записей</div>
           <div class="stat-value" id="rowsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Приёмок</div>
+          <div class="stat-label" data-i18n="receipts">Приёмок</div>
           <div class="stat-value" id="receiptCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Продаж</div>
+          <div class="stat-label" data-i18n="sales_label">Продаж</div>
           <div class="stat-value" id="saleCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Списаний</div>
+          <div class="stat-label" data-i18n="writeoffs">Списаний</div>
           <div class="stat-value" id="writeoffCount">0</div>
         </div>
       </div>
@@ -384,27 +410,27 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">История движений</h2>
-      <div class="muted">Показываются движения товаров по складу и операциям.</div>
+      <h2 class="card-title" data-i18n="history_title">История движений</h2>
+      <div class="muted" data-i18n="history_subtitle">Показываются движения товаров по складу и операциям.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Тип</th>
-              <th>Товар</th>
+              <th data-i18n="type">Тип</th>
+              <th data-i18n="item">Товар</th>
               <th>SKU</th>
-              <th>МХ</th>
-              <th>Кол-во</th>
-              <th>Комментарий</th>
-              <th>Пользователь</th>
-              <th>Дата</th>
+              <th data-i18n="location_short">МХ</th>
+              <th data-i18n="qty">Кол-во</th>
+              <th data-i18n="comment">Комментарий</th>
+              <th data-i18n="user">Пользователь</th>
+              <th data-i18n="date">Дата</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="9" class="empty">Загрузка данных...</td>
+              <td colspan="9" class="empty" data-i18n="loading_data">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -575,12 +601,12 @@
     }
 
     function movementBadge(type) {
-      if (type === "receipt") return `<span class="badge badge-receipt">Приёмка</span>`;
-      if (type === "sale") return `<span class="badge badge-sale">Продажа</span>`;
-      if (type === "writeoff") return `<span class="badge badge-writeoff">Списание</span>`;
-      if (type === "adjustment") return `<span class="badge badge-adjustment">Корректировка</span>`;
-      if (type === "transfer_in") return `<span class="badge badge-transfer">Перемещение вход</span>`;
-      if (type === "transfer_out") return `<span class="badge badge-transfer">Перемещение выход</span>`;
+      if (type === "receipt") return `<span class="badge badge-receipt">${i18n.t("type_receipt")}</span>`;
+      if (type === "sale") return `<span class="badge badge-sale">${i18n.t("type_sale")}</span>`;
+      if (type === "writeoff") return `<span class="badge badge-writeoff">${i18n.t("type_writeoff")}</span>`;
+      if (type === "adjustment") return `<span class="badge badge-adjustment">${i18n.t("type_adjustment")}</span>`;
+      if (type === "transfer_in") return `<span class="badge badge-transfer">${i18n.t("type_transfer_in")}</span>`;
+      if (type === "transfer_out") return `<span class="badge badge-transfer">${i18n.t("type_transfer_out")}</span>`;
       return Ui.escapeHtml(type || "");
     }
 
@@ -634,7 +660,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="empty">Нет данных</td>
+            <td colspan="9" class="empty">${i18n.t("no_data")}</td>
           </tr>
         `;
         return;
@@ -677,7 +703,7 @@
     async function loadData() {
       try {
         const tenantId = API.getTenantId();
-        showStatus(`Загрузка движений...\nTenant ID: ${tenantId}`, "info");
+        showStatus(`${i18n.t("loading_movements")}\nTenant ID: ${tenantId}`, "info");
 
         const data = await API.get(`/stock/movements?${buildQuery()}`);
         movementsData = extractList(data, ["movements", "data", "rows"]).map(normalizeMovement);
@@ -685,16 +711,16 @@
         renderTable();
 
         showStatus(
-          `Данные загружены.\nTenant ID: ${tenantId}\nЗаписей: ${movementsData.length}`,
+          `${i18n.t("data_loaded")}\nTenant ID: ${tenantId}\n${i18n.t("records")}: ${movementsData.length}`,
           "success"
         );
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="empty">Ошибка загрузки данных</td>
+            <td colspan="9" class="empty">${i18n.t("load_error_row")}</td>
           </tr>
         `;
-        showStatus("Ошибка: " + Ui.translateError(err.message), "error");
+        showStatus(i18n.t("error_prefix") + Ui.translateError(err.message), "error");
       }
     }
 
@@ -751,6 +777,8 @@
     }
 
     function bootstrap() {
+      i18n.applyTranslations();
+      i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
       loadData();
     }

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" translate="no">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Товары</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
 
   <style>
     :root{
@@ -279,24 +280,25 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Товары</div>
+      <div class="title" id="pageTitle">Товары</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <div id="langSwitcher" class="lang-switcher"></div>
+        <button class="btn btn-light" onclick="goBack()" id="backBtn">Назад</button>
+        <button class="btn btn-light" onclick="logout()" id="logoutBtn">Выйти</button>
       </div>
     </div>
 
     <div class="card">
       <h2 class="card-title" id="formTitle">Создать товар</h2>
-      <div class="muted">Карточка товара для приёмки, продажи, списания и остатков.</div>
+      <div class="muted" id="pageHint">Карточка товара для приёмки, продажи, списания и остатков.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Товаров</div>
+          <div class="stat-label" id="itemsCountLabel">Товаров</div>
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Tenant ID</div>
+          <div class="stat-label" id="tenantLabel">Tenant ID</div>
           <div class="stat-value" id="tenantValue">1</div>
         </div>
       </div>
@@ -304,39 +306,39 @@
       <form id="itemForm" autocomplete="off" style="margin-top:18px;">
         <div class="form-grid">
           <div class="field">
-            <label for="name">Название</label>
+            <label for="name" id="labelName">Название</label>
             <input id="name" type="text" placeholder="Например: Тест товар SaaS" />
           </div>
 
           <div class="field">
-            <label for="sku">Артикул / SKU</label>
+            <label for="sku" id="labelSku">Артикул / SKU</label>
             <input id="sku" type="text" placeholder="Например: SKU-001" />
           </div>
 
           <div class="field">
-            <label for="barcode">Штрихкод</label>
+            <label for="barcode" id="labelBarcode">Штрихкод</label>
             <input id="barcode" type="text" placeholder="Например: 1234567890123" />
           </div>
 
           <div class="field">
-            <label for="purchasePrice">Закупочная цена</label>
+            <label for="purchasePrice" id="labelPurchasePrice">Закупочная цена</label>
             <input id="purchasePrice" type="number" step="0.01" min="0" value="0" />
           </div>
 
           <div class="field">
-            <label for="salePrice">Цена продажи</label>
+            <label for="salePrice" id="labelSalePrice">Цена продажи</label>
             <input id="salePrice" type="number" step="0.01" min="0" value="0" />
           </div>
 
           <div class="field">
-            <label for="unit">Единица</label>
+            <label for="unit" id="labelUnit">Единица</label>
             <input id="unit" type="text" placeholder="Например: pcs" value="pcs" />
           </div>
         </div>
 
         <div class="toolbar">
           <div class="field">
-            <label for="searchInput">Поиск</label>
+            <label for="searchInput" id="labelSearch">Поиск</label>
             <input id="searchInput" type="text" placeholder="Поиск по названию, артикулу, штрихкоду" />
           </div>
 
@@ -353,22 +355,22 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Список товаров</h2>
+      <h2 class="card-title" id="listTitle">Список товаров</h2>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Название</th>
+              <th id="thName">Название</th>
               <th>Артикул / SKU</th>
               <th>Штрихкод</th>
-              <th>Ед.</th>
-              <th>Закупка</th>
-              <th>Продажа</th>
-              <th>Активно</th>
-              <th>Дата</th>
-              <th>Действия</th>
+              <th id="thUnit">Ед.</th>
+              <th id="thPurchase">Закупка</th>
+              <th id="thSale">Продажа</th>
+              <th id="thActive">Активно</th>
+              <th id="thDate">Дата</th>
+              <th id="thActions">Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
@@ -384,6 +386,7 @@
     <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
 
   <script>    const FALLBACK_TENANT_ID = 1;
 
@@ -491,6 +494,8 @@
     let itemsData = [];
     let editId = null;
 
+    const tr = (key, fallback="") => { const value = i18n.t(key); return value !== key ? value : (fallback || key); };
+
     const els = {
       formTitle: document.getElementById("formTitle"),
       itemForm: document.getElementById("itemForm"),
@@ -510,6 +515,46 @@
       itemsCount: document.getElementById("itemsCount"),
       tenantValue: document.getElementById("tenantValue")
     };
+    }
+
+    function applyStaticTranslations() {
+      if (window.i18n && typeof window.i18n.applyTranslations === "function") {
+        window.i18n.applyTranslations();
+      }
+      document.title = i18n.tr("page_items_title") !== "page_items_title" ? i18n.tr("page_items_title") : "BFC24 CONTROL — Товары";
+      const setText = (id, key, fallback) => { const el = document.getElementById(id); if (el) { const value = i18n.t(key); el.textContent = value !== key ? value : fallback; } };
+      const setPlaceholder = (id, key, fallback) => { const el = document.getElementById(id); if (el) { const value = i18n.t(key); el.placeholder = value !== key ? value : fallback; } };
+      setTextr("pageTitle", "items_title", "Товары");
+      setTextr("backBtn", "back", "Назад");
+      setTextr("logoutBtn", "logout", "Выйти");
+      setTextr("formTitle", editId ? "edit" : "items_add", editId ? (i18n.tr("edit") !== "edit" ? i18n.tr("edit") : "Редактировать") : "Добавить товар");
+      setTextr("pageHint", "items_desc", "Справочник товаров");
+      setTextr("itemsCountLabel", "items", "Товары");
+      setTextr("tenantLabel", "tenant_id", "Tenant ID");
+      setTextr("labelName", "item_name", "Название");
+      setTextr("labelSku", "item_sku", "Артикул / SKU");
+      setTextr("labelBarcode", "item_barcode", "Штрихкод");
+      setTextr("labelPurchasePrice", "item_purchase_price", "Закупочная цена");
+      setTextr("labelSalePrice", "item_sale_price", "Цена продажи");
+      setTextr("labelUnit", "item_unit", "Единица");
+      setTextr("labelSearch", "search", "Поиск");
+      setTextr("saveBtn", "save", (i18n.tr("save") !== "save" ? i18n.tr("save") : "Сохранить"));
+      setTextr("cancelEditBtn", "cancel", "Отменить");
+      setTextr("refreshBtn", "refresh", "Обновить");
+      setTextr("listTitle", "items_list", "Список товаров");
+      setTextr("thName", "item_name", "Название");
+      setTextr("thUnit", "item_unit", "Ед.");
+      setTextr("thPurchase", "item_purchase_price", "Закупка");
+      setTextr("thSale", "item_sale_price", "Продажа");
+      setTextr("thActive", "status_active", "Активно");
+      setTextr("thDate", "movement_date", "Дата");
+      setTextr("thActions", "actions", "Действия");
+      setPlaceholder("name", "item_name", "Название");
+      setPlaceholder("sku", "item_sku", "Артикул / SKU");
+      setPlaceholder("barcode", "item_barcode", "Штрихкод");
+      setPlaceholder("unit", "item_unit", "Единица");
+      setPlaceholder("searchInput", "item_search", "Поиск по названию, артикулу, штрихкоду");
+    }
 
     function goBack() {
       window.location.href = "/index.html";
@@ -606,8 +651,8 @@
 
     function resetForm() {
       editId = null;
-      els.formTitle.textContent = "Создать товар";
-      els.saveBtn.textContent = "Сохранить";
+      els.formTitle.textContent = tr("items_add", "Добавить товар");
+      els.saveBtn.textContent = (i18n.tr("save") !== "save" ? i18n.tr("save") : "Сохранить");
       els.cancelEditBtn.style.display = "none";
       els.name.value = "";
       els.sku.value = "";
@@ -620,8 +665,8 @@
 
     function startEdit(item) {
       editId = item.id;
-      els.formTitle.textContent = `Редактировать товар #${item.id}`;
-      els.saveBtn.textContent = "Сохранить изменения";
+      els.formTitle.textContent = `${tr("edit", "Редактировать")} #${item.id}`;
+      els.saveBtn.textContent = (i18n.tr("save") !== "save" ? i18n.tr("save") : "Сохранить");
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = item.name || "";
       els.sku.value = item.sku || "";
@@ -671,11 +716,11 @@
           <td>${escapeHtml(row.unit)}</td>
           <td>${escapeHtml(formatMoney(row.purchase_price))}</td>
           <td>${escapeHtml(formatMoney(row.sale_price))}</td>
-          <td>${row.is_active ? "Да" : "Нет"}</td>
+          <td>${row.is_active ? tr("yes", "Да") : tr("no", "Нет")}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
           <td>
             <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">Редактировать</button>
+              <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">${tr("edit", "Редактировать")}</button>
             </div>
           </td>
         </tr>
@@ -701,10 +746,10 @@
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="10" class="empty">Ошибка загрузки данных</td>
+            <td colspan="10" class="empty">${tr("status_error", "Ошибка")}</td>
           </tr>
         `;
-        showStatus(els.pageStatus, "Ошибка: " + Ui.translateError(err.message), "error");
+        showStatus(els.pageStatus, `${tr("status_error", "Ошибка")}: ${Ui.translateError(err.message)}`, "error");
       }
     }
 
@@ -723,15 +768,15 @@
         const unit = (els.unit.value || "").trim() || "pcs";
 
         if (!name) {
-          throw new Error("Название обязательно");
+          throw new Error(tr("item_name", "Название") + " " + tr("required_suffix", "обязательно"));
         }
 
         if (!Number.isFinite(purchase_price) || purchase_price < 0) {
-          throw new Error("Закупочная цена должна быть 0 или больше");
+          throw new Error(tr("status_error", "Ошибка"));
         }
 
         if (!Number.isFinite(sale_price) || sale_price < 0) {
-          throw new Error("Цена продажи должна быть 0 или больше");
+          throw new Error(tr("status_error", "Ошибка"));
         }
 
         const body = {
@@ -745,19 +790,19 @@
         };
 
         if (editId) {
-          showStatus(els.submitStatus, `Сохраняю изменения товара #${editId}...`, "info");
+          showStatus(els.submitStatus, `${tr("status_saving", "Сохранение...")} #${editId}...`, "info");
           await apiPut(`/items/${editId}`, body);
-          showStatus(els.submitStatus, `Товар #${editId} успешно обновлён`, "success");
+          showStatus(els.submitStatus, `${tr("status_success", "Успешно")} #${editId}`, "success");
         } else {
-          showStatus(els.submitStatus, "Создаю товар...", "info");
-          await apiPost("/items", body);
-          showStatus(els.submitStatus, "Товар успешно создан", "success");
+          showStatus(els.submitStatus, tr("status_saving", "Сохранение..."), "info");
+          await apiPostr("/items", body);
+          showStatus(els.submitStatus, tr("status_success", "Успешно"), "success");
         }
 
         resetForm();
         await loadData();
       } catch (err) {
-        showStatus(els.submitStatus, "Ошибка сохранения: " + Ui.translateError(err.message), "error");
+        showStatus(els.submitStatus, `${tr("status_error", "Ошибка")}: ${Ui.translateError(err.message)}`, "error");
       }
     }
 
@@ -769,6 +814,9 @@
     }
 
     function bootstrap() {
+      i18n.applyTranslations();
+      i18n.renderLanguageSwitcher("langSwitcher");
+      applyStaticTranslations();
       parseUser();
       bindEvents();
       loadData();

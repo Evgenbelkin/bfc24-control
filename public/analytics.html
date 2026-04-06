@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" translate="no">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Аналитика</title>
+  <meta name="google" content="notranslate" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -58,6 +59,10 @@
     .page-title  { margin:0 0 4px; font-size:clamp(26px,4vw,40px); font-weight:800; letter-spacing:-.03em; line-height:1.05; }
     .page-subtitle { margin:0; color:var(--text-muted); font-size:15px; }
     .header-right { display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex-shrink:0; }
+
+    .lang-switcher{display:flex;gap:8px;flex-wrap:wrap}
+    .lang-btn{min-width:60px;padding:9px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#eef2f7;color:#111827;font-size:13px;font-weight:700;cursor:pointer;line-height:1.2}
+    .lang-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:var(--shadow-xs)}
 
     /* ── Buttons ── */
     .btn {
@@ -292,10 +297,11 @@
   <!-- Шапка -->
   <div class="page-header">
     <div>
-      <h1 class="page-title">📊 Аналитика</h1>
+      <h1 class="page-title" data-i18n="title">📊 Аналитика</h1>
       <p class="page-subtitle" id="subtitle">Финансовый отчёт · BFC24 CONTROL</p>
     </div>
     <div class="header-right">
+      <div id="langSwitcher" class="lang-switcher"></div>
       <a href="/index.html" class="btn btn-secondary">← Главная</a>
       <button class="btn btn-primary" onclick="loadAll()">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115 0M20 15a9 9 0 01-15 0"/></svg>
@@ -307,54 +313,54 @@
   <!-- Фильтр -->
   <div class="filter-bar">
     <div class="filter-field" id="tenant-field">
-      <label>Tenant ID</label>
+      <label data-i18n="tenant_id">Tenant ID</label>
       <input type="number" id="tenant-id-input" placeholder="напр. 3" min="1" step="1" style="width:110px"/>
     </div>
     <div class="filter-divider"></div>
     <div class="filter-field">
-      <label>С даты</label>
+      <label data-i18n="date_from">С даты</label>
       <input type="date" id="date-from"/>
     </div>
     <div class="filter-field">
-      <label>По дату</label>
+      <label data-i18n="date_to">По дату</label>
       <input type="date" id="date-to"/>
     </div>
     <div class="filter-field">
-      <label>Быстрый период</label>
+      <label data-i18n="quick_period">Быстрый период</label>
       <div class="period-presets">
-        <button class="preset-btn" data-preset="7">7 дн</button>
-        <button class="preset-btn active" data-preset="30">30 дн</button>
-        <button class="preset-btn" data-preset="90">90 дн</button>
-        <button class="preset-btn" data-preset="month">Месяц</button>
-        <button class="preset-btn" data-preset="year">Год</button>
+        <button class="preset-btn" data-preset="7" data-i18n="days_7">7 дн</button>
+        <button class="preset-btn active" data-preset="30" data-i18n="days_30">30 дн</button>
+        <button class="preset-btn" data-preset="90" data-i18n="days_90">90 дн</button>
+        <button class="preset-btn" data-preset="month" data-i18n="month">Месяц</button>
+        <button class="preset-btn" data-preset="year" data-i18n="year">Год</button>
       </div>
     </div>
     <div class="filter-actions">
-      <button class="btn btn-secondary" onclick="clearFilter()">Сбросить</button>
-      <button class="btn btn-primary" onclick="loadAll()">Применить</button>
+      <button class="btn btn-secondary" onclick="clearFilter()" data-i18n="reset">Сбросить</button>
+      <button class="btn btn-primary" onclick="loadAll()" data-i18n="apply">Применить</button>
     </div>
   </div>
 
   <!-- Статус -->
-  <div class="load-bar" id="load-bar"><div class="spinner"></div><span id="load-text">Загрузка…</span></div>
-  <div class="alert alert-danger" id="alert-error"><span class="alert-icon">⚠️</span><span id="alert-text">Ошибка</span></div>
+  <div class="load-bar" id="load-bar"><div class="spinner"></div><span id="load-text" data-i18n="loading">Загрузка…</span></div>
+  <div class="alert alert-danger" id="alert-error"><span class="alert-icon">⚠️</span><span id="alert-text" data-i18n="error">Ошибка</span></div>
   <div class="alert alert-warning" id="alert-auth">
     <span class="alert-icon">🔒</span>
-    Сессия истекла. <a href="/login.html" style="color:inherit;font-weight:700;margin-left:4px">Войти снова</a>
+    <span data-i18n="session_expired">Сессия истекла.</span> <a href="/login.html" style="color:inherit;font-weight:700;margin-left:4px" data-i18n="login_again">Войти снова</a>
   </div>
   <div class="alert alert-warning" id="alert-no-tenant" style="flex-direction:column;gap:8px">
     <div style="display:flex;align-items:center;gap:10px">
       <span class="alert-icon">⚠️</span>
-      <span><strong>Не выбран клиент (tenant_id).</strong> Укажите Tenant ID в поле фильтра выше и нажмите «Применить» — или откройте страницу с параметром <code>?tenant_id=X</code> в URL.</span>
+      <span><strong data-i18n="tenant_missing_title">Не выбран клиент (tenant_id).</strong> <span data-i18n="tenant_missing_text">Укажите Tenant ID в поле фильтра выше и нажмите «Применить» — или откройте страницу с параметром</span> <code>?tenant_id=X</code> <span data-i18n="tenant_missing_tail">в URL.</span></span>
     </div>
-    <div style="font-size:13px;color:#92400e;padding-left:26px">Например: <code>analytics.html?tenant_id=3</code></div>
+    <div style="font-size:13px;color:#92400e;padding-left:26px"><span data-i18n="example">Например:</span> <code>analytics.html?tenant_id=3</code></div>
   </div>
 
   <!-- ════ Блок 1 — P&L ════ -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-blue">💰</div>
-      <h2 class="section-title">P&amp;L — Прибыли и убытки</h2>
+      <h2 class="section-title" data-i18n="pnl">P&amp;L — Прибыли и убытки</h2>
       <span class="section-note" id="pnl-period-note"></span>
     </div>
     <div class="kpi-grid" id="pnl-kpi-grid">
@@ -370,7 +376,7 @@
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-blue">📈</div>
-      <h2 class="section-title">Динамика по дням</h2>
+      <h2 class="section-title" data-i18n="daily">Динамика по дням</h2>
       <span class="section-note" id="chart-note"></span>
     </div>
     <div id="chart-wrap"><div class="skeleton sk-chart"></div></div>
@@ -380,8 +386,8 @@
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-amber">🏆</div>
-      <h2 class="section-title">Топ товаров</h2>
-      <span class="section-note" id="top-note">по выручке</span>
+      <h2 class="section-title" data-i18n="top_items">Топ товаров</h2>
+      <span class="section-note" id="top-note" data-i18n="by_revenue">по выручке</span>
     </div>
     <div id="top-items-wrap"><div class="skeleton sk-table"></div></div>
   </div>
@@ -390,8 +396,8 @@
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-red">💳</div>
-      <h2 class="section-title">Долги и реализация</h2>
-      <span class="section-note">Актуально на сейчас</span>
+      <h2 class="section-title" data-i18n="debts_sales">Долги и реализация</h2>
+      <span class="section-note" data-i18n="up_to_date">Актуально на сейчас</span>
     </div>
     <div class="kpi-grid" id="debts-kpi-grid">
       <div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div>
@@ -404,8 +410,8 @@
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-green">📦</div>
-      <h2 class="section-title">Состояние склада</h2>
-      <span class="section-note">Актуально на сейчас</span>
+      <h2 class="section-title" data-i18n="warehouse_state">Состояние склада</h2>
+      <span class="section-note" data-i18n="up_to_date">Актуально на сейчас</span>
     </div>
     <div class="kpi-grid" id="stock-kpi-grid">
       <div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div>
@@ -416,13 +422,16 @@
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-red">🔴</div>
-      <h2 class="section-title">Расхождения остатков</h2>
+      <h2 class="section-title" data-i18n="stock_diff">Расхождения остатков</h2>
       <span class="section-note">stock vs batches</span>
     </div>
     <div id="sync-body"><div class="skeleton" style="height:60px;border-radius:var(--radius-md)"></div></div>
   </div>
 
 </div><!-- /shell -->
+
+
+
 
 <script>
 "use strict";
@@ -445,11 +454,11 @@ function getEffectiveTenantId() {
 
 function fmt(n, d=0) {
   if (n == null || isNaN(+n)) return "—";
-  return new Intl.NumberFormat("ru-RU",{minimumFractionDigits:d,maximumFractionDigits:d}).format(+n);
+  return new Intl.NumberFormat(i18n.getLang()==="zh"?"zh-CN":i18n.getLang()==="en"?"en-US":"ru-RU",{minimumFractionDigits:d,maximumFractionDigits:d}).format(+n);
 }
 function fmtMoney(n) {
   if (n == null || isNaN(+n)) return "—";
-  return new Intl.NumberFormat("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2}).format(+n);
+  return new Intl.NumberFormat(i18n.getLang()==="zh"?"zh-CN":i18n.getLang()==="en"?"en-US":"ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2}).format(+n);
 }
 function esc(v) { return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function sign(n)  { return +n >= 0 ? "positive" : "negative"; }
@@ -586,14 +595,14 @@ function blockError(id,title,msg){
 function renderPnlKpi(pnl){
   const gm=+(pnl.gross_margin_pct||0), nm=+(pnl.net_margin_pct||0);
   return [
-    {color:"c-blue",  label:"Выручка",               value:fmtMoney(pnl.revenue),
+    {color:"c-blue",  label:i18n.t("revenue"),               value:fmtMoney(pnl.revenue),
      sub: +pnl.total_discount>0 ? `Скидки: ${fmtMoney(pnl.total_discount)}` : `Продаж: ${fmt(pnl.sales_count)}`},
     {color:"c-amber", label:"Себестоимость продаж",   value:fmtMoney(pnl.cogs), sub:`FIFO · ${fmt(pnl.line_items_count)} поз.`},
     {color:+pnl.gross_profit>=0?"c-green":"c-red", label:"Валовая прибыль",
      value:fmtMoney(pnl.gross_profit), vc:sign(pnl.gross_profit),
      badge:{text:`${gm.toFixed(1)}%`, cls:gm>=15?"badge-green":"badge-red"}},
     {color:"c-red",   label:"Операционные расходы",   value:fmtMoney(pnl.operating_expenses), sub:"Аренда, ЗП, реклама…"},
-    {color:+pnl.net_profit>=0?"c-green":"c-red", label:"Чистая прибыль",
+    {color:+pnl.net_profit>=0?"c-green":"c-red", label:i18n.t("net_profit"),
      value:fmtMoney(pnl.net_profit), vc:sign(pnl.net_profit),
      badge:{text:`${nm.toFixed(1)}%`, cls:nm>=10?"badge-green":nm>=0?"badge-amber":"badge-red"}},
     {color:"c-purple",label:"Маржа валовая",          value:`${gm.toFixed(2)}%`,
@@ -615,13 +624,13 @@ function renderPnlKpi(pnl){
 function renderPnlFunnel(pnl){
   const rev=+(pnl.revenue)||1;
   const rows=[
-    {dot:"#2563eb",label:"Выручка",sub:`${fmt(pnl.sales_count)} продаж`,amount:pnl.revenue,pct:100,bar:"#2563eb"},
+    {dot:"#2563eb",label:i18n.t("revenue"),sub:`${fmt(pnl.sales_count)} продаж`,amount:pnl.revenue,pct:100,bar:"#2563eb"},
     {dot:"#94a3b8",label:"Скидки",sub:"от выручки",amount:-pnl.total_discount,pct:Math.min(+pnl.total_discount/rev*100,100),bar:"#94a3b8"},
     {dot:"#d97706",label:"Себестоимость продаж",sub:"COGS по FIFO",amount:-pnl.cogs,pct:Math.min(+pnl.cogs/rev*100,100),bar:"#f59e0b"},
     {dot:+pnl.gross_profit>=0?"#16a34a":"#dc2626",label:"Валовая прибыль",sub:`Маржа ${+(pnl.gross_margin_pct||0).toFixed(1)}%`,
      amount:pnl.gross_profit,pct:Math.min(Math.abs(+pnl.gross_profit/rev)*100,100),bar:+pnl.gross_profit>=0?"#22c55e":"#ef4444",total:true},
     {dot:"#dc2626",label:"Операционные расходы",sub:"Аренда, ЗП, прочее",amount:-pnl.operating_expenses,pct:Math.min(+pnl.operating_expenses/rev*100,100),bar:"#f87171"},
-    {dot:+pnl.net_profit>=0?"#0d9488":"#dc2626",label:"Чистая прибыль",sub:`Маржа ${+(pnl.net_margin_pct||0).toFixed(1)}%`,
+    {dot:+pnl.net_profit>=0?"#0d9488":"#dc2626",label:i18n.t("net_profit"),sub:`Маржа ${+(pnl.net_margin_pct||0).toFixed(1)}%`,
      amount:pnl.net_profit,pct:Math.min(Math.abs(+pnl.net_profit/rev)*100,100),bar:+pnl.net_profit>=0?"#14b8a6":"#ef4444",total:true},
   ];
   return `<div class="pnl-funnel">${rows.map(r=>`
@@ -899,9 +908,9 @@ function renderDebtsTable(list){
 function renderStockKpi(sv){
   const t=sv.totals||{};
   return [
-    {color:"c-teal",  label:"Стоимость остатков (FIFO)", value:fmtMoney(t.stock_cost_value), sub:`${fmt(t.total_skus)} SKU на складе`},
-    {color:"c-green", label:"Потенциальная выручка",      value:fmtMoney(t.stock_sale_value), sub:"По цене продажи"},
-    {color:"c-purple",label:"Потенциальная прибыль",      value:fmtMoney(t.potential_profit), sub:"Продать весь склад"},
+    {color:"c-teal",  label:i18n.t("stock_value_fifo"), value:fmtMoney(t.stock_cost_value), sub:`${fmt(t.total_skus)} SKU на складе`},
+    {color:"c-green", label:i18n.t("potential_revenue"),      value:fmtMoney(t.stock_sale_value), sub:i18n.t("sale_price")},
+    {color:"c-purple",label:i18n.t("potential_profit"),      value:fmtMoney(t.potential_profit), sub:i18n.t("sell_all_stock")},
   ].map(c=>`<div class="kpi-card ${esc(c.color)}"><div class="kpi-label">${esc(c.label)}</div><div class="kpi-value">${c.value}</div><div class="kpi-sub">${esc(c.sub)}</div></div>`).join("");
 }
 
@@ -924,7 +933,7 @@ function renderSyncCheck(sv){
       <td>${fmt(r.qty_in_stock,3)}</td>
       <td>${fmt(r.qty_in_batches,3)}</td>
       <td class="${diff>0?"cell-warning":"cell-danger"}">${diff>0?"+":""}${fmt(diff,3)}</td>
-      <td><span class="kpi-badge ${Math.abs(diff)>1?"badge-red":"badge-amber"}">${Math.abs(diff)>1?"⚠ Серьёзное":"△ Малое"}</span></td>
+      <td><span class="kpi-badge ${Math.abs(diff)>1?"badge-red":"badge-amber"}">${Math.abs(diff)>1?i18n.t("severe"):i18n.t("minor")}</span></td>
     </tr>`;
   }).join("");
   return `
@@ -986,7 +995,7 @@ async function loadAll(){
 
   /* Топ товаров */
   if (topR.status==="fulfilled"){
-    document.getElementById("top-note").textContent=`топ ${topR.value.limit||10} по выручке`;
+    document.getElementById("top-note").textContent=i18n.t("top_by_revenue",{n:(topR.value.limit||10)});
     document.getElementById("top-items-wrap").innerHTML=renderTopItems(topR.value);
   } else if (topR.reason?.message!=="unauthorized"){
     document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">Ошибка топ товаров</div><p class="empty-state-text">${esc(topR.reason?.message||"")}</p></div>`;
@@ -1000,7 +1009,7 @@ async function loadAll(){
       `<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Топ открытых долгов</div>`+
       renderDebtsTable(debtsR.value.top_open_debts||[]);
   } else if (debtsR.reason?.message!=="unauthorized"){
-    blockError("debts-kpi-grid","Ошибка долгов",debtsR.reason?.message||"");
+    blockError("debts-kpi-grid",i18n.t("debts_error"),debtsR.reason?.message||"");
     document.getElementById("debts-table-wrap").innerHTML="";
   }
 
@@ -1009,17 +1018,20 @@ async function loadAll(){
     document.getElementById("stock-kpi-grid").innerHTML=renderStockKpi(svR.value);
     document.getElementById("sync-body").innerHTML=renderSyncCheck(svR.value);
   } else if (svR.reason?.message!=="unauthorized"){
-    blockError("stock-kpi-grid","Ошибка склада",svR.reason?.message||"");
+    blockError("stock-kpi-grid",i18n.t("stock_error"),svR.reason?.message||"");
     document.getElementById("sync-body").innerHTML="";
   }
 
   /* Общая ошибка */
   if ([pnlR,dailyR,topR,debtsR,svR].every(r=>r.status==="rejected")&&pnlR.reason?.message!=="unauthorized")
-    showError("Не удалось загрузить данные: "+(pnlR.reason?.message||"Ошибка сервера"));
+    showError(i18n.t("load_failed")+" "+(pnlR.reason?.message||i18n.t("server_error")));
 
   hideLoader();
 }
 
+/* i18n */
+i18n.applyTranslations();
+i18n.renderLanguageSwitcher("langSwitcher");
 /* Запуск */
 loadAll();
 </script>
