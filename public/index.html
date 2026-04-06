@@ -1,150 +1,893 @@
-<!-- ВСТАВЬ ВЕСЬ ФАЙЛ НИЖЕ ПОЛНОСТЬЮ -->
-
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="common.appName">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #e9eef6;
+    :root {
+      --bg-color: #e9eef6;
+      --bg-accent: #dde7f5;
+      --card-bg: rgba(255, 255, 255, 0.98);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent-color: #2563eb;
+      --accent-hover: #1d4ed8;
+      --border-color: #dbe4f0;
+      --danger-text: #dc2626;
+      --danger-bg: #fff5f5;
+      --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 8px 22px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 42px rgba(15, 23, 42, 0.14);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background:
+        radial-gradient(circle at top left, #f8fbff 0%, var(--bg-color) 42%, var(--bg-accent) 100%);
+      color: var(--text-main);
+      padding: 28px 18px 40px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .lang-btn {
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text-main);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.18s ease;
+    }
+
+    .lang-btn:hover {
+      border-color: rgba(37, 99, 235, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .lang-btn.active {
+      background: var(--accent-color);
+      color: #fff;
+      border-color: var(--accent-color);
     }
 
     .topbar {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 20px;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: clamp(30px, 4vw, 44px);
+      font-weight: 800;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.03em;
+      line-height: 1.04;
+    }
+
+    .muted {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    #userBox {
+      min-width: 240px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 13px;
+      box-shadow: var(--shadow-sm);
+      color: var(--text-muted);
+      backdrop-filter: blur(8px);
+    }
+
+    #userBox b {
+      color: var(--text-main);
     }
 
     .menu {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 20px;
     }
 
     .card {
-      background: white;
-      padding: 18px;
-      border-radius: 14px;
-      cursor: pointer;
-      border: 1px solid #ddd;
-    }
-
-    .lang-switch {
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 22px;
+      min-height: 176px;
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
       display: flex;
-      gap: 6px;
-      margin-bottom: 10px;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      backdrop-filter: blur(8px);
     }
 
-    .lang-switch button {
-      padding: 6px 10px;
-      font-size: 12px;
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0) 50%);
+      pointer-events: none;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(37, 99, 235, 0.26);
+    }
+
+    .card:active {
+      transform: translateY(-1px);
+    }
+
+    .card__content,
+    .card__footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card__top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .card__icon {
+      width: 74px;
+      height: 74px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.95);
+      flex-shrink: 0;
+    }
+
+    .card__arrow {
+      color: var(--accent-color);
+      font-size: 20px;
+      opacity: 0.42;
+      flex-shrink: 0;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .card:hover .card__arrow {
+      transform: translateX(3px);
+      opacity: 1;
+    }
+
+    .card h3 {
+      font-size: 19px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .card .muted {
+      font-size: 14px;
+      line-height: 1.45;
+      margin: 0;
+      max-width: 27ch;
+    }
+
+    .card__footer {
+      margin-top: 18px;
+      color: var(--accent-color);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .card--logout {
+      background: linear-gradient(180deg, #ffffff 0%, var(--danger-bg) 100%);
+    }
+
+    .card--logout .card__icon {
+      background: linear-gradient(180deg, #fff7f7 0%, #ffe8e8 100%);
+    }
+
+    .card--logout .card__footer,
+    .card--logout .card__arrow {
+      color: var(--danger-text);
+    }
+
+    .menu-icon {
+      width: 64px;
+      height: 64px;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .menu-icon .stroke-main {
+      stroke: #1f2937;
+    }
+
+    .menu-icon .stroke-accent {
+      stroke: #4f9cf9;
+    }
+
+    .menu-icon .fill-accent {
+      fill: #4f9cf9;
+    }
+
+    .owner-redirect {
+      max-width: 700px;
+      margin: 80px auto 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      box-shadow: var(--shadow-lg);
+      padding: 28px;
+      text-align: center;
+    }
+
+    .owner-redirect h2 {
+      margin: 0 0 10px;
+      font-size: 28px;
+    }
+
+    .owner-redirect p {
+      margin: 0 0 18px;
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    .owner-redirect button {
+      border: none;
+      border-radius: 12px;
+      background: var(--accent-color);
+      color: #fff;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .owner-redirect button:hover {
+      background: var(--accent-hover);
+    }
+
+    @media (max-width: 768px) {
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      .topbar {
+        flex-direction: column;
+      }
+
+      #userBox {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .card {
+        min-height: 164px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 14px 28px;
+      }
+
+      .menu {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .card {
+        padding: 18px;
+        min-height: 152px;
+      }
+
+      .card__icon {
+        width: 68px;
+        height: 68px;
+      }
+
+      .menu-icon {
+        width: 58px;
+        height: 58px;
+      }
+
+      .card h3 {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
-
 <body>
+  <div class="container" id="app">
+    <div class="toolbar">
+      <div class="lang-switch">
+        <button type="button" class="lang-btn" data-lang="ru" data-i18n="common.languageRu">RU</button>
+        <button type="button" class="lang-btn" data-lang="en" data-i18n="common.languageEn">EN</button>
+        <button type="button" class="lang-btn" data-lang="zh" data-i18n="common.languageZh">中文</button>
+      </div>
+    </div>
 
-<div class="lang-switch">
-  <button onclick="i18n.setLang('ru')">RU</button>
-  <button onclick="i18n.setLang('en')">EN</button>
-  <button onclick="i18n.setLang('zh')">中文</button>
-</div>
+    <div class="topbar">
+      <div>
+        <h1 data-i18n="common.appName">BFC24 CONTROL</h1>
+        <div class="muted" data-i18n="index.subtitle">Главное меню тестирования системы</div>
+      </div>
 
-<div class="topbar">
-  <div>
-    <h1>BFC24 CONTROL</h1>
-    <div data-i18n="main_menu"></div>
+      <div id="userBox" data-i18n="common.loadingUser">Проверка пользователя...</div>
+    </div>
+
+    <div class="menu" id="menu">
+      <div class="card" onclick="window.location.href='/items.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stroke-main" d="M14 22H34L42 30V50C42 52.2091 40.2091 54 38 54H18C15.7909 54 14 52.2091 14 50V22Z" stroke-width="2.4" stroke-linejoin="round"/>
+                <path class="stroke-main" d="M34 22V30H42" stroke-width="2.4" stroke-linejoin="round"/>
+                <path class="stroke-main" d="M22 18H46C48.2091 18 50 19.7909 50 22V42" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M23 36H33" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M23 42H33" stroke-width="2.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.itemsTitle">Товары</h3>
+          <div class="muted" data-i18n="index.itemsDesc">Справочник товаров</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/locations.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stroke-main" d="M14 14V52" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M50 14V52" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M14 20H50" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M14 32H50" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M14 44H50" stroke-width="2.4" stroke-linecap="round"/>
+                <rect class="fill-accent" x="18" y="15" width="10" height="5" rx="1.5"/>
+                <rect class="fill-accent" x="36" y="15" width="10" height="5" rx="1.5"/>
+                <rect class="fill-accent" x="20" y="27" width="8" height="5" rx="1.5"/>
+                <rect class="fill-accent" x="36" y="27" width="8" height="5" rx="1.5"/>
+                <rect class="fill-accent" x="18" y="39" width="10" height="5" rx="1.5"/>
+                <rect class="fill-accent" x="34" y="39" width="12" height="5" rx="1.5"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.locationsTitle">Места хранения</h3>
+          <div class="muted" data-i18n="index.locationsDesc">Создание мест хранения</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/clients.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle class="stroke-main" cx="23" cy="21" r="6" stroke-width="2.4"/>
+                <circle class="stroke-main" cx="41" cy="21" r="6" stroke-width="2.4"/>
+                <path class="stroke-accent" d="M20 35C21.5 32.5 24.5 31 28 31H36C39.5 31 42.5 32.5 44 35" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M12 47L22 39C23.8 37.6 26.3 37.7 27.9 39.4L31 42.6C32.1 43.8 34 43.9 35.3 42.8L39.4 39.4C41.1 38 43.5 38 45.2 39.4L52 45" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path class="stroke-main" d="M16 52H48" stroke-width="2.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.clientsTitle">Клиенты</h3>
+          <div class="muted" data-i18n="index.clientsDesc">Для продаж и реализаций</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/stock.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stroke-main" d="M14 50H50" stroke-width="2.4" stroke-linecap="round"/>
+                <rect class="stroke-main" x="16" y="32" width="8" height="18" rx="2" stroke-width="2.4"/>
+                <rect class="stroke-main" x="28" y="24" width="8" height="26" rx="2" stroke-width="2.4"/>
+                <rect class="stroke-main" x="40" y="16" width="8" height="34" rx="2" stroke-width="2.4"/>
+                <rect class="fill-accent" x="18.5" y="38" width="3" height="10" rx="1"/>
+                <rect class="fill-accent" x="30.5" y="30" width="3" height="18" rx="1"/>
+                <rect class="fill-accent" x="42.5" y="22" width="3" height="26" rx="1"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.stockTitle">Остатки</h3>
+          <div class="muted" data-i18n="index.stockDesc">Все товары, остатки и места хранения</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/movements.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle class="stroke-main" cx="16" cy="16" r="4" stroke-width="2.4"/>
+                <circle class="stroke-main" cx="16" cy="48" r="4" stroke-width="2.4"/>
+                <circle class="stroke-main" cx="48" cy="16" r="4" stroke-width="2.4"/>
+                <circle class="stroke-main" cx="48" cy="48" r="4" stroke-width="2.4"/>
+                <path class="stroke-accent" d="M21 18H36" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M33 13L38 18L33 23" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path class="stroke-main" d="M21 46H36" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M33 41L38 46L33 51" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path class="stroke-main" d="M18 21L30 33" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M34 31L46 19" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M18 43L30 31" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M34 33L46 45" stroke-width="2.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.movementsTitle">Движения</h3>
+          <div class="muted" data-i18n="index.movementsDesc">История движений товара</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/incoming.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stroke-main" d="M16 28L24 18H40L48 28V48C48 50.2091 46.2091 52 44 52H20C17.7909 52 16 50.2091 16 48V28Z" stroke-width="2.4" stroke-linejoin="round"/>
+                <path class="stroke-main" d="M24 18L32 28L40 18" stroke-width="2.4" stroke-linejoin="round"/>
+                <path class="stroke-accent" d="M32 10V25" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M26 19L32 25L38 19" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.incomingTitle">Приёмка</h3>
+          <div class="muted" data-i18n="index.incomingDesc">Приёмка товара в выбранное МХ</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/sales.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle class="stroke-main" cx="22" cy="18" r="8" stroke-width="2.4"/>
+                <path class="stroke-main" d="M32 24H43L47 39H24L20 20H14" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle class="stroke-main" cx="28" cy="47" r="3.5" stroke-width="2.4"/>
+                <circle class="stroke-main" cx="43" cy="47" r="3.5" stroke-width="2.4"/>
+                <path class="stroke-accent" d="M22 14V22" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M18 18H26" stroke-width="2.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.salesTitle">Продажа</h3>
+          <div class="muted" data-i18n="index.salesDesc">Продажа с выбором МХ и клиента</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/writeoff.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stroke-main" d="M17 47L45 19" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M21 17C24.5 17 27 19.5 27 23C27 26.5 24.5 29 21 29C17.5 29 15 26.5 15 23C15 19.5 17.5 17 21 17Z" stroke-width="2.4"/>
+                <path class="stroke-main" d="M43 35C46.5 35 49 37.5 49 41C49 44.5 46.5 47 43 47C39.5 47 37 44.5 37 41C37 37.5 39.5 35 43 35Z" stroke-width="2.4"/>
+                <path class="stroke-accent" d="M39 41H47" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-main" d="M31 21L37 15" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M27 25L33 19" stroke-width="2.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.writeoffTitle">Списание</h3>
+          <div class="muted" data-i18n="index.writeoffDesc">Списание товара с МХ</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/cash.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="12" y="20" width="40" height="24" rx="4" stroke-width="2.4"/>
+                <path class="stroke-main" d="M18 20V16C18 13.7909 19.7909 12 22 12H42C44.2091 12 46 13.7909 46 16V20" stroke-width="2.4" stroke-linecap="round"/>
+                <circle class="stroke-accent" cx="32" cy="32" r="6" stroke-width="2.4"/>
+                <path class="stroke-accent" d="M32 27V37" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M29 29.5H33.5C34.8807 29.5 36 30.6193 36 32C36 33.3807 34.8807 34.5 33.5 34.5H28" stroke-width="2.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.cashTitle">Деньги</h3>
+          <div class="muted" data-i18n="index.cashDesc">Журнал поступлений и оплат</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/expenses.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="14" y="16" width="36" height="32" rx="4" stroke-width="2.4"/>
+                <path class="stroke-main" d="M22 24H42" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M22 32H34" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M40 38H48" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M44 34V42" stroke-width="2.8" stroke-linecap="round"/>
+                <circle class="stroke-accent" cx="44" cy="38" r="8" stroke-width="2.4"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.expensesTitle">Расходы</h3>
+          <div class="muted" data-i18n="index.expensesDesc">Учёт аренды, зарплаты, закупки и других расходов</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/analytics.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="12" y="14" width="40" height="36" rx="4" stroke-width="2.4"/>
+                <path class="stroke-main" d="M20 44V34" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-main" d="M32 44V24" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-main" d="M44 44V18" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M18 28L27 24L35 29L46 20" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle class="fill-accent" cx="18" cy="28" r="2.2"/>
+                <circle class="fill-accent" cx="27" cy="24" r="2.2"/>
+                <circle class="fill-accent" cx="35" cy="29" r="2.2"/>
+                <circle class="fill-accent" cx="46" cy="20" r="2.2"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.analyticsTitle">Аналитика</h3>
+          <div class="muted" data-i18n="index.analyticsDesc">PnL, капитализация склада и расхождения по остаткам</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/debts.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="16" y="12" width="28" height="40" rx="3" stroke-width="2.4"/>
+                <path class="stroke-main" d="M22 20H38" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M22 28H38" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M22 36H32" stroke-width="2.4" stroke-linecap="round"/>
+                <circle class="stroke-accent" cx="46" cy="42" r="8" stroke-width="2.4"/>
+                <path class="stroke-accent" d="M42 42H50" stroke-width="2.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.debtsTitle">Долги клиентов</h3>
+          <div class="muted" data-i18n="index.debtsDesc">Контроль реализаций и погашений</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card card--logout" id="logoutCard">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stroke-main" d="M26 14H18C15.7909 14 14 15.7909 14 18V46C14 48.2091 15.7909 50 18 50H26" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M36 22L46 32L36 42" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path class="stroke-accent" d="M22 32H45" stroke-width="2.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.logoutTitle">Выход</h3>
+          <div class="muted" data-i18n="index.logoutDesc">Очистить токен и выйти из системы</div>
+        </div>
+        <div class="card__footer" data-i18n="index.logoutButton">Выйти</div>
+      </div>
+    </div>
   </div>
-  <div id="userBox" data-i18n="loading_user"></div>
-</div>
 
-<div class="menu">
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
 
-  <div class="card" onclick="location.href='/items.html'">
-    <h3 data-i18n="items"></h3>
-    <div data-i18n="items_desc"></div>
-  </div>
+  <script>
+    const Ui = window.AppUI || {
+      escapeHtml: (value) => String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;"),
+      translateError: (value) => String(value || "Ошибка"),
+      displayDateTime: (value) => {
+        if (!value) return "";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleString("ru-RU");
+      }
+    };
 
-  <div class="card" onclick="location.href='/locations.html'">
-    <h3 data-i18n="locations"></h3>
-    <div data-i18n="locations_desc"></div>
-  </div>
+    async function requestFallback(method, path, body) {
+      const token = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
 
-  <div class="card" onclick="location.href='/clients.html'">
-    <h3 data-i18n="clients"></h3>
-    <div data-i18n="clients_desc"></div>
-  </div>
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
 
-  <div class="card" onclick="location.href='/stock.html'">
-    <h3 data-i18n="stock"></h3>
-    <div data-i18n="stock_desc"></div>
-  </div>
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
 
-  <div class="card" onclick="location.href='/movements.html'">
-    <h3 data-i18n="movements"></h3>
-    <div data-i18n="movements_desc"></div>
-  </div>
+      return data;
+    }
 
-  <div class="card" onclick="location.href='/incoming.html'">
-    <h3 data-i18n="incoming"></h3>
-    <div data-i18n="incoming_desc"></div>
-  </div>
+    function getTenantIdFromStorage(fallback = 1) {
+      try {
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
+      } catch {}
+      return fallback;
+    }
 
-  <div class="card" onclick="location.href='/sales.html'">
-    <h3 data-i18n="sales"></h3>
-    <div data-i18n="sales_desc"></div>
-  </div>
+    const ApiBridge = {
+      getTenantId(fallback = 1) {
+        if (window.API && typeof window.API.getTenantId === "function") {
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
+        }
+        return getTenantIdFromStorage(fallback);
+      },
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      },
+      post(path, body) {
+        if (window.API && typeof window.API.post === "function") {
+          return window.API.post(path, body);
+        }
+        return requestFallback("POST", path, body);
+      },
+      put(path, body) {
+        if (window.API && typeof window.API.put === "function") {
+          return window.API.put(path, body);
+        }
+        return requestFallback("PUT", path, body);
+      },
+      patch(path, body) {
+        if (window.API && typeof window.API.patch === "function") {
+          return window.API.patch(path, body);
+        }
+        return requestFallback("PATCH", path, body);
+      },
+      delete(path) {
+        if (window.API && typeof window.API.delete === "function") {
+          return window.API.delete(path);
+        }
+        return requestFallback("DELETE", path);
+      }
+    };
 
-  <div class="card" onclick="location.href='/writeoff.html'">
-    <h3 data-i18n="writeoff"></h3>
-    <div data-i18n="writeoff_desc"></div>
-  </div>
+    const token = localStorage.getItem("token");
 
-  <div class="card" onclick="location.href='/cash.html'">
-    <h3 data-i18n="cash"></h3>
-    <div data-i18n="cash_desc"></div>
-  </div>
+    if (!token) {
+      window.location.href = "/login.html";
+    }
 
-  <div class="card" onclick="location.href='/expenses.html'">
-    <h3 data-i18n="expenses"></h3>
-    <div data-i18n="expenses_desc"></div>
-  </div>
+    function normalizeUserPayload(payload) {
+      if (!payload || typeof payload !== "object") return null;
+      if (payload.user && typeof payload.user === "object") return payload.user;
+      return payload;
+    }
 
-  <div class="card" onclick="location.href='/analytics.html'">
-    <h3 data-i18n="analytics"></h3>
-    <div data-i18n="analytics_desc"></div>
-  </div>
+    function bindLanguageButtons() {
+      document.querySelectorAll("[data-lang]").forEach((button) => {
+        button.addEventListener("click", () => {
+          i18n.setLang(button.getAttribute("data-lang"));
+          const savedUserRaw = localStorage.getItem("user");
+          if (savedUserRaw) {
+            try {
+              const savedUser = normalizeUserPayload(JSON.parse(savedUserRaw));
+              if (savedUser?.role !== "owner" && savedUser) {
+                renderUserBox(savedUser);
+              }
+            } catch (_) {}
+          }
+        });
+      });
 
-  <div class="card" onclick="location.href='/debts.html'">
-    <h3 data-i18n="debts"></h3>
-    <div data-i18n="debts_desc"></div>
-  </div>
+      document.addEventListener("app:language-changed", () => {
+        const savedUserRaw = localStorage.getItem("user");
+        if (savedUserRaw) {
+          try {
+            const savedUser = normalizeUserPayload(JSON.parse(savedUserRaw));
+            if (savedUser?.role !== "owner" && savedUser) {
+              renderUserBox(savedUser);
+            }
+          } catch (_) {}
+        }
+      });
+    }
 
-  <div class="card" onclick="logout()">
-    <h3 data-i18n="logout"></h3>
-    <div data-i18n="logout_desc"></div>
-  </div>
+    function renderOwnerRedirect(user) {
+      const app = document.getElementById("app");
+      app.innerHTML = `
+        <div class="toolbar">
+          <div class="lang-switch">
+            <button type="button" class="lang-btn ${i18n.getLang() === "ru" ? "active" : ""}" data-lang="ru">${i18n.t("common.languageRu")}</button>
+            <button type="button" class="lang-btn ${i18n.getLang() === "en" ? "active" : ""}" data-lang="en">${i18n.t("common.languageEn")}</button>
+            <button type="button" class="lang-btn ${i18n.getLang() === "zh" ? "active" : ""}" data-lang="zh">${i18n.t("common.languageZh")}</button>
+          </div>
+        </div>
+        <div class="owner-redirect">
+          <h2>${Ui.escapeHtml(i18n.t("index.ownerRedirectTitle"))}</h2>
+          <p>${Ui.escapeHtml(i18n.t("index.ownerRedirectText"))}</p>
+          <button onclick="window.location.href='/owner-dashboard.html'">${Ui.escapeHtml(i18n.t("index.ownerRedirectButton"))}</button>
+        </div>
+      `;
+      bindLanguageButtons();
+    }
 
-</div>
+    function renderUserBox(user) {
+      const userBox = document.getElementById("userBox");
+      if (!userBox) return;
 
-<script src="/js/i18n.js"></script>
+      const tenantText =
+        user && (user.tenant_id === null || user.tenant_id === undefined || user.tenant_id === "")
+          ? i18n.t("common.ownerMode")
+          : (user?.tenant_id ?? "-");
 
-<script>
-function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  location.href = "/login.html";
-}
+      const companyText = user?.company_name
+        ? `<div style="margin-top:6px;"><b>${Ui.escapeHtml(i18n.t("common.companyLabel"))}:</b> ${Ui.escapeHtml(user.company_name)}</div>`
+        : "";
 
-i18n.applyTranslations();
-</script>
+      userBox.innerHTML = `
+        <div><b>${Ui.escapeHtml(i18n.t("common.userLabel"))}:</b> ${Ui.escapeHtml(user?.username || "-")}</div>
+        <div style="margin-top:6px;"><b>${Ui.escapeHtml(i18n.t("common.roleLabel"))}:</b> ${Ui.escapeHtml(user?.role || "-")}</div>
+        ${companyText}
+        <div style="margin-top:6px;"><b>${Ui.escapeHtml(i18n.t("common.tenantLabel"))}:</b> ${Ui.escapeHtml(tenantText)}</div>
+      `;
+    }
 
+    async function loadMe() {
+      try {
+        const savedUserRaw = localStorage.getItem("user");
+        if (savedUserRaw) {
+          try {
+            const savedUser = normalizeUserPayload(JSON.parse(savedUserRaw));
+            if (savedUser?.role === "owner") {
+              renderOwnerRedirect(savedUser);
+              return;
+            }
+            if (savedUser) {
+              renderUserBox(savedUser);
+            }
+          } catch (_) {}
+        }
+
+        const data = window.API && typeof window.API.get === "function"
+          ? await window.API.get("/auth/me")
+          : await requestFallback("GET", "/auth/me");
+
+        if (!data) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          window.location.href = "/login.html";
+          return;
+        }
+
+        const user = normalizeUserPayload(data);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        if (user?.role === "owner") {
+          renderOwnerRedirect(user);
+          return;
+        }
+
+        renderUserBox(user);
+      } catch (e) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login.html";
+      }
+    }
+
+    document.getElementById("logoutCard").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    });
+
+    bindLanguageButtons();
+    i18n.applyTranslations();
+    loadMe();
+  </script>
 </body>
 </html>

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="login.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Вход</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
   <style>
     body {
       margin: 0;
@@ -12,7 +13,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
+      padding: 16px;
+      box-sizing: border-box;
     }
 
     .card {
@@ -26,6 +29,36 @@
     h2 {
       margin: 0 0 20px;
       text-align: center;
+      line-height: 1.2;
+    }
+
+    .lang-switch {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .lang-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #e2e8f0;
+      color: #0f172a;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .lang-btn:hover {
+      background: #dbe4f0;
+    }
+
+    .lang-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
     }
 
     input {
@@ -35,9 +68,10 @@
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 14px;
+      box-sizing: border-box;
     }
 
-    button {
+    .submit-btn {
       width: 100%;
       padding: 12px;
       background: #2563eb;
@@ -46,25 +80,10 @@
       border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
-      margin-bottom: 6px;
     }
 
-    button:hover {
+    .submit-btn:hover {
       background: #1d4ed8;
-    }
-
-    .lang-switch {
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-
-    .lang-switch button {
-      padding: 6px 10px;
-      font-size: 12px;
-      background: #e2e8f0;
-      color: #111;
     }
 
     .error {
@@ -72,27 +91,27 @@
       font-size: 13px;
       margin-bottom: 10px;
       text-align: center;
+      min-height: 16px;
     }
   </style>
 </head>
 <body>
 
 <div class="card">
-
   <div class="lang-switch">
-    <button onclick="i18n.setLang('ru')">RU</button>
-    <button onclick="i18n.setLang('en')">EN</button>
-    <button onclick="i18n.setLang('zh')">中文</button>
+    <button type="button" class="lang-btn" data-lang="ru" data-i18n="common.languageRu">RU</button>
+    <button type="button" class="lang-btn" data-lang="en" data-i18n="common.languageEn">EN</button>
+    <button type="button" class="lang-btn" data-lang="zh" data-i18n="common.languageZh">中文</button>
   </div>
 
-  <h2 data-i18n="app_title"></h2>
+  <h2 data-i18n="login.heading">BFC24 CONTROL</h2>
 
   <div id="error" class="error"></div>
 
-  <input id="username" data-i18n-placeholder="username" />
-  <input id="password" type="password" data-i18n-placeholder="password" />
+  <input id="username" data-i18n-placeholder="login.usernamePlaceholder" autocomplete="username" />
+  <input id="password" type="password" data-i18n-placeholder="login.passwordPlaceholder" autocomplete="current-password" />
 
-  <button onclick="login()" data-i18n="login_button"></button>
+  <button type="button" class="submit-btn" onclick="login()" data-i18n="login.submit">Войти</button>
 </div>
 
 <script src="/js/config.js"></script>
@@ -101,47 +120,60 @@
 <script src="/js/i18n.js"></script>
 
 <script>
-const Ui = window.AppUI || {
-  escapeHtml: (value) => String(value ?? ""),
-  translateError: (value) => String(value || "Ошибка")
-};
+  const Ui = window.AppUI || {
+    escapeHtml: (value) => String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;"),
+    translateError: (value) => String(value || "Ошибка")
+  };
 
-async function login() {
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const errorBox = document.getElementById('error');
-
-  errorBox.textContent = '';
-
-  try {
-    const res = await fetch('/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+  function bindLanguageButtons() {
+    document.querySelectorAll("[data-lang]").forEach((button) => {
+      button.addEventListener("click", () => {
+        i18n.setLang(button.getAttribute("data-lang"));
+      });
     });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      errorBox.textContent = Ui.translateError(data.error);
-      return;
-    }
-
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-
-    if (data.user.role === 'owner') {
-      window.location.href = '/owner-dashboard.html';
-    } else {
-      window.location.href = '/index.html';
-    }
-
-  } catch (err) {
-    errorBox.textContent = Ui.translateError(err.message);
   }
-}
 
-i18n.applyTranslations();
+  async function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const errorBox = document.getElementById("error");
+
+    errorBox.textContent = "";
+
+    try {
+      const res = await fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+
+      if (!data.ok) {
+        errorBox.textContent = Ui.translateError(data.error);
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      if (data.user.role === "owner") {
+        window.location.href = "/owner-dashboard.html";
+      } else {
+        window.location.href = "/index.html";
+      }
+    } catch (err) {
+      errorBox.textContent = Ui.translateError(err.message) || i18n.t("common.loginConnectionError");
+    }
+  }
+
+  bindLanguageButtons();
+  i18n.applyTranslations();
 </script>
 
 </body>
