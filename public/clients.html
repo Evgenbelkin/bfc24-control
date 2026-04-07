@@ -577,9 +577,9 @@
       el.textContent = "";
     }
 
-    function setPageStatus(text, type) {
-      pageStatusState = { text, type };
-      showStatus(els.pageStatus, text, type);
+    function setPageStatus(key, vars, type) {
+      pageStatusState = { key, vars: vars || {}, type };
+      showStatus(els.pageStatus, i18n.format(key, vars || {}), type);
     }
 
     function clearPageStatus() {
@@ -587,9 +587,9 @@
       hideStatus(els.pageStatus);
     }
 
-    function setSubmitStatus(text, type) {
-      submitStatusState = { text, type };
-      showStatus(els.submitStatus, text, type);
+    function setSubmitStatus(key, vars, type) {
+      submitStatusState = { key, vars: vars || {}, type };
+      showStatus(els.submitStatus, i18n.format(key, vars || {}), type);
     }
 
     function clearSubmitStatus() {
@@ -599,10 +599,18 @@
 
     function restoreStatusesAfterLanguageChange() {
       if (pageStatusState) {
-        showStatus(els.pageStatus, pageStatusState.text, pageStatusState.type);
+        showStatus(
+          els.pageStatus,
+          i18n.format(pageStatusState.key, pageStatusState.vars || {}),
+          pageStatusState.type
+        );
       }
       if (submitStatusState) {
-        showStatus(els.submitStatus, submitStatusState.text, submitStatusState.type);
+        showStatus(
+          els.submitStatus,
+          i18n.format(submitStatusState.key, submitStatusState.vars || {}),
+          submitStatusState.type
+        );
       }
     }
 
@@ -762,31 +770,22 @@
         els.tenantValue.textContent = String(tenantId);
 
         renderLoadingRow();
-        setPageStatus(
-          i18n.format("clients.loadingStatus", { tenantId }),
-          "info"
-        );
+        setPageStatus("clients.loadingStatus", { tenantId }, "info");
 
         const data = await apiGet(`/clients?tenant_id=${tenantId}`);
         clientsData = extractList(data, ["clients", "counterparties", "data", "rows"]).map(normalizeClient);
 
         renderTable();
 
-        setPageStatus(
-          i18n.format("clients.loadedStatus", {
-            tenantId,
-            count: clientsData.length
-          }),
-          "success"
-        );
+        setPageStatus("clients.loadedStatus", {
+          tenantId,
+          count: clientsData.length
+        }, "success");
       } catch (err) {
         renderLoadErrorRow();
-        setPageStatus(
-          i18n.format("clients.loadErrorStatus", {
-            error: Ui.translateError(err.message)
-          }),
-          "error"
-        );
+        setPageStatus("clients.loadErrorStatus", {
+          error: Ui.translateError(err.message)
+        }, "error");
       }
     }
 
@@ -812,30 +811,21 @@
         };
 
         if (editId) {
-          setSubmitStatus(
-            i18n.format("clients.savingUpdate", { id: editId }),
-            "info"
-          );
+          setSubmitStatus("clients.savingUpdate", { id: editId }, "info");
           await apiPut(`/clients/${editId}`, body);
-          setSubmitStatus(
-            i18n.format("clients.updatedSuccess", { id: editId }),
-            "success"
-          );
+          setSubmitStatus("clients.updatedSuccess", { id: editId }, "success");
         } else {
-          setSubmitStatus(i18n.t("clients.savingCreate"), "info");
+          setSubmitStatus("clients.savingCreate", {}, "info");
           await apiPost("/clients", body);
-          setSubmitStatus(i18n.t("clients.createdSuccess"), "success");
+          setSubmitStatus("clients.createdSuccess", {}, "success");
         }
 
         resetForm();
         await loadData();
       } catch (err) {
-        setSubmitStatus(
-          i18n.format("clients.saveErrorStatus", {
-            error: Ui.translateError(err.message)
-          }),
-          "error"
-        );
+        setSubmitStatus("clients.saveErrorStatus", {
+          error: Ui.translateError(err.message)
+        }, "error");
       }
     }
 

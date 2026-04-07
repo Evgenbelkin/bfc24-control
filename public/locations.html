@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" translate="no" data-page-title-i18n="locations.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Места хранения</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
 
   <style>
     :root{
@@ -44,6 +45,13 @@
       flex-wrap:wrap;
     }
 
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
     .title{
       font-size:28px;
       font-weight:700;
@@ -53,6 +61,30 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+    }
+
+    .lang-switcher{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .lang-switcher button{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+      min-width:56px;
+    }
+
+    .lang-switcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
     }
 
     .btn{
@@ -268,30 +300,44 @@
       .wrap{
         padding:16px 12px 32px;
       }
+
+      .topbar{
+        align-items:flex-start;
+      }
+
+      .topbar-right{
+        width:100%;
+        justify-content:space-between;
+      }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Места хранения</div>
-      <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+      <div class="title" data-i18n="locations.heading">Места хранения</div>
+
+      <div class="topbar-right">
+        <div id="langSwitcher" class="lang-switcher"></div>
+
+        <div class="top-actions">
+          <button class="btn btn-light" onclick="goBack()" data-i18n="locations.backButton">Назад</button>
+          <button class="btn btn-light" onclick="logout()" data-i18n="locations.logoutButton">Выйти</button>
+        </div>
       </div>
     </div>
 
     <div class="card">
       <h2 class="card-title" id="formTitle">Создать место хранения</h2>
-      <div class="muted">Например: Контейнер 1, Контейнер 2, Склад магазина, Витрина.</div>
+      <div class="muted" data-i18n="locations.subtitle">Например: Контейнер 1, Контейнер 2, Склад магазина, Витрина.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Мест хранения</div>
+          <div class="stat-label" data-i18n="locations.statsLocations">Мест хранения</div>
           <div class="stat-value" id="locationsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Tenant ID</div>
+          <div class="stat-label" data-i18n="locations.statsTenant">Tenant ID</div>
           <div class="stat-value" id="tenantValue">1</div>
         </div>
       </div>
@@ -299,38 +345,38 @@
       <form id="locationForm" autocomplete="off" style="margin-top:18px;">
         <div class="form-grid">
           <div class="field">
-            <label for="name">Название</label>
-            <input id="name" type="text" placeholder="Например: Контейнер 1" />
+            <label for="name" data-i18n="locations.nameLabel">Название</label>
+            <input id="name" type="text" data-i18n-placeholder="locations.namePlaceholder" placeholder="Например: Контейнер 1" />
           </div>
 
           <div class="field">
-            <label for="code">Код</label>
-            <input id="code" type="text" placeholder="Например: K1" />
+            <label for="code" data-i18n="locations.codeLabel">Код</label>
+            <input id="code" type="text" data-i18n-placeholder="locations.codePlaceholder" placeholder="Например: K1" />
           </div>
 
           <div class="field">
-            <label for="locationType">Тип</label>
+            <label for="locationType" data-i18n="locations.typeLabel">Тип</label>
             <select id="locationType">
-              <option value="container">Контейнер</option>
-              <option value="warehouse">Склад</option>
-              <option value="storage">Storage</option>
-              <option value="shop">Магазин</option>
-              <option value="shelf">Полка</option>
-              <option value="other">Другое</option>
+              <option value="container" data-i18n="locations.typeContainer">Контейнер</option>
+              <option value="warehouse" data-i18n="locations.typeWarehouse">Склад</option>
+              <option value="storage" data-i18n="locations.typeStorage">Storage</option>
+              <option value="shop" data-i18n="locations.typeShop">Магазин</option>
+              <option value="shelf" data-i18n="locations.typeShelf">Полка</option>
+              <option value="other" data-i18n="locations.typeOther">Другое</option>
             </select>
           </div>
         </div>
 
         <div class="toolbar">
           <div class="field">
-            <label for="searchInput">Поиск</label>
-            <input id="searchInput" type="text" placeholder="Поиск по названию, коду, типу" />
+            <label for="searchInput" data-i18n="locations.searchLabel">Поиск</label>
+            <input id="searchInput" type="text" data-i18n-placeholder="locations.searchPlaceholder" placeholder="Поиск по названию, коду, типу" />
           </div>
 
           <div class="toolbar-actions">
             <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
             <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
-            <button type="button" class="btn btn-light" id="refreshBtn">Обновить список</button>
+            <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="locations.refreshButton">Обновить список</button>
           </div>
         </div>
       </form>
@@ -340,24 +386,24 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Список мест хранения</h2>
+      <h2 class="card-title" data-i18n="locations.listTitle">Список мест хранения</h2>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Название</th>
-              <th>Код</th>
-              <th>Тип</th>
-              <th>Активно</th>
-              <th>Дата</th>
-              <th>Действия</th>
+              <th data-i18n="locations.tableId">ID</th>
+              <th data-i18n="locations.tableName">Название</th>
+              <th data-i18n="locations.tableCode">Код</th>
+              <th data-i18n="locations.tableType">Тип</th>
+              <th data-i18n="locations.tableActive">Активно</th>
+              <th data-i18n="locations.tableDate">Дата</th>
+              <th data-i18n="locations.tableActions">Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="7" class="empty">Загрузка данных...</td>
+              <td colspan="7" class="empty" data-i18n="locations.loadingData">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -365,8 +411,12 @@
     </div>
   </div>
 
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+
   <script>
-    const API_BASE = '';
     const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
@@ -374,9 +424,107 @@
       window.location.href = "/login.html";
     }
 
+    const Ui = window.AppUI || {
+      escapeHtml: (value) => String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;"),
+      translateError: (value) => String(value || "Ошибка"),
+      displayDateTime: (value) => {
+        if (!value) return "";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleString("ru-RU");
+      }
+    };
+
+    async function requestFallback(method, path, body) {
+      const currentToken = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(currentToken ? { Authorization: "Bearer " + currentToken } : {})
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
+
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+
+      return data;
+    }
+
+    function getTenantIdFromStorage(fallback = 1) {
+      try {
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
+      } catch {}
+      return fallback;
+    }
+
+    const ApiBridge = {
+      getTenantId(fallback = 1) {
+        if (window.API && typeof window.API.getTenantId === "function") {
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
+        }
+        return getTenantIdFromStorage(fallback);
+      },
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      },
+      post(path, body) {
+        if (window.API && typeof window.API.post === "function") {
+          return window.API.post(path, body);
+        }
+        return requestFallback("POST", path, body);
+      },
+      put(path, body) {
+        if (window.API && typeof window.API.put === "function") {
+          return window.API.put(path, body);
+        }
+        return requestFallback("PUT", path, body);
+      },
+      patch(path, body) {
+        if (window.API && typeof window.API.patch === "function") {
+          return window.API.patch(path, body);
+        }
+        return requestFallback("PATCH", path, body);
+      },
+      delete(path) {
+        if (window.API && typeof window.API.delete === "function") {
+          return window.API.delete(path);
+        }
+        return requestFallback("DELETE", path);
+      }
+    };
+
     let authUser = null;
     let locationsData = [];
     let editId = null;
+
+    let pageStatusState = null;
+    let submitStatusState = null;
 
     const els = {
       formTitle: document.getElementById("formTitle"),
@@ -418,14 +566,7 @@
       if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
         return Number(authUser.tenant_id);
       }
-      return FALLBACK_TENANT_ID;
-    }
-
-    function authHeaders() {
-      return {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      };
+      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== "undefined" ? FALLBACK_TENANT_ID : 1);
     }
 
     function showStatus(el, text, type = "info") {
@@ -438,6 +579,43 @@
       el.textContent = "";
     }
 
+    function setPageStatus(key, vars, type) {
+      pageStatusState = { key, vars: vars || {}, type };
+      showStatus(els.pageStatus, i18n.format(key, vars || {}), type);
+    }
+
+    function clearPageStatus() {
+      pageStatusState = null;
+      hideStatus(els.pageStatus);
+    }
+
+    function setSubmitStatus(key, vars, type) {
+      submitStatusState = { key, vars: vars || {}, type };
+      showStatus(els.submitStatus, i18n.format(key, vars || {}), type);
+    }
+
+    function clearSubmitStatus() {
+      submitStatusState = null;
+      hideStatus(els.submitStatus);
+    }
+
+    function restoreStatusesAfterLanguageChange() {
+      if (pageStatusState) {
+        showStatus(
+          els.pageStatus,
+          i18n.format(pageStatusState.key, pageStatusState.vars || {}),
+          pageStatusState.type
+        );
+      }
+      if (submitStatusState) {
+        showStatus(
+          els.submitStatus,
+          i18n.format(submitStatusState.key, submitStatusState.vars || {}),
+          submitStatusState.type
+        );
+      }
+    }
+
     function escapeHtml(value) {
       return String(value ?? "")
         .replaceAll("&", "&amp;")
@@ -448,10 +626,7 @@
     }
 
     function formatDate(value) {
-      if (!value) return "";
-      const d = new Date(value);
-      if (Number.isNaN(d.getTime())) return String(value);
-      return d.toLocaleString("ru-RU");
+      return Ui.displayDateTime(value);
     }
 
     function extractList(data, keys) {
@@ -470,68 +645,15 @@
     }
 
     async function apiGet(path) {
-      const res = await fetch(API_BASE + path, {
-        method: "GET",
-        headers: authHeaders()
-      });
-
-      const text = await res.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { raw: text };
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || ("HTTP " + res.status));
-      }
-
-      return data;
+      return ApiBridge.get(path);
     }
 
     async function apiPost(path, body) {
-      const res = await fetch(API_BASE + path, {
-        method: "POST",
-        headers: authHeaders(),
-        body: JSON.stringify(body)
-      });
-
-      const text = await res.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { raw: text };
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || ("HTTP " + res.status));
-      }
-
-      return data;
+      return ApiBridge.post(path, body);
     }
 
     async function apiPut(path, body) {
-      const res = await fetch(API_BASE + path, {
-        method: "PUT",
-        headers: authHeaders(),
-        body: JSON.stringify(body)
-      });
-
-      const text = await res.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { raw: text };
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || ("HTTP " + res.status));
-      }
-
-      return data;
+      return ApiBridge.put(path, body);
     }
 
     function normalizeLocation(row) {
@@ -545,33 +667,48 @@
       };
     }
 
+    function getFormTitleText() {
+      if (editId) {
+        return i18n.format("locations.formEditTitle", { id: editId });
+      }
+      return i18n.t("locations.formCreateTitle");
+    }
+
+    function getSaveButtonText() {
+      return editId ? i18n.t("locations.saveChangesButton") : i18n.t("locations.saveButton");
+    }
+
+    function syncFormTexts() {
+      els.formTitle.textContent = getFormTitleText();
+      els.saveBtn.textContent = getSaveButtonText();
+      els.cancelEditBtn.textContent = i18n.t("locations.cancelEditButton");
+    }
+
     function resetForm() {
       editId = null;
-      els.formTitle.textContent = "Создать место хранения";
-      els.saveBtn.textContent = "Сохранить";
+      syncFormTexts();
       els.cancelEditBtn.style.display = "none";
       els.name.value = "";
       els.code.value = "";
       els.locationType.value = "container";
-      hideStatus(els.submitStatus);
+      clearSubmitStatus();
     }
 
     function startEdit(location) {
       editId = location.id;
-      els.formTitle.textContent = `Редактировать место хранения #${location.id}`;
-      els.saveBtn.textContent = "Сохранить изменения";
+      syncFormTexts();
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = location.name || "";
       els.code.value = location.code || "";
       els.locationType.value = location.location_type || "container";
-      hideStatus(els.submitStatus);
+      clearSubmitStatus();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function getFilteredRows() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
 
-      return locationsData.filter(row => {
+      return locationsData.filter((row) => {
         if (!search) return true;
         const text = [
           row.name,
@@ -590,58 +727,73 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="empty">Нет данных</td>
+            <td colspan="7" class="empty">${escapeHtml(i18n.t("locations.noData"))}</td>
           </tr>
         `;
         return;
       }
 
-      els.tbody.innerHTML = rows.map(row => `
+      els.tbody.innerHTML = rows.map((row) => `
         <tr>
           <td>${escapeHtml(row.id)}</td>
           <td>${escapeHtml(row.name)}</td>
           <td>${escapeHtml(row.code)}</td>
-          <td>${escapeHtml(row.location_type)}</td>
-          <td>${row.is_active ? "Да" : "Нет"}</td>
+          <td>${escapeHtml(i18n.t("locations.typeValue." + row.location_type))}</td>
+          <td>${row.is_active ? escapeHtml(i18n.t("locations.activeYes")) : escapeHtml(i18n.t("locations.activeNo"))}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
           <td>
             <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editLocation('${escapeHtml(row.id)}')">Редактировать</button>
+              <button type="button" class="btn btn-secondary" onclick="editLocation('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("locations.editButton"))}</button>
             </div>
           </td>
         </tr>
       `).join("");
     }
 
+    function renderLoadingRow() {
+      els.tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty">${escapeHtml(i18n.t("locations.loadingData"))}</td>
+        </tr>
+      `;
+    }
+
+    function renderLoadErrorRow() {
+      els.tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty">${escapeHtml(i18n.t("locations.loadErrorRow"))}</td>
+        </tr>
+      `;
+    }
+
     async function loadData() {
       try {
         const tenantId = getTenantId();
         els.tenantValue.textContent = String(tenantId);
-        showStatus(els.pageStatus, `Загрузка мест хранения...\nTenant ID: ${tenantId}`, "info");
+
+        renderLoadingRow();
+        setPageStatus("locations.loadingStatus", { tenantId }, "info");
 
         const data = await apiGet(`/locations?tenant_id=${tenantId}`);
         locationsData = extractList(data, ["locations", "data", "rows"]).map(normalizeLocation);
 
         renderTable();
 
-        showStatus(
-          els.pageStatus,
-          `Данные загружены.\nTenant ID: ${tenantId}\nМест хранения: ${locationsData.length}`,
-          "success"
-        );
+        setPageStatus("locations.loadedStatus", {
+          tenantId,
+          count: locationsData.length
+        }, "success");
       } catch (err) {
-        els.tbody.innerHTML = `
-          <tr>
-            <td colspan="7" class="empty">Ошибка загрузки данных</td>
-          </tr>
-        `;
-        showStatus(els.pageStatus, "Ошибка: " + err.message, "error");
+        renderLoadErrorRow();
+        setPageStatus("locations.loadErrorStatus", {
+          error: Ui.translateError(err.message)
+        }, "error");
       }
     }
 
     async function handleSubmit(e) {
       e.preventDefault();
-      hideStatus(els.submitStatus);
+      clearSubmitStatus();
 
       try {
         const tenantId = getTenantId();
@@ -651,15 +803,15 @@
         const location_type = (els.locationType.value || "").trim();
 
         if (!name) {
-          throw new Error("Название обязательно");
+          throw new Error(i18n.t("locations.nameRequired"));
         }
 
         if (!code) {
-          throw new Error("Код обязателен");
+          throw new Error(i18n.t("locations.codeRequired"));
         }
 
         if (!location_type) {
-          throw new Error("Тип обязателен");
+          throw new Error(i18n.t("locations.typeRequired"));
         }
 
         const body = {
@@ -670,19 +822,21 @@
         };
 
         if (editId) {
-          showStatus(els.submitStatus, `Сохраняю изменения места хранения #${editId}...`, "info");
+          setSubmitStatus("locations.savingUpdate", { id: editId }, "info");
           await apiPut(`/locations/${editId}`, body);
-          showStatus(els.submitStatus, `Место хранения #${editId} успешно обновлено`, "success");
+          setSubmitStatus("locations.updatedSuccess", { id: editId }, "success");
         } else {
-          showStatus(els.submitStatus, "Создаю место хранения...", "info");
+          setSubmitStatus("locations.savingCreate", {}, "info");
           await apiPost("/locations", body);
-          showStatus(els.submitStatus, "Место хранения успешно создано", "success");
+          setSubmitStatus("locations.createdSuccess", {}, "success");
         }
 
         resetForm();
         await loadData();
       } catch (err) {
-        showStatus(els.submitStatus, "Ошибка сохранения: " + err.message, "error");
+        setSubmitStatus("locations.saveErrorStatus", {
+          error: Ui.translateError(err.message)
+        }, "error");
       }
     }
 
@@ -691,22 +845,34 @@
       els.searchInput.addEventListener("input", renderTable);
       els.cancelEditBtn.addEventListener("click", resetForm);
       els.refreshBtn.addEventListener("click", loadData);
+
+      document.addEventListener("app:language-changed", () => {
+        i18n.applyTranslations();
+        syncFormTexts();
+        renderTable();
+        restoreStatusesAfterLanguageChange();
+      });
     }
 
     function bootstrap() {
       parseUser();
+      i18n.applyTranslations();
+      i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
+      syncFormTexts();
       loadData();
     }
 
     function editLocation(id) {
-      const found = locationsData.find(x => String(x.id) === String(id));
+      const found = locationsData.find((x) => String(x.id) === String(id));
       if (!found) return;
       startEdit(found);
     }
 
     bootstrap();
     window.editLocation = editLocation;
+    window.goBack = goBack;
+    window.logout = logout;
   </script>
 </body>
 </html>
