@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="cash.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Деньги</title>
@@ -53,6 +53,7 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+      align-items:center;
     }
 
     .btn{
@@ -270,6 +271,18 @@
       padding:24px 12px;
     }
 
+    #langSwitcher{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    #langSwitcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
     @media (max-width: 1180px){
       .filters{
         grid-template-columns:1fr 1fr 1fr;
@@ -300,82 +313,83 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Деньги</div>
+      <div class="title" data-i18n="cash.heading">Деньги</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <div id="langSwitcher"></div>
+        <button class="btn btn-light" onclick="goBack()" data-i18n="cash.backButton">Назад</button>
+        <button class="btn btn-light" onclick="logout()" data-i18n="cash.logoutButton">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтры</h2>
+      <h2 class="card-title" data-i18n="cash.filtersTitle">Фильтры</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск по клиенту / товару / комментарию</label>
-          <input id="searchInput" type="text" placeholder="Например: Иванов, Тест товар, наличные" />
+          <label for="searchInput" data-i18n="cash.searchLabel">Поиск по клиенту / товару / комментарию</label>
+          <input id="searchInput" type="text" data-i18n-placeholder="cash.searchPlaceholder" placeholder="Например: Иванов, Тест товар, наличные" />
         </div>
 
         <div class="field">
-          <label for="typeFilter">Тип движения</label>
+          <label for="typeFilter" data-i18n="cash.typeFilterLabel">Тип движения</label>
           <select id="typeFilter">
-            <option value="">Все</option>
-            <option value="income">Доход</option>
-            <option value="expense">Расход</option>
+            <option value="" data-i18n="cash.typeAll">Все</option>
+            <option value="income" data-i18n="cash.typeIncome">Доход</option>
+            <option value="expense" data-i18n="cash.typeExpense">Расход</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="paymentFilter">Способ оплаты</label>
+          <label for="paymentFilter" data-i18n="cash.paymentFilterLabel">Способ оплаты</label>
           <select id="paymentFilter">
-            <option value="">Все</option>
-            <option value="cash">Наличные</option>
-            <option value="card">Карта</option>
-            <option value="transfer">Перевод</option>
-            <option value="consignment">Под реализацию</option>
+            <option value="" data-i18n="cash.paymentAll">Все</option>
+            <option value="cash" data-i18n="cash.paymentCash">Наличные</option>
+            <option value="card" data-i18n="cash.paymentCard">Карта</option>
+            <option value="transfer" data-i18n="cash.paymentTransfer">Перевод</option>
+            <option value="consignment" data-i18n="cash.paymentConsignment">Под реализацию</option>
           </select>
         </div>
 
         <div class="field">
-          <label>Быстрый период</label>
+          <label data-i18n="cash.quickPeriodLabel">Быстрый период</label>
           <div class="period-buttons">
-            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn">Сегодня</button>
-            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn">Неделя</button>
-            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn">Месяц</button>
+            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn" data-i18n="cash.periodToday">Сегодня</button>
+            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn" data-i18n="cash.periodWeek">Неделя</button>
+            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn" data-i18n="cash.periodMonth">Месяц</button>
           </div>
         </div>
 
         <div class="field">
-          <label for="dateFrom">Дата от</label>
+          <label for="dateFrom" data-i18n="cash.dateFromLabel">Дата от</label>
           <input id="dateFrom" type="date" />
         </div>
 
         <div class="field">
-          <label for="dateTo">Дата до</label>
+          <label for="dateTo" data-i18n="cash.dateToLabel">Дата до</label>
           <input id="dateTo" type="date" />
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="cash.refreshButton">Обновить</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Записей</div>
+          <div class="stat-label" data-i18n="cash.statsRows">Записей</div>
           <div class="stat-value" id="rowsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Доход</div>
+          <div class="stat-label" data-i18n="cash.statsIncome">Доход</div>
           <div class="stat-value" id="incomeTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Расход</div>
+          <div class="stat-label" data-i18n="cash.statsExpense">Расход</div>
           <div class="stat-value" id="expenseTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Баланс</div>
+          <div class="stat-label" data-i18n="cash.statsBalance">Баланс</div>
           <div class="stat-value" id="balanceTotal">0</div>
         </div>
       </div>
@@ -384,27 +398,27 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Движения денег</h2>
-      <div class="muted">Показываются денежные операции по продажам, оплатам и другим действиям.</div>
+      <h2 class="card-title" data-i18n="cash.tableTitle">Движения денег</h2>
+      <div class="muted" data-i18n="cash.tableSubtitle">Показываются денежные операции по продажам, оплатам и другим действиям.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Тип</th>
-              <th>Сумма</th>
-              <th>Оплата</th>
-              <th>Клиент</th>
-              <th>Товар</th>
-              <th>Категория</th>
-              <th>Комментарий</th>
-              <th>Дата</th>
+              <th data-i18n="cash.tableId">ID</th>
+              <th data-i18n="cash.tableType">Тип</th>
+              <th data-i18n="cash.tableAmount">Сумма</th>
+              <th data-i18n="cash.tablePayment">Оплата</th>
+              <th data-i18n="cash.tableClient">Клиент</th>
+              <th data-i18n="cash.tableItem">Товар</th>
+              <th data-i18n="cash.tableCategory">Категория</th>
+              <th data-i18n="cash.tableComment">Комментарий</th>
+              <th data-i18n="cash.tableDate">Дата</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="9" class="empty">Загрузка данных...</td>
+              <td colspan="9" class="empty" data-i18n="cash.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -415,6 +429,7 @@
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
 
   <script>
     const FALLBACK_TENANT_ID = 1;
@@ -517,6 +532,14 @@
       balanceTotal: document.getElementById("balanceTotal")
     };
 
+    function t(key) {
+      return window.i18n ? window.i18n.t(key) : key;
+    }
+
+    function tf(key, vars) {
+      return window.i18n ? window.i18n.format(key, vars) : key;
+    }
+
     function goBack() {
       window.location.href = "/index.html";
     }
@@ -583,18 +606,18 @@
     }
 
     function paymentLabel(value) {
-      if (value === "cash") return "Наличные";
-      if (value === "card") return "Карта";
-      if (value === "transfer") return "Перевод";
-      if (value === "consignment") return "Под реализацию";
+      if (value === "cash") return t("cash.paymentCash");
+      if (value === "card") return t("cash.paymentCard");
+      if (value === "transfer") return t("cash.paymentTransfer");
+      if (value === "consignment") return t("cash.paymentConsignment");
       return value || "";
     }
 
     function typeBadge(type) {
       if (type === "expense") {
-        return `<span class="badge badge-expense">Расход</span>`;
+        return `<span class="badge badge-expense">${escapeHtml(t("cash.badgeExpense"))}</span>`;
       }
-      return `<span class="badge badge-income">Доход</span>`;
+      return `<span class="badge badge-income">${escapeHtml(t("cash.badgeIncome"))}</span>`;
     }
 
     async function apiGet(path) {
@@ -735,7 +758,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="empty">Нет данных</td>
+            <td colspan="9" class="empty">${escapeHtml(t("cash.noData"))}</td>
           </tr>
         `;
         return;
@@ -756,10 +779,18 @@
       `).join("");
     }
 
+    function refreshStaticTranslations() {
+      if (window.i18n) {
+        window.i18n.applyTranslations();
+        window.i18n.renderLanguageSwitcher("langSwitcher");
+      }
+      renderTable();
+    }
+
     async function loadData() {
       try {
         const tenantId = getTenantId();
-        showStatus(`Загрузка денег...\nTenant ID: ${tenantId}`, "info");
+        showStatus(tf("cash.loadingStatus", { tenantId }), "info");
 
         const cashRes = await apiGet(`/cash?tenant_id=${tenantId}`);
         cashData = extractList(cashRes, ["cash", "data", "rows"]).map(normalizeCashRow);
@@ -767,16 +798,16 @@
         renderTable();
 
         showStatus(
-          `Данные загружены.\nTenant ID: ${tenantId}\nЗаписей: ${cashData.length}`,
+          tf("cash.loadedStatus", { tenantId, count: cashData.length }),
           "success"
         );
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="empty">Ошибка загрузки данных</td>
+            <td colspan="9" class="empty">${escapeHtml(t("cash.loadErrorRow"))}</td>
           </tr>
         `;
-        showStatus("Ошибка: " + Ui.translateError(err.message), "error");
+        showStatus(tf("cash.loadErrorStatus", { error: Ui.translateError(err.message) }), "error");
       }
     }
 
@@ -800,11 +831,19 @@
       els.periodMonthBtn.addEventListener("click", () => setPeriod("month"));
 
       els.refreshBtn.addEventListener("click", loadData);
+
+      document.addEventListener("app:language-changed", () => {
+        refreshStaticTranslations();
+      });
     }
 
     function bootstrap() {
       parseUser();
       bindEvents();
+      if (window.i18n) {
+        window.i18n.applyTranslations();
+        window.i18n.renderLanguageSwitcher("langSwitcher");
+      }
       loadData();
     }
 
