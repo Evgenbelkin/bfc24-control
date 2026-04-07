@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" translate="no" data-page-title-i18n="clients.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Клиенты</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
 
   <style>
     :root{
@@ -44,6 +45,13 @@
       flex-wrap:wrap;
     }
 
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
     .title{
       font-size:28px;
       font-weight:700;
@@ -53,6 +61,30 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+    }
+
+    .lang-switcher{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .lang-switcher button{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+      min-width:56px;
+    }
+
+    .lang-switcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
     }
 
     .btn{
@@ -273,30 +305,44 @@
       .wrap{
         padding:16px 12px 32px;
       }
+
+      .topbar{
+        align-items:flex-start;
+      }
+
+      .topbar-right{
+        width:100%;
+        justify-content:space-between;
+      }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Клиенты</div>
-      <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+      <div class="title" data-i18n="clients.heading">Клиенты</div>
+
+      <div class="topbar-right">
+        <div id="langSwitcher" class="lang-switcher"></div>
+
+        <div class="top-actions">
+          <button class="btn btn-light" onclick="goBack()" data-i18n="clients.backButton">Назад</button>
+          <button class="btn btn-light" onclick="logout()" data-i18n="clients.logoutButton">Выйти</button>
+        </div>
       </div>
     </div>
 
     <div class="card">
       <h2 class="card-title" id="formTitle">Создать клиента</h2>
-      <div class="muted">Карточка клиента для продаж, долгов и денежных операций.</div>
+      <div class="muted" data-i18n="clients.subtitle">Карточка клиента для продаж, долгов и денежных операций.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Клиентов</div>
+          <div class="stat-label" data-i18n="clients.statsClients">Клиентов</div>
           <div class="stat-value" id="clientsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Tenant ID</div>
+          <div class="stat-label" data-i18n="clients.statsTenant">Tenant ID</div>
           <div class="stat-value" id="tenantValue">1</div>
         </div>
       </div>
@@ -304,31 +350,31 @@
       <form id="clientForm" autocomplete="off" style="margin-top:18px;">
         <div class="form-grid">
           <div class="field">
-            <label for="name">Имя</label>
-            <input id="name" type="text" placeholder="Например: ИП Иванов" />
+            <label for="name" data-i18n="clients.nameLabel">Имя</label>
+            <input id="name" type="text" data-i18n-placeholder="clients.namePlaceholder" placeholder="Например: ИП Иванов" />
           </div>
 
           <div class="field">
-            <label for="phone">Телефон</label>
-            <input id="phone" type="text" placeholder="Например: 79991234567" />
+            <label for="phone" data-i18n="clients.phoneLabel">Телефон</label>
+            <input id="phone" type="text" data-i18n-placeholder="clients.phonePlaceholder" placeholder="Например: 79991234567" />
           </div>
 
           <div class="field full">
-            <label for="comment">Комментарий</label>
-            <textarea id="comment" placeholder="Примечание по клиенту"></textarea>
+            <label for="comment" data-i18n="clients.commentLabel">Комментарий</label>
+            <textarea id="comment" data-i18n-placeholder="clients.commentPlaceholder" placeholder="Примечание по клиенту"></textarea>
           </div>
         </div>
 
         <div class="toolbar">
           <div class="field">
-            <label for="searchInput">Поиск</label>
-            <input id="searchInput" type="text" placeholder="Поиск по имени, телефону, комментарию" />
+            <label for="searchInput" data-i18n="clients.searchLabel">Поиск</label>
+            <input id="searchInput" type="text" data-i18n-placeholder="clients.searchPlaceholder" placeholder="Поиск по имени, телефону, комментарию" />
           </div>
 
           <div class="toolbar-actions">
             <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
             <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
-            <button type="button" class="btn btn-light" id="refreshBtn">Обновить список</button>
+            <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="clients.refreshButton">Обновить список</button>
           </div>
         </div>
       </form>
@@ -338,24 +384,24 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Список клиентов</h2>
+      <h2 class="card-title" data-i18n="clients.listTitle">Список клиентов</h2>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Имя</th>
-              <th>Телефон</th>
-              <th>Комментарий</th>
-              <th>Активно</th>
-              <th>Дата</th>
-              <th>Действия</th>
+              <th data-i18n="clients.tableId">ID</th>
+              <th data-i18n="clients.tableName">Имя</th>
+              <th data-i18n="clients.tablePhone">Телефон</th>
+              <th data-i18n="clients.tableComment">Комментарий</th>
+              <th data-i18n="clients.tableActive">Активно</th>
+              <th data-i18n="clients.tableDate">Дата</th>
+              <th data-i18n="clients.tableActions">Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="7" class="empty">Загрузка данных...</td>
+              <td colspan="7" class="empty" data-i18n="clients.loadingData">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -363,11 +409,13 @@
     </div>
   </div>
 
-    <script src="/js/config.js"></script>
+  <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
 
-  <script>    const FALLBACK_TENANT_ID = 1;
+  <script>
+    const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -391,12 +439,12 @@
     };
 
     async function requestFallback(method, path, body) {
-      const token = localStorage.getItem("token") || "";
+      const currentToken = localStorage.getItem("token") || "";
       const response = await fetch(path, {
         method,
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: "Bearer " + token } : {})
+          ...(currentToken ? { Authorization: "Bearer " + currentToken } : {})
         },
         ...(body !== undefined ? { body: JSON.stringify(body) } : {})
       });
@@ -473,6 +521,9 @@
     let clientsData = [];
     let editId = null;
 
+    let pageStatusState = null;
+    let submitStatusState = null;
+
     const els = {
       formTitle: document.getElementById("formTitle"),
       clientForm: document.getElementById("clientForm"),
@@ -510,10 +561,10 @@
     }
 
     function getTenantId() {
-      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== '') {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
         return Number(authUser.tenant_id);
       }
-      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== 'undefined' ? FALLBACK_TENANT_ID : 1);
+      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== "undefined" ? FALLBACK_TENANT_ID : 1);
     }
 
     function showStatus(el, text, type = "info") {
@@ -524,6 +575,35 @@
     function hideStatus(el) {
       el.className = "status";
       el.textContent = "";
+    }
+
+    function setPageStatus(text, type) {
+      pageStatusState = { text, type };
+      showStatus(els.pageStatus, text, type);
+    }
+
+    function clearPageStatus() {
+      pageStatusState = null;
+      hideStatus(els.pageStatus);
+    }
+
+    function setSubmitStatus(text, type) {
+      submitStatusState = { text, type };
+      showStatus(els.submitStatus, text, type);
+    }
+
+    function clearSubmitStatus() {
+      submitStatusState = null;
+      hideStatus(els.submitStatus);
+    }
+
+    function restoreStatusesAfterLanguageChange() {
+      if (pageStatusState) {
+        showStatus(els.pageStatus, pageStatusState.text, pageStatusState.type);
+      }
+      if (submitStatusState) {
+        showStatus(els.submitStatus, submitStatusState.text, submitStatusState.type);
+      }
     }
 
     function escapeHtml(value) {
@@ -553,12 +633,15 @@
 
       return [];
     }
+
     async function apiGet(path) {
       return ApiBridge.get(path);
     }
+
     async function apiPost(path, body) {
       return ApiBridge.post(path, body);
     }
+
     async function apiPut(path, body) {
       return ApiBridge.put(path, body);
     }
@@ -574,33 +657,48 @@
       };
     }
 
+    function getFormTitleText() {
+      if (editId) {
+        return i18n.format("clients.formEditTitle", { id: editId });
+      }
+      return i18n.t("clients.formCreateTitle");
+    }
+
+    function getSaveButtonText() {
+      return editId ? i18n.t("clients.saveChangesButton") : i18n.t("clients.saveButton");
+    }
+
+    function syncFormTexts() {
+      els.formTitle.textContent = getFormTitleText();
+      els.saveBtn.textContent = getSaveButtonText();
+      els.cancelEditBtn.textContent = i18n.t("clients.cancelEditButton");
+    }
+
     function resetForm() {
       editId = null;
-      els.formTitle.textContent = "Создать клиента";
-      els.saveBtn.textContent = "Сохранить";
+      syncFormTexts();
       els.cancelEditBtn.style.display = "none";
       els.name.value = "";
       els.phone.value = "";
       els.comment.value = "";
-      hideStatus(els.submitStatus);
+      clearSubmitStatus();
     }
 
     function startEdit(client) {
       editId = client.id;
-      els.formTitle.textContent = `Редактировать клиента #${client.id}`;
-      els.saveBtn.textContent = "Сохранить изменения";
+      syncFormTexts();
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = client.name || "";
       els.phone.value = client.phone || "";
       els.comment.value = client.comment || "";
-      hideStatus(els.submitStatus);
+      clearSubmitStatus();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function getFilteredRows() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
 
-      return clientsData.filter(row => {
+      return clientsData.filter((row) => {
         if (!search) return true;
         const text = [
           row.name,
@@ -619,58 +717,82 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="empty">Нет данных</td>
+            <td colspan="7" class="empty">${escapeHtml(i18n.t("clients.noData"))}</td>
           </tr>
         `;
         return;
       }
 
-      els.tbody.innerHTML = rows.map(row => `
+      els.tbody.innerHTML = rows.map((row) => `
         <tr>
           <td>${escapeHtml(row.id)}</td>
           <td>${escapeHtml(row.name)}</td>
           <td>${escapeHtml(row.phone)}</td>
           <td>${escapeHtml(row.comment)}</td>
-          <td>${row.is_active ? "Да" : "Нет"}</td>
+          <td>${row.is_active ? escapeHtml(i18n.t("clients.activeYes")) : escapeHtml(i18n.t("clients.activeNo"))}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
           <td>
             <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editClient('${escapeHtml(row.id)}')">Редактировать</button>
+              <button type="button" class="btn btn-secondary" onclick="editClient('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("clients.editButton"))}</button>
             </div>
           </td>
         </tr>
       `).join("");
     }
 
+    function renderLoadingRow() {
+      els.tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty">${escapeHtml(i18n.t("clients.loadingData"))}</td>
+        </tr>
+      `;
+    }
+
+    function renderLoadErrorRow() {
+      els.tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty">${escapeHtml(i18n.t("clients.loadErrorRow"))}</td>
+        </tr>
+      `;
+    }
+
     async function loadData() {
       try {
         const tenantId = getTenantId();
         els.tenantValue.textContent = String(tenantId);
-        showStatus(els.pageStatus, `Загрузка клиентов...\nTenant ID: ${tenantId}`, "info");
+
+        renderLoadingRow();
+        setPageStatus(
+          i18n.format("clients.loadingStatus", { tenantId }),
+          "info"
+        );
 
         const data = await apiGet(`/clients?tenant_id=${tenantId}`);
         clientsData = extractList(data, ["clients", "counterparties", "data", "rows"]).map(normalizeClient);
 
         renderTable();
 
-        showStatus(
-          els.pageStatus,
-          `Данные загружены.\nTenant ID: ${tenantId}\nКлиентов: ${clientsData.length}`,
+        setPageStatus(
+          i18n.format("clients.loadedStatus", {
+            tenantId,
+            count: clientsData.length
+          }),
           "success"
         );
       } catch (err) {
-        els.tbody.innerHTML = `
-          <tr>
-            <td colspan="7" class="empty">Ошибка загрузки данных</td>
-          </tr>
-        `;
-        showStatus(els.pageStatus, "Ошибка: " + Ui.translateError(err.message), "error");
+        renderLoadErrorRow();
+        setPageStatus(
+          i18n.format("clients.loadErrorStatus", {
+            error: Ui.translateError(err.message)
+          }),
+          "error"
+        );
       }
     }
 
     async function handleSubmit(e) {
       e.preventDefault();
-      hideStatus(els.submitStatus);
+      clearSubmitStatus();
 
       try {
         const tenantId = getTenantId();
@@ -679,7 +801,7 @@
         const comment = (els.comment.value || "").trim();
 
         if (!name) {
-          throw new Error("Имя обязательно");
+          throw new Error(i18n.t("clients.nameRequired"));
         }
 
         const body = {
@@ -690,19 +812,30 @@
         };
 
         if (editId) {
-          showStatus(els.submitStatus, `Сохраняю изменения клиента #${editId}...`, "info");
+          setSubmitStatus(
+            i18n.format("clients.savingUpdate", { id: editId }),
+            "info"
+          );
           await apiPut(`/clients/${editId}`, body);
-          showStatus(els.submitStatus, `Клиент #${editId} успешно обновлён`, "success");
+          setSubmitStatus(
+            i18n.format("clients.updatedSuccess", { id: editId }),
+            "success"
+          );
         } else {
-          showStatus(els.submitStatus, "Создаю клиента...", "info");
+          setSubmitStatus(i18n.t("clients.savingCreate"), "info");
           await apiPost("/clients", body);
-          showStatus(els.submitStatus, "Клиент успешно создан", "success");
+          setSubmitStatus(i18n.t("clients.createdSuccess"), "success");
         }
 
         resetForm();
         await loadData();
       } catch (err) {
-        showStatus(els.submitStatus, "Ошибка сохранения: " + Ui.translateError(err.message), "error");
+        setSubmitStatus(
+          i18n.format("clients.saveErrorStatus", {
+            error: Ui.translateError(err.message)
+          }),
+          "error"
+        );
       }
     }
 
@@ -711,22 +844,34 @@
       els.searchInput.addEventListener("input", renderTable);
       els.cancelEditBtn.addEventListener("click", resetForm);
       els.refreshBtn.addEventListener("click", loadData);
+
+      document.addEventListener("app:language-changed", () => {
+        i18n.applyTranslations();
+        syncFormTexts();
+        renderTable();
+        restoreStatusesAfterLanguageChange();
+      });
     }
 
     function bootstrap() {
       parseUser();
+      i18n.applyTranslations();
+      i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
+      syncFormTexts();
       loadData();
     }
 
     function editClient(id) {
-      const found = clientsData.find(x => String(x.id) === String(id));
+      const found = clientsData.find((x) => String(x.id) === String(id));
       if (!found) return;
       startEdit(found);
     }
 
     bootstrap();
     window.editClient = editClient;
+    window.goBack = goBack;
+    window.logout = logout;
   </script>
 </body>
 </html>
