@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" translate="no" data-page-title-i18n="items.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Товары</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
 
   <style>
     :root{
@@ -44,6 +45,13 @@
       flex-wrap:wrap;
     }
 
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
     .title{
       font-size:28px;
       font-weight:700;
@@ -53,6 +61,30 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+    }
+
+    .lang-switcher{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .lang-switcher button{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+      min-width:56px;
+    }
+
+    .lang-switcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
     }
 
     .btn{
@@ -273,30 +305,44 @@
       .wrap{
         padding:16px 12px 32px;
       }
+
+      .topbar{
+        align-items:flex-start;
+      }
+
+      .topbar-right{
+        width:100%;
+        justify-content:space-between;
+      }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Товары</div>
-      <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+      <div class="title" data-i18n="items.heading">Товары</div>
+
+      <div class="topbar-right">
+        <div id="langSwitcher" class="lang-switcher"></div>
+
+        <div class="top-actions">
+          <button class="btn btn-light" onclick="goBack()" data-i18n="items.backButton">Назад</button>
+          <button class="btn btn-light" onclick="logout()" data-i18n="items.logoutButton">Выйти</button>
+        </div>
       </div>
     </div>
 
     <div class="card">
       <h2 class="card-title" id="formTitle">Создать товар</h2>
-      <div class="muted">Карточка товара для приёмки, продажи, списания и остатков.</div>
+      <div class="muted" data-i18n="items.subtitle">Карточка товара для приёмки, продажи, списания и остатков.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Товаров</div>
+          <div class="stat-label" data-i18n="items.statsItems">Товаров</div>
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Tenant ID</div>
+          <div class="stat-label" data-i18n="items.statsTenant">Tenant ID</div>
           <div class="stat-value" id="tenantValue">1</div>
         </div>
       </div>
@@ -304,46 +350,46 @@
       <form id="itemForm" autocomplete="off" style="margin-top:18px;">
         <div class="form-grid">
           <div class="field">
-            <label for="name">Название</label>
-            <input id="name" type="text" placeholder="Например: Тест товар SaaS" />
+            <label for="name" data-i18n="items.nameLabel">Название</label>
+            <input id="name" type="text" data-i18n-placeholder="items.namePlaceholder" placeholder="Например: Тест товар SaaS" />
           </div>
 
           <div class="field">
-            <label for="sku">Артикул / SKU</label>
-            <input id="sku" type="text" placeholder="Например: SKU-001" />
+            <label for="sku" data-i18n="items.skuLabel">Артикул / SKU</label>
+            <input id="sku" type="text" data-i18n-placeholder="items.skuPlaceholder" placeholder="Например: SKU-001" />
           </div>
 
           <div class="field">
-            <label for="barcode">Штрихкод</label>
-            <input id="barcode" type="text" placeholder="Например: 1234567890123" />
+            <label for="barcode" data-i18n="items.barcodeLabel">Штрихкод</label>
+            <input id="barcode" type="text" data-i18n-placeholder="items.barcodePlaceholder" placeholder="Например: 1234567890123" />
           </div>
 
           <div class="field">
-            <label for="purchasePrice">Закупочная цена</label>
+            <label for="purchasePrice" data-i18n="items.purchasePriceLabel">Закупочная цена</label>
             <input id="purchasePrice" type="number" step="0.01" min="0" value="0" />
           </div>
 
           <div class="field">
-            <label for="salePrice">Цена продажи</label>
+            <label for="salePrice" data-i18n="items.salePriceLabel">Цена продажи</label>
             <input id="salePrice" type="number" step="0.01" min="0" value="0" />
           </div>
 
           <div class="field">
-            <label for="unit">Единица</label>
-            <input id="unit" type="text" placeholder="Например: pcs" value="pcs" />
+            <label for="unit" data-i18n="items.unitLabel">Единица</label>
+            <input id="unit" type="text" data-i18n-placeholder="items.unitPlaceholder" placeholder="Например: pcs" value="pcs" />
           </div>
         </div>
 
         <div class="toolbar">
           <div class="field">
-            <label for="searchInput">Поиск</label>
-            <input id="searchInput" type="text" placeholder="Поиск по названию, артикулу, штрихкоду" />
+            <label for="searchInput" data-i18n="items.searchLabel">Поиск</label>
+            <input id="searchInput" type="text" data-i18n-placeholder="items.searchPlaceholder" placeholder="Поиск по названию, артикулу, штрихкоду" />
           </div>
 
           <div class="toolbar-actions">
             <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
             <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
-            <button type="button" class="btn btn-light" id="refreshBtn">Обновить список</button>
+            <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="items.refreshButton">Обновить список</button>
           </div>
         </div>
       </form>
@@ -353,27 +399,27 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Список товаров</h2>
+      <h2 class="card-title" data-i18n="items.listTitle">Список товаров</h2>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Название</th>
-              <th>Артикул / SKU</th>
-              <th>Штрихкод</th>
-              <th>Ед.</th>
-              <th>Закупка</th>
-              <th>Продажа</th>
-              <th>Активно</th>
-              <th>Дата</th>
-              <th>Действия</th>
+              <th data-i18n="items.tableId">ID</th>
+              <th data-i18n="items.tableName">Название</th>
+              <th data-i18n="items.tableSku">Артикул / SKU</th>
+              <th data-i18n="items.tableBarcode">Штрихкод</th>
+              <th data-i18n="items.tableUnit">Ед.</th>
+              <th data-i18n="items.tablePurchase">Закупка</th>
+              <th data-i18n="items.tableSale">Продажа</th>
+              <th data-i18n="items.tableActive">Активно</th>
+              <th data-i18n="items.tableDate">Дата</th>
+              <th data-i18n="items.tableActions">Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="10" class="empty">Загрузка данных...</td>
+              <td colspan="10" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -381,11 +427,13 @@
     </div>
   </div>
 
-    <script src="/js/config.js"></script>
+  <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
 
-  <script>    const FALLBACK_TENANT_ID = 1;
+  <script>
+    const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -491,6 +539,9 @@
     let itemsData = [];
     let editId = null;
 
+    let pageStatusState = null;
+    let submitStatusState = null;
+
     const els = {
       formTitle: document.getElementById("formTitle"),
       itemForm: document.getElementById("itemForm"),
@@ -547,6 +598,43 @@
       el.textContent = "";
     }
 
+    function setPageStatus(key, vars, type) {
+      pageStatusState = { key, vars: vars || {}, type };
+      showStatus(els.pageStatus, i18n.format(key, vars || {}), type);
+    }
+
+    function clearPageStatus() {
+      pageStatusState = null;
+      hideStatus(els.pageStatus);
+    }
+
+    function setSubmitStatus(key, vars, type) {
+      submitStatusState = { key, vars: vars || {}, type };
+      showStatus(els.submitStatus, i18n.format(key, vars || {}), type);
+    }
+
+    function clearSubmitStatus() {
+      submitStatusState = null;
+      hideStatus(els.submitStatus);
+    }
+
+    function restoreStatusesAfterLanguageChange() {
+      if (pageStatusState) {
+        showStatus(
+          els.pageStatus,
+          i18n.format(pageStatusState.key, pageStatusState.vars || {}),
+          pageStatusState.type
+        );
+      }
+      if (submitStatusState) {
+        showStatus(
+          els.submitStatus,
+          i18n.format(submitStatusState.key, submitStatusState.vars || {}),
+          submitStatusState.type
+        );
+      }
+    }
+
     function escapeHtml(value) {
       return String(value ?? "")
         .replaceAll("&", "&amp;")
@@ -580,12 +668,15 @@
 
       return [];
     }
+
     async function apiGet(path) {
       return ApiBridge.get(path);
     }
+
     async function apiPost(path, body) {
       return ApiBridge.post(path, body);
     }
+
     async function apiPut(path, body) {
       return ApiBridge.put(path, body);
     }
@@ -604,10 +695,26 @@
       };
     }
 
+    function getFormTitleText() {
+      if (editId) {
+        return i18n.format("items.formEditTitle", { id: editId });
+      }
+      return i18n.t("items.formCreateTitle");
+    }
+
+    function getSaveButtonText() {
+      return editId ? i18n.t("items.saveChangesButton") : i18n.t("items.saveButton");
+    }
+
+    function syncFormTexts() {
+      els.formTitle.textContent = getFormTitleText();
+      els.saveBtn.textContent = getSaveButtonText();
+      els.cancelEditBtn.textContent = i18n.t("items.cancelEditButton");
+    }
+
     function resetForm() {
       editId = null;
-      els.formTitle.textContent = "Создать товар";
-      els.saveBtn.textContent = "Сохранить";
+      syncFormTexts();
       els.cancelEditBtn.style.display = "none";
       els.name.value = "";
       els.sku.value = "";
@@ -615,13 +722,12 @@
       els.purchasePrice.value = "0";
       els.salePrice.value = "0";
       els.unit.value = "pcs";
-      hideStatus(els.submitStatus);
+      clearSubmitStatus();
     }
 
     function startEdit(item) {
       editId = item.id;
-      els.formTitle.textContent = `Редактировать товар #${item.id}`;
-      els.saveBtn.textContent = "Сохранить изменения";
+      syncFormTexts();
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = item.name || "";
       els.sku.value = item.sku || "";
@@ -629,14 +735,14 @@
       els.purchasePrice.value = String(item.purchase_price ?? 0);
       els.salePrice.value = String(item.sale_price ?? 0);
       els.unit.value = item.unit || "pcs";
-      hideStatus(els.submitStatus);
+      clearSubmitStatus();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function getFilteredRows() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
 
-      return itemsData.filter(row => {
+      return itemsData.filter((row) => {
         if (!search) return true;
         const text = [
           row.name,
@@ -656,13 +762,13 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="10" class="empty">Нет данных</td>
+            <td colspan="10" class="empty">${escapeHtml(i18n.t("items.noData"))}</td>
           </tr>
         `;
         return;
       }
 
-      els.tbody.innerHTML = rows.map(row => `
+      els.tbody.innerHTML = rows.map((row) => `
         <tr>
           <td>${escapeHtml(row.id)}</td>
           <td>${escapeHtml(row.name)}</td>
@@ -671,46 +777,61 @@
           <td>${escapeHtml(row.unit)}</td>
           <td>${escapeHtml(formatMoney(row.purchase_price))}</td>
           <td>${escapeHtml(formatMoney(row.sale_price))}</td>
-          <td>${row.is_active ? "Да" : "Нет"}</td>
+          <td>${row.is_active ? escapeHtml(i18n.t("items.activeYes")) : escapeHtml(i18n.t("items.activeNo"))}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
           <td>
             <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">Редактировать</button>
+              <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("items.editButton"))}</button>
             </div>
           </td>
         </tr>
       `).join("");
     }
 
+    function renderLoadingRow() {
+      els.tbody.innerHTML = `
+        <tr>
+          <td colspan="10" class="empty">${escapeHtml(i18n.t("items.loadingData"))}</td>
+        </tr>
+      `;
+    }
+
+    function renderLoadErrorRow() {
+      els.tbody.innerHTML = `
+        <tr>
+          <td colspan="10" class="empty">${escapeHtml(i18n.t("items.loadErrorRow"))}</td>
+        </tr>
+      `;
+    }
+
     async function loadData() {
       try {
         const tenantId = getTenantId();
         els.tenantValue.textContent = String(tenantId);
-        showStatus(els.pageStatus, `Загрузка товаров...\nTenant ID: ${tenantId}`, "info");
+
+        renderLoadingRow();
+        setPageStatus("items.loadingStatus", { tenantId }, "info");
 
         const data = await apiGet(`/items?tenant_id=${tenantId}`);
         itemsData = extractList(data, ["items", "data", "rows"]).map(normalizeItem);
 
         renderTable();
 
-        showStatus(
-          els.pageStatus,
-          `Данные загружены.\nTenant ID: ${tenantId}\nТоваров: ${itemsData.length}`,
-          "success"
-        );
+        setPageStatus("items.loadedStatus", {
+          tenantId,
+          count: itemsData.length
+        }, "success");
       } catch (err) {
-        els.tbody.innerHTML = `
-          <tr>
-            <td colspan="10" class="empty">Ошибка загрузки данных</td>
-          </tr>
-        `;
-        showStatus(els.pageStatus, "Ошибка: " + Ui.translateError(err.message), "error");
+        renderLoadErrorRow();
+        setPageStatus("items.loadErrorStatus", {
+          error: Ui.translateError(err.message)
+        }, "error");
       }
     }
 
     async function handleSubmit(e) {
       e.preventDefault();
-      hideStatus(els.submitStatus);
+      clearSubmitStatus();
 
       try {
         const tenantId = getTenantId();
@@ -723,15 +844,15 @@
         const unit = (els.unit.value || "").trim() || "pcs";
 
         if (!name) {
-          throw new Error("Название обязательно");
+          throw new Error(i18n.t("items.nameRequired"));
         }
 
         if (!Number.isFinite(purchase_price) || purchase_price < 0) {
-          throw new Error("Закупочная цена должна быть 0 или больше");
+          throw new Error(i18n.t("items.purchasePriceInvalid"));
         }
 
         if (!Number.isFinite(sale_price) || sale_price < 0) {
-          throw new Error("Цена продажи должна быть 0 или больше");
+          throw new Error(i18n.t("items.salePriceInvalid"));
         }
 
         const body = {
@@ -745,19 +866,21 @@
         };
 
         if (editId) {
-          showStatus(els.submitStatus, `Сохраняю изменения товара #${editId}...`, "info");
+          setSubmitStatus("items.savingUpdate", { id: editId }, "info");
           await apiPut(`/items/${editId}`, body);
-          showStatus(els.submitStatus, `Товар #${editId} успешно обновлён`, "success");
+          setSubmitStatus("items.updatedSuccess", { id: editId }, "success");
         } else {
-          showStatus(els.submitStatus, "Создаю товар...", "info");
+          setSubmitStatus("items.savingCreate", {}, "info");
           await apiPost("/items", body);
-          showStatus(els.submitStatus, "Товар успешно создан", "success");
+          setSubmitStatus("items.createdSuccess", {}, "success");
         }
 
         resetForm();
         await loadData();
       } catch (err) {
-        showStatus(els.submitStatus, "Ошибка сохранения: " + Ui.translateError(err.message), "error");
+        setSubmitStatus("items.saveErrorStatus", {
+          error: Ui.translateError(err.message)
+        }, "error");
       }
     }
 
@@ -766,11 +889,21 @@
       els.searchInput.addEventListener("input", renderTable);
       els.cancelEditBtn.addEventListener("click", resetForm);
       els.refreshBtn.addEventListener("click", loadData);
+
+      document.addEventListener("app:language-changed", () => {
+        i18n.applyTranslations();
+        syncFormTexts();
+        renderTable();
+        restoreStatusesAfterLanguageChange();
+      });
     }
 
     function bootstrap() {
       parseUser();
+      i18n.applyTranslations();
+      i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
+      syncFormTexts();
       loadData();
     }
 
@@ -782,6 +915,8 @@
 
     bootstrap();
     window.editItem = editItem;
+    window.goBack = goBack;
+    window.logout = logout;
   </script>
 </body>
 </html>
