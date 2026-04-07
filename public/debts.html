@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="debts.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Долги клиентов</title>
@@ -312,58 +312,59 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Долги клиентов</div>
+      <div class="title" data-i18n="debts.heading">Долги клиентов</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <div id="langSwitcher"></div>
+        <button class="btn btn-light" onclick="goBack()" data-i18n="debts.backButton">Назад</button>
+        <button class="btn btn-light" onclick="logout()" data-i18n="debts.logoutButton">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтры</h2>
+      <h2 class="card-title" data-i18n="debts.filtersTitle">Фильтры</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск по клиенту / товару / комментарию</label>
-          <input id="searchInput" list="searchSuggestions" type="text" placeholder="Например: Иванов, Тест товар, реализация" autocomplete="off" />
+          <label for="searchInput" data-i18n="debts.searchLabel">Поиск по клиенту / товару / комментарию</label>
+          <input id="searchInput" list="searchSuggestions" type="text" placeholder="Например: Иванов, Тест товар, реализация" data-i18n-placeholder="debts.searchPlaceholder" autocomplete="off" />
           <datalist id="searchSuggestions"></datalist>
         </div>
 
         <div class="field">
-          <label for="statusFilter">Статус</label>
+          <label for="statusFilter" data-i18n="debts.statusFilterLabel">Статус</label>
           <select id="statusFilter">
-            <option value="">Все</option>
-            <option value="open">Открыт</option>
-            <option value="partial">Частично оплачен</option>
-            <option value="paid">Оплачен</option>
+            <option value="" data-i18n="debts.statusAll">Все</option>
+            <option value="open" data-i18n="debts.statusOpen">Открыт</option>
+            <option value="partial" data-i18n="debts.statusPartial">Частично оплачен</option>
+            <option value="paid" data-i18n="debts.statusPaid">Оплачен</option>
           </select>
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="debts.refreshButton">Обновить</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Всего долгов</div>
+          <div class="stat-label" data-i18n="debts.statsTotal">Всего долгов</div>
           <div class="stat-value" id="totalCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Открытых</div>
+          <div class="stat-label" data-i18n="debts.statsOpen">Открытых</div>
           <div class="stat-value" id="openCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Частично оплачено</div>
+          <div class="stat-label" data-i18n="debts.statsPartial">Частично оплачено</div>
           <div class="stat-value" id="partialCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Оплачено</div>
+          <div class="stat-label" data-i18n="debts.statsPaid">Оплачено</div>
           <div class="stat-value" id="paidCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Остаток к оплате</div>
+          <div class="stat-label" data-i18n="debts.statsBalance">Остаток к оплате</div>
           <div class="stat-value" id="balanceTotal">0</div>
         </div>
       </div>
@@ -372,30 +373,30 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Список долгов</h2>
-      <div class="muted">Можно принимать частичную или полную оплату по каждому долгу.</div>
+      <h2 class="card-title" data-i18n="debts.listTitle">Список долгов</h2>
+      <div class="muted" data-i18n="debts.listSubtitle">Можно принимать частичную или полную оплату по каждому долгу.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Клиент</th>
-              <th>Товар</th>
-              <th>МХ</th>
-              <th>Кол-во</th>
-              <th>Сумма</th>
-              <th>Оплачено</th>
-              <th>Остаток</th>
-              <th>Статус</th>
-              <th>Комментарий</th>
-              <th>Дата</th>
-              <th>Оплата</th>
+              <th data-i18n="debts.tableClient">Клиент</th>
+              <th data-i18n="debts.tableItem">Товар</th>
+              <th data-i18n="debts.tableLocation">МХ</th>
+              <th data-i18n="debts.tableQty">Кол-во</th>
+              <th data-i18n="debts.tableAmount">Сумма</th>
+              <th data-i18n="debts.tablePaid">Оплачено</th>
+              <th data-i18n="debts.tableBalance">Остаток</th>
+              <th data-i18n="debts.tableStatus">Статус</th>
+              <th data-i18n="debts.tableComment">Комментарий</th>
+              <th data-i18n="debts.tableDate">Дата</th>
+              <th data-i18n="debts.tablePayment">Оплата</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="12" class="empty">Загрузка данных...</td>
+              <td colspan="12" class="empty" data-i18n="debts.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -406,6 +407,7 @@
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
 
   <script>
     const FALLBACK_TENANT_ID = 1;
@@ -509,6 +511,14 @@
       searchSuggestions: document.getElementById("searchSuggestions")
     };
 
+    function t(key) {
+      return window.i18n ? window.i18n.t(key) : key;
+    }
+
+    function tf(key, vars) {
+      return window.i18n ? window.i18n.format(key, vars) : key;
+    }
+
     function goBack() {
       window.location.href = "/index.html";
     }
@@ -576,12 +586,12 @@
 
     function getStatusBadge(status) {
       if (status === "paid") {
-        return `<span class="badge badge-paid">Оплачен</span>`;
+        return `<span class="badge badge-paid">${escapeHtml(t("debts.badgePaid"))}</span>`;
       }
       if (status === "partial") {
-        return `<span class="badge badge-partial">Частично оплачен</span>`;
+        return `<span class="badge badge-partial">${escapeHtml(t("debts.badgePartial"))}</span>`;
       }
-      return `<span class="badge badge-open">Открыт</span>`;
+      return `<span class="badge badge-open">${escapeHtml(t("debts.badgeOpen"))}</span>`;
     }
 
     async function apiGet(path) {
@@ -693,7 +703,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="12" class="empty">Нет данных</td>
+            <td colspan="12" class="empty">${escapeHtml(t("debts.noData"))}</td>
           </tr>
         `;
         return;
@@ -717,16 +727,16 @@
             <td>
               <div class="pay-box">
                 <div class="pay-row">
-                  <input type="number" min="0.01" step="0.01" placeholder="Сумма" id="pay_amount_${escapeHtml(row.id)}" ${payDisabled} />
+                  <input type="number" min="0.01" step="0.01" placeholder="${escapeHtml(t("debts.payAmountPlaceholder"))}" id="pay_amount_${escapeHtml(row.id)}" ${payDisabled} />
                   <select id="pay_method_${escapeHtml(row.id)}" ${payDisabled}>
-                    <option value="cash">Наличные</option>
-                    <option value="card">Карта</option>
-                    <option value="transfer">Перевод</option>
+                    <option value="cash">${escapeHtml(t("debts.paymentCash"))}</option>
+                    <option value="card">${escapeHtml(t("debts.paymentCard"))}</option>
+                    <option value="transfer">${escapeHtml(t("debts.paymentTransfer"))}</option>
                   </select>
                 </div>
-                <input type="text" placeholder="Комментарий к оплате" id="pay_comment_${escapeHtml(row.id)}" ${payDisabled} />
-                <button type="button" class="btn btn-success" onclick="payDebt('${escapeHtml(row.id)}')" ${payDisabled}>Принять оплату</button>
-                <div class="small">Остаток: ${escapeHtml(formatMoney(row.balance_amount))}</div>
+                <input type="text" placeholder="${escapeHtml(t("debts.payCommentPlaceholder"))}" id="pay_comment_${escapeHtml(row.id)}" ${payDisabled} />
+                <button type="button" class="btn btn-success" onclick="payDebt('${escapeHtml(row.id)}')" ${payDisabled}>${escapeHtml(t("debts.payButton"))}</button>
+                <div class="small">${escapeHtml(tf("debts.payBalanceHint", { amount: formatMoney(row.balance_amount) }))}</div>
               </div>
             </td>
           </tr>
@@ -737,7 +747,7 @@
     async function loadData() {
       try {
         const tenantId = getTenantId();
-        showStatus(`Загрузка долгов...\nTenant ID: ${tenantId}`, "info");
+        showStatus(tf("debts.loadingStatus", { tenantId }), "info");
 
         const data = await apiGet(`/debts?tenant_id=${tenantId}`);
         debtsData = extractList(data, ["debts", "data", "rows"]).map(normalizeDebt);
@@ -745,14 +755,14 @@
         rebuildSuggestions();
         renderTable();
 
-        showStatus(`Данные загружены.\nTenant ID: ${tenantId}\nДолгов: ${debtsData.length}`, "success");
+        showStatus(tf("debts.loadedStatus", { tenantId, count: debtsData.length }), "success");
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="12" class="empty">Ошибка загрузки данных</td>
+            <td colspan="12" class="empty">${escapeHtml(t("debts.loadErrorRow"))}</td>
           </tr>
         `;
-        showStatus("Ошибка: " + Ui.translateError(err.message), "error");
+        showStatus(tf("debts.loadErrorStatus", { error: Ui.translateError(err.message) }), "error");
       }
     }
 
@@ -765,12 +775,12 @@
         const commentEl = document.getElementById(`pay_comment_${debtId}`);
 
         if (!amountEl) {
-          throw new Error("Поле суммы не найдено");
+          throw new Error(t("debts.payAmountFieldMissing"));
         }
 
         const amount = Number(amountEl.value);
         if (!amount || amount <= 0) {
-          throw new Error("Укажи корректную сумму оплаты");
+          throw new Error(t("debts.payAmountInvalid"));
         }
 
         const body = {
@@ -780,14 +790,14 @@
           comment: commentEl ? ((commentEl.value || "").trim() || null) : null
         };
 
-        showStatus(`Провожу оплату по долгу #${debtId}...\nTenant ID: ${tenantId}`, "info");
+        showStatus(tf("debts.payingStatus", { debtId, tenantId }), "info");
 
         await apiPost(`/debts/${debtId}/pay`, body);
 
-        showStatus(`Оплата по долгу #${debtId} успешно проведена`, "success");
+        showStatus(tf("debts.paidStatus", { debtId }), "success");
         await loadData();
       } catch (err) {
-        showStatus("Ошибка оплаты: " + Ui.translateError(err.message), "error");
+        showStatus(tf("debts.payErrorStatus", { error: Ui.translateError(err.message) }), "error");
       }
     }
 
@@ -797,9 +807,22 @@
       els.refreshBtn.addEventListener("click", loadData);
     }
 
+    function refreshStaticTranslations() {
+      if (window.i18n) {
+        window.i18n.applyTranslations();
+        window.i18n.renderLanguageSwitcher("langSwitcher");
+      }
+      renderTable();
+    }
+
     function bootstrap() {
       parseUser();
       bindEvents();
+      if (window.i18n) {
+        window.i18n.applyTranslations();
+        window.i18n.renderLanguageSwitcher("langSwitcher");
+      }
+      document.addEventListener("app:language-changed", refreshStaticTranslations);
       loadData();
     }
 
