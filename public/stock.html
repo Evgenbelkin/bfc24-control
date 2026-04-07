@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" translate="no" data-page-title-i18n="stock.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Остатки</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
 
   <style>
     :root{
@@ -42,6 +43,13 @@
       flex-wrap:wrap;
     }
 
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
     .title{
       font-size:28px;
       font-weight:700;
@@ -51,6 +59,30 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+    }
+
+    .lang-switcher{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .lang-switcher button{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+      min-width:56px;
+    }
+
+    .lang-switcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
     }
 
     .btn{
@@ -236,60 +268,74 @@
       .wrap{
         padding:16px 12px 32px;
       }
+
+      .topbar{
+        align-items:flex-start;
+      }
+
+      .topbar-right{
+        width:100%;
+        justify-content:space-between;
+      }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Остатки</div>
-      <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+      <div class="title" data-i18n="stock.heading">Остатки</div>
+
+      <div class="topbar-right">
+        <div id="langSwitcher" class="lang-switcher"></div>
+
+        <div class="top-actions">
+          <button class="btn btn-light" onclick="goBack()" data-i18n="stock.backButton">Назад</button>
+          <button class="btn btn-light" onclick="logout()" data-i18n="stock.logoutButton">Выйти</button>
+        </div>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтры</h2>
+      <h2 class="card-title" data-i18n="stock.filtersTitle">Фильтры</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск по товару / артикулу / штрихкоду</label>
-          <input id="searchInput" type="text" placeholder="Например: Тест, SaaS, SKU, barcode" />
+          <label for="searchInput" data-i18n="stock.searchLabel">Поиск по товару / артикулу / штрихкоду</label>
+          <input id="searchInput" type="text" data-i18n-placeholder="stock.searchPlaceholder" placeholder="Например: Тест, SaaS, SKU, barcode" />
         </div>
 
         <div class="field">
-          <label for="locationFilter">Место хранения</label>
+          <label for="locationFilter" data-i18n="stock.locationFilterLabel">Место хранения</label>
           <select id="locationFilter">
-            <option value="">Все МХ</option>
+            <option value="" data-i18n="stock.locationFilterAll">Все МХ</option>
           </select>
         </div>
 
         <div class="field">
-          <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <label data-i18n="stock.actionsLabel">&nbsp;</label>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="stock.refreshButton">Обновить</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Строк остатков</div>
+          <div class="stat-label" data-i18n="stock.statsRows">Строк остатков</div>
           <div class="stat-value" id="rowsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Товаров</div>
+          <div class="stat-label" data-i18n="stock.statsItems">Товаров</div>
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Мест хранения</div>
+          <div class="stat-label" data-i18n="stock.statsLocations">Мест хранения</div>
           <div class="stat-value" id="locationsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Сумма по фильтру</div>
+          <div class="stat-label" data-i18n="stock.statsQtyTotal">Сумма по фильтру</div>
           <div class="stat-value" id="qtyTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Общая сумма</div>
+          <div class="stat-label" data-i18n="stock.statsQtyGrandTotal">Общая сумма</div>
           <div class="stat-value" id="qtyGrandTotal">0</div>
         </div>
       </div>
@@ -298,23 +344,23 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Текущие остатки</h2>
-      <div class="muted">Показываются фактические остатки по товарам и местам хранения.</div>
+      <h2 class="card-title" data-i18n="stock.currentStockTitle">Текущие остатки</h2>
+      <div class="muted" data-i18n="stock.currentStockSubtitle">Показываются фактические остатки по товарам и местам хранения.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Товар</th>
-              <th>Артикул / SKU</th>
-              <th>Штрихкод</th>
-              <th>Место хранения</th>
-              <th>Количество</th>
+              <th data-i18n="stock.tableItem">Товар</th>
+              <th data-i18n="stock.tableSku">Артикул / SKU</th>
+              <th data-i18n="stock.tableBarcode">Штрихкод</th>
+              <th data-i18n="stock.tableLocation">Место хранения</th>
+              <th data-i18n="stock.tableQty">Количество</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="5" class="empty">Загрузка данных...</td>
+              <td colspan="5" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -322,26 +368,26 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Партии товаров</h2>
-      <div class="muted">Показываются партии закупки для FIFO, капитализации и контроля себестоимости.</div>
+      <h2 class="card-title" data-i18n="stock.batchesTitle">Партии товаров</h2>
+      <div class="muted" data-i18n="stock.batchesSubtitle">Показываются партии закупки для FIFO, капитализации и контроля себестоимости.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Товар</th>
-              <th>Артикул / SKU</th>
-              <th>Штрихкод</th>
-              <th>Дата партии</th>
-              <th>Кол-во в партии</th>
-              <th>Остаток партии</th>
-              <th>Цена закупки</th>
-              <th>Сумма остатка</th>
+              <th data-i18n="stock.batchTableItem">Товар</th>
+              <th data-i18n="stock.batchTableSku">Артикул / SKU</th>
+              <th data-i18n="stock.batchTableBarcode">Штрихкод</th>
+              <th data-i18n="stock.batchTableDate">Дата партии</th>
+              <th data-i18n="stock.batchTableQtyTotal">Кол-во в партии</th>
+              <th data-i18n="stock.batchTableQtyRemaining">Остаток партии</th>
+              <th data-i18n="stock.batchTableUnitCost">Цена закупки</th>
+              <th data-i18n="stock.batchTableTotalSum">Сумма остатка</th>
             </tr>
           </thead>
           <tbody id="batchesTbody">
             <tr>
-              <td colspan="8" class="empty">Загрузка партий...</td>
+              <td colspan="8" class="empty" data-i18n="stock.loadingBatches">Загрузка партий...</td>
             </tr>
           </tbody>
         </table>
@@ -352,6 +398,7 @@
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
 
   <script>
     const token = localStorage.getItem("token");
@@ -371,7 +418,7 @@
         if (!value) return "";
         const d = new Date(value);
         if (Number.isNaN(d.getTime())) return String(value);
-        return d.toLocaleString("ru-RU");
+        return d.toLocaleString();
       }
     };
 
@@ -460,6 +507,8 @@
     let locationsData = [];
     let batchesData = [];
 
+    let pageStatusState = null;
+
     const els = {
       searchInput: document.getElementById("searchInput"),
       locationFilter: document.getElementById("locationFilter"),
@@ -497,12 +546,23 @@
       if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
         return Number(authUser.tenant_id);
       }
-      return 1;
+      return ApiBridge.getTenantId(1);
     }
 
     function showStatus(text, type = "info") {
       els.pageStatus.className = "status show " + type;
       els.pageStatus.textContent = text;
+    }
+
+    function setPageStatus(key, vars, type) {
+      pageStatusState = { key, vars: vars || {}, type };
+      showStatus(i18n.format(key, vars || {}), type);
+    }
+
+    function restoreStatusesAfterLanguageChange() {
+      if (pageStatusState) {
+        showStatus(i18n.format(pageStatusState.key, pageStatusState.vars || {}), pageStatusState.type);
+      }
     }
 
     function normalize(data, type = "") {
@@ -567,6 +627,8 @@
     }
 
     function renderLocationFilter() {
+      const currentValue = els.locationFilter.value;
+
       const options = locationsData
         .slice()
         .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"))
@@ -576,7 +638,11 @@
         })
         .join("");
 
-      els.locationFilter.innerHTML = `<option value="">Все МХ</option>` + options;
+      els.locationFilter.innerHTML = `<option value="">${escapeHtml(i18n.t("stock.locationFilterAll"))}</option>` + options;
+
+      if ([...els.locationFilter.options].some(opt => String(opt.value) === String(currentValue))) {
+        els.locationFilter.value = currentValue;
+      }
     }
 
     function buildRows() {
@@ -680,7 +746,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="empty">Нет остатков по выбранному фильтру</td>
+            <td colspan="5" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td>
           </tr>
         `;
         return;
@@ -688,7 +754,7 @@
 
       els.tbody.innerHTML = rows.map(row => `
         <tr>
-          <td>${escapeHtml(row.item_name || "Без названия")}</td>
+          <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
           <td>${escapeHtml(row.sku)}</td>
           <td>${escapeHtml(row.barcode)}</td>
           <td>${escapeHtml(row.location_display)}</td>
@@ -725,7 +791,7 @@
       if (!rows.length) {
         els.batchesTbody.innerHTML = `
           <tr>
-            <td colspan="8" class="empty">Нет партий по выбранному фильтру</td>
+            <td colspan="8" class="empty">${escapeHtml(i18n.t("stock.noBatches"))}</td>
           </tr>
         `;
         return;
@@ -733,7 +799,7 @@
 
       els.batchesTbody.innerHTML = rows.map(row => `
         <tr>
-          <td>${escapeHtml(row.item_name || "Без названия")}</td>
+          <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
           <td>${escapeHtml(row.sku || "")}</td>
           <td>${escapeHtml(row.barcode || "")}</td>
           <td>${escapeHtml(row.batch_date || "")}</td>
@@ -747,7 +813,7 @@
 
     async function loadData() {
       try {
-        showStatus("Загрузка остатков...", "info");
+        setPageStatus("stock.loadingStatus", {}, "info");
 
         const tenantId = getTenantId();
 
@@ -767,22 +833,26 @@
         renderTable();
         renderBatches();
 
-        showStatus(
-          `Данные загружены.\nСтрок остатков: ${stockData.length}\nТоваров: ${itemsData.length}\nМХ: ${locationsData.length}\nПартий: ${batchesData.length}`,
-          "success"
-        );
+        setPageStatus("stock.loadedStatus", {
+          stock: stockData.length,
+          items: itemsData.length,
+          locations: locationsData.length,
+          batches: batchesData.length
+        }, "success");
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="empty">Ошибка загрузки данных</td>
+            <td colspan="5" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td>
           </tr>
         `;
         els.batchesTbody.innerHTML = `
           <tr>
-            <td colspan="8" class="empty">Ошибка загрузки партий</td>
+            <td colspan="8" class="empty">${escapeHtml(i18n.t("stock.batchesLoadError"))}</td>
           </tr>
         `;
-        showStatus("Ошибка: " + Ui.translateError(err.message), "error");
+        setPageStatus("stock.loadErrorStatus", {
+          error: Ui.translateError(err.message)
+        }, "error");
       }
     }
 
@@ -793,15 +863,28 @@
       });
       els.locationFilter.addEventListener("change", renderTable);
       els.refreshBtn.addEventListener("click", loadData);
+
+      document.addEventListener("app:language-changed", () => {
+        i18n.applyTranslations();
+        renderLocationFilter();
+        renderTable();
+        renderBatches();
+        restoreStatusesAfterLanguageChange();
+      });
     }
 
     function bootstrap() {
       parseUser();
+      i18n.applyTranslations();
+      i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
       loadData();
     }
 
     bootstrap();
+
+    window.goBack = goBack;
+    window.logout = logout;
   </script>
 </body>
 </html>
