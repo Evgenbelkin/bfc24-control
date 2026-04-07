@@ -51,20 +51,17 @@
       line-height: 1.45;
     }
 
-    /* ── Shell ── */
     .shell { max-width: var(--container); margin: 0 auto; padding: 28px 18px 56px; }
 
-    /* ── Header ── */
     .page-header { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-bottom:24px; flex-wrap:wrap; }
     .page-title  { margin:0 0 4px; font-size:clamp(26px,4vw,40px); font-weight:800; letter-spacing:-.03em; line-height:1.05; }
     .page-subtitle { margin:0; color:var(--text-muted); font-size:15px; }
     .header-right { display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex-shrink:0; }
 
-    .lang-switcher{display:flex;gap:8px;flex-wrap:wrap}
-    .lang-btn{min-width:60px;padding:9px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#eef2f7;color:#111827;font-size:13px;font-weight:700;cursor:pointer;line-height:1.2}
-    .lang-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:var(--shadow-xs)}
+    .lang-switcher{display:flex;gap:4px;}
+    .lang-btn{border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12px;font-weight:700;background:var(--surface);color:var(--text-muted);}
+    .lang-btn.lang-active{background:var(--accent);color:#fff;border-color:var(--accent);}
 
-    /* ── Buttons ── */
     .btn {
       display:inline-flex; align-items:center; gap:7px; min-height:42px;
       padding:0 16px; border:1px solid transparent; border-radius:var(--radius-sm);
@@ -79,24 +76,19 @@
     .btn-secondary { background:var(--surface); color:var(--text-main); border-color:var(--border); box-shadow:var(--shadow-xs); }
     .btn-secondary:hover { border-color:var(--border-strong); }
 
-    /* ── Filter bar ── */
     .filter-bar {
       display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;
       padding:18px 20px; background:var(--surface); border:1px solid var(--border);
       border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); margin-bottom:24px;
     }
     .filter-field { display:flex; flex-direction:column; gap:5px; }
-    .filter-field label {
-      font-size:12px; font-weight:600; color:var(--text-muted);
-      letter-spacing:.03em; text-transform:uppercase;
-    }
+    .filter-field label { font-size:12px; font-weight:600; color:var(--text-muted); letter-spacing:.03em; text-transform:uppercase; }
     .filter-field input[type="date"],
     .filter-field input[type="number"] {
       min-height:40px; padding:0 12px; border:1px solid var(--border);
       border-radius:var(--radius-sm); background:#fff; color:var(--text-main);
       font:14px 'Inter',sans-serif; outline:none;
-      transition:border-color var(--transition), box-shadow var(--transition);
-      box-shadow:var(--shadow-xs);
+      transition:border-color var(--transition), box-shadow var(--transition); box-shadow:var(--shadow-xs);
     }
     .filter-field input:focus { border-color:rgba(37,99,235,.5); box-shadow:0 0 0 3px rgba(37,99,235,.12); }
     #tenant-id-input.from-url { border-color:var(--accent); background:var(--accent-soft); color:var(--accent); font-weight:600; }
@@ -104,46 +96,29 @@
     .filter-actions { display:flex; gap:8px; align-items:flex-end; margin-left:auto; }
     .period-presets { display:flex; gap:6px; flex-wrap:wrap; }
     .preset-btn {
-      min-height:32px; padding:0 11px; border:1px solid var(--border);
-      border-radius:999px; background:#fff; font:500 12px 'Inter',sans-serif;
-      color:var(--text-muted); cursor:pointer; transition:all var(--transition);
+      min-height:32px; padding:0 11px; border:1px solid var(--border); border-radius:999px;
+      background:#fff; font:500 12px 'Inter',sans-serif; color:var(--text-muted); cursor:pointer; transition:all var(--transition);
     }
     .preset-btn:hover, .preset-btn.active { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
 
-    /* ── Loader / alerts ── */
     .load-bar {
       display:none; align-items:center; gap:10px; padding:14px 18px;
       background:var(--accent-soft); border:1px solid rgba(37,99,235,.2);
-      border-radius:var(--radius-md); color:var(--accent);
-      font-size:14px; font-weight:500; margin-bottom:20px;
+      border-radius:var(--radius-md); color:var(--accent); font-size:14px; font-weight:500; margin-bottom:20px;
     }
     .load-bar.visible { display:flex; }
-    .spinner {
-      width:18px; height:18px; border:2px solid rgba(37,99,235,.3);
-      border-top-color:var(--accent); border-radius:50%;
-      animation:spin .7s linear infinite; flex-shrink:0;
-    }
+    .spinner { width:18px; height:18px; border:2px solid rgba(37,99,235,.3); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
-    .alert {
-      display:none; align-items:flex-start; gap:10px; padding:13px 16px;
-      border-radius:var(--radius-md); border:1px solid transparent;
-      margin-bottom:20px; font-size:14px;
-    }
+    .alert { display:none; align-items:flex-start; gap:10px; padding:13px 16px; border-radius:var(--radius-md); border:1px solid transparent; margin-bottom:20px; font-size:14px; }
     .alert.visible { display:flex; }
     .alert-danger  { background:var(--danger-bg);  border-color:#fca5a5; color:#991b1b; }
     .alert-warning { background:var(--warning-bg); border-color:#fde68a; color:#92400e; }
-    .alert-info    { background:var(--accent-soft); border-color:#bfdbfe; color:#1e40af; }
     .alert-icon    { font-size:16px; flex-shrink:0; margin-top:1px; }
 
-    /* ── Sections ── */
     .section { margin-bottom:32px; }
     .section-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
-    .section-icon {
-      width:34px; height:34px; border-radius:9px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:16px; flex-shrink:0;
-    }
+    .section-icon { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
     .icon-blue   { background:var(--accent-soft); }
     .icon-green  { background:var(--success-bg);  }
     .icon-amber  { background:var(--warning-bg);  }
@@ -151,7 +126,6 @@
     .section-title { font-size:17px; font-weight:700; letter-spacing:-.02em; margin:0; }
     .section-note  { font-size:13px; color:var(--text-muted); margin:0 0 0 auto; }
 
-    /* ── KPI grid ── */
     .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
     .kpi-card {
       position:relative; background:var(--surface); border:1px solid var(--border);
@@ -159,10 +133,7 @@
       overflow:hidden; transition:box-shadow var(--transition), transform var(--transition);
     }
     .kpi-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-2px); }
-    .kpi-card::before {
-      content:''; position:absolute; left:0; top:0; bottom:0;
-      width:4px; border-radius:4px 0 0 4px;
-    }
+    .kpi-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:4px 0 0 4px; }
     .kpi-card.c-blue::before   { background:var(--accent); }
     .kpi-card.c-green::before  { background:var(--success); }
     .kpi-card.c-amber::before  { background:var(--warning); }
@@ -175,15 +146,11 @@
     .kpi-value.positive { color:var(--success); }
     .kpi-value.negative { color:var(--danger); }
     .kpi-sub   { margin-top:6px; font-size:12px; color:var(--text-muted); }
-    .kpi-badge {
-      display:inline-flex; align-items:center; gap:4px;
-      padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; margin-top:8px;
-    }
+    .kpi-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; margin-top:8px; }
     .badge-green  { background:var(--success-bg); color:#166534; }
     .badge-red    { background:var(--danger-bg);  color:#991b1b; }
     .badge-amber  { background:var(--warning-bg); color:#92400e; }
 
-    /* ── P&L funnel ── */
     .pnl-funnel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); overflow:hidden; }
     .pnl-row { display:flex; align-items:center; padding:14px 20px; gap:16px; border-bottom:1px solid var(--border); transition:background var(--transition); }
     .pnl-row:last-child { border-bottom:none; }
@@ -197,13 +164,11 @@
     .pnl-bar    { height:100%; border-radius:3px; transition:width .5s ease; }
     .pnl-amount { font-size:15px; font-weight:700; text-align:right; min-width:130px; font-variant-numeric:tabular-nums; }
 
-    /* ── Expenses ── */
     .expense-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
     .exp-pill     { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px 16px; box-shadow:var(--shadow-xs); display:flex; flex-direction:column; gap:5px; }
     .exp-label    { font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
     .exp-val      { font-size:18px; font-weight:700; }
 
-    /* ── Chart ── */
     .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:20px 20px 12px; }
     .chart-legend { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:14px; }
     .chart-legend-item { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text-muted); }
@@ -218,14 +183,13 @@
     }
     .chart-tooltip.visible { opacity:1; transform:translateY(0); }
 
-    /* ── Tables ── */
     .table-wrap { width:100%; overflow-x:auto; border-radius:var(--radius-md); border:1px solid var(--border); background:#fff; }
     table { width:100%; border-collapse:collapse; min-width:540px; }
     thead th {
       position:sticky; top:0; z-index:1; background:#f7faff;
       text-align:left; font-size:12px; font-weight:700; color:var(--text-muted);
-      text-transform:uppercase; letter-spacing:.04em;
-      padding:11px 14px; border-bottom:1px solid var(--border); white-space:nowrap;
+      text-transform:uppercase; letter-spacing:.04em; padding:11px 14px;
+      border-bottom:1px solid var(--border); white-space:nowrap;
     }
     thead th.r { text-align:right; }
     tbody td { padding:11px 14px; border-bottom:1px solid #edf2f8; font-size:14px; vertical-align:middle; }
@@ -239,35 +203,29 @@
     .cell-warning { color:var(--warning); font-weight:600; }
     .cell-success { color:var(--success); font-weight:600; }
 
-    /* ── Rank badge ── */
     .rank-badge { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; font-size:11px; font-weight:700; }
     .rank-1 { background:#fef3c7; color:#92400e; }
     .rank-2 { background:#e2e8f0; color:#475569; }
     .rank-3 { background:#fee2e2; color:#991b1b; }
     .rank-n { background:#f1f5f9; color:#64748b; }
 
-    /* ── Margin mini bar ── */
     .margin-mini { display:flex; align-items:center; gap:6px; }
     .margin-mini-bar { flex:1; height:5px; background:var(--border); border-radius:3px; overflow:hidden; min-width:40px; }
     .margin-mini-fill { height:100%; border-radius:3px; }
     .margin-mini-val { font-size:12px; font-weight:700; min-width:38px; text-align:right; }
 
-    /* ── Progress bar (debts) ── */
     .progress-wrap { height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin-top:8px; }
     .progress-fill { height:100%; border-radius:3px; transition:width .6s ease; }
 
-    /* ── Misc ── */
     .margin-track { height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:6px; }
     .margin-fill  { height:100%; border-radius:4px; transition:width .6s ease; }
     .debt-overdue { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; background:var(--danger-bg); color:#991b1b; }
 
-    /* ── Empty state ── */
     .empty-state { text-align:center; padding:36px 20px; color:var(--text-muted); background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%); border:1px dashed var(--border-strong); border-radius:var(--radius-lg); }
     .empty-state-icon  { font-size:36px; margin-bottom:10px; }
     .empty-state-title { font-size:16px; font-weight:700; color:var(--text-main); margin:0 0 4px; }
     .empty-state-text  { font-size:14px; margin:0; }
 
-    /* ── Skeletons ── */
     .skeleton { background:linear-gradient(90deg,#e8edf5 25%,#f4f7fc 50%,#e8edf5 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
     @keyframes shimmer { to { background-position:-200% 0; } }
     .sk-kpi    { height:100px; border-radius:var(--radius-lg); }
@@ -275,7 +233,6 @@
     .sk-chart  { height:230px; border-radius:var(--radius-lg); }
     .sk-table  { height:240px; border-radius:var(--radius-lg); }
 
-    /* ── Responsive ── */
     @media (max-width:768px) {
       .shell { padding:16px 12px 40px; }
       .page-header { flex-direction:column; }
@@ -297,15 +254,15 @@
   <!-- Шапка -->
   <div class="page-header">
     <div>
-      <h1 class="page-title" data-i18n="title">📊 Аналитика</h1>
+      <h1 class="page-title">📊 <span data-i18n="analytics_title">Аналитика</span></h1>
       <p class="page-subtitle" id="subtitle">Финансовый отчёт · BFC24 CONTROL</p>
     </div>
     <div class="header-right">
       <div id="langSwitcher" class="lang-switcher"></div>
-      <a href="/index.html" class="btn btn-secondary">← Главная</a>
+      <a href="/index.html" class="btn btn-secondary">← <span data-i18n="analytics_home">Главная</span></a>
       <button class="btn btn-primary" onclick="loadAll()">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115 0M20 15a9 9 0 01-15 0"/></svg>
-        Обновить
+        <span data-i18n="refresh">Обновить</span>
       </button>
     </div>
   </div>
@@ -313,26 +270,26 @@
   <!-- Фильтр -->
   <div class="filter-bar">
     <div class="filter-field" id="tenant-field">
-      <label data-i18n="tenant_id">Tenant ID</label>
-      <input type="number" id="tenant-id-input" placeholder="напр. 3" min="1" step="1" style="width:110px"/>
+      <label data-i18n="stat_tenant_id">Tenant ID</label>
+      <input type="number" id="tenant-id-input" data-i18n-placeholder="analytics_tenant_ph" placeholder="напр. 3" min="1" step="1" style="width:110px"/>
     </div>
     <div class="filter-divider"></div>
     <div class="filter-field">
-      <label data-i18n="date_from">С даты</label>
+      <label data-i18n="label_date_from">С даты</label>
       <input type="date" id="date-from"/>
     </div>
     <div class="filter-field">
-      <label data-i18n="date_to">По дату</label>
+      <label data-i18n="label_date_to">По дату</label>
       <input type="date" id="date-to"/>
     </div>
     <div class="filter-field">
-      <label data-i18n="quick_period">Быстрый период</label>
+      <label data-i18n="label_period">Быстрый период</label>
       <div class="period-presets">
-        <button class="preset-btn" data-preset="7" data-i18n="days_7">7 дн</button>
-        <button class="preset-btn active" data-preset="30" data-i18n="days_30">30 дн</button>
-        <button class="preset-btn" data-preset="90" data-i18n="days_90">90 дн</button>
-        <button class="preset-btn" data-preset="month" data-i18n="month">Месяц</button>
-        <button class="preset-btn" data-preset="year" data-i18n="year">Год</button>
+        <button class="preset-btn" data-preset="7"     data-i18n="analytics_7d">7 дн</button>
+        <button class="preset-btn active" data-preset="30" data-i18n="analytics_30d">30 дн</button>
+        <button class="preset-btn" data-preset="90"    data-i18n="analytics_90d">90 дн</button>
+        <button class="preset-btn" data-preset="month" data-i18n="period_month">Месяц</button>
+        <button class="preset-btn" data-preset="year"  data-i18n="analytics_year">Год</button>
       </div>
     </div>
     <div class="filter-actions">
@@ -342,25 +299,33 @@
   </div>
 
   <!-- Статус -->
-  <div class="load-bar" id="load-bar"><div class="spinner"></div><span id="load-text" data-i18n="loading">Загрузка…</span></div>
-  <div class="alert alert-danger" id="alert-error"><span class="alert-icon">⚠️</span><span id="alert-text" data-i18n="error">Ошибка</span></div>
+  <div class="load-bar" id="load-bar"><div class="spinner"></div><span id="load-text" data-i18n="status_loading">Загрузка…</span></div>
+  <div class="alert alert-danger" id="alert-error"><span class="alert-icon">⚠️</span><span id="alert-text" data-i18n="status_error">Ошибка</span></div>
   <div class="alert alert-warning" id="alert-auth">
     <span class="alert-icon">🔒</span>
-    <span data-i18n="session_expired">Сессия истекла.</span> <a href="/login.html" style="color:inherit;font-weight:700;margin-left:4px" data-i18n="login_again">Войти снова</a>
+    <span data-i18n="analytics_session_expired">Сессия истекла.</span>
+    <a href="/login.html" style="color:inherit;font-weight:700;margin-left:4px" data-i18n="analytics_login_again">Войти снова</a>
   </div>
   <div class="alert alert-warning" id="alert-no-tenant" style="flex-direction:column;gap:8px">
     <div style="display:flex;align-items:center;gap:10px">
       <span class="alert-icon">⚠️</span>
-      <span><strong data-i18n="tenant_missing_title">Не выбран клиент (tenant_id).</strong> <span data-i18n="tenant_missing_text">Укажите Tenant ID в поле фильтра выше и нажмите «Применить» — или откройте страницу с параметром</span> <code>?tenant_id=X</code> <span data-i18n="tenant_missing_tail">в URL.</span></span>
+      <span>
+        <strong data-i18n="analytics_no_tenant_title">Не выбран клиент (tenant_id).</strong>
+        <span data-i18n="analytics_no_tenant_text">Укажите Tenant ID в поле фильтра выше и нажмите «Применить» — или откройте страницу с параметром</span>
+        <code>?tenant_id=X</code>
+        <span data-i18n="analytics_no_tenant_tail">в URL.</span>
+      </span>
     </div>
-    <div style="font-size:13px;color:#92400e;padding-left:26px"><span data-i18n="example">Например:</span> <code>analytics.html?tenant_id=3</code></div>
+    <div style="font-size:13px;color:#92400e;padding-left:26px">
+      <span data-i18n="analytics_example">Например:</span> <code>analytics.html?tenant_id=3</code>
+    </div>
   </div>
 
-  <!-- ════ Блок 1 — P&L ════ -->
+  <!-- Блок 1 — P&L -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-blue">💰</div>
-      <h2 class="section-title" data-i18n="pnl">P&amp;L — Прибыли и убытки</h2>
+      <h2 class="section-title" data-i18n="analytics_pnl">P&amp;L — Прибыли и убытки</h2>
       <span class="section-note" id="pnl-period-note"></span>
     </div>
     <div class="kpi-grid" id="pnl-kpi-grid">
@@ -372,32 +337,32 @@
     <div style="margin-top:16px" id="expenses-wrap"></div>
   </div>
 
-  <!-- ════ Блок 2 — Динамика ════ -->
+  <!-- Блок 2 — Динамика -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-blue">📈</div>
-      <h2 class="section-title" data-i18n="daily">Динамика по дням</h2>
+      <h2 class="section-title" data-i18n="analytics_daily">Динамика по дням</h2>
       <span class="section-note" id="chart-note"></span>
     </div>
     <div id="chart-wrap"><div class="skeleton sk-chart"></div></div>
   </div>
 
-  <!-- ════ Блок 3 — Топ товаров ════ -->
+  <!-- Блок 3 — Топ товаров -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-amber">🏆</div>
-      <h2 class="section-title" data-i18n="top_items">Топ товаров</h2>
-      <span class="section-note" id="top-note" data-i18n="by_revenue">по выручке</span>
+      <h2 class="section-title" data-i18n="analytics_top_items">Топ товаров</h2>
+      <span class="section-note" id="top-note" data-i18n="analytics_by_revenue">по выручке</span>
     </div>
     <div id="top-items-wrap"><div class="skeleton sk-table"></div></div>
   </div>
 
-  <!-- ════ Блок 4 — Долги ════ -->
+  <!-- Блок 4 — Долги -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-red">💳</div>
-      <h2 class="section-title" data-i18n="debts_sales">Долги и реализация</h2>
-      <span class="section-note" data-i18n="up_to_date">Актуально на сейчас</span>
+      <h2 class="section-title" data-i18n="analytics_debts_title">Долги и реализация</h2>
+      <span class="section-note" data-i18n="analytics_up_to_date">Актуально на сейчас</span>
     </div>
     <div class="kpi-grid" id="debts-kpi-grid">
       <div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div>
@@ -406,23 +371,23 @@
     <div style="margin-top:16px" id="debts-table-wrap"><div class="skeleton sk-table" style="height:180px"></div></div>
   </div>
 
-  <!-- ════ Блок 5 — Склад ════ -->
+  <!-- Блок 5 — Склад -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-green">📦</div>
-      <h2 class="section-title" data-i18n="warehouse_state">Состояние склада</h2>
-      <span class="section-note" data-i18n="up_to_date">Актуально на сейчас</span>
+      <h2 class="section-title" data-i18n="analytics_warehouse">Состояние склада</h2>
+      <span class="section-note" data-i18n="analytics_up_to_date">Актуально на сейчас</span>
     </div>
     <div class="kpi-grid" id="stock-kpi-grid">
       <div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div><div class="skeleton sk-kpi"></div>
     </div>
   </div>
 
-  <!-- ════ Блок 6 — Расхождения ════ -->
+  <!-- Блок 6 — Расхождения -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-red">🔴</div>
-      <h2 class="section-title" data-i18n="stock_diff">Расхождения остатков</h2>
+      <h2 class="section-title" data-i18n="analytics_stock_diff">Расхождения остатков</h2>
       <span class="section-note">stock vs batches</span>
     </div>
     <div id="sync-body"><div class="skeleton" style="height:60px;border-radius:var(--radius-md)"></div></div>
@@ -430,45 +395,36 @@
 
 </div><!-- /shell -->
 
-
-
-
+<script src="/js/i18n.js"></script>
 <script>
 "use strict";
 
-/* ══════════════════════════════════════════════════════════
-   УТИЛИТЫ
-   ══════════════════════════════════════════════════════════ */
 const API_BASE = "";
 function getToken() { return localStorage.getItem("token") || ""; }
 function getUser()  { try { return JSON.parse(localStorage.getItem("user")); } catch { return null; } }
 
-function getEffectiveTenantId() {
-  /* Приоритет: 1) поле ввода  2) localStorage  3) null */
-  const fv = document.getElementById("tenant-id-input").value.trim();
-  if (fv !== "") { const n = Number(fv); if (Number.isInteger(n) && n > 0) return n; }
-  const u = getUser();
-  if (u && u.tenant_id != null && u.tenant_id !== "") { const n = Number(u.tenant_id); if (Number.isInteger(n) && n > 0) return n; }
-  return null;
+/* Locale-aware number formatter без i18n.getLang() — берём напрямую из i18n.lang */
+function numLocale() {
+  const l = (window.i18n && i18n.lang) || "ru";
+  return l === "zh" ? "zh-CN" : l === "en" ? "en-US" : "ru-RU";
 }
 
 function fmt(n, d=0) {
   if (n == null || isNaN(+n)) return "—";
-  return new Intl.NumberFormat(i18n.getLang()==="zh"?"zh-CN":i18n.getLang()==="en"?"en-US":"ru-RU",{minimumFractionDigits:d,maximumFractionDigits:d}).format(+n);
+  return new Intl.NumberFormat(numLocale(),{minimumFractionDigits:d,maximumFractionDigits:d}).format(+n);
 }
 function fmtMoney(n) {
   if (n == null || isNaN(+n)) return "—";
-  return new Intl.NumberFormat(i18n.getLang()==="zh"?"zh-CN":i18n.getLang()==="en"?"en-US":"ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2}).format(+n);
+  return new Intl.NumberFormat(numLocale(),{minimumFractionDigits:2,maximumFractionDigits:2}).format(+n);
 }
 function esc(v) { return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function sign(n)  { return +n >= 0 ? "positive" : "negative"; }
 function mClr(p)  { return +p >= 30 ? "#16a34a" : +p >= 15 ? "#d97706" : "#dc2626"; }
 
-/* ══════════════════════════════════════════════════════════
-   AUTH + TENANT INIT
-   ══════════════════════════════════════════════════════════ */
+/* AUTH */
 (function(){ if (!getToken()) window.location.href = "/login.html"; })();
 
+/* TENANT INIT */
 (function initTenant(){
   const p   = new URLSearchParams(window.location.search);
   const ut  = p.get("tenant_id");
@@ -479,15 +435,13 @@ function mClr(p)  { return +p >= 30 ? "#16a34a" : +p >= 15 ? "#d97706" : "#dc262
     const u = getUser();
     if (u && u.tenant_id != null) {
       inp.value = +u.tenant_id;
-      if (u.role === "client") { inp.readOnly = true; inp.style.opacity = ".6"; inp.title = "Ваш tenant_id"; }
+      if (u.role === "client") { inp.readOnly = true; inp.style.opacity = ".6"; inp.title = i18n.t("stat_tenant_id"); }
     }
   }
   inp.addEventListener("input", () => { inp.classList.remove("from-url"); inp.title = ""; });
 })();
 
-/* ══════════════════════════════════════════════════════════
-   ФИЛЬТР / ПРЕСЕТЫ
-   ══════════════════════════════════════════════════════════ */
+/* ФИЛЬТР */
 const $from = document.getElementById("date-from");
 const $to   = document.getElementById("date-to");
 
@@ -509,9 +463,15 @@ document.querySelectorAll(".preset-btn").forEach(btn=>{
 });
 function clearFilter(){ $from.value=""; $to.value=""; document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active")); loadAll(); }
 
-/* ══════════════════════════════════════════════════════════
-   API
-   ══════════════════════════════════════════════════════════ */
+/* API */
+function getEffectiveTenantId() {
+  const fv = document.getElementById("tenant-id-input").value.trim();
+  if (fv !== "") { const n = Number(fv); if (Number.isInteger(n) && n > 0) return n; }
+  const u = getUser();
+  if (u && u.tenant_id != null && u.tenant_id !== "") { const n = Number(u.tenant_id); if (Number.isInteger(n) && n > 0) return n; }
+  return null;
+}
+
 async function apiFetch(path){
   const res = await fetch(API_BASE+path,{headers:{Authorization:"Bearer "+getToken()}});
   if (res.status===401||res.status===403){ document.getElementById("alert-auth").classList.add("visible"); throw new Error("unauthorized"); }
@@ -536,23 +496,12 @@ function buildTenantOnly(){
   return p.toString();
 }
 
-/* ══════════════════════════════════════════════════════════
-   UI STATE
-   ══════════════════════════════════════════════════════════ */
-function showLoader(t="Загрузка…"){
-  document.getElementById("load-text").textContent=t;
-  document.getElementById("load-bar").classList.add("visible");
-  document.getElementById("alert-error").classList.remove("visible");
-}
+/* UI STATE */
+function showLoader(t){ document.getElementById("load-text").textContent=t||i18n.t("status_loading"); document.getElementById("load-bar").classList.add("visible"); document.getElementById("alert-error").classList.remove("visible"); }
 function hideLoader(){ document.getElementById("load-bar").classList.remove("visible"); }
 function showError(m){ document.getElementById("alert-text").textContent=m; document.getElementById("alert-error").classList.add("visible"); }
 
-const DATA_BLOCKS = [
-  "pnl-kpi-grid","pnl-funnel-wrap","expenses-wrap",
-  "chart-wrap","top-items-wrap",
-  "debts-kpi-grid","debts-table-wrap",
-  "stock-kpi-grid","sync-body",
-];
+const DATA_BLOCKS = ["pnl-kpi-grid","pnl-funnel-wrap","expenses-wrap","chart-wrap","top-items-wrap","debts-kpi-grid","debts-table-wrap","stock-kpi-grid","sync-body"];
 
 function checkTenant(){
   const has = getEffectiveTenantId() !== null;
@@ -563,12 +512,12 @@ function checkTenant(){
 
 function updateSubtitle(){
   const u=getUser(), tid=getEffectiveTenantId();
-  const parts=["Финансовый отчёт","BFC24 CONTROL"];
+  const parts=[i18n.t("analytics_subtitle_report"),"BFC24 CONTROL"];
   if (u?.company_name) parts.push(u.company_name);
   if (tid) parts.push(`Tenant #${tid}`);
   if ($from.value&&$to.value) parts.push(`${$from.value} — ${$to.value}`);
-  else if ($from.value) parts.push(`с ${$from.value}`);
-  else if ($to.value)   parts.push(`по ${$to.value}`);
+  else if ($from.value) parts.push(`${i18n.t("analytics_from")} ${$from.value}`);
+  else if ($to.value)   parts.push(`${i18n.t("analytics_to")} ${$to.value}`);
   document.getElementById("subtitle").textContent=parts.join(" · ");
 }
 
@@ -589,25 +538,24 @@ function blockError(id,title,msg){
   if (el) el.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">❌</div><div class="empty-state-title">${esc(title)}</div><p class="empty-state-text">${esc(msg)}</p></div>`;
 }
 
-/* ══════════════════════════════════════════════════════════
-   РЕНДЕР — P&L KPI
-   ══════════════════════════════════════════════════════════ */
+/* РЕНДЕР — P&L KPI */
 function renderPnlKpi(pnl){
   const gm=+(pnl.gross_margin_pct||0), nm=+(pnl.net_margin_pct||0);
   return [
-    {color:"c-blue",  label:i18n.t("revenue"),               value:fmtMoney(pnl.revenue),
-     sub: +pnl.total_discount>0 ? `Скидки: ${fmtMoney(pnl.total_discount)}` : `Продаж: ${fmt(pnl.sales_count)}`},
-    {color:"c-amber", label:"Себестоимость продаж",   value:fmtMoney(pnl.cogs), sub:`FIFO · ${fmt(pnl.line_items_count)} поз.`},
-    {color:+pnl.gross_profit>=0?"c-green":"c-red", label:"Валовая прибыль",
+    {color:"c-blue",  label:i18n.t("analytics_revenue"),
+     value:fmtMoney(pnl.revenue),
+     sub: +pnl.total_discount>0 ? `${i18n.t("analytics_discounts")}: ${fmtMoney(pnl.total_discount)}` : `${i18n.t("analytics_sales_count")}: ${fmt(pnl.sales_count)}`},
+    {color:"c-amber", label:i18n.t("analytics_cogs"),   value:fmtMoney(pnl.cogs), sub:`FIFO · ${fmt(pnl.line_items_count)} ${i18n.t("analytics_positions")}`},
+    {color:+pnl.gross_profit>=0?"c-green":"c-red", label:i18n.t("analytics_gross_profit"),
      value:fmtMoney(pnl.gross_profit), vc:sign(pnl.gross_profit),
      badge:{text:`${gm.toFixed(1)}%`, cls:gm>=15?"badge-green":"badge-red"}},
-    {color:"c-red",   label:"Операционные расходы",   value:fmtMoney(pnl.operating_expenses), sub:"Аренда, ЗП, реклама…"},
-    {color:+pnl.net_profit>=0?"c-green":"c-red", label:i18n.t("net_profit"),
+    {color:"c-red",   label:i18n.t("analytics_opex"),   value:fmtMoney(pnl.operating_expenses), sub:i18n.t("analytics_opex_hint")},
+    {color:+pnl.net_profit>=0?"c-green":"c-red", label:i18n.t("analytics_net_profit"),
      value:fmtMoney(pnl.net_profit), vc:sign(pnl.net_profit),
      badge:{text:`${nm.toFixed(1)}%`, cls:nm>=10?"badge-green":nm>=0?"badge-amber":"badge-red"}},
-    {color:"c-purple",label:"Маржа валовая",          value:`${gm.toFixed(2)}%`,
+    {color:"c-purple",label:i18n.t("analytics_gross_margin"), value:`${gm.toFixed(2)}%`,
      extra:`<div class="margin-track"><div class="margin-fill" style="width:${Math.min(Math.max(gm,0),100)}%;background:${mClr(gm)}"></div></div>`,
-     sub:`Чистая маржа: ${nm.toFixed(2)}%`},
+     sub:`${i18n.t("analytics_net_margin")}: ${nm.toFixed(2)}%`},
   ].map(c=>`
     <div class="kpi-card ${esc(c.color)}">
       <div class="kpi-label">${esc(c.label)}</div>
@@ -618,19 +566,19 @@ function renderPnlKpi(pnl){
     </div>`).join("");
 }
 
-/* ══════════════════════════════════════════════════════════
-   РЕНДЕР — P&L ВОРОНКА
-   ══════════════════════════════════════════════════════════ */
+/* РЕНДЕР — P&L ВОРОНКА */
 function renderPnlFunnel(pnl){
   const rev=+(pnl.revenue)||1;
   const rows=[
-    {dot:"#2563eb",label:i18n.t("revenue"),sub:`${fmt(pnl.sales_count)} продаж`,amount:pnl.revenue,pct:100,bar:"#2563eb"},
-    {dot:"#94a3b8",label:"Скидки",sub:"от выручки",amount:-pnl.total_discount,pct:Math.min(+pnl.total_discount/rev*100,100),bar:"#94a3b8"},
-    {dot:"#d97706",label:"Себестоимость продаж",sub:"COGS по FIFO",amount:-pnl.cogs,pct:Math.min(+pnl.cogs/rev*100,100),bar:"#f59e0b"},
-    {dot:+pnl.gross_profit>=0?"#16a34a":"#dc2626",label:"Валовая прибыль",sub:`Маржа ${+(pnl.gross_margin_pct||0).toFixed(1)}%`,
+    {dot:"#2563eb",label:i18n.t("analytics_revenue"),sub:`${fmt(pnl.sales_count)} ${i18n.t("analytics_sales_noun")}`,amount:pnl.revenue,pct:100,bar:"#2563eb"},
+    {dot:"#94a3b8",label:i18n.t("analytics_discounts"),sub:i18n.t("analytics_from_revenue"),amount:-pnl.total_discount,pct:Math.min(+pnl.total_discount/rev*100,100),bar:"#94a3b8"},
+    {dot:"#d97706",label:i18n.t("analytics_cogs"),sub:"COGS FIFO",amount:-pnl.cogs,pct:Math.min(+pnl.cogs/rev*100,100),bar:"#f59e0b"},
+    {dot:+pnl.gross_profit>=0?"#16a34a":"#dc2626",label:i18n.t("analytics_gross_profit"),
+     sub:`${i18n.t("analytics_margin_short")} ${+(pnl.gross_margin_pct||0).toFixed(1)}%`,
      amount:pnl.gross_profit,pct:Math.min(Math.abs(+pnl.gross_profit/rev)*100,100),bar:+pnl.gross_profit>=0?"#22c55e":"#ef4444",total:true},
-    {dot:"#dc2626",label:"Операционные расходы",sub:"Аренда, ЗП, прочее",amount:-pnl.operating_expenses,pct:Math.min(+pnl.operating_expenses/rev*100,100),bar:"#f87171"},
-    {dot:+pnl.net_profit>=0?"#0d9488":"#dc2626",label:i18n.t("net_profit"),sub:`Маржа ${+(pnl.net_margin_pct||0).toFixed(1)}%`,
+    {dot:"#dc2626",label:i18n.t("analytics_opex"),sub:i18n.t("analytics_opex_hint"),amount:-pnl.operating_expenses,pct:Math.min(+pnl.operating_expenses/rev*100,100),bar:"#f87171"},
+    {dot:+pnl.net_profit>=0?"#0d9488":"#dc2626",label:i18n.t("analytics_net_profit"),
+     sub:`${i18n.t("analytics_margin_short")} ${+(pnl.net_margin_pct||0).toFixed(1)}%`,
      amount:pnl.net_profit,pct:Math.min(Math.abs(+pnl.net_profit/rev)*100,100),bar:+pnl.net_profit>=0?"#14b8a6":"#ef4444",total:true},
   ];
   return `<div class="pnl-funnel">${rows.map(r=>`
@@ -644,30 +592,23 @@ function renderPnlFunnel(pnl){
     </div>`).join("")}</div>`;
 }
 
-/* ══════════════════════════════════════════════════════════
-   РЕНДЕР — РАСХОДЫ
-   ══════════════════════════════════════════════════════════ */
+/* РЕНДЕР — РАСХОДЫ */
 function renderExpenses(pnl){
   const bd=pnl.expenses_breakdown||{};
-  const LABELS={rent:"Аренда",salary:"Зарплата",delivery:"Доставка",ads:"Реклама",utilities:"Коммунальные",other:"Прочее",uncategorized:"Без категории"};
-  const pills=Object.entries(LABELS).filter(([k])=>+(bd[k]||0)>0)
-    .map(([k,l])=>`<div class="exp-pill"><div class="exp-label">${esc(l)}</div><div class="exp-val">${fmtMoney(bd[k])}</div></div>`).join("");
+  const KEYS={rent:"cat_rent",salary:"cat_salary",delivery:"cat_delivery",ads:"cat_ads",utilities:"cat_utilities",other:"cat_other",uncategorized:"analytics_uncategorized"};
+  const pills=Object.entries(KEYS).filter(([k])=>+(bd[k]||0)>0)
+    .map(([k,ik])=>`<div class="exp-pill"><div class="exp-label">${esc(i18n.t(ik))}</div><div class="exp-val">${fmtMoney(bd[k])}</div></div>`).join("");
   if (!pills) return "";
-  return `<div style="margin-top:12px"><div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">Расходы по категориям</div><div class="expense-grid">${pills}</div></div>`;
+  return `<div style="margin-top:12px"><div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">${i18n.t("analytics_expenses_by_cat")}</div><div class="expense-grid">${pills}</div></div>`;
 }
 
-/* ══════════════════════════════════════════════════════════
-   РЕНДЕР — SVG-ГРАФИК (pnl-daily)
-   Чистый SVG, без внешних библиотек.
-   Две линии: выручка и чистая прибыль.
-   ══════════════════════════════════════════════════════════ */
+/* РЕНДЕР — ГРАФИК */
 function renderChart(daily){
   if (!daily||!daily.length) return `
     <div class="empty-state"><div class="empty-state-icon">📉</div>
-    <div class="empty-state-title">Нет данных за период</div>
-    <p class="empty-state-text">Попробуйте расширить диапазон дат.</p></div>`;
+    <div class="empty-state-title">${i18n.t("analytics_no_data_period")}</div>
+    <p class="empty-state-text">${i18n.t("analytics_widen_range")}</p></div>`;
 
-  /* Размеры */
   const VW=900, PL=64, PR=16, PT=12, PB=34;
   const CW=VW-PL-PR, CH=190, VH=CH+PT+PB;
 
@@ -683,33 +624,29 @@ function renderChart(daily){
   function py(v){ return PT+CH - ((v-dMin)/span)*CH; }
   function pts(arr){ return arr.map((v,i)=>`${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" "); }
 
-  /* Y-grid */
   const YTICKS=5;
   const yGrid = Array.from({length:YTICKS+1},(_,i)=>{ const v=dMin+(span/YTICKS)*i; return {v,y:py(v)}; });
 
-  /* X-labels */
   const maxL = Math.min(10,n);
   const step = Math.max(1,Math.floor(n/maxL));
   const xLbls = daily.map((d,i)=>({i,date:d.date})).filter((_,i)=>i%step===0||i===n-1);
 
-  /* Area path */
   const z = py(0).toFixed(1);
   const areaPath = `M ${px(0).toFixed(1)},${z} `+revenues.map((v,i)=>`L ${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" ")+` L ${px(n-1).toFixed(1)},${z} Z`;
-
-  /* Ширина колонки для hit-зон */
   const colW = n>1 ? CW/(n-1) : CW;
 
-  /* Форматы */
   function fmtAxis(v){ const a=Math.abs(v); if(a>=1e6) return (v/1e6).toFixed(1)+"M"; if(a>=1000) return (v/1000).toFixed(0)+"k"; return v.toFixed(0); }
   function fmtD(iso){ const[,m,d]=iso.split("-"); return `${d}.${m}`; }
 
   const uid = "cs"+Date.now();
+  const revLabel = i18n.t("analytics_revenue");
+  const netLabel = i18n.t("analytics_net_profit");
 
   const svg = `
   <div class="chart-card">
     <div class="chart-legend">
-      <div class="chart-legend-item"><div class="legend-dot" style="background:var(--chart-rev)"></div>Выручка</div>
-      <div class="chart-legend-item"><div class="legend-dot" style="background:var(--chart-net)"></div>Чистая прибыль</div>
+      <div class="chart-legend-item"><div class="legend-dot" style="background:var(--chart-rev)"></div>${esc(revLabel)}</div>
+      <div class="chart-legend-item"><div class="legend-dot" style="background:var(--chart-net)"></div>${esc(netLabel)}</div>
     </div>
     <div class="chart-svg-wrap">
       <svg id="${uid}" viewBox="0 0 ${VW} ${VH}" width="100%" style="height:${VH}px;cursor:crosshair">
@@ -720,44 +657,30 @@ function renderChart(daily){
           </linearGradient>
           <clipPath id="cl-${uid}"><rect x="${PL}" y="${PT}" width="${CW}" height="${CH}"/></clipPath>
         </defs>
-
         ${yGrid.map(t=>`
           <line x1="${PL}" y1="${t.y.toFixed(1)}" x2="${VW-PR}" y2="${t.y.toFixed(1)}"
                 stroke="#dbe4f0" stroke-width="1" ${t.v===0?"":'stroke-dasharray="4 3"'}/>
           <text x="${PL-6}" y="${t.y.toFixed(1)}" text-anchor="end" dominant-baseline="middle"
                 font-size="11" font-family="Inter,sans-serif" fill="#94a3b8">${fmtAxis(t.v)}</text>`).join("")}
-
         <line x1="${PL}" y1="${z}" x2="${VW-PR}" y2="${z}" stroke="#94a3b8" stroke-width="1"/>
-
         <path d="${areaPath}" fill="url(#gr-${uid})" clip-path="url(#cl-${uid})"/>
-
         <polyline points="${pts(revenues)}" fill="none" stroke="var(--chart-rev)"
-                  stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"
-                  clip-path="url(#cl-${uid})"/>
-
+                  stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#cl-${uid})"/>
         <polyline points="${pts(profits)}" fill="none" stroke="var(--chart-net)"
-                  stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
-                  clip-path="url(#cl-${uid})"/>
-
+                  stroke-width="2" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#cl-${uid})"/>
         ${n<=60 ? revenues.map((v,i)=>`<circle cx="${px(i).toFixed(1)}" cy="${py(v).toFixed(1)}" r="3"
             fill="#fff" stroke="var(--chart-rev)" stroke-width="2" pointer-events="none" clip-path="url(#cl-${uid})"/>`).join("") : ""}
         ${n<=60 ? profits.map((v,i)=>`<circle cx="${px(i).toFixed(1)}" cy="${py(v).toFixed(1)}" r="2.5"
             fill="#fff" stroke="${v>=0?"var(--chart-net)":"var(--chart-neg)"}" stroke-width="2"
             pointer-events="none" clip-path="url(#cl-${uid})"/>`).join("") : ""}
-
         <line id="cur-${uid}" x1="0" y1="${PT}" x2="0" y2="${PT+CH}" stroke="var(--chart-rev)"
               stroke-width="1" stroke-dasharray="4 3" opacity="0" pointer-events="none"/>
-
         ${daily.map((d,i)=>{
           const cx=px(i), hw=colW/2;
           return `<rect class="chit" x="${(cx-hw).toFixed(1)}" y="${PT}" width="${colW.toFixed(1)}" height="${CH}"
-            fill="transparent"
-            data-date="${esc(d.date)}"
-            data-rev="${d.revenue}" data-net="${d.net_profit}"
-            data-gp="${d.gross_profit}" data-exp="${d.expenses}"
-            data-cx="${cx.toFixed(1)}"/>`;
+            fill="transparent" data-date="${esc(d.date)}" data-rev="${d.revenue}" data-net="${d.net_profit}"
+            data-gp="${d.gross_profit}" data-exp="${d.expenses}" data-cx="${cx.toFixed(1)}"/>`;
         }).join("")}
-
         ${xLbls.map(l=>`<text x="${px(l.i).toFixed(1)}" y="${PT+CH+20}" text-anchor="middle"
             font-size="10" font-family="Inter,sans-serif" fill="#94a3b8">${fmtD(l.date)}</text>`).join("")}
       </svg>
@@ -773,7 +696,7 @@ function renderChart(daily){
       r.addEventListener("mouseenter",e=>{
         const d=e.currentTarget.dataset;
         cur.setAttribute("x1",d.cx); cur.setAttribute("x2",d.cx); cur.setAttribute("opacity","1");
-        tt.innerHTML=`<strong>${esc(d.date)}</strong><br>Выручка:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${fmtMoney(d.rev)}<br>Вал. прибыль:&nbsp;${fmtMoney(d.gp)}<br>Расходы:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${fmtMoney(d.exp)}<br>Чист. прибыль:${fmtMoney(d.net)}`;
+        tt.innerHTML=`<strong>${esc(d.date)}</strong><br>${esc(i18n.t("analytics_revenue"))}: ${fmtMoney(d.rev)}<br>${esc(i18n.t("analytics_gross_profit"))}: ${fmtMoney(d.gp)}<br>${esc(i18n.t("analytics_expenses_short"))}: ${fmtMoney(d.exp)}<br>${esc(i18n.t("analytics_net_profit"))}: ${fmtMoney(d.net)}`;
         tt.classList.add("visible");
       });
       r.addEventListener("mousemove",e=>{ tt.style.left=(e.clientX+14)+"px"; tt.style.top=(e.clientY-10)+"px"; });
@@ -784,12 +707,10 @@ function renderChart(daily){
   return svg;
 }
 
-/* ══════════════════════════════════════════════════════════
-   РЕНДЕР — ТОП ТОВАРОВ
-   ══════════════════════════════════════════════════════════ */
+/* РЕНДЕР — ТОП ТОВАРОВ */
 function renderTopItems(data){
   const items=data.items||[];
-  if (!items.length) return `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">Нет продаж за период</div><p class="empty-state-text">Попробуйте расширить диапазон дат.</p></div>`;
+  if (!items.length) return `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">${i18n.t("analytics_no_sales")}</div><p class="empty-state-text">${i18n.t("analytics_widen_range")}</p></div>`;
 
   const tot=data.totals||{};
   const rows=items.map(it=>{
@@ -801,7 +722,7 @@ function renderTopItems(data){
         <div style="font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(it.item_name)}">${esc(it.item_name)}</div>
         ${it.sku?`<div style="font-size:12px;color:var(--text-muted)">${esc(it.sku)}</div>`:""}
       </td>
-      <td class="r">${fmt(it.qty_sold,0)}&nbsp;<span style="font-size:11px;color:var(--text-muted)">${esc(it.unit||"шт")}</span></td>
+      <td class="r">${fmt(it.qty_sold,0)}&nbsp;<span style="font-size:11px;color:var(--text-muted)">${esc(it.unit||i18n.t("analytics_unit_default"))}</span></td>
       <td class="r" style="font-weight:700">${fmtMoney(it.revenue)}</td>
       <td class="r cell-muted">${fmtMoney(it.cogs)}</td>
       <td class="r ${+it.gross_profit>=0?"cell-success":"cell-danger"}">${fmtMoney(it.gross_profit)}</td>
@@ -817,14 +738,17 @@ function renderTopItems(data){
   const tm=+(tot.margin_pct||0);
   return `<div class="table-wrap"><table>
     <thead><tr>
-      <th style="width:36px">#</th><th>Товар</th>
-      <th class="r">Кол-во</th><th class="r">Выручка</th>
-      <th class="r">Себест.</th><th class="r">Вал. прибыль</th>
-      <th style="min-width:120px">Маржа</th>
+      <th style="width:36px">#</th>
+      <th>${esc(i18n.t("col_item"))}</th>
+      <th class="r">${esc(i18n.t("col_qty"))}</th>
+      <th class="r">${esc(i18n.t("analytics_revenue"))}</th>
+      <th class="r">${esc(i18n.t("analytics_cogs_short"))}</th>
+      <th class="r">${esc(i18n.t("analytics_gross_profit"))}</th>
+      <th style="min-width:120px">${esc(i18n.t("analytics_margin_col"))}</th>
     </tr></thead>
     <tbody>${rows}</tbody>
     <tfoot><tr>
-      <td colspan="2">Итого топ-${items.length}</td>
+      <td colspan="2">${i18n.t("analytics_total_top")} ${items.length}</td>
       <td class="r">${fmt(tot.qty_sold,0)}</td>
       <td class="r">${fmtMoney(tot.revenue)}</td>
       <td class="r">${fmtMoney(tot.cogs)}</td>
@@ -834,20 +758,18 @@ function renderTopItems(data){
   </table></div>`;
 }
 
-/* ══════════════════════════════════════════════════════════
-   РЕНДЕР — ДОЛГИ KPI
-   ══════════════════════════════════════════════════════════ */
+/* РЕНДЕР — ДОЛГИ KPI */
 function renderDebtsKpi(s){
   const cr=+(s.collection_rate_pct||0);
   return [
-    {color:"c-red",    label:"Непогашенный остаток",     value:fmtMoney(s.total_balance_amount), sub:`Начальная сумма: ${fmtMoney(s.total_initial_amount)}`},
-    {color:"c-orange", label:"Просрочено",                value:fmt(s.overdue_count),
-     sub:+s.overdue_amount>0?`На сумму: ${fmtMoney(s.overdue_amount)}`:"Без просроченных",
-     badge:+s.overdue_count>0?{text:"⚠ Требует внимания",cls:"badge-red"}:{text:"✓ OK",cls:"badge-green"}},
-    {color:"c-amber",  label:"Открытых / частичных",     value:`${fmt(s.open_count)} / ${fmt(s.partial_count)}`, sub:`Всего долгов: ${fmt(s.total_count)}`},
-    {color:"c-green",  label:"Собрано",                  value:fmtMoney(s.total_paid_amount),
+    {color:"c-red",    label:i18n.t("stat_balance_total"), value:fmtMoney(s.total_balance_amount), sub:`${i18n.t("analytics_initial_sum")}: ${fmtMoney(s.total_initial_amount)}`},
+    {color:"c-orange", label:i18n.t("analytics_overdue"),  value:fmt(s.overdue_count),
+     sub:+s.overdue_amount>0?`${i18n.t("analytics_overdue_sum")}: ${fmtMoney(s.overdue_amount)}`:i18n.t("analytics_no_overdue"),
+     badge:+s.overdue_count>0?{text:`⚠ ${i18n.t("analytics_needs_attention")}`,cls:"badge-red"}:{text:`✓ OK`,cls:"badge-green"}},
+    {color:"c-amber",  label:`${i18n.t("stat_open_debts")} / ${i18n.t("stat_partial_debts")}`, value:`${fmt(s.open_count)} / ${fmt(s.partial_count)}`, sub:`${i18n.t("stat_total_debts")}: ${fmt(s.total_count)}`},
+    {color:"c-green",  label:i18n.t("analytics_collected"), value:fmtMoney(s.total_paid_amount),
      extra:`<div class="progress-wrap"><div class="progress-fill" style="width:${Math.min(cr,100).toFixed(1)}%;background:var(--success)"></div></div>`,
-     sub:`${cr.toFixed(1)}% от общей суммы`},
+     sub:`${cr.toFixed(1)}% ${i18n.t("analytics_of_total")}`},
   ].map(c=>`
     <div class="kpi-card ${esc(c.color)}">
       <div class="kpi-label">${esc(c.label)}</div>
@@ -858,15 +780,13 @@ function renderDebtsKpi(s){
     </div>`).join("");
 }
 
-/* ══════════════════════════════════════════════════════════
-   РЕНДЕР — ТАБЛИЦА ДОЛГОВ
-   ══════════════════════════════════════════════════════════ */
+/* РЕНДЕР — ТАБЛИЦА ДОЛГОВ */
 function renderDebtsTable(list){
   if (!list||!list.length) return `
     <div class="empty-state" style="border-style:solid;border-color:var(--success-bg);background:linear-gradient(180deg,#f0fdf4 0%,#dcfce7 100%)">
       <div class="empty-state-icon">✅</div>
-      <div class="empty-state-title" style="color:var(--success)">Нет открытых долгов</div>
-      <p class="empty-state-text">Все реализации оплачены.</p>
+      <div class="empty-state-title" style="color:var(--success)">${i18n.t("analytics_no_open_debts")}</div>
+      <p class="empty-state-text">${i18n.t("analytics_all_paid")}</p>
     </div>`;
 
   const rows=list.map(d=>{
@@ -881,11 +801,11 @@ function renderDebtsTable(list){
       <td class="r" style="font-weight:700;color:var(--danger)">${fmtMoney(d.balance_amount)}</td>
       <td>
         <div class="progress-wrap" style="min-width:70px"><div class="progress-fill" style="width:${pp.toFixed(1)}%;background:var(--success)"></div></div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${pp.toFixed(0)}% оплачено</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${pp.toFixed(0)}% ${i18n.t("analytics_paid_pct")}</div>
       </td>
       <td>
         ${d.is_overdue
-          ? `<span class="debt-overdue">⚠ ${d.overdue_days} дн</span>`
+          ? `<span class="debt-overdue">⚠ ${d.overdue_days} ${i18n.t("analytics_days")}</span>`
           : d.due_date
             ? `<span style="font-size:12px;color:var(--text-muted)">${esc(d.due_date)}</span>`
             : `<span class="cell-muted">—</span>`}
@@ -895,35 +815,35 @@ function renderDebtsTable(list){
 
   return `<div class="table-wrap"><table>
     <thead><tr>
-      <th>Контрагент</th><th class="r">Долг</th><th class="r">Оплачено</th>
-      <th class="r">Остаток</th><th style="min-width:110px">Прогресс</th><th>Срок / просрочка</th>
+      <th>${esc(i18n.t("col_client"))}</th>
+      <th class="r">${esc(i18n.t("analytics_debt_sum"))}</th>
+      <th class="r">${esc(i18n.t("col_paid"))}</th>
+      <th class="r">${esc(i18n.t("col_balance"))}</th>
+      <th style="min-width:110px">${esc(i18n.t("analytics_progress"))}</th>
+      <th>${esc(i18n.t("analytics_due_overdue"))}</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>`;
 }
 
-/* ══════════════════════════════════════════════════════════
-   РЕНДЕР — СКЛАД
-   ══════════════════════════════════════════════════════════ */
+/* РЕНДЕР — СКЛАД */
 function renderStockKpi(sv){
   const t=sv.totals||{};
   return [
-    {color:"c-teal",  label:i18n.t("stock_value_fifo"), value:fmtMoney(t.stock_cost_value), sub:`${fmt(t.total_skus)} SKU на складе`},
-    {color:"c-green", label:i18n.t("potential_revenue"),      value:fmtMoney(t.stock_sale_value), sub:i18n.t("sale_price")},
-    {color:"c-purple",label:i18n.t("potential_profit"),      value:fmtMoney(t.potential_profit), sub:i18n.t("sell_all_stock")},
+    {color:"c-teal",  label:i18n.t("analytics_stock_fifo"),    value:fmtMoney(t.stock_cost_value), sub:`${fmt(t.total_skus)} SKU ${i18n.t("analytics_in_stock")}`},
+    {color:"c-green", label:i18n.t("analytics_potential_rev"), value:fmtMoney(t.stock_sale_value), sub:i18n.t("analytics_at_sale_price")},
+    {color:"c-purple",label:i18n.t("analytics_potential_prf"), value:fmtMoney(t.potential_profit), sub:i18n.t("analytics_sell_all")},
   ].map(c=>`<div class="kpi-card ${esc(c.color)}"><div class="kpi-label">${esc(c.label)}</div><div class="kpi-value">${c.value}</div><div class="kpi-sub">${esc(c.sub)}</div></div>`).join("");
 }
 
-/* ══════════════════════════════════════════════════════════
-   РЕНДЕР — OUT-OF-SYNC
-   ══════════════════════════════════════════════════════════ */
+/* РЕНДЕР — OUT-OF-SYNC */
 function renderSyncCheck(sv){
   const ch=sv.sync_check||{ok:true,out_of_sync:[]};
   if (ch.ok) return `
     <div class="empty-state" style="border-style:solid;border-color:var(--success-bg);background:linear-gradient(180deg,#f0fdf4 0%,#dcfce7 100%)">
       <div class="empty-state-icon">✅</div>
-      <div class="empty-state-title" style="color:var(--success)">Всё синхронизировано</div>
-      <p class="empty-state-text">Остатки stock совпадают с партиями item_batches.</p>
+      <div class="empty-state-title" style="color:var(--success)">${i18n.t("analytics_synced")}</div>
+      <p class="empty-state-text">${i18n.t("analytics_synced_hint")}</p>
     </div>`;
   const rows=ch.out_of_sync.map(r=>{
     const diff=+r.diff;
@@ -933,27 +853,31 @@ function renderSyncCheck(sv){
       <td>${fmt(r.qty_in_stock,3)}</td>
       <td>${fmt(r.qty_in_batches,3)}</td>
       <td class="${diff>0?"cell-warning":"cell-danger"}">${diff>0?"+":""}${fmt(diff,3)}</td>
-      <td><span class="kpi-badge ${Math.abs(diff)>1?"badge-red":"badge-amber"}">${Math.abs(diff)>1?i18n.t("severe"):i18n.t("minor")}</span></td>
+      <td><span class="kpi-badge ${Math.abs(diff)>1?"badge-red":"badge-amber"}">${Math.abs(diff)>1?i18n.t("analytics_severe"):i18n.t("analytics_minor")}</span></td>
     </tr>`;
   }).join("");
   return `
     <div class="alert alert-warning visible" style="margin-bottom:14px">
       <span class="alert-icon">⚠️</span>
-      Обнаружено расхождений: <strong>${ch.out_of_sync.length}</strong>. Требуется инвентаризация.
+      ${i18n.t("analytics_discrepancies_found")}: <strong>${ch.out_of_sync.length}</strong>. ${i18n.t("analytics_needs_inventory")}.
     </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Товар</th><th>ID</th><th>В stock</th><th>В batches</th><th>Разница</th><th>Степень</th></tr></thead>
+      <thead><tr>
+        <th>${esc(i18n.t("col_item"))}</th><th>ID</th>
+        <th>${esc(i18n.t("analytics_in_stock_col"))}</th>
+        <th>${esc(i18n.t("analytics_in_batches"))}</th>
+        <th>${esc(i18n.t("analytics_diff"))}</th>
+        <th>${esc(i18n.t("analytics_severity"))}</th>
+      </tr></thead>
       <tbody>${rows}</tbody>
     </table></div>`;
 }
 
-/* ══════════════════════════════════════════════════════════
-   ГЛАВНАЯ ЗАГРУЗКА
-   ══════════════════════════════════════════════════════════ */
+/* ГЛАВНАЯ ЗАГРУЗКА */
 async function loadAll(){
   if (!checkTenant()){ hideLoader(); updateSubtitle(); return; }
 
-  showLoader("Загрузка данных…");
+  showLoader(i18n.t("loading_data"));
   showSkeletons();
   updateSubtitle();
   document.getElementById("alert-error").classList.remove("visible");
@@ -961,7 +885,7 @@ async function loadAll(){
 
   const q    = buildQuery();
   const qTop = buildQuery({limit:10});
-  const qTid = buildTenantOnly();          // долги и склад — без фильтра дат
+  const qTid = buildTenantOnly();
 
   const [pnlR, dailyR, topR, debtsR, svR] = await Promise.allSettled([
     apiFetch(`/reports/pnl?${q}`),
@@ -975,30 +899,30 @@ async function loadAll(){
   if (pnlR.status==="fulfilled"){
     const pnl=pnlR.value.pnl, per=pnlR.value.period;
     const from=per?.date_from||$from.value, to=per?.date_to||$to.value;
-    document.getElementById("pnl-period-note").textContent = from&&to?`${from} — ${to}`:from?`с ${from}`:"";
+    document.getElementById("pnl-period-note").textContent = from&&to?`${from} — ${to}`:from?`${i18n.t("analytics_from")} ${from}`:"";
     document.getElementById("pnl-kpi-grid").innerHTML    = renderPnlKpi(pnl);
     document.getElementById("pnl-funnel-wrap").innerHTML = renderPnlFunnel(pnl);
     document.getElementById("expenses-wrap").innerHTML   = renderExpenses(pnl);
   } else if (pnlR.reason?.message!=="unauthorized"){
-    blockError("pnl-kpi-grid","Ошибка P&L",pnlR.reason?.message||"");
+    blockError("pnl-kpi-grid",`${i18n.t("status_error")} P&L`,pnlR.reason?.message||"");
     document.getElementById("pnl-funnel-wrap").innerHTML="";
   }
 
   /* Динамика */
   if (dailyR.status==="fulfilled"){
     const d=dailyR.value.daily||[];
-    document.getElementById("chart-note").textContent=`${d.length} дн.`;
+    document.getElementById("chart-note").textContent=`${d.length} ${i18n.t("analytics_days_short")}`;
     document.getElementById("chart-wrap").innerHTML=renderChart(d);
   } else if (dailyR.reason?.message!=="unauthorized"){
-    document.getElementById("chart-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">Ошибка динамики</div><p class="empty-state-text">${esc(dailyR.reason?.message||"")}</p></div>`;
+    document.getElementById("chart-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${i18n.t("analytics_chart_error")}</div><p class="empty-state-text">${esc(dailyR.reason?.message||"")}</p></div>`;
   }
 
   /* Топ товаров */
   if (topR.status==="fulfilled"){
-    document.getElementById("top-note").textContent=i18n.t("top_by_revenue",{n:(topR.value.limit||10)});
+    document.getElementById("top-note").textContent=`${i18n.t("analytics_top")} ${topR.value.limit||10} ${i18n.t("analytics_by_revenue")}`;
     document.getElementById("top-items-wrap").innerHTML=renderTopItems(topR.value);
   } else if (topR.reason?.message!=="unauthorized"){
-    document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">Ошибка топ товаров</div><p class="empty-state-text">${esc(topR.reason?.message||"")}</p></div>`;
+    document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${i18n.t("analytics_top_error")}</div><p class="empty-state-text">${esc(topR.reason?.message||"")}</p></div>`;
   }
 
   /* Долги */
@@ -1006,10 +930,10 @@ async function loadAll(){
     const s=debtsR.value.summary||{};
     document.getElementById("debts-kpi-grid").innerHTML=renderDebtsKpi(s);
     document.getElementById("debts-table-wrap").innerHTML=
-      `<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Топ открытых долгов</div>`+
+      `<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">${i18n.t("analytics_top_open_debts")}</div>`+
       renderDebtsTable(debtsR.value.top_open_debts||[]);
   } else if (debtsR.reason?.message!=="unauthorized"){
-    blockError("debts-kpi-grid",i18n.t("debts_error"),debtsR.reason?.message||"");
+    blockError("debts-kpi-grid",i18n.t("analytics_debts_error"),debtsR.reason?.message||"");
     document.getElementById("debts-table-wrap").innerHTML="";
   }
 
@@ -1018,21 +942,19 @@ async function loadAll(){
     document.getElementById("stock-kpi-grid").innerHTML=renderStockKpi(svR.value);
     document.getElementById("sync-body").innerHTML=renderSyncCheck(svR.value);
   } else if (svR.reason?.message!=="unauthorized"){
-    blockError("stock-kpi-grid",i18n.t("stock_error"),svR.reason?.message||"");
+    blockError("stock-kpi-grid",i18n.t("analytics_stock_error"),svR.reason?.message||"");
     document.getElementById("sync-body").innerHTML="";
   }
 
   /* Общая ошибка */
   if ([pnlR,dailyR,topR,debtsR,svR].every(r=>r.status==="rejected")&&pnlR.reason?.message!=="unauthorized")
-    showError(i18n.t("load_failed")+" "+(pnlR.reason?.message||i18n.t("server_error")));
+    showError(`${i18n.t("load_error")}: ${pnlR.reason?.message||i18n.t("status_error")}`);
 
   hideLoader();
 }
 
-/* i18n */
 i18n.applyTranslations();
 i18n.renderLanguageSwitcher("langSwitcher");
-/* Запуск */
 loadAll();
 </script>
 </body>
