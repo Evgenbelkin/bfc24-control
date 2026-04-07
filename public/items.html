@@ -20,72 +20,285 @@
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:16px;
     }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);}
-    .wrap{max-width:1320px;margin:0 auto;padding:24px 16px 48px;}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
-    .title{font-size:28px;font-weight:700;}
-    .top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-    .btn{border:none;border-radius:12px;padding:12px 16px;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;}
-    .btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:var(--primary-hover);}
-    .btn-light{background:#fff;color:var(--text);border:1px solid var(--line);}
-    .btn-secondary{background:#f8fafc;color:var(--text);border:1px solid var(--line);}
-    .card{background:var(--card);border:1px solid #eef1f5;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px;}
-    .card-title{font-size:18px;font-weight:700;margin:0 0 14px;}
-    .muted{color:var(--muted);font-size:13px;}
-    .form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
-    .field{display:flex;flex-direction:column;gap:7px;min-width:0;}
-    .field.full{grid-column:1/-1;}
-    label{font-size:14px;font-weight:700;}
-    input,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;background:#fff;color:var(--text);outline:none;}
-    input:focus,textarea:focus{border-color:#9db8ff;box-shadow:0 0 0 4px rgba(37,99,235,.10);}
-    textarea{min-height:92px;resize:vertical;}
-    .toolbar{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-top:18px;}
-    .toolbar-actions{display:flex;gap:10px;flex-wrap:wrap;}
-    .status{margin-top:12px;padding:12px 14px;border-radius:12px;font-size:14px;display:none;white-space:pre-wrap;}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1320px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .btn-primary:hover{
+      background:var(--primary-hover);
+    }
+
+    .btn-light{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-secondary{
+      background:#f8fafc;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid #eef1f5;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:16px;
+    }
+
+    .card-title{
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 14px;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      min-width:0;
+    }
+
+    .field.full{
+      grid-column:1 / -1;
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    input, textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus, textarea:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    textarea{
+      min-height:92px;
+      resize:vertical;
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      align-items:end;
+      margin-top:18px;
+    }
+
+    .toolbar-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+
     .status.show{display:block}
-    .status.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;}
-    .status.success{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;}
-    .status.info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
-    .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px;}
-    .stat{background:#f8fafc;border:1px solid #e8edf4;border-radius:14px;padding:14px;}
-    .stat-label{color:var(--muted);font-size:12px;margin-bottom:6px;}
-    .stat-value{font-size:22px;font-weight:800;}
-    .table-wrap{overflow:auto;margin-top:10px;}
-    table{width:100%;min-width:1200px;border-collapse:collapse;background:#fff;}
-    th,td{border-bottom:1px solid #eef1f5;padding:12px 10px;text-align:left;vertical-align:top;font-size:14px;}
-    th{background:#f8fafc;font-weight:700;color:#111827;position:sticky;top:0;z-index:1;}
-    tr:hover td{background:#fbfdff;}
-    .row-actions{display:flex;gap:8px;flex-wrap:wrap;}
-    .empty{text-align:center;color:var(--muted);padding:24px 12px;}
-    .lang-switcher{display:flex;gap:4px;}
-    .lang-btn{border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12px;font-weight:700;background:#fff;color:var(--muted);}
-    .lang-btn.lang-active{background:var(--primary);color:#fff;border-color:var(--primary);}
-    @media(max-width:980px){.form-grid,.stats,.toolbar{grid-template-columns:1fr;}.title{font-size:24px;}.wrap{padding:16px 12px 32px;}}
+    .status.error{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+    .status.success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .status.info{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .stat{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      margin-top:10px;
+    }
+
+    table{
+      width:100%;
+      min-width:1200px;
+      border-collapse:collapse;
+      background:#fff;
+    }
+
+    th, td{
+      border-bottom:1px solid #eef1f5;
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    th{
+      background:#f8fafc;
+      font-weight:700;
+      color:#111827;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    tr:hover td{
+      background:#fbfdff;
+    }
+
+    .row-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:24px 12px;
+    }
+
+    @media (max-width: 980px){
+      .form-grid,
+      .stats,
+      .toolbar{
+        grid-template-columns:1fr;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .wrap{
+        padding:16px 12px 32px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title" data-i18n="page_items">Товары</div>
+      <div class="title" id="pageTitle">Товары</div>
       <div class="top-actions">
         <div id="langSwitcher" class="lang-switcher"></div>
-        <button class="btn btn-light" onclick="goBack()" data-i18n="back">Назад</button>
-        <button class="btn btn-light" onclick="logout()" data-i18n="logout">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()" id="backBtn">Назад</button>
+        <button class="btn btn-light" onclick="logout()" id="logoutBtn">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title" id="formTitle" data-i18n="form_create_item">Создать товар</h2>
-      <div class="muted" data-i18n="item_card_hint">Карточка товара для приёмки, продажи, списания и остатков.</div>
+      <h2 class="card-title" id="formTitle">Создать товар</h2>
+      <div class="muted" id="pageHint">Карточка товара для приёмки, продажи, списания и остатков.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label" data-i18n="stat_items_count">Товаров</div>
+          <div class="stat-label" id="itemsCountLabel">Товаров</div>
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label" data-i18n="stat_tenant_id">Tenant ID</div>
+          <div class="stat-label" id="tenantLabel">Tenant ID</div>
           <div class="stat-value" id="tenantValue">1</div>
         </div>
       </div>
@@ -93,40 +306,46 @@
       <form id="itemForm" autocomplete="off" style="margin-top:18px;">
         <div class="form-grid">
           <div class="field">
-            <label for="name" data-i18n="label_name">Название</label>
-            <input id="name" type="text" data-i18n-placeholder="ph_name_item" placeholder="Например: Тест товар SaaS" />
+            <label for="name" id="labelName">Название</label>
+            <input id="name" type="text" placeholder="Например: Тест товар SaaS" />
           </div>
+
           <div class="field">
-            <label for="sku" data-i18n="label_sku">Артикул / SKU</label>
-            <input id="sku" type="text" data-i18n-placeholder="ph_sku" placeholder="Например: SKU-001" />
+            <label for="sku" id="labelSku">Артикул / SKU</label>
+            <input id="sku" type="text" placeholder="Например: SKU-001" />
           </div>
+
           <div class="field">
-            <label for="barcode" data-i18n="label_barcode">Штрихкод</label>
-            <input id="barcode" type="text" data-i18n-placeholder="ph_barcode" placeholder="Например: 1234567890123" />
+            <label for="barcode" id="labelBarcode">Штрихкод</label>
+            <input id="barcode" type="text" placeholder="Например: 1234567890123" />
           </div>
+
           <div class="field">
-            <label for="purchasePrice" data-i18n="label_purchase_price">Закупочная цена</label>
+            <label for="purchasePrice" id="labelPurchasePrice">Закупочная цена</label>
             <input id="purchasePrice" type="number" step="0.01" min="0" value="0" />
           </div>
+
           <div class="field">
-            <label for="salePrice" data-i18n="label_sale_price">Цена продажи</label>
+            <label for="salePrice" id="labelSalePrice">Цена продажи</label>
             <input id="salePrice" type="number" step="0.01" min="0" value="0" />
           </div>
+
           <div class="field">
-            <label for="unit" data-i18n="label_unit">Единица</label>
-            <input id="unit" type="text" data-i18n-placeholder="ph_unit" placeholder="Например: pcs" value="pcs" />
+            <label for="unit" id="labelUnit">Единица</label>
+            <input id="unit" type="text" placeholder="Например: pcs" value="pcs" />
           </div>
         </div>
 
         <div class="toolbar">
           <div class="field">
-            <label for="searchInput" data-i18n="label_search">Поиск</label>
-            <input id="searchInput" type="text" data-i18n-placeholder="ph_search_items" placeholder="Поиск по названию, артикулу, штрихкоду" />
+            <label for="searchInput" id="labelSearch">Поиск</label>
+            <input id="searchInput" type="text" placeholder="Поиск по названию, артикулу, штрихкоду" />
           </div>
+
           <div class="toolbar-actions">
-            <button type="submit" class="btn btn-primary" id="saveBtn" data-i18n="save">Сохранить</button>
-            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;" data-i18n="cancel_edit">Отменить редактирование</button>
-            <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="refresh_list">Обновить список</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
+            <button type="button" class="btn btn-light" id="refreshBtn">Обновить список</button>
           </div>
         </div>
       </form>
@@ -136,26 +355,27 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title" data-i18n="list_items">Список товаров</h2>
+      <h2 class="card-title" id="listTitle">Список товаров</h2>
+
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th data-i18n="col_id">ID</th>
-              <th data-i18n="col_name">Название</th>
-              <th data-i18n="col_sku">Артикул / SKU</th>
-              <th data-i18n="col_barcode">Штрихкод</th>
-              <th data-i18n="col_unit">Ед.</th>
-              <th data-i18n="col_purchase">Закупка</th>
-              <th data-i18n="col_sale">Продажа</th>
-              <th data-i18n="col_active">Активно</th>
-              <th data-i18n="col_date">Дата</th>
-              <th data-i18n="col_actions">Действия</th>
+              <th>ID</th>
+              <th id="thName">Название</th>
+              <th>Артикул / SKU</th>
+              <th>Штрихкод</th>
+              <th id="thUnit">Ед.</th>
+              <th id="thPurchase">Закупка</th>
+              <th id="thSale">Продажа</th>
+              <th id="thActive">Активно</th>
+              <th id="thDate">Дата</th>
+              <th id="thActions">Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="10" class="empty" data-i18n="status_loading">Загрузка данных...</td>
+              <td colspan="10" class="empty">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -163,94 +383,196 @@
     </div>
   </div>
 
-  <script src="/js/config.js"></script>
+    <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
   <script src="/js/i18n.js"></script>
 
-  <script>
-    const FALLBACK_TENANT_ID = 1;
+  <script>    const FALLBACK_TENANT_ID = 1;
 
     const token = localStorage.getItem("token");
-    if (!token) { window.location.href = "/login.html"; }
+    if (!token) {
+      window.location.href = "/login.html";
+    }
 
     const Ui = window.AppUI || {
-      escapeHtml: (v) => String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"),
-      translateError: (v) => String(v || i18n.t("status_error")),
-      displayDateTime: (v) => {
-        if (!v) return "";
-        const d = new Date(v);
-        if (Number.isNaN(d.getTime())) return String(v);
+      escapeHtml: (value) => String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;"),
+      translateError: (value) => String(value || "Ошибка"),
+      displayDateTime: (value) => {
+        if (!value) return "";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
         return d.toLocaleString("ru-RU");
       }
     };
 
     async function requestFallback(method, path, body) {
-      const t = localStorage.getItem("token") || "";
-      const res = await fetch(path, {
+      const token = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
         method,
-        headers: { "Content-Type": "application/json", ...(t ? { Authorization: "Bearer " + t } : {}) },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
         ...(body !== undefined ? { body: JSON.stringify(body) } : {})
       });
-      const text = await res.text();
+
+      const text = await response.text();
       let data = {};
-      try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
-      if (!res.ok || data.ok === false) throw new Error(data.error || data.message || ("HTTP " + res.status));
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+
       return data;
     }
 
     function getTenantIdFromStorage(fallback = 1) {
       try {
-        const u = JSON.parse(localStorage.getItem("user"));
-        if (u && u.tenant_id !== null && u.tenant_id !== undefined && u.tenant_id !== "") return Number(u.tenant_id);
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
       } catch {}
       return fallback;
     }
 
     const ApiBridge = {
-      getTenantId(f = 1) {
+      getTenantId(fallback = 1) {
         if (window.API && typeof window.API.getTenantId === "function") {
-          const t = window.API.getTenantId();
-          if (t !== null && t !== undefined && t !== "") return Number(t);
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
         }
-        return getTenantIdFromStorage(f);
+        return getTenantIdFromStorage(fallback);
       },
-      get(p)        { return window.API?.get    ? window.API.get(p)         : requestFallback("GET",    p); },
-      post(p, b)    { return window.API?.post   ? window.API.post(p, b)     : requestFallback("POST",   p, b); },
-      put(p, b)     { return window.API?.put    ? window.API.put(p, b)      : requestFallback("PUT",    p, b); },
-      patch(p, b)   { return window.API?.patch  ? window.API.patch(p, b)    : requestFallback("PATCH",  p, b); },
-      delete(p)     { return window.API?.delete ? window.API.delete(p)      : requestFallback("DELETE", p); }
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      },
+      post(path, body) {
+        if (window.API && typeof window.API.post === "function") {
+          return window.API.post(path, body);
+        }
+        return requestFallback("POST", path, body);
+      },
+      put(path, body) {
+        if (window.API && typeof window.API.put === "function") {
+          return window.API.put(path, body);
+        }
+        return requestFallback("PUT", path, body);
+      },
+      patch(path, body) {
+        if (window.API && typeof window.API.patch === "function") {
+          return window.API.patch(path, body);
+        }
+        return requestFallback("PATCH", path, body);
+      },
+      delete(path) {
+        if (window.API && typeof window.API.delete === "function") {
+          return window.API.delete(path);
+        }
+        return requestFallback("DELETE", path);
+      }
     };
 
     let authUser = null;
     let itemsData = [];
     let editId = null;
 
-    const els = {
-      formTitle:     document.getElementById("formTitle"),
-      itemForm:      document.getElementById("itemForm"),
-      name:          document.getElementById("name"),
-      sku:           document.getElementById("sku"),
-      barcode:       document.getElementById("barcode"),
-      purchasePrice: document.getElementById("purchasePrice"),
-      salePrice:     document.getElementById("salePrice"),
-      unit:          document.getElementById("unit"),
-      searchInput:   document.getElementById("searchInput"),
-      saveBtn:       document.getElementById("saveBtn"),
-      cancelEditBtn: document.getElementById("cancelEditBtn"),
-      refreshBtn:    document.getElementById("refreshBtn"),
-      tbody:         document.getElementById("tbody"),
-      pageStatus:    document.getElementById("pageStatus"),
-      submitStatus:  document.getElementById("submitStatus"),
-      itemsCount:    document.getElementById("itemsCount"),
-      tenantValue:   document.getElementById("tenantValue")
-    };
+    const tr = (key, fallback="") => { const value = i18n.t(key); return value !== key ? value : (fallback || key); };
 
-    function goBack()  { window.location.href = "/index.html"; }
-    function logout()  { localStorage.removeItem("token"); localStorage.removeItem("user"); window.location.href = "/login.html"; }
+    const els = {
+      formTitle: document.getElementById("formTitle"),
+      itemForm: document.getElementById("itemForm"),
+      name: document.getElementById("name"),
+      sku: document.getElementById("sku"),
+      barcode: document.getElementById("barcode"),
+      purchasePrice: document.getElementById("purchasePrice"),
+      salePrice: document.getElementById("salePrice"),
+      unit: document.getElementById("unit"),
+      searchInput: document.getElementById("searchInput"),
+      saveBtn: document.getElementById("saveBtn"),
+      cancelEditBtn: document.getElementById("cancelEditBtn"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      tbody: document.getElementById("tbody"),
+      pageStatus: document.getElementById("pageStatus"),
+      submitStatus: document.getElementById("submitStatus"),
+      itemsCount: document.getElementById("itemsCount"),
+      tenantValue: document.getElementById("tenantValue")
+    };
+    }
+
+    function applyStaticTranslations() {
+      if (window.i18n && typeof window.i18n.applyTranslations === "function") {
+        window.i18n.applyTranslations();
+      }
+      document.title = i18n.tr("page_items_title") !== "page_items_title" ? i18n.tr("page_items_title") : "BFC24 CONTROL — Товары";
+      const setText = (id, key, fallback) => { const el = document.getElementById(id); if (el) { const value = i18n.t(key); el.textContent = value !== key ? value : fallback; } };
+      const setPlaceholder = (id, key, fallback) => { const el = document.getElementById(id); if (el) { const value = i18n.t(key); el.placeholder = value !== key ? value : fallback; } };
+      setTextr("pageTitle", "items_title", "Товары");
+      setTextr("backBtn", "back", "Назад");
+      setTextr("logoutBtn", "logout", "Выйти");
+      setTextr("formTitle", editId ? "edit" : "items_add", editId ? (i18n.tr("edit") !== "edit" ? i18n.tr("edit") : "Редактировать") : "Добавить товар");
+      setTextr("pageHint", "items_desc", "Справочник товаров");
+      setTextr("itemsCountLabel", "items", "Товары");
+      setTextr("tenantLabel", "tenant_id", "Tenant ID");
+      setTextr("labelName", "item_name", "Название");
+      setTextr("labelSku", "item_sku", "Артикул / SKU");
+      setTextr("labelBarcode", "item_barcode", "Штрихкод");
+      setTextr("labelPurchasePrice", "item_purchase_price", "Закупочная цена");
+      setTextr("labelSalePrice", "item_sale_price", "Цена продажи");
+      setTextr("labelUnit", "item_unit", "Единица");
+      setTextr("labelSearch", "search", "Поиск");
+      setTextr("saveBtn", "save", (i18n.tr("save") !== "save" ? i18n.tr("save") : "Сохранить"));
+      setTextr("cancelEditBtn", "cancel", "Отменить");
+      setTextr("refreshBtn", "refresh", "Обновить");
+      setTextr("listTitle", "items_list", "Список товаров");
+      setTextr("thName", "item_name", "Название");
+      setTextr("thUnit", "item_unit", "Ед.");
+      setTextr("thPurchase", "item_purchase_price", "Закупка");
+      setTextr("thSale", "item_sale_price", "Продажа");
+      setTextr("thActive", "status_active", "Активно");
+      setTextr("thDate", "movement_date", "Дата");
+      setTextr("thActions", "actions", "Действия");
+      setPlaceholder("name", "item_name", "Название");
+      setPlaceholder("sku", "item_sku", "Артикул / SKU");
+      setPlaceholder("barcode", "item_barcode", "Штрихкод");
+      setPlaceholder("unit", "item_unit", "Единица");
+      setPlaceholder("searchInput", "item_search", "Поиск по названию, артикулу, штрихкоду");
+    }
+
+    function goBack() {
+      window.location.href = "/index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
 
     function parseUser() {
-      try { authUser = JSON.parse(localStorage.getItem("user")); } catch { authUser = null; }
+      try {
+        const raw = localStorage.getItem("user");
+        authUser = raw ? JSON.parse(raw) : null;
+      } catch {
+        authUser = null;
+      }
     }
 
     function getTenantId() {
@@ -260,17 +582,31 @@
       return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== 'undefined' ? FALLBACK_TENANT_ID : 1);
     }
 
-    function showStatus(el, text, type = "info") { el.className = "status show " + type; el.textContent = text; }
-    function hideStatus(el) { el.className = "status"; el.textContent = ""; }
-
-    function escapeHtml(v) {
-      return String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    function showStatus(el, text, type = "info") {
+      el.className = "status show " + type;
+      el.textContent = text;
     }
 
-    function formatDate(v) { return Ui.displayDateTime(v); }
+    function hideStatus(el) {
+      el.className = "status";
+      el.textContent = "";
+    }
 
-    function formatMoney(v) {
-      const n = Number(v || 0);
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatDate(value) {
+      return Ui.displayDateTime(value);
+    }
+
+    function formatMoney(value) {
+      const n = Number(value || 0);
       if (!Number.isFinite(n)) return "0";
       return n % 1 === 0 ? String(n) : n.toFixed(2);
     }
@@ -278,14 +614,26 @@
     function extractList(data, keys) {
       if (Array.isArray(data)) return data;
       if (!data || typeof data !== "object") return [];
-      for (const k of keys) { if (Array.isArray(data[k])) return data[k]; }
-      for (const v of Object.values(data)) { if (Array.isArray(v)) return v; }
+
+      for (const key of keys) {
+        if (Array.isArray(data[key])) return data[key];
+      }
+
+      for (const value of Object.values(data)) {
+        if (Array.isArray(value)) return value;
+      }
+
       return [];
     }
-
-    async function apiGet(p)       { return ApiBridge.get(p); }
-    async function apiPost(p, b)   { return ApiBridge.post(p, b); }
-    async function apiPut(p, b)    { return ApiBridge.put(p, b); }
+    async function apiGet(path) {
+      return ApiBridge.get(path);
+    }
+    async function apiPost(path, body) {
+      return ApiBridge.post(path, body);
+    }
+    async function apiPut(path, body) {
+      return ApiBridge.put(path, body);
+    }
 
     function normalizeItem(row) {
       return {
@@ -303,34 +651,46 @@
 
     function resetForm() {
       editId = null;
-      els.formTitle.textContent = i18n.t("form_create_item");
-      els.saveBtn.textContent   = i18n.t("save");
+      els.formTitle.textContent = tr("items_add", "Добавить товар");
+      els.saveBtn.textContent = (i18n.tr("save") !== "save" ? i18n.tr("save") : "Сохранить");
       els.cancelEditBtn.style.display = "none";
-      els.name.value = ""; els.sku.value = ""; els.barcode.value = "";
-      els.purchasePrice.value = "0"; els.salePrice.value = "0"; els.unit.value = "pcs";
+      els.name.value = "";
+      els.sku.value = "";
+      els.barcode.value = "";
+      els.purchasePrice.value = "0";
+      els.salePrice.value = "0";
+      els.unit.value = "pcs";
       hideStatus(els.submitStatus);
     }
 
     function startEdit(item) {
       editId = item.id;
-      els.formTitle.textContent = `${i18n.t("form_edit_item")} #${item.id}`;
-      els.saveBtn.textContent   = i18n.t("save_changes");
+      els.formTitle.textContent = `${tr("edit", "Редактировать")} #${item.id}`;
+      els.saveBtn.textContent = (i18n.tr("save") !== "save" ? i18n.tr("save") : "Сохранить");
       els.cancelEditBtn.style.display = "inline-flex";
-      els.name.value          = item.name || "";
-      els.sku.value           = item.sku || "";
-      els.barcode.value       = item.barcode || "";
+      els.name.value = item.name || "";
+      els.sku.value = item.sku || "";
+      els.barcode.value = item.barcode || "";
       els.purchasePrice.value = String(item.purchase_price ?? 0);
-      els.salePrice.value     = String(item.sale_price ?? 0);
-      els.unit.value          = item.unit || "pcs";
+      els.salePrice.value = String(item.sale_price ?? 0);
+      els.unit.value = item.unit || "pcs";
       hideStatus(els.submitStatus);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function getFilteredRows() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
+
       return itemsData.filter(row => {
         if (!search) return true;
-        return [row.name, row.sku, row.barcode, row.unit].join(" ").toLowerCase().includes(search);
+        const text = [
+          row.name,
+          row.sku,
+          row.barcode,
+          row.unit
+        ].join(" ").toLowerCase();
+
+        return text.includes(search);
       });
     }
 
@@ -339,7 +699,11 @@
       els.itemsCount.textContent = String(itemsData.length);
 
       if (!rows.length) {
-        els.tbody.innerHTML = `<tr><td colspan="10" class="empty">${i18n.t("status_no_data")}</td></tr>`;
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="10" class="empty">Нет данных</td>
+          </tr>
+        `;
         return;
       }
 
@@ -352,11 +716,11 @@
           <td>${escapeHtml(row.unit)}</td>
           <td>${escapeHtml(formatMoney(row.purchase_price))}</td>
           <td>${escapeHtml(formatMoney(row.sale_price))}</td>
-          <td>${row.is_active ? i18n.t("yes") : i18n.t("no")}</td>
+          <td>${row.is_active ? tr("yes", "Да") : tr("no", "Нет")}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
           <td>
             <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">${i18n.t("edit")}</button>
+              <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">${tr("edit", "Редактировать")}</button>
             </div>
           </td>
         </tr>
@@ -367,20 +731,25 @@
       try {
         const tenantId = getTenantId();
         els.tenantValue.textContent = String(tenantId);
-        showStatus(els.pageStatus, `${i18n.t("loading_data")}\nTenant ID: ${tenantId}`, "info");
+        showStatus(els.pageStatus, `Загрузка товаров...\nTenant ID: ${tenantId}`, "info");
 
         const data = await apiGet(`/items?tenant_id=${tenantId}`);
         itemsData = extractList(data, ["items", "data", "rows"]).map(normalizeItem);
 
         renderTable();
+
         showStatus(
           els.pageStatus,
-          `${i18n.t("data_loaded")}\nTenant ID: ${tenantId}\n${i18n.t("stat_items_count")}: ${itemsData.length}`,
+          `Данные загружены.\nTenant ID: ${tenantId}\nТоваров: ${itemsData.length}`,
           "success"
         );
       } catch (err) {
-        els.tbody.innerHTML = `<tr><td colspan="10" class="empty">${i18n.t("load_error")}</td></tr>`;
-        showStatus(els.pageStatus, `${i18n.t("status_error")}: ${Ui.translateError(err.message)}`, "error");
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="10" class="empty">${tr("status_error", "Ошибка")}</td>
+          </tr>
+        `;
+        showStatus(els.pageStatus, `${tr("status_error", "Ошибка")}: ${Ui.translateError(err.message)}`, "error");
       }
     }
 
@@ -389,34 +758,51 @@
       hideStatus(els.submitStatus);
 
       try {
-        const tenantId       = getTenantId();
-        const name           = (els.name.value || "").trim();
-        const sku            = (els.sku.value  || "").trim();
-        const barcode        = (els.barcode.value || "").trim();
+        const tenantId = getTenantId();
+
+        const name = (els.name.value || "").trim();
+        const sku = (els.sku.value || "").trim();
+        const barcode = (els.barcode.value || "").trim();
         const purchase_price = Number(els.purchasePrice.value || 0);
-        const sale_price     = Number(els.salePrice.value || 0);
-        const unit           = (els.unit.value || "").trim() || "pcs";
+        const sale_price = Number(els.salePrice.value || 0);
+        const unit = (els.unit.value || "").trim() || "pcs";
 
-        if (!name) throw new Error(i18n.t("err_name_required"));
-        if (!Number.isFinite(purchase_price) || purchase_price < 0) throw new Error(i18n.t("err_price_invalid"));
-        if (!Number.isFinite(sale_price)     || sale_price < 0)     throw new Error(i18n.t("err_sale_price_invalid"));
+        if (!name) {
+          throw new Error(tr("item_name", "Название") + " " + tr("required_suffix", "обязательно"));
+        }
 
-        const body = { tenant_id: tenantId, name, sku: sku || null, barcode: barcode || null, unit, purchase_price, sale_price };
+        if (!Number.isFinite(purchase_price) || purchase_price < 0) {
+          throw new Error(tr("status_error", "Ошибка"));
+        }
+
+        if (!Number.isFinite(sale_price) || sale_price < 0) {
+          throw new Error(tr("status_error", "Ошибка"));
+        }
+
+        const body = {
+          tenant_id: tenantId,
+          name,
+          sku: sku || null,
+          barcode: barcode || null,
+          unit,
+          purchase_price,
+          sale_price
+        };
 
         if (editId) {
-          showStatus(els.submitStatus, `${i18n.t("status_saving")} #${editId}...`, "info");
+          showStatus(els.submitStatus, `${tr("status_saving", "Сохранение...")} #${editId}...`, "info");
           await apiPut(`/items/${editId}`, body);
-          showStatus(els.submitStatus, `${i18n.t("msg_item_updated")} #${editId}`, "success");
+          showStatus(els.submitStatus, `${tr("status_success", "Успешно")} #${editId}`, "success");
         } else {
-          showStatus(els.submitStatus, i18n.t("status_saving"), "info");
-          await apiPost("/items", body);
-          showStatus(els.submitStatus, i18n.t("msg_item_created"), "success");
+          showStatus(els.submitStatus, tr("status_saving", "Сохранение..."), "info");
+          await apiPostr("/items", body);
+          showStatus(els.submitStatus, tr("status_success", "Успешно"), "success");
         }
 
         resetForm();
         await loadData();
       } catch (err) {
-        showStatus(els.submitStatus, `${i18n.t("save_error")}: ${Ui.translateError(err.message)}`, "error");
+        showStatus(els.submitStatus, `${tr("status_error", "Ошибка")}: ${Ui.translateError(err.message)}`, "error");
       }
     }
 
@@ -427,25 +813,23 @@
       els.refreshBtn.addEventListener("click", loadData);
     }
 
+    function bootstrap() {
+      i18n.applyTranslations();
+      i18n.renderLanguageSwitcher("langSwitcher");
+      applyStaticTranslations();
+      parseUser();
+      bindEvents();
+      loadData();
+    }
+
     function editItem(id) {
       const found = itemsData.find(x => String(x.id) === String(id));
       if (!found) return;
       startEdit(found);
     }
 
-    function bootstrap() {
-      parseUser();
-      bindEvents();
-      loadData();
-    }
-
     bootstrap();
     window.editItem = editItem;
-  </script>
-
-  <script>
-    i18n.applyTranslations();
-    i18n.renderLanguageSwitcher("langSwitcher");
   </script>
 </body>
 </html>
