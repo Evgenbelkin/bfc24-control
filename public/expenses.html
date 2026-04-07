@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="expenses.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Расходы</title>
@@ -53,6 +53,7 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+      align-items:center;
     }
 
     .btn{
@@ -292,6 +293,18 @@
       padding:24px 12px;
     }
 
+    #langSwitcher{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    #langSwitcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
     @media (max-width: 1180px){
       .form-grid,
       .filters{
@@ -324,133 +337,134 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Расходы</div>
+      <div class="title" data-i18n="expenses.heading">Расходы</div>
       <div class="top-actions">
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <div id="langSwitcher"></div>
+        <button class="btn btn-light" onclick="goBack()" data-i18n="expenses.backButton">Назад</button>
+        <button class="btn btn-light" onclick="logout()" data-i18n="expenses.logoutButton">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Добавить расход</h2>
+      <h2 class="card-title" data-i18n="expenses.formTitle">Добавить расход</h2>
 
       <div class="form-grid">
         <div class="field">
-          <label for="amountInput">Сумма</label>
-          <input id="amountInput" type="number" min="0.01" step="0.01" placeholder="Например: 1500" />
+          <label for="amountInput" data-i18n="expenses.amountLabel">Сумма</label>
+          <input id="amountInput" type="number" min="0.01" step="0.01" placeholder="Например: 1500" data-i18n-placeholder="expenses.amountPlaceholder" />
         </div>
 
         <div class="field">
-          <label for="categoryInput">Категория</label>
+          <label for="categoryInput" data-i18n="expenses.categoryLabel">Категория</label>
           <select id="categoryInput">
-            <option value="">Выбери категорию</option>
-            <option value="rent">Аренда</option>
-            <option value="salary">Зарплата</option>
-            <option value="purchase">Закупка</option>
-            <option value="delivery">Доставка</option>
-            <option value="ads">Реклама</option>
-            <option value="utilities">Коммунальные</option>
-            <option value="other">Прочее</option>
+            <option value="" data-i18n="expenses.categoryEmpty">Выбери категорию</option>
+            <option value="rent" data-i18n="expenses.categoryRent">Аренда</option>
+            <option value="salary" data-i18n="expenses.categorySalary">Зарплата</option>
+            <option value="purchase" data-i18n="expenses.categoryPurchase">Закупка</option>
+            <option value="delivery" data-i18n="expenses.categoryDelivery">Доставка</option>
+            <option value="ads" data-i18n="expenses.categoryAds">Реклама</option>
+            <option value="utilities" data-i18n="expenses.categoryUtilities">Коммунальные</option>
+            <option value="other" data-i18n="expenses.categoryOther">Прочее</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="paymentMethodInput">Способ оплаты</label>
+          <label for="paymentMethodInput" data-i18n="expenses.paymentMethodLabel">Способ оплаты</label>
           <select id="paymentMethodInput">
-            <option value="cash">Наличные</option>
-            <option value="card">Карта</option>
-            <option value="transfer">Перевод</option>
+            <option value="cash" data-i18n="expenses.paymentCash">Наличные</option>
+            <option value="card" data-i18n="expenses.paymentCard">Карта</option>
+            <option value="transfer" data-i18n="expenses.paymentTransfer">Перевод</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="expenseDateInput">Дата расхода</label>
+          <label for="expenseDateInput" data-i18n="expenses.expenseDateLabel">Дата расхода</label>
           <input id="expenseDateInput" type="date" />
         </div>
 
         <div class="field" style="grid-column:1 / -1;">
-          <label for="commentInput">Комментарий</label>
-          <input id="commentInput" type="text" placeholder="Например: аренда контейнера за апрель" />
+          <label for="commentInput" data-i18n="expenses.commentLabel">Комментарий</label>
+          <input id="commentInput" type="text" placeholder="Например: аренда контейнера за апрель" data-i18n-placeholder="expenses.commentPlaceholder" />
         </div>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-success" id="saveBtn">Сохранить расход</button>
-        <button type="button" class="btn btn-light" id="clearBtn">Очистить</button>
+        <button type="button" class="btn btn-success" id="saveBtn" data-i18n="expenses.saveButton">Сохранить расход</button>
+        <button type="button" class="btn btn-light" id="clearBtn" data-i18n="expenses.clearButton">Очистить</button>
       </div>
 
       <div id="formStatus" class="status info"></div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтры и история расходов</h2>
+      <h2 class="card-title" data-i18n="expenses.historyTitle">Фильтры и история расходов</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск по комментарию / категории / пользователю</label>
-          <input id="searchInput" type="text" placeholder="Например: аренда, зарплата, admin" />
+          <label for="searchInput" data-i18n="expenses.searchLabel">Поиск по комментарию / категории / пользователю</label>
+          <input id="searchInput" type="text" placeholder="Например: аренда, зарплата, admin" data-i18n-placeholder="expenses.searchPlaceholder" />
         </div>
 
         <div class="field">
-          <label for="categoryFilter">Категория</label>
+          <label for="categoryFilter" data-i18n="expenses.categoryFilterLabel">Категория</label>
           <select id="categoryFilter">
-            <option value="">Все</option>
-            <option value="rent">Аренда</option>
-            <option value="salary">Зарплата</option>
-            <option value="purchase">Закупка</option>
-            <option value="delivery">Доставка</option>
-            <option value="ads">Реклама</option>
-            <option value="utilities">Коммунальные</option>
-            <option value="other">Прочее</option>
+            <option value="" data-i18n="expenses.filterAll">Все</option>
+            <option value="rent" data-i18n="expenses.categoryRent">Аренда</option>
+            <option value="salary" data-i18n="expenses.categorySalary">Зарплата</option>
+            <option value="purchase" data-i18n="expenses.categoryPurchase">Закупка</option>
+            <option value="delivery" data-i18n="expenses.categoryDelivery">Доставка</option>
+            <option value="ads" data-i18n="expenses.categoryAds">Реклама</option>
+            <option value="utilities" data-i18n="expenses.categoryUtilities">Коммунальные</option>
+            <option value="other" data-i18n="expenses.categoryOther">Прочее</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="paymentFilter">Способ оплаты</label>
+          <label for="paymentFilter" data-i18n="expenses.paymentFilterLabel">Способ оплаты</label>
           <select id="paymentFilter">
-            <option value="">Все</option>
-            <option value="cash">Наличные</option>
-            <option value="card">Карта</option>
-            <option value="transfer">Перевод</option>
+            <option value="" data-i18n="expenses.filterAll">Все</option>
+            <option value="cash" data-i18n="expenses.paymentCash">Наличные</option>
+            <option value="card" data-i18n="expenses.paymentCard">Карта</option>
+            <option value="transfer" data-i18n="expenses.paymentTransfer">Перевод</option>
           </select>
         </div>
 
         <div class="field">
-          <label>Быстрый период</label>
+          <label data-i18n="expenses.quickPeriodLabel">Быстрый период</label>
           <div class="period-buttons">
-            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn">Сегодня</button>
-            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn">Неделя</button>
-            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn">Месяц</button>
+            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn" data-i18n="expenses.periodToday">Сегодня</button>
+            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn" data-i18n="expenses.periodWeek">Неделя</button>
+            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn" data-i18n="expenses.periodMonth">Месяц</button>
           </div>
         </div>
 
         <div class="field">
-          <label for="dateFrom">Дата от</label>
+          <label for="dateFrom" data-i18n="expenses.dateFromLabel">Дата от</label>
           <input id="dateFrom" type="date" />
         </div>
 
         <div class="field">
-          <label for="dateTo">Дата до</label>
+          <label for="dateTo" data-i18n="expenses.dateToLabel">Дата до</label>
           <input id="dateTo" type="date" />
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="expenses.refreshButton">Обновить</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Записей</div>
+          <div class="stat-label" data-i18n="expenses.statsRows">Записей</div>
           <div class="stat-value" id="rowsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Сумма расходов</div>
+          <div class="stat-label" data-i18n="expenses.statsTotal">Сумма расходов</div>
           <div class="stat-value" id="expenseTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Средний расход</div>
+          <div class="stat-label" data-i18n="expenses.statsAverage">Средний расход</div>
           <div class="stat-value" id="avgExpense">0</div>
         </div>
       </div>
@@ -462,18 +476,18 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Тип</th>
-              <th>Сумма</th>
-              <th>Категория</th>
-              <th>Оплата</th>
-              <th>Комментарий</th>
-              <th>Создал</th>
-              <th>Дата</th>
+              <th data-i18n="expenses.tableType">Тип</th>
+              <th data-i18n="expenses.tableAmount">Сумма</th>
+              <th data-i18n="expenses.tableCategory">Категория</th>
+              <th data-i18n="expenses.tablePayment">Оплата</th>
+              <th data-i18n="expenses.tableComment">Комментарий</th>
+              <th data-i18n="expenses.tableCreatedBy">Создал</th>
+              <th data-i18n="expenses.tableDate">Дата</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="8" class="empty">Загрузка данных...</td>
+              <td colspan="8" class="empty" data-i18n="expenses.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -484,6 +498,7 @@
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
 
   <script>
     const FALLBACK_TENANT_ID = 1;
@@ -611,6 +626,14 @@
       avgExpense: document.getElementById("avgExpense")
     };
 
+    function t(key) {
+      return window.i18n ? window.i18n.t(key) : key;
+    }
+
+    function tf(key, vars) {
+      return window.i18n ? window.i18n.format(key, vars) : key;
+    }
+
     function goBack() {
       window.location.href = "/index.html";
     }
@@ -682,10 +705,22 @@
     }
 
     function paymentLabel(value) {
-      if (value === "cash") return "Наличные";
-      if (value === "card") return "Карта";
-      if (value === "transfer") return "Перевод";
+      if (value === "cash") return t("expenses.paymentCash");
+      if (value === "card") return t("expenses.paymentCard");
+      if (value === "transfer") return t("expenses.paymentTransfer");
       return value || "";
+    }
+
+    function categoryLabel(value) {
+      const key = String(value || "").trim().toLowerCase();
+      if (key === "rent") return t("expenses.categoryRent");
+      if (key === "salary") return t("expenses.categorySalary");
+      if (key === "purchase") return t("expenses.categoryPurchase");
+      if (key === "delivery") return t("expenses.categoryDelivery");
+      if (key === "ads") return t("expenses.categoryAds");
+      if (key === "utilities") return t("expenses.categoryUtilities");
+      if (key === "other") return t("expenses.categoryOther");
+      return CATEGORY_LABELS[key] || value || "";
     }
 
     function toDateInputValue(date) {
@@ -791,7 +826,7 @@
           if (!search) return true;
 
           const text = [
-            row.category_label,
+            categoryLabel(row.category),
             row.comment,
             row.created_by_username,
             paymentLabel(row.payment_method)
@@ -817,7 +852,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="8" class="empty">Нет данных</td>
+            <td colspan="8" class="empty">${escapeHtml(t("expenses.noData"))}</td>
           </tr>
         `;
         return;
@@ -826,12 +861,12 @@
       els.tbody.innerHTML = rows.map(row => `
         <tr>
           <td>${escapeHtml(row.id)}</td>
-          <td><span class="badge badge-expense">Расход</span></td>
+          <td><span class="badge badge-expense">${escapeHtml(t("expenses.badgeExpense"))}</span></td>
           <td>${escapeHtml(formatMoney(row.amount))}</td>
-          <td>${escapeHtml(row.category_label)}</td>
+          <td>${escapeHtml(categoryLabel(row.category))}</td>
           <td>${escapeHtml(paymentLabel(row.payment_method))}</td>
           <td>${escapeHtml(row.comment)}</td>
-          <td>${escapeHtml(row.created_by_username || "-")}</td>
+          <td>${escapeHtml(row.created_by_username || t("expenses.noUser"))}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
         </tr>
       `).join("");
@@ -840,7 +875,7 @@
     async function loadData() {
       try {
         const tenantId = getTenantId();
-        showStatus(els.pageStatus, `Загрузка расходов...\nTenant ID: ${tenantId}`, "info");
+        showStatus(els.pageStatus, tf("expenses.loadingStatus", { tenantId }), "info");
 
         const data = await ApiBridge.get(`/expenses?tenant_id=${tenantId}`);
         expensesData = extractList(data, ["expenses", "data", "rows"]).map(normalizeExpenseRow);
@@ -849,16 +884,16 @@
 
         showStatus(
           els.pageStatus,
-          `Данные загружены.\nTenant ID: ${tenantId}\nРасходов: ${expensesData.length}`,
+          tf("expenses.loadedStatus", { tenantId, count: expensesData.length }),
           "success"
         );
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="8" class="empty">Ошибка загрузки данных</td>
+            <td colspan="8" class="empty">${escapeHtml(t("expenses.loadErrorRow"))}</td>
           </tr>
         `;
-        showStatus(els.pageStatus, "Ошибка: " + Ui.translateError(err.message), "error");
+        showStatus(els.pageStatus, tf("expenses.loadErrorStatus", { error: Ui.translateError(err.message) }), "error");
       }
     }
 
@@ -872,18 +907,18 @@
         const comment = String(els.commentInput.value || "").trim();
 
         if (!Number.isFinite(amount) || amount <= 0) {
-          throw new Error("Укажи корректную сумму расхода");
+          throw new Error(t("expenses.amountInvalid"));
         }
 
         if (!category) {
-          throw new Error("Выбери категорию расхода");
+          throw new Error(t("expenses.categoryRequired"));
         }
 
         if (!paymentMethod) {
-          throw new Error("Выбери способ оплаты");
+          throw new Error(t("expenses.paymentRequired"));
         }
 
-        showStatus(els.formStatus, "Сохраняю расход...", "info");
+        showStatus(els.formStatus, t("expenses.savingStatus"), "info");
 
         await ApiBridge.post("/expenses", {
           tenant_id: tenantId,
@@ -894,11 +929,11 @@
           comment: comment || null
         });
 
-        showStatus(els.formStatus, "Расход успешно сохранён", "success");
+        showStatus(els.formStatus, t("expenses.savedStatus"), "success");
         clearForm();
         await loadData();
       } catch (err) {
-        showStatus(els.formStatus, "Ошибка: " + Ui.translateError(err.message), "error");
+        showStatus(els.formStatus, tf("expenses.saveErrorStatus", { error: Ui.translateError(err.message) }), "error");
       }
     }
 
@@ -925,12 +960,24 @@
       els.periodMonthBtn.addEventListener("click", () => setPeriod("month"));
 
       els.refreshBtn.addEventListener("click", loadData);
+
+      document.addEventListener("app:language-changed", () => {
+        if (window.i18n) {
+          window.i18n.applyTranslations();
+          window.i18n.renderLanguageSwitcher("langSwitcher");
+        }
+        renderTable();
+      });
     }
 
     function bootstrap() {
       parseUser();
       setDefaultExpenseDate();
       bindEvents();
+      if (window.i18n) {
+        window.i18n.applyTranslations();
+        window.i18n.renderLanguageSwitcher("langSwitcher");
+      }
       loadData();
     }
 
