@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru" translate="no">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title data-i18n="clients_page_title">BFC24 CONTROL — Клиенты</title>
+  <title>BFC24 CONTROL — Клиенты</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="google" content="notranslate" />
 
   <style>
     :root{
@@ -54,7 +53,6 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      align-items:center;
     }
 
     .btn{
@@ -78,6 +76,12 @@
 
     .btn-light{
       background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-secondary{
+      background:#f8fafc;
       color:var(--text);
       border:1px solid var(--line);
     }
@@ -112,6 +116,7 @@
       display:flex;
       flex-direction:column;
       gap:7px;
+      min-width:0;
     }
 
     .field.full{
@@ -130,77 +135,598 @@
       padding:12px 14px;
       font-size:15px;
       background:#fff;
+      color:var(--text);
       outline:none;
     }
 
-    .lang-switcher{
+    input:focus, textarea:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    textarea{
+      min-height:92px;
+      resize:vertical;
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      align-items:end;
+      margin-top:18px;
+    }
+
+    .toolbar-actions{
       display:flex;
-      gap:6px;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
-    .lang-btn{
-      padding:6px 10px;
-      border-radius:8px;
-      border:1px solid #cbd5e1;
-      background:#eef2f7;
-      cursor:pointer;
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+
+    .status.show{display:block}
+    .status.error{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+    .status.success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .status.info{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .stat{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      color:var(--muted);
       font-size:12px;
-      font-weight:700;
+      margin-bottom:6px;
     }
 
-    .lang-btn.active{
-      background:#2563eb;
-      color:#fff;
+    .stat-value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      margin-top:10px;
+    }
+
+    table{
+      width:100%;
+      min-width:980px;
+      border-collapse:collapse;
+      background:#fff;
+    }
+
+    th, td{
+      border-bottom:1px solid #eef1f5;
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    th{
+      background:#f8fafc;
+      font-weight:700;
+      color:#111827;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    tr:hover td{
+      background:#fbfdff;
+    }
+
+    .row-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:24px 12px;
+    }
+
+    @media (max-width: 900px){
+      .form-grid,
+      .stats,
+      .toolbar{
+        grid-template-columns:1fr;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .wrap{
+        padding:16px 12px 32px;
+      }
     }
   </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">Клиенты</div>
+      <div class="top-actions">
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
+      </div>
+    </div>
 
-<div class="wrap notranslate">
+    <div class="card">
+      <h2 class="card-title" id="formTitle">Создать клиента</h2>
+      <div class="muted">Карточка клиента для продаж, долгов и денежных операций.</div>
 
-  <div class="topbar">
-    <div class="title" data-i18n="clients_title">Клиенты</div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Клиентов</div>
+          <div class="stat-value" id="clientsCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Tenant ID</div>
+          <div class="stat-value" id="tenantValue">1</div>
+        </div>
+      </div>
 
-    <div class="top-actions">
-      <div id="langSwitcher" class="lang-switcher"></div>
-      <button class="btn btn-light" onclick="location.href='/index.html'" data-i18n="back">Назад</button>
+      <form id="clientForm" autocomplete="off" style="margin-top:18px;">
+        <div class="form-grid">
+          <div class="field">
+            <label for="name">Имя</label>
+            <input id="name" type="text" placeholder="Например: ИП Иванов" />
+          </div>
+
+          <div class="field">
+            <label for="phone">Телефон</label>
+            <input id="phone" type="text" placeholder="Например: 79991234567" />
+          </div>
+
+          <div class="field full">
+            <label for="comment">Комментарий</label>
+            <textarea id="comment" placeholder="Примечание по клиенту"></textarea>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="field">
+            <label for="searchInput">Поиск</label>
+            <input id="searchInput" type="text" placeholder="Поиск по имени, телефону, комментарию" />
+          </div>
+
+          <div class="toolbar-actions">
+            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
+            <button type="button" class="btn btn-light" id="refreshBtn">Обновить список</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="pageStatus" class="status info"></div>
+      <div id="submitStatus" class="status"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Список клиентов</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Имя</th>
+              <th>Телефон</th>
+              <th>Комментарий</th>
+              <th>Активно</th>
+              <th>Дата</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td colspan="7" class="empty">Загрузка данных...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title" data-i18n="clients_add">Добавить клиента</div>
+    <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
 
-    <div class="form-grid">
-      <div class="field">
-        <label data-i18n="clients_name">Имя</label>
-        <input id="name" />
-      </div>
+  <script>    const FALLBACK_TENANT_ID = 1;
 
-      <div class="field">
-        <label data-i18n="clients_phone">Телефон</label>
-        <input id="phone" />
-      </div>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/login.html";
+    }
 
-      <div class="field full">
-        <label data-i18n="clients_comment">Комментарий</label>
-        <textarea id="comment"></textarea>
-      </div>
-    </div>
+    const Ui = window.AppUI || {
+      escapeHtml: (value) => String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;"),
+      translateError: (value) => String(value || "Ошибка"),
+      displayDateTime: (value) => {
+        if (!value) return "";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleString("ru-RU");
+      }
+    };
 
-    <div style="margin-top:16px;">
-      <button class="btn btn-primary" onclick="createClient()" data-i18n="save">Сохранить</button>
-    </div>
-  </div>
+    async function requestFallback(method, path, body) {
+      const token = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
 
-</div>
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
 
-<script src="/js/i18n.js"></script>
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
 
-<script>
-i18n.applyTranslations();
-i18n.renderLanguageSwitcher("langSwitcher");
-</script>
+      return data;
+    }
 
+    function getTenantIdFromStorage(fallback = 1) {
+      try {
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
+      } catch {}
+      return fallback;
+    }
+
+    const ApiBridge = {
+      getTenantId(fallback = 1) {
+        if (window.API && typeof window.API.getTenantId === "function") {
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
+        }
+        return getTenantIdFromStorage(fallback);
+      },
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      },
+      post(path, body) {
+        if (window.API && typeof window.API.post === "function") {
+          return window.API.post(path, body);
+        }
+        return requestFallback("POST", path, body);
+      },
+      put(path, body) {
+        if (window.API && typeof window.API.put === "function") {
+          return window.API.put(path, body);
+        }
+        return requestFallback("PUT", path, body);
+      },
+      patch(path, body) {
+        if (window.API && typeof window.API.patch === "function") {
+          return window.API.patch(path, body);
+        }
+        return requestFallback("PATCH", path, body);
+      },
+      delete(path) {
+        if (window.API && typeof window.API.delete === "function") {
+          return window.API.delete(path);
+        }
+        return requestFallback("DELETE", path);
+      }
+    };
+
+    let authUser = null;
+    let clientsData = [];
+    let editId = null;
+
+    const els = {
+      formTitle: document.getElementById("formTitle"),
+      clientForm: document.getElementById("clientForm"),
+      name: document.getElementById("name"),
+      phone: document.getElementById("phone"),
+      comment: document.getElementById("comment"),
+      searchInput: document.getElementById("searchInput"),
+      saveBtn: document.getElementById("saveBtn"),
+      cancelEditBtn: document.getElementById("cancelEditBtn"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      tbody: document.getElementById("tbody"),
+      pageStatus: document.getElementById("pageStatus"),
+      submitStatus: document.getElementById("submitStatus"),
+      clientsCount: document.getElementById("clientsCount"),
+      tenantValue: document.getElementById("tenantValue")
+    };
+
+    function goBack() {
+      window.location.href = "/index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
+
+    function parseUser() {
+      try {
+        const raw = localStorage.getItem("user");
+        authUser = raw ? JSON.parse(raw) : null;
+      } catch {
+        authUser = null;
+      }
+    }
+
+    function getTenantId() {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== '') {
+        return Number(authUser.tenant_id);
+      }
+      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== 'undefined' ? FALLBACK_TENANT_ID : 1);
+    }
+
+    function showStatus(el, text, type = "info") {
+      el.className = "status show " + type;
+      el.textContent = text;
+    }
+
+    function hideStatus(el) {
+      el.className = "status";
+      el.textContent = "";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatDate(value) {
+      return Ui.displayDateTime(value);
+    }
+
+    function extractList(data, keys) {
+      if (Array.isArray(data)) return data;
+      if (!data || typeof data !== "object") return [];
+
+      for (const key of keys) {
+        if (Array.isArray(data[key])) return data[key];
+      }
+
+      for (const value of Object.values(data)) {
+        if (Array.isArray(value)) return value;
+      }
+
+      return [];
+    }
+    async function apiGet(path) {
+      return ApiBridge.get(path);
+    }
+    async function apiPost(path, body) {
+      return ApiBridge.post(path, body);
+    }
+    async function apiPut(path, body) {
+      return ApiBridge.put(path, body);
+    }
+
+    function normalizeClient(row) {
+      return {
+        id: row.id,
+        name: row.name || "",
+        phone: row.phone || "",
+        comment: row.comment || "",
+        is_active: row.is_active === false ? false : true,
+        created_at: row.created_at || row.date || null
+      };
+    }
+
+    function resetForm() {
+      editId = null;
+      els.formTitle.textContent = "Создать клиента";
+      els.saveBtn.textContent = "Сохранить";
+      els.cancelEditBtn.style.display = "none";
+      els.name.value = "";
+      els.phone.value = "";
+      els.comment.value = "";
+      hideStatus(els.submitStatus);
+    }
+
+    function startEdit(client) {
+      editId = client.id;
+      els.formTitle.textContent = `Редактировать клиента #${client.id}`;
+      els.saveBtn.textContent = "Сохранить изменения";
+      els.cancelEditBtn.style.display = "inline-flex";
+      els.name.value = client.name || "";
+      els.phone.value = client.phone || "";
+      els.comment.value = client.comment || "";
+      hideStatus(els.submitStatus);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function getFilteredRows() {
+      const search = (els.searchInput.value || "").trim().toLowerCase();
+
+      return clientsData.filter(row => {
+        if (!search) return true;
+        const text = [
+          row.name,
+          row.phone,
+          row.comment
+        ].join(" ").toLowerCase();
+
+        return text.includes(search);
+      });
+    }
+
+    function renderTable() {
+      const rows = getFilteredRows();
+      els.clientsCount.textContent = String(clientsData.length);
+
+      if (!rows.length) {
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="empty">Нет данных</td>
+          </tr>
+        `;
+        return;
+      }
+
+      els.tbody.innerHTML = rows.map(row => `
+        <tr>
+          <td>${escapeHtml(row.id)}</td>
+          <td>${escapeHtml(row.name)}</td>
+          <td>${escapeHtml(row.phone)}</td>
+          <td>${escapeHtml(row.comment)}</td>
+          <td>${row.is_active ? "Да" : "Нет"}</td>
+          <td>${escapeHtml(formatDate(row.created_at))}</td>
+          <td>
+            <div class="row-actions">
+              <button type="button" class="btn btn-secondary" onclick="editClient('${escapeHtml(row.id)}')">Редактировать</button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadData() {
+      try {
+        const tenantId = getTenantId();
+        els.tenantValue.textContent = String(tenantId);
+        showStatus(els.pageStatus, `Загрузка клиентов...\nTenant ID: ${tenantId}`, "info");
+
+        const data = await apiGet(`/clients?tenant_id=${tenantId}`);
+        clientsData = extractList(data, ["clients", "counterparties", "data", "rows"]).map(normalizeClient);
+
+        renderTable();
+
+        showStatus(
+          els.pageStatus,
+          `Данные загружены.\nTenant ID: ${tenantId}\nКлиентов: ${clientsData.length}`,
+          "success"
+        );
+      } catch (err) {
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="empty">Ошибка загрузки данных</td>
+          </tr>
+        `;
+        showStatus(els.pageStatus, "Ошибка: " + Ui.translateError(err.message), "error");
+      }
+    }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      hideStatus(els.submitStatus);
+
+      try {
+        const tenantId = getTenantId();
+        const name = (els.name.value || "").trim();
+        const phone = (els.phone.value || "").trim();
+        const comment = (els.comment.value || "").trim();
+
+        if (!name) {
+          throw new Error("Имя обязательно");
+        }
+
+        const body = {
+          tenant_id: tenantId,
+          name,
+          phone: phone || null,
+          comment: comment || null
+        };
+
+        if (editId) {
+          showStatus(els.submitStatus, `Сохраняю изменения клиента #${editId}...`, "info");
+          await apiPut(`/clients/${editId}`, body);
+          showStatus(els.submitStatus, `Клиент #${editId} успешно обновлён`, "success");
+        } else {
+          showStatus(els.submitStatus, "Создаю клиента...", "info");
+          await apiPost("/clients", body);
+          showStatus(els.submitStatus, "Клиент успешно создан", "success");
+        }
+
+        resetForm();
+        await loadData();
+      } catch (err) {
+        showStatus(els.submitStatus, "Ошибка сохранения: " + Ui.translateError(err.message), "error");
+      }
+    }
+
+    function bindEvents() {
+      els.clientForm.addEventListener("submit", handleSubmit);
+      els.searchInput.addEventListener("input", renderTable);
+      els.cancelEditBtn.addEventListener("click", resetForm);
+      els.refreshBtn.addEventListener("click", loadData);
+    }
+
+    function bootstrap() {
+      parseUser();
+      bindEvents();
+      loadData();
+    }
+
+    function editClient(id) {
+      const found = clientsData.find(x => String(x.id) === String(id));
+      if (!found) return;
+      startEdit(found);
+    }
+
+    bootstrap();
+    window.editClient = editClient;
+  </script>
 </body>
 </html>

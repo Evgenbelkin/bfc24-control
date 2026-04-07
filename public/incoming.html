@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru" translate="no">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="google" content="notranslate" />
-  <title data-i18n="incoming_page_title">BFC24 CONTROL — Приёмка</title>
+  <title>BFC24 CONTROL — Приёмка</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -272,55 +271,29 @@
         padding:16px 12px 32px;
       }
     }
-
-    .lang-switcher{
-      display:flex;
-      gap:6px;
-      flex-wrap:wrap;
-    }
-
-    .lang-btn{
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid #cbd5e1;
-      background:#eef2f7;
-      color:#111827;
-      cursor:pointer;
-      font-size:12px;
-      font-weight:700;
-      line-height:1.2;
-    }
-
-    .lang-btn.active{
-      background:var(--primary);
-      color:#fff;
-      border-color:var(--primary);
-    }
-
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title" data-i18n="incoming_title">Приёмка</div>
+      <div class="title">Приёмка</div>
       <div class="top-actions">
-        <div id="langSwitcher" class="lang-switcher"></div>
-        <button class="btn btn-light" onclick="goBack()" data-i18n="back">Назад</button>
-        <button class="btn btn-light" onclick="logout()" data-i18n="logout">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title" data-i18n="new_receiving">Новая приёмка</h2>
-      <div class="muted" data-i18n="incoming_subtitle">Выбери товар, место хранения, количество и цену закупки для прихода на склад.</div>
+      <h2 class="card-title">Новая приёмка</h2>
+      <div class="muted">Выбери товар, место хранения, количество и цену закупки для прихода на склад.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label" data-i18n="items_loaded">Товаров загружено</div>
+          <div class="stat-label">Товаров загружено</div>
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label" data-i18n="locations_loaded">Мест хранения</div>
+          <div class="stat-label">Мест хранения</div>
           <div class="stat-value" id="locationsCount">0</div>
         </div>
         <div class="stat">
@@ -334,12 +307,12 @@
       <form id="incomingForm" autocomplete="off">
         <div class="form-grid" style="margin-top:18px;">
           <div class="field full">
-            <label for="itemSearch" data-i18n="item">Товар</label>
+            <label for="itemSearch">Товар</label>
             <div class="autocomplete">
               <input
                 id="itemSearch"
                 type="text"
-                data-i18n-placeholder="search_item_placeholder" placeholder="Начни вводить название, штрихкод, SKU или артикул"
+                placeholder="Начни вводить название, штрихкод, SKU или артикул"
                 autocomplete="off"
               />
               <div id="itemResults" class="results"></div>
@@ -348,33 +321,33 @@
           </div>
 
           <div class="field">
-            <label for="locationId" data-i18n="storage_location">Место хранения</label>
+            <label for="locationId">Место хранения</label>
             <select id="locationId">
-              <option value="" data-i18n="select_location">Выберите МХ</option>
+              <option value="">Выберите МХ</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="qty" data-i18n="quantity">Количество</label>
+            <label for="qty">Количество</label>
             <input id="qty" type="number" min="1" step="1" value="1" />
           </div>
 
           <div class="field">
-            <label for="purchasePrice" data-i18n="purchase_price">Цена закупки</label>
+            <label for="purchasePrice">Цена закупки</label>
             <input id="purchasePrice" type="number" min="0" step="0.01" value="0" />
-            <div class="hint" data-i18n="purchase_price_hint">Укажи закупочную цену за 1 единицу товара.</div>
+            <div class="hint">Укажи закупочную цену за 1 единицу товара.</div>
           </div>
 
           <div class="field full">
-            <label for="comment" data-i18n="comment">Комментарий</label>
-            <textarea id="comment" data-i18n-placeholder="incoming_comment_placeholder" placeholder="Например: новая поставка, докупка, возврат товара"></textarea>
-            <div class="hint" data-i18n="comment_optional_hint">Комментарий не обязателен, но лучше указывать.</div>
+            <label for="comment">Комментарий</label>
+            <textarea id="comment" placeholder="Например: новая поставка, докупка, возврат товара"></textarea>
+            <div class="hint">Комментарий не обязателен, но лучше указывать.</div>
           </div>
         </div>
 
         <div class="inline">
-          <button type="submit" class="btn btn-primary" data-i18n="submit_receiving">Провести приёмку</button>
-          <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="refresh_data">Обновить данные</button>
+          <button type="submit" class="btn btn-primary">Провести приёмку</button>
+          <button type="button" class="btn btn-light" id="refreshBtn">Обновить данные</button>
         </div>
       </form>
 
@@ -385,14 +358,6 @@
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
-  <script src="/js/i18n.js"></script>
-
-  
-
-
-
-  
-
 
   <script>
     const token = localStorage.getItem("token");
@@ -403,7 +368,7 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;"),
-      translateError: (value) => String(value || (window.i18n ? i18n.t("error_generic") : "Ошибка")),
+      translateError: (value) => String(value || "Ошибка"),
       displayDateTime: (value) => {
         if (!value) return "";
         const d = new Date(value);
@@ -583,7 +548,7 @@
 
       els.selectedItemBox.classList.add("active");
       els.selectedItemBox.innerHTML = `
-        <div><strong>Выбран товар:</strong> ${Ui.escapeHtml(selectedItem.name || i18n.t("unnamed"))}</div>
+        <div><strong>Выбран товар:</strong> ${Ui.escapeHtml(selectedItem.name || "Без названия")}</div>
         <div class="muted" style="margin-top:6px;">
           ID: ${Ui.escapeHtml(String(selectedItem.id ?? ""))}
           ${selectedItem.sku ? " | SKU: " + Ui.escapeHtml(selectedItem.sku) : ""}
@@ -607,7 +572,7 @@
 
       els.itemResults.innerHTML = items.map(item => `
         <div class="result-item" data-id="${Ui.escapeHtml(String(item.id))}">
-          <div class="result-title">${Ui.escapeHtml(item.name || i18n.t("unnamed"))}</div>
+          <div class="result-title">${Ui.escapeHtml(item.name || "Без названия")}</div>
           <div class="result-sub">
             ID: ${Ui.escapeHtml(String(item.id ?? ""))}
             ${item.sku ? " | SKU: " + Ui.escapeHtml(item.sku) : ""}
@@ -635,7 +600,7 @@
 
     function fillLocations() {
       els.locationId.innerHTML =
-        `<option value="" data-i18n="select_location">Выберите МХ</option>` +
+        `<option value="">Выберите МХ</option>` +
         allLocations.map(loc => `
           <option value="${Ui.escapeHtml(String(loc.id))}">
             ${Ui.escapeHtml(loc.name || "")}${loc.code ? " (" + Ui.escapeHtml(loc.code) + ")" : ""}
@@ -662,7 +627,7 @@
       hideStatus(els.pageStatus);
 
       try {
-        showStatus(els.pageStatus, i18n.t("loading_data"), "info");
+        showStatus(els.pageStatus, "Загрузка данных...", "info");
 
         selectedItem = null;
         renderSelectedItem();
@@ -676,11 +641,11 @@
 
         showStatus(
           els.pageStatus,
-          `${i18n.t("data_loaded")}\n${i18n.t("items_loaded")}: ${allItems.length}\n${i18n.t("locations_loaded")}: ${allLocations.length}`,
+          `Данные загружены.\nТоваров: ${allItems.length}\nМХ: ${allLocations.length}`,
           "success"
         );
       } catch (err) {
-        showStatus(els.pageStatus, i18n.t("load_error") + Ui.translateError(err.message), "error");
+        showStatus(els.pageStatus, "Ошибка загрузки данных: " + Ui.translateError(err.message), "error");
       }
     }
 
@@ -707,21 +672,21 @@
         const tenantId = API.getTenantId();
 
         if (!selectedItem || !selectedItem.id) {
-          throw new Error(i18n.t("choose_item_from_list"));
+          throw new Error("Выбери товар из списка");
         }
 
         if (!els.locationId.value) {
-          throw new Error(i18n.t("choose_location"));
+          throw new Error("Выбери место хранения");
         }
 
         const qty = Number(els.qty.value);
         if (!qty || qty <= 0) {
-          throw new Error(i18n.t("qty_positive"));
+          throw new Error("Количество должно быть больше 0");
         }
 
         const purchasePrice = Number(els.purchasePrice.value);
         if (Number.isNaN(purchasePrice) || purchasePrice < 0) {
-          throw new Error(i18n.t("purchase_price_nonnegative"));
+          throw new Error("Цена закупки должна быть 0 или больше");
         }
 
         const body = {
@@ -733,13 +698,13 @@
           comment: (els.comment.value || "").trim() || null
         };
 
-        showStatus(els.submitStatus, i18n.t("processing_receiving"), "info");
+        showStatus(els.submitStatus, "Провожу приёмку...", "info");
 
         const result = await API.post("/stock/incoming", body);
 
         showStatus(
           els.submitStatus,
-          i18n.t("receiving_success") + "\n\n" + JSON.stringify(result, null, 2),
+          "Приёмка успешно проведена.\n\n" + JSON.stringify(result, null, 2),
           "success"
         );
 
@@ -752,7 +717,7 @@
         renderSelectedItem();
         els.itemResults.style.display = "none";
       } catch (err) {
-        showStatus(els.submitStatus, i18n.t("receiving_error") + Ui.translateError(err.message), "error");
+        showStatus(els.submitStatus, "Ошибка приёмки: " + Ui.translateError(err.message), "error");
       }
     }
 
@@ -781,8 +746,6 @@
       loadInitialData();
     }
 
-    i18n.applyTranslations();
-    i18n.renderLanguageSwitcher("langSwitcher");
     bootstrap();
   </script>
 </body>

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru" translate="no">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Деньги</title>
-  <meta name="google" content="notranslate" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -54,12 +53,7 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      align-items:center;
     }
-
-    .lang-switcher{display:flex;gap:8px;flex-wrap:wrap}
-    .lang-btn{min-width:60px;padding:9px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#eef2f7;color:#111827;font-size:13px;font-weight:700;cursor:pointer;line-height:1.2}
-    .lang-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 
     .btn{
       border:none;
@@ -306,83 +300,82 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title" data-i18n="title">Деньги</div>
+      <div class="title">Деньги</div>
       <div class="top-actions">
-        <div id="langSwitcher" class="lang-switcher"></div>
-        <button class="btn btn-light" onclick="goBack()" data-i18n="back">Назад</button>
-        <button class="btn btn-light" onclick="logout()" data-i18n="logout">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title" data-i18n="filters">Фильтры</h2>
+      <h2 class="card-title">Фильтры</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput" data-i18n="search_label">Поиск по клиенту / товару / комментарию</label>
-          <input id="searchInput" type="text" data-i18n-placeholder="search_placeholder" placeholder="Например: Иванов, Тест товар, наличные" />
+          <label for="searchInput">Поиск по клиенту / товару / комментарию</label>
+          <input id="searchInput" type="text" placeholder="Например: Иванов, Тест товар, наличные" />
         </div>
 
         <div class="field">
-          <label for="typeFilter" data-i18n="type">Тип движения</label>
+          <label for="typeFilter">Тип движения</label>
           <select id="typeFilter">
-            <option value="" data-i18n="all">Все</option>
-            <option value="income" data-i18n="income">Доход</option>
-            <option value="expense" data-i18n="expense">Расход</option>
+            <option value="">Все</option>
+            <option value="income">Доход</option>
+            <option value="expense">Расход</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="paymentFilter" data-i18n="payment_method">Способ оплаты</label>
+          <label for="paymentFilter">Способ оплаты</label>
           <select id="paymentFilter">
-            <option value="" data-i18n="all">Все</option>
-            <option value="cash" data-i18n="cash">Наличные</option>
-            <option value="card" data-i18n="card">Карта</option>
-            <option value="transfer" data-i18n="transfer">Перевод</option>
-            <option value="consignment" data-i18n="consignment">Под реализацию</option>
+            <option value="">Все</option>
+            <option value="cash">Наличные</option>
+            <option value="card">Карта</option>
+            <option value="transfer">Перевод</option>
+            <option value="consignment">Под реализацию</option>
           </select>
         </div>
 
         <div class="field">
-          <label data-i18n="quick_period">Быстрый период</label>
+          <label>Быстрый период</label>
           <div class="period-buttons">
-            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn" data-i18n="today">Сегодня</button>
-            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn" data-i18n="week">Неделя</button>
-            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn" data-i18n="month">Месяц</button>
+            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn">Сегодня</button>
+            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn">Неделя</button>
+            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn">Месяц</button>
           </div>
         </div>
 
         <div class="field">
-          <label for="dateFrom" data-i18n="date_from">Дата от</label>
+          <label for="dateFrom">Дата от</label>
           <input id="dateFrom" type="date" />
         </div>
 
         <div class="field">
-          <label for="dateTo" data-i18n="date_to">Дата до</label>
+          <label for="dateTo">Дата до</label>
           <input id="dateTo" type="date" />
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="refresh">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label" data-i18n="records">Записей</div>
+          <div class="stat-label">Записей</div>
           <div class="stat-value" id="rowsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label" data-i18n="income">Доход</div>
+          <div class="stat-label">Доход</div>
           <div class="stat-value" id="incomeTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label" data-i18n="expense">Расход</div>
+          <div class="stat-label">Расход</div>
           <div class="stat-value" id="expenseTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label" data-i18n="balance">Баланс</div>
+          <div class="stat-label">Баланс</div>
           <div class="stat-value" id="balanceTotal">0</div>
         </div>
       </div>
@@ -391,27 +384,27 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title" data-i18n="money_movements">Движения денег</h2>
-      <div class="muted" data-i18n="money_movements_desc">Показываются денежные операции по продажам, оплатам и другим действиям.</div>
+      <h2 class="card-title">Движения денег</h2>
+      <div class="muted">Показываются денежные операции по продажам, оплатам и другим действиям.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th data-i18n="type">Тип</th>
-              <th data-i18n="amount">Сумма</th>
-              <th data-i18n="payment">Оплата</th>
-              <th data-i18n="client">Клиент</th>
-              <th data-i18n="item">Товар</th>
-              <th data-i18n="category">Категория</th>
-              <th data-i18n="comment">Комментарий</th>
-              <th data-i18n="date">Дата</th>
+              <th>Тип</th>
+              <th>Сумма</th>
+              <th>Оплата</th>
+              <th>Клиент</th>
+              <th>Товар</th>
+              <th>Категория</th>
+              <th>Комментарий</th>
+              <th>Дата</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="9" class="empty" data-i18n="loading_data">Загрузка данных...</td>
+              <td colspan="9" class="empty">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -419,13 +412,9 @@
     </div>
   </div>
 
-  
-
-
-<script src="/js/config.js"></script>
+  <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
-  <script src="/js/i18n.js"></script>
 
   <script>
     const FALLBACK_TENANT_ID = 1;
@@ -814,8 +803,6 @@
     }
 
     function bootstrap() {
-      i18n.applyTranslations();
-      i18n.renderLanguageSwitcher("langSwitcher");
       parseUser();
       bindEvents();
       loadData();

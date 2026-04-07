@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru" translate="no">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Места хранения</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="google" content="notranslate" />
 
   <style>
     :root{
@@ -275,25 +274,24 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title" id="pageTitle">Места хранения</div>
+      <div class="title">Места хранения</div>
       <div class="top-actions">
-        <div id="langSwitcher" class="lang-switcher"></div>
-        <button class="btn btn-light" onclick="goBack()" id="backBtn">Назад</button>
-        <button class="btn btn-light" onclick="logout()" id="logoutBtn">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
       </div>
     </div>
 
     <div class="card">
       <h2 class="card-title" id="formTitle">Создать место хранения</h2>
-      <div class="muted" id="pageHint">Создание мест хранения</div>
+      <div class="muted">Например: Контейнер 1, Контейнер 2, Склад магазина, Витрина.</div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label" id="locationsCountLabel">Мест хранения</div>
+          <div class="stat-label">Мест хранения</div>
           <div class="stat-value" id="locationsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label" id="tenantLabel">Tenant ID</div>
+          <div class="stat-label">Tenant ID</div>
           <div class="stat-value" id="tenantValue">1</div>
         </div>
       </div>
@@ -301,17 +299,17 @@
       <form id="locationForm" autocomplete="off" style="margin-top:18px;">
         <div class="form-grid">
           <div class="field">
-            <label for="name" id="labelName">Название</label>
+            <label for="name">Название</label>
             <input id="name" type="text" placeholder="Например: Контейнер 1" />
           </div>
 
           <div class="field">
-            <label for="code" id="labelCode">Код</label>
+            <label for="code">Код</label>
             <input id="code" type="text" placeholder="Например: K1" />
           </div>
 
           <div class="field">
-            <label for="locationType" id="labelType">Тип</label>
+            <label for="locationType">Тип</label>
             <select id="locationType">
               <option value="container">Контейнер</option>
               <option value="warehouse">Склад</option>
@@ -325,7 +323,7 @@
 
         <div class="toolbar">
           <div class="field">
-            <label for="searchInput" id="labelSearch">Поиск</label>
+            <label for="searchInput">Поиск</label>
             <input id="searchInput" type="text" placeholder="Поиск по названию, коду, типу" />
           </div>
 
@@ -342,19 +340,19 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title" id="listTitle">Список мест хранения</h2>
+      <h2 class="card-title">Список мест хранения</h2>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th id="thName">Название</th>
-              <th id="thCode">Код</th>
-              <th id="thType">Тип</th>
-              <th id="thActive">Активно</th>
-              <th id="thDate">Дата</th>
-              <th id="thActions">Действия</th>
+              <th>Название</th>
+              <th>Код</th>
+              <th>Тип</th>
+              <th>Активно</th>
+              <th>Дата</th>
+              <th>Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
@@ -366,11 +364,6 @@
       </div>
     </div>
   </div>
-
-  <script src="/js/config.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/app-ui.js"></script>
-  <script src="/js/i18n.js"></script>
 
   <script>
     const API_BASE = '';
@@ -384,8 +377,6 @@
     let authUser = null;
     let locationsData = [];
     let editId = null;
-
-    const tr = (key, fallback="") => { const value = i18n.t(key); return value !== key ? value : (fallback || key); };
 
     const els = {
       formTitle: document.getElementById("formTitle"),
@@ -403,55 +394,6 @@
       locationsCount: document.getElementById("locationsCount"),
       tenantValue: document.getElementById("tenantValue")
     };
-
-
-    const Ui = window.AppUI || {
-      translateError: (value) => String(value || "Error")
-    };
-    }
-
-    function applyStaticTranslations() {
-      if (window.i18n && typeof window.i18n.applyTranslations === "function") {
-        window.i18n.applyTranslations();
-      }
-      document.title = i18n.tr("page_locations_title") !== "page_locations_title" ? i18n.tr("page_locations_title") : "BFC24 CONTROL — Места хранения";
-      const setText = (id, key, fallback) => { const el = document.getElementById(id); if (el) { const value = i18n.t(key); el.textContent = value !== key ? value : fallback; } };
-      const setPlaceholder = (id, key, fallback) => { const el = document.getElementById(id); if (el) { const value = i18n.t(key); el.placeholder = value !== key ? value : fallback; } };
-      setTextr("pageTitle", "locations_title", "Места хранения");
-      setTextr("backBtn", "back", "Назад");
-      setTextr("logoutBtn", "logout", "Выйти");
-      setTextr("formTitle", editId ? "edit" : "locations_add", editId ? tr("edit", "Редактировать") : "Добавить место хранения");
-      setTextr("pageHint", "locations_desc", "Создание мест хранения");
-      setTextr("locationsCountLabel", "locations", "Места хранения");
-      setTextr("tenantLabel", "tenant_id", "Tenant ID");
-      setTextr("labelName", "location_name", "Название");
-      setTextr("labelCode", "location_code", "Код");
-      setTextr("labelType", "location_type", "Тип");
-      setTextr("labelSearch", "search", "Поиск");
-      setTextr("saveBtn", "save", (i18n.tr("save") !== "save" ? i18n.tr("save") : "Сохранить"));
-      setTextr("cancelEditBtn", "cancel", "Отменить");
-      setTextr("refreshBtn", "refresh", "Обновить");
-      setTextr("listTitle", "locations_list", "Список мест хранения");
-      setTextr("thName", "location_name", "Название");
-      setTextr("thCode", "location_code", "Код");
-      setTextr("thType", "location_type", "Тип");
-      setTextr("thActive", "status_active", "Активно");
-      setTextr("thDate", "movement_date", "Дата");
-      setTextr("thActions", "actions", "Действия");
-      setPlaceholder("name", "location_name", "Название");
-      setPlaceholder("code", "location_code", "Код");
-      setPlaceholder("searchInput", "location_search", "Поиск по названию, коду, типу");
-      const optionMap = {
-        container: (i18n.tr("location_type_container") !== "location_type_container" ? i18n.tr("location_type_container") : "Контейнер"),
-        warehouse: (i18n.tr("location_type_warehouse") !== "location_type_warehouse" ? i18n.tr("location_type_warehouse") : "Склад"),
-        storage: (i18n.tr("location_type_storage") !== "location_type_storage" ? i18n.tr("location_type_storage") : "Storage"),
-        shop: (i18n.tr("location_type_shop") !== "location_type_shop" ? i18n.tr("location_type_shop") : "Магазин"),
-        shelf: (i18n.tr("location_type_shelf") !== "location_type_shelf" ? i18n.tr("location_type_shelf") : "Полка"),
-        other: (i18n.tr("location_type_other") !== "location_type_other" ? i18n.tr("location_type_other") : "Другое")
-      };
-      const select = document.getElementById("locationType");
-      if (select) [...select.options].forEach(opt => { if (optionMap[opt.value]) opt.textContent = optionMap[opt.value]; });
-    }
 
     function goBack() {
       window.location.href = "/index.html";
@@ -605,8 +547,8 @@
 
     function resetForm() {
       editId = null;
-      els.formTitle.textContent = tr("locations_add", "Добавить место хранения");
-      els.saveBtn.textContent = (i18n.tr("save") !== "save" ? i18n.tr("save") : "Сохранить");
+      els.formTitle.textContent = "Создать место хранения";
+      els.saveBtn.textContent = "Сохранить";
       els.cancelEditBtn.style.display = "none";
       els.name.value = "";
       els.code.value = "";
@@ -616,8 +558,8 @@
 
     function startEdit(location) {
       editId = location.id;
-      els.formTitle.textContent = `${tr("edit", "Редактировать")} #${location.id}`;
-      els.saveBtn.textContent = (i18n.tr("save") !== "save" ? i18n.tr("save") : "Сохранить");
+      els.formTitle.textContent = `Редактировать место хранения #${location.id}`;
+      els.saveBtn.textContent = "Сохранить изменения";
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = location.name || "";
       els.code.value = location.code || "";
@@ -660,11 +602,11 @@
           <td>${escapeHtml(row.name)}</td>
           <td>${escapeHtml(row.code)}</td>
           <td>${escapeHtml(row.location_type)}</td>
-          <td>${row.is_active ? tr("yes", "Да") : tr("no", "Нет")}</td>
+          <td>${row.is_active ? "Да" : "Нет"}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
           <td>
             <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editLocation('${escapeHtml(row.id)}')">${tr("edit", "Редактировать")}</button>
+              <button type="button" class="btn btn-secondary" onclick="editLocation('${escapeHtml(row.id)}')">Редактировать</button>
             </div>
           </td>
         </tr>
@@ -690,10 +632,10 @@
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="empty">${tr("status_error", "Ошибка")}</td>
+            <td colspan="7" class="empty">Ошибка загрузки данных</td>
           </tr>
         `;
-        showStatus(els.pageStatus, `${tr("status_error", "Ошибка")}: ${Ui.translateError(err.message)}`, "error");
+        showStatus(els.pageStatus, "Ошибка: " + err.message, "error");
       }
     }
 
@@ -709,15 +651,15 @@
         const location_type = (els.locationType.value || "").trim();
 
         if (!name) {
-          throw new Error(tr("location_name", "Название") + " " + tr("required_suffix", "обязательно"));
+          throw new Error("Название обязательно");
         }
 
         if (!code) {
-          throw new Error(tr("location_code", "Код") + " " + tr("required_suffix", "обязательно"));
+          throw new Error("Код обязателен");
         }
 
         if (!location_type) {
-          throw new Error(tr("location_type", "Тип") + " " + tr("required_suffix", "обязательно"));
+          throw new Error("Тип обязателен");
         }
 
         const body = {
@@ -728,19 +670,19 @@
         };
 
         if (editId) {
-          showStatus(els.submitStatus, `${tr("status_saving", "Сохранение...")} #${editId}...`, "info");
+          showStatus(els.submitStatus, `Сохраняю изменения места хранения #${editId}...`, "info");
           await apiPut(`/locations/${editId}`, body);
-          showStatus(els.submitStatus, `${tr("status_success", "Успешно")} #${editId}`, "success");
+          showStatus(els.submitStatus, `Место хранения #${editId} успешно обновлено`, "success");
         } else {
-          showStatus(els.submitStatus, tr("status_saving", "Сохранение..."), "info");
-          await apiPostr("/locations", body);
-          showStatus(els.submitStatus, tr("status_success", "Успешно"), "success");
+          showStatus(els.submitStatus, "Создаю место хранения...", "info");
+          await apiPost("/locations", body);
+          showStatus(els.submitStatus, "Место хранения успешно создано", "success");
         }
 
         resetForm();
         await loadData();
       } catch (err) {
-        showStatus(els.submitStatus, `${tr("status_error", "Ошибка")}: ${Ui.translateError(err.message)}`, "error");
+        showStatus(els.submitStatus, "Ошибка сохранения: " + err.message, "error");
       }
     }
 
@@ -752,9 +694,6 @@
     }
 
     function bootstrap() {
-      i18n.applyTranslations();
-      i18n.renderLanguageSwitcher("langSwitcher");
-      applyStaticTranslations();
       parseUser();
       bindEvents();
       loadData();

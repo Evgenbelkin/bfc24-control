@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru" translate="no">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="google" content="notranslate" />
-  <title data-i18n="sales_page_title">BFC24 CONTROL — Продажа</title>
+  <title>BFC24 CONTROL — Продажа</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{
@@ -276,33 +275,6 @@
       display:none !important;
     }
 
-
-    .lang-switcher{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .lang-btn{
-      min-width:60px;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid #cbd5e1;
-      background:#eef2f7;
-      color:#111827;
-      cursor:pointer;
-      font-size:12px;
-      font-weight:700;
-      line-height:1.2;
-    }
-
-    .lang-btn.active{
-      background:var(--primary);
-      color:#fff;
-      border-color:var(--primary);
-    }
-
     @media (max-width: 760px){
       .form-grid,
       .stats{
@@ -322,34 +294,33 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title" data-i18n="sales_title">Продажа</div>
+      <div class="title">Продажа</div>
       <div class="top-actions">
-        <div id="langSwitcher" class="lang-switcher"></div>
-        <button class="btn btn-light" onclick="goBack()" data-i18n="back">Назад</button>
-        <button class="btn btn-light" onclick="logout()" data-i18n="logout">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
       </div>
     </div>
 
     <div class="grid">
       <div class="card">
-        <h2 class="card-title" data-i18n="sales_new_sale">Новая продажа</h2>
-        <div class="muted" data-i18n="sales_subtitle">Экран работает с backend SaaS. Для owner tenant_id передаётся обязательно.</div>
+        <h2 class="card-title">Новая продажа</h2>
+        <div class="muted">Экран работает с backend SaaS. Для owner tenant_id передаётся обязательно.</div>
 
         <div class="stats">
           <div class="stat">
-            <div class="stat-label" data-i18n="sales_items_loaded">Товаров загружено</div>
+            <div class="stat-label">Товаров загружено</div>
             <div class="stat-value" id="itemsCount">0</div>
           </div>
           <div class="stat">
-            <div class="stat-label" data-i18n="sales_locations_loaded">Мест хранения</div>
+            <div class="stat-label">Мест хранения</div>
             <div class="stat-value" id="locationsCount">0</div>
           </div>
           <div class="stat">
-            <div class="stat-label" data-i18n="sales_clients_loaded">Клиентов</div>
+            <div class="stat-label">Клиентов</div>
             <div class="stat-value" id="clientsCount">0</div>
           </div>
           <div class="stat">
-            <div class="stat-label" data-i18n="sales_stock_loaded">Остатков загружено</div>
+            <div class="stat-label">Остатков загружено</div>
             <div class="stat-value" id="stockCount">0</div>
           </div>
         </div>
@@ -359,28 +330,28 @@
         <form id="saleForm" autocomplete="off">
           <div class="form-grid" style="margin-top:18px;">
             <div class="field">
-              <label for="tenantId" data-i18n="tenant_id">Tenant ID</label>
+              <label for="tenantId">Tenant ID</label>
               <input id="tenantId" type="number" min="1" value="1" />
-              <div class="hint" data-i18n="owner_required_hint">Для owner обязательно.</div>
+              <div class="hint">Для owner обязательно.</div>
             </div>
 
             <div class="field">
-              <label for="paymentMethod" data-i18n="payment_method">Способ оплаты</label>
+              <label for="paymentMethod">Способ оплаты</label>
               <select id="paymentMethod">
-                <option value="cash" data-i18n="payment_cash">Наличные</option>
-                <option value="card" data-i18n="payment_card">Карта</option>
-                <option value="transfer" data-i18n="payment_transfer">Перевод</option>
-                <option value="consignment" data-i18n="payment_consignment">Под реализацию</option>
+                <option value="cash">Наличные</option>
+                <option value="card">Карта</option>
+                <option value="transfer">Перевод</option>
+                <option value="consignment">Под реализацию</option>
               </select>
             </div>
 
             <div class="field full">
-              <label for="itemSearch" data-i18n="item">Товар</label>
+              <label for="itemSearch">Товар</label>
               <div class="autocomplete">
                 <input
                   id="itemSearch"
                   type="text"
-                  data-i18n-placeholder="search_item_placeholder" placeholder="Начни вводить название, штрихкод, SKU или артикул"
+                  placeholder="Начни вводить название, штрихкод, SKU или артикул"
                   autocomplete="off"
                 />
                 <div id="itemResults" class="results"></div>
@@ -389,38 +360,38 @@
             </div>
 
             <div class="field">
-              <label for="locationId" data-i18n="storage_location">Место хранения</label>
+              <label for="locationId">Место хранения</label>
               <select id="locationId">
-                <option value="" data-i18n="select_location">Выберите МХ</option>
+                <option value="">Выберите МХ</option>
               </select>
             </div>
 
             <div class="field">
-              <label for="counterpartyId" data-i18n="client">Клиент</label>
+              <label for="counterpartyId">Клиент</label>
               <select id="counterpartyId">
-                <option value="" data-i18n="without_client">Без клиента</option>
+                <option value="">Без клиента</option>
               </select>
             </div>
 
             <div class="field">
-              <label for="qty" data-i18n="quantity">Количество</label>
+              <label for="qty">Количество</label>
               <input id="qty" type="number" min="1" step="1" value="1" />
             </div>
 
             <div class="field">
-              <label for="price" data-i18n="unit_price">Цена за единицу</label>
+              <label for="price">Цена за единицу</label>
               <input id="price" type="number" min="0" step="0.01" value="0" />
             </div>
 
             <div class="field full">
-              <label for="comment" data-i18n="comment">Комментарий</label>
-              <textarea id="comment" data-i18n-placeholder="sales_comment_placeholder" placeholder="Комментарий к продаже"></textarea>
+              <label for="comment">Комментарий</label>
+              <textarea id="comment" placeholder="Комментарий к продаже"></textarea>
             </div>
           </div>
 
           <div class="inline" style="margin-top:18px;">
-            <button type="submit" class="btn btn-primary" data-i18n="submit_sale">Провести продажу</button>
-            <button type="button" class="btn btn-light" onclick="loadInitialData()" data-i18n="refresh_data">Обновить данные</button>
+            <button type="submit" class="btn btn-primary">Провести продажу</button>
+            <button type="button" class="btn btn-light" onclick="loadInitialData()">Обновить данные</button>
           </div>
         </form>
 
@@ -432,8 +403,6 @@
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
-  <script src="/js/i18n.js"></script>
-  
 
   <script>
     const FALLBACK_TENANT_ID = 1;
@@ -445,7 +414,7 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;"),
-      translateError: (value) => String(value || (window.i18n ? i18n.t("error_generic") : "Ошибка")),
+      translateError: (value) => String(value || "Ошибка"),
       displayDateTime: (value) => {
         if (!value) return "";
         const d = new Date(value);
@@ -678,25 +647,25 @@
       if (stockQty !== null) {
         stockInfo = `
           <div class="selected-stock ${stockQty <= 0 ? "zero" : ""}">
-            ${i18n.t("selected_stock_prefix")}: ${stockQty}
+            Остаток на выбранном МХ: ${stockQty}
           </div>
         `;
       } else {
         stockInfo = `
           <div class="selected-stock">
-            ${i18n.t("select_location_to_see_stock")}
+            Выбери место хранения, чтобы увидеть остаток
           </div>
         `;
       }
 
       els.selectedItemBox.classList.add("active");
       els.selectedItemBox.innerHTML = `
-        <div><strong>${escapeHtml(i18n.t("selected_item_title"))}:</strong> ${escapeHtml(selectedItem.name || i18n.t("unnamed"))}</div>
+        <div><strong>Выбран товар:</strong> ${escapeHtml(selectedItem.name || "Без названия")}</div>
         <div class="muted" style="margin-top:6px;">
           ID: ${escapeHtml(String(selectedItem.id ?? ""))}
           ${selectedItem.sku ? " | SKU: " + escapeHtml(selectedItem.sku) : ""}
-          ${selectedItem.barcode ? " | " + escapeHtml(i18n.t("barcode_short")) + ": " + escapeHtml(selectedItem.barcode) : ""}
-          ${selectedItem.vendor_code ? " | " + escapeHtml(i18n.t("article_short")) + ": " + escapeHtml(selectedItem.vendor_code) : ""}
+          ${selectedItem.barcode ? " | ШК: " + escapeHtml(selectedItem.barcode) : ""}
+          ${selectedItem.vendor_code ? " | Артикул: " + escapeHtml(selectedItem.vendor_code) : ""}
         </div>
         ${stockInfo}
       `;
@@ -706,8 +675,8 @@
       if (!items.length) {
         els.itemResults.innerHTML = `
           <div class="result-item">
-            <div class="result-title">${escapeHtml(i18n.t("nothing_found"))}</div>
-            <div class="result-sub">${escapeHtml(i18n.t("check_search_query"))}</div>
+            <div class="result-title">Ничего не найдено</div>
+            <div class="result-sub">Проверь название, штрихкод, SKU или артикул.</div>
           </div>
         `;
         els.itemResults.style.display = "block";
@@ -716,12 +685,12 @@
 
       els.itemResults.innerHTML = items.map((item) => `
         <div class="result-item" data-id="${escapeHtml(String(item.id))}">
-          <div class="result-title">${escapeHtml(item.name || i18n.t("unnamed"))}</div>
+          <div class="result-title">${escapeHtml(item.name || "Без названия")}</div>
           <div class="result-sub">
             ID: ${escapeHtml(String(item.id ?? ""))}
             ${item.sku ? " | SKU: " + escapeHtml(item.sku) : ""}
-            ${item.barcode ? " | " + escapeHtml(i18n.t("barcode_short")) + ": " + escapeHtml(item.barcode) : ""}
-            ${item.vendor_code ? " | " + escapeHtml(i18n.t("article_short")) + ": " + escapeHtml(item.vendor_code) : ""}
+            ${item.barcode ? " | ШК: " + escapeHtml(item.barcode) : ""}
+            ${item.vendor_code ? " | Артикул: " + escapeHtml(item.vendor_code) : ""}
           </div>
         </div>
       `).join("");
@@ -748,7 +717,7 @@
     }
 
     function fillLocations() {
-      els.locationId.innerHTML = `<option value="" data-i18n="select_location">Выберите МХ</option>` +
+      els.locationId.innerHTML = `<option value="">Выберите МХ</option>` +
         allLocations.map((loc) => `
           <option value="${escapeHtml(String(loc.id))}">
             ${escapeHtml(loc.name || "")}${loc.code ? " (" + escapeHtml(loc.code) + ")" : ""}
@@ -757,7 +726,7 @@
     }
 
     function fillClients() {
-      els.counterpartyId.innerHTML = `<option value="" data-i18n="without_client">Без клиента</option>` +
+      els.counterpartyId.innerHTML = `<option value="">Без клиента</option>` +
         allClients.map((client) => `
           <option value="${escapeHtml(String(client.id))}">
             ${escapeHtml(client.name || "")}
@@ -767,7 +736,7 @@
 
     async function loadItems() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error(i18n.t("provide_tenant_id"));
+      if (!tenantId) throw new Error("Укажи tenant_id");
 
       const data = await apiGet(`/items?tenant_id=${tenantId}`);
       const items = extractList(data, ["items", "data", "rows"]).map(normalizeItem);
@@ -778,7 +747,7 @@
 
     async function loadLocations() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error(i18n.t("provide_tenant_id"));
+      if (!tenantId) throw new Error("Укажи tenant_id");
 
       const data = await apiGet(`/locations?tenant_id=${tenantId}`);
       allLocations = extractList(data, ["locations", "data", "rows"]);
@@ -788,7 +757,7 @@
 
     async function loadClients() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error(i18n.t("provide_tenant_id"));
+      if (!tenantId) throw new Error("Укажи tenant_id");
 
       const data = await apiGet(`/clients?tenant_id=${tenantId}`);
       allClients = extractList(data, ["clients", "counterparties", "data", "rows"]);
@@ -798,7 +767,7 @@
 
     async function loadStock() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error(i18n.t("provide_tenant_id"));
+      if (!tenantId) throw new Error("Укажи tenant_id");
 
       const data = await apiGet(`/stock?tenant_id=${tenantId}`);
       const rows = extractList(data, ["stock", "data", "rows"]).map(normalizeStockRow);
@@ -817,7 +786,7 @@
       hideStatus(els.pageStatus);
 
       try {
-        showStatus(els.pageStatus, i18n.t("loading_data"), "info");
+        showStatus(els.pageStatus, "Загрузка данных...", "info");
         selectedItem = null;
         renderSelectedItem();
         els.itemResults.style.display = "none";
@@ -833,11 +802,11 @@
 
         showStatus(
           els.pageStatus,
-          `${i18n.t("data_loaded")}\n${i18n.t("sales_items_loaded")}: ${allItems.length}, ${i18n.t("sales_locations_loaded")}: ${allLocations.length}, ${i18n.t("sales_clients_loaded")}: ${allClients.length}, ${i18n.t("sales_stock_loaded")}: ${els.stockCount.textContent}`,
+          `Данные загружены.\nТоваров: ${allItems.length}, МХ: ${allLocations.length}, клиентов: ${allClients.length}, остатков: ${els.stockCount.textContent}`,
           "success"
         );
       } catch (err) {
-        showStatus(els.pageStatus, i18n.t("load_error") + ": " + Ui.translateError(err.message), "error");
+        showStatus(els.pageStatus, "Ошибка загрузки данных: " + Ui.translateError(err.message), "error");
       }
     }
 
@@ -871,23 +840,23 @@
 
       try {
         const tenantId = getTenantId();
-        if (!tenantId) throw new Error(i18n.t("provide_tenant_id"));
-        if (!selectedItem || !selectedItem.id) throw new Error(i18n.t("choose_item_from_list"));
-        if (!els.locationId.value) throw new Error(i18n.t("choose_location"));
+        if (!tenantId) throw new Error("Укажи tenant_id");
+        if (!selectedItem || !selectedItem.id) throw new Error("Выбери товар из списка");
+        if (!els.locationId.value) throw new Error("Выбери место хранения");
 
         const qty = Number(els.qty.value);
-        if (!Number.isFinite(qty) || qty <= 0) throw new Error(i18n.t("qty_must_be_positive"));
+        if (!Number.isFinite(qty) || qty <= 0) throw new Error("Количество должно быть больше 0");
 
         const price = Number(els.price.value || 0);
-        if (!Number.isFinite(price) || price < 0) throw new Error(i18n.t("price_non_negative"));
+        if (!Number.isFinite(price) || price < 0) throw new Error("Цена не может быть отрицательной");
 
         const stockQty = getCurrentStockQty();
         if (stockQty === null) {
-          throw new Error(i18n.t("stock_not_determined"));
+          throw new Error("Не удалось определить остаток по выбранному месту хранения");
         }
 
         if (qty > stockQty) {
-          throw new Error(`${i18n.t("insufficient_stock")}: ${stockQty}`);
+          throw new Error(`Недостаточно товара. Остаток: ${stockQty}`);
         }
 
         const paymentMethod = els.paymentMethod.value;
@@ -908,7 +877,7 @@
           body.counterparty_id = Number(els.counterpartyId.value);
         }
 
-        showStatus(els.submitStatus, i18n.t("processing_sale"), "info");
+        showStatus(els.submitStatus, "Провожу продажу...", "info");
 
         const result = await apiPost("/sales/sell", body);
 
@@ -917,7 +886,7 @@
 
         showStatus(
           els.submitStatus,
-          i18n.t("sale_success") + "\n\n" + JSON.stringify(result, null, 2),
+          "Продажа успешно проведена.\n\n" + JSON.stringify(result, null, 2),
           "success"
         );
 
@@ -932,7 +901,7 @@
         renderSelectedItem();
         els.itemResults.style.display = "none";
       } catch (err) {
-        showStatus(els.submitStatus, i18n.t("sale_error") + ": " + Ui.translateError(err.message), "error");
+        showStatus(els.submitStatus, "Ошибка продажи: " + Ui.translateError(err.message), "error");
       }
     }
 
@@ -980,8 +949,6 @@
       loadInitialData();
     }
 
-    i18n.applyTranslations();
-    i18n.renderLanguageSwitcher("langSwitcher");
     bootstrap();
   </script>
 </body>
