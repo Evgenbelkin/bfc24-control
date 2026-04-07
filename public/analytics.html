@@ -911,11 +911,26 @@ function renderDebtsTable(list){
    РЕНДЕР — СКЛАД
    ══════════════════════════════════════════════════════════ */
 function renderStockKpi(sv){
-  const t=sv.totals||{};
+  const totals = sv.totals || {};
   return [
-    {color:"c-teal",  label:t("analytics.stockCostValue","Стоимость остатков (FIFO)"), value:fmtMoney(t.stock_cost_value), sub:tf("analytics.skuInStock",{value:fmt(t.total_skus)},`${fmt(t.total_skus)} SKU на складе`)},
-    {color:"c-green", label:t("analytics.potentialRevenue","Потенциальная выручка"),      value:fmtMoney(t.stock_sale_value), sub:t("analytics.atSalePrice","По цене продажи")},
-    {color:"c-purple",label:t("analytics.potentialProfit","Потенциальная прибыль"),      value:fmtMoney(t.potential_profit), sub:t("analytics.sellEntireStock","Продать весь склад")},
+    {
+      color:"c-teal",
+      label:t("analytics.stockCostValue","Стоимость остатков (FIFO)"),
+      value:fmtMoney(totals.stock_cost_value),
+      sub:tf("analytics.skuInStock",{value:fmt(totals.total_skus)},`${fmt(totals.total_skus)} SKU на складе`)
+    },
+    {
+      color:"c-green",
+      label:t("analytics.potentialRevenue","Потенциальная выручка"),
+      value:fmtMoney(totals.stock_sale_value),
+      sub:t("analytics.atSalePrice","По цене продажи")
+    },
+    {
+      color:"c-purple",
+      label:t("analytics.potentialProfit","Потенциальная прибыль"),
+      value:fmtMoney(totals.potential_profit),
+      sub:t("analytics.sellEntireStock","Продать весь склад")
+    },
   ].map(c=>`<div class="kpi-card ${esc(c.color)}"><div class="kpi-label">${esc(c.label)}</div><div class="kpi-value">${c.value}</div><div class="kpi-sub">${esc(c.sub)}</div></div>`).join("");
 }
 
