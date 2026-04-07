@@ -646,62 +646,64 @@
     }
 
     function buildRows() {
-      return stockData.map(stockRow => {
-        const itemId =
-          stockRow.item_id ??
-          stockRow.itemId ??
-          stockRow.product_id ??
-          stockRow.productId ??
-          null;
+      return stockData
+        .map(stockRow => {
+          const itemId =
+            stockRow.item_id ??
+            stockRow.itemId ??
+            stockRow.product_id ??
+            stockRow.productId ??
+            null;
 
-        const locationId =
-          stockRow.location_id ??
-          stockRow.locationId ??
-          null;
+          const locationId =
+            stockRow.location_id ??
+            stockRow.locationId ??
+            null;
 
-        const qty =
-          Number(
-            stockRow.qty ??
-            stockRow.quantity ??
-            stockRow.stock_qty ??
-            0
-          );
+          const qty =
+            Number(
+              stockRow.qty ??
+              stockRow.quantity ??
+              stockRow.stock_qty ??
+              0
+            );
 
-        const item =
-          itemsData.find(i => String(i.id) === String(itemId)) || {};
+          const item =
+            itemsData.find(i => String(i.id) === String(itemId)) || {};
 
-        const location =
-          locationsData.find(l => String(l.id) === String(locationId)) || {};
+          const location =
+            locationsData.find(l => String(l.id) === String(locationId)) || {};
 
-        const locationName = location.name || stockRow.location_name || "";
-        const locationCode = location.code || stockRow.location_code || "";
+          const locationName = location.name || stockRow.location_name || "";
+          const locationCode = location.code || stockRow.location_code || "";
 
-        return {
-          item_id: itemId,
-          item_name:
-            item.name ||
-            item.item_name ||
-            stockRow.item_name ||
-            stockRow.name ||
-            "",
-          sku:
-            item.sku ||
-            item.vendor_code ||
-            item.article ||
-            item.code ||
-            stockRow.sku ||
-            "",
-          barcode:
-            item.barcode ||
-            stockRow.barcode ||
-            "",
-          location_id: locationId,
-          location_name: locationName,
-          location_code: locationCode,
-          location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
-          qty
-        };
-      });
+          return {
+            item_id: itemId,
+            item_name:
+              item.name ||
+              item.item_name ||
+              stockRow.item_name ||
+              stockRow.name ||
+              "",
+            sku:
+              item.sku ||
+              item.vendor_code ||
+              item.article ||
+              item.code ||
+              stockRow.sku ||
+              "",
+            barcode:
+              item.barcode ||
+              stockRow.barcode ||
+              "",
+            location_id: locationId,
+            location_name: locationName,
+            location_code: locationCode,
+            location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
+            qty
+          };
+        })
+        .filter(row => Number(row.qty || 0) > 0);
     }
 
     function renderTable() {
@@ -738,8 +740,8 @@
         });
 
       els.rowsCount.textContent = String(rows.length);
-      els.itemsCount.textContent = String(itemsData.length);
-      els.locationsCount.textContent = String(locationsData.length);
+      els.itemsCount.textContent = String(new Set(allRows.map(row => String(row.item_id || ""))).size);
+      els.locationsCount.textContent = String(new Set(allRows.map(row => String(row.location_id || ""))).size);
       els.qtyTotal.textContent = formatNumber(rows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
       els.qtyGrandTotal.textContent = formatNumber(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
 
@@ -834,7 +836,7 @@
         renderBatches();
 
         setPageStatus("stock.loadedStatus", {
-          stock: stockData.length,
+          stock: buildRows().length,
           items: itemsData.length,
           locations: locationsData.length,
           batches: batchesData.length
