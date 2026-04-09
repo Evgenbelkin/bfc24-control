@@ -5,6 +5,10 @@ const {
   requireRole,
   getEffectiveTenantId,
 } = require("../middleware/auth");
+const {
+  requireActiveWriteSubscription,
+  checkTenantItemLimit,
+} = require("../middleware/permissions");
 
 const router = express.Router();
 
@@ -204,6 +208,7 @@ router.get("/:id", authRequired, async (req, res) => {
 router.post(
   "/",
   authRequired,
+  requireActiveWriteSubscription(),
   requireRole("owner", "admin", "client_owner", "client_manager", "client"),
   async (req, res) => {
     try {
@@ -214,6 +219,11 @@ router.post(
           ok: false,
           error: "tenant_not_defined",
         });
+      }
+
+      const limitCheck = await checkTenantItemLimit(tenantId);
+      if (!limitCheck.ok) {
+        return res.status(403).json(limitCheck);
       }
 
       const name = String(req.body.name || "").trim();
@@ -315,6 +325,7 @@ router.post(
 router.put(
   "/:id",
   authRequired,
+  requireActiveWriteSubscription(),
   requireRole("owner", "admin", "client_owner", "client_manager", "client"),
   async (req, res) => {
     try {
@@ -453,6 +464,7 @@ router.put(
 router.delete(
   "/:id",
   authRequired,
+  requireActiveWriteSubscription(),
   requireRole("owner", "admin", "client_owner"),
   async (req, res) => {
     try {
