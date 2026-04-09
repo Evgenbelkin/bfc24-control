@@ -229,6 +229,9 @@ router.get(
           sr.id::text AS id,
           sr.tenant_id::text AS tenant_id,
           t.name AS tenant_name,
+          t.subscription_status,
+          t.subscription_start_at,
+          t.subscription_end_at,
           sr.contact_name,
           sr.phone,
           sr.email,
@@ -370,6 +373,163 @@ router.patch(
       });
     } catch (error) {
       console.error('[PATCH /owner-admin/subscription-requests/:id/status] error:', error);
+      return res.status(500).json({ ok: false, error: 'internal_server_error' });
+    }
+  }
+);
+
+router.post(
+  '/owner-admin/subscription-requests/:id/activate',
+  authRequired,
+  requirePermission('owner.subscription_requests.update'),
+  async (req, res) => {
+    try {
+      const id = Number(req.params?.id);
+      const daysRaw = Number(req.body?.days || 30);
+      const days = Number.isFinite(daysRaw) ? Math.max(1, Math.min(daysRaw, 3650)) : 30;
+
+      if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({ ok: false, error: 'invalid_request_id' });
+      }
+
+      const requestResult = await pool.query(
+        `
+        SELECT
+          sr.id,
+          sr.tenant_id,
+          sr.status,
+          sr.contact_name,
+          sr.phone,
+          sr.email,
+          sr.comment,
+          t.name AS tenant_name,
+          t.subscription_status,
+          t.subscription_start_at,
+          t.subscription_end_at
+        FROM saas.subscription_requests sr
+        LEFT JOIN saas.tenants t ON t.id = sr.tenant_id
+        WHERE sr.id = $1
+        LIMIT 1
+        `,
+        [id]
+      );
+
+      const requestRow = requestResult.rows[0];
+      if (!requestRow) {
+        return res.status(404).json({ ok: false, error: 'subscription_request_not_found' });
+      }
+
+      if (!requestRow.tenant_id) {
+        return res.status(400).json({ ok: false, error: 'tenant_not_found' });
+      }
+
+      const processedBy = toBigIntOrNull(req.user?.id);
+
+      await pool.query('BEGIN');
+
+      const tenantUpdateResult = await pool.query(
+        `
+        UPDATE saas.tenants
+        SET
+          subscription_status = 'active',
+          subscription_start_at = NOW(),
+          subscription_end_at = NOW() + ($2::text || ' days')::interval,
+          updated_at = NOW(),
+          is_blocked = false,
+          block_reason = NULL,
+          status = 'active',
+          is_active = true
+        WHERE id = $1
+        RETURNING
+          id::text AS id,
+          name,
+          subscription_status,
+          subscription_start_at,
+          subscription_end_at,
+          status,
+          is_active,
+          is_blocked
+        `,
+        [requestRow.tenant_id, String(days)]
+      );
+
+      const tenant = tenantUpdateResult.rows[0];
+      if (!tenant) {
+        await pool.query('ROLLBACK');
+        return res.status(404).json({ ok: false, error: 'tenant_not_found' });
+      }
+
+      const requestUpdateResult = await pool.query(
+        `
+        UPDATE saas.subscription_requests
+        SET
+          status = 'done',
+          updated_at = NOW(),
+          processed_at = NOW(),
+          processed_by = $2::bigint
+        WHERE id = $1
+        RETURNING
+          id::text AS id,
+          tenant_id::text AS tenant_id,
+          contact_name,
+          phone,
+          email,
+          comment,
+          status,
+          created_at,
+          updated_at,
+          processed_at,
+          processed_by::text AS processed_by
+        `,
+        [id, processedBy]
+      );
+
+      const updatedRequest = requestUpdateResult.rows[0];
+
+      await pool.query('COMMIT');
+
+      await logActivity({
+        actorUserId: req.user?.id || null,
+        tenantId: requestRow.tenant_id,
+        action: 'subscription_activated',
+        entityType: 'tenant',
+        entityId: tenant.id,
+        details: {
+          request_id: String(id),
+          tenant_name: tenant.name,
+          days,
+          subscription_status: tenant.subscription_status,
+          subscription_start_at: tenant.subscription_start_at,
+          subscription_end_at: tenant.subscription_end_at
+        },
+        req
+      });
+
+      await logActivity({
+        actorUserId: req.user?.id || null,
+        tenantId: requestRow.tenant_id,
+        action: 'subscription_request_activated',
+        entityType: 'subscription_request',
+        entityId: updatedRequest.id,
+        details: {
+          tenant_name: tenant.name,
+          days,
+          final_status: updatedRequest.status
+        },
+        req
+      });
+
+      return res.json({
+        ok: true,
+        tenant,
+        request: updatedRequest
+      });
+    } catch (error) {
+      try {
+        await pool.query('ROLLBACK');
+      } catch (_) {}
+
+      console.error('[POST /owner-admin/subscription-requests/:id/activate] error:', error);
       return res.status(500).json({ ok: false, error: 'internal_server_error' });
     }
   }
