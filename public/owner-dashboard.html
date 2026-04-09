@@ -6,233 +6,202 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
+    /* ══════════════════════════════════════════════════════════
+       ПЕРЕМЕННЫЕ
+       ══════════════════════════════════════════════════════════ */
     :root {
-      --bg: #0b1020;
-      --panel: #121933;
-      --panel-2: #182245;
-      --panel-3: #1f2b57;
-      --text: #ecf2ff;
-      --muted: #9fb0d3;
-      --line: rgba(255,255,255,0.08);
-      --line-2: rgba(255,255,255,0.14);
-      --accent: #5aa8ff;
-      --accent-2: #7b68ff;
-      --success: #19c37d;
-      --warning: #f5b942;
-      --danger: #ff5f73;
-      --shadow: 0 18px 40px rgba(0,0,0,0.30);
-      --radius: 20px;
-      --radius-sm: 14px;
-      --input-bg: rgba(255,255,255,0.05);
-      --chip-bg: rgba(255,255,255,0.07);
-      --sticky-bg: rgba(18,25,51,0.95);
+      --bg:         #0b1020;
+      --text:       #ecf2ff;
+      --muted:      #8fa4cc;
+      --line:       rgba(255,255,255,0.07);
+      --line-2:     rgba(255,255,255,0.13);
+      --accent:     #5aa8ff;
+      --accent-2:   #7b68ff;
+      --success:    #19c37d;
+      --warning:    #f5b942;
+      --danger:     #ff5f73;
+      --shadow:     0 16px 40px rgba(0,0,0,0.32);
+      --radius:     18px;
+      --radius-sm:  12px;
+      --input-bg:   rgba(255,255,255,0.05);
+      --chip-bg:    rgba(255,255,255,0.06);
+      --panel-bg:   rgba(255,255,255,0.04);
+      --sticky-bg:  rgba(11,16,32,0.97);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    *, *::before, *::after { box-sizing: border-box; }
 
     html, body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       background:
-        radial-gradient(circle at top left, rgba(90,168,255,0.18), transparent 28%),
-        radial-gradient(circle at top right, rgba(123,104,255,0.16), transparent 24%),
-        linear-gradient(180deg, #09101f 0%, #0d1430 100%);
+        radial-gradient(circle at 0% 0%,   rgba(90,168,255,0.16) 0%, transparent 26%),
+        radial-gradient(circle at 100% 0%,  rgba(123,104,255,0.14) 0%, transparent 22%),
+        linear-gradient(180deg, #09101f 0%, #0c1330 100%);
       color: var(--text);
-      font-family: Inter, Arial, sans-serif;
+      font-family: Inter, -apple-system, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
       min-height: 100%;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+    a { color: inherit; text-decoration: none; }
 
+    /* ══════════════════════════════════════════════════════════
+       LAYOUT
+       ══════════════════════════════════════════════════════════ */
     .page {
-      max-width: 1680px;
+      max-width: 1760px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 18px 20px 48px;
     }
 
+    /* ══════════════════════════════════════════════════════════
+       TOPBAR
+       ══════════════════════════════════════════════════════════ */
     .topbar {
       display: flex;
-      gap: 16px;
+      gap: 14px;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 22px;
+      margin-bottom: 16px;
       flex-wrap: wrap;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
+    .brand { display: flex; align-items: center; gap: 12px; }
 
     .brand-logo {
-      width: 56px;
-      height: 56px;
-      border-radius: 18px;
+      width: 46px; height: 46px;
+      border-radius: 14px;
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow);
-      flex: 0 0 auto;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 24px rgba(90,168,255,0.30);
+      flex-shrink: 0;
     }
+    .brand-logo svg { width: 22px; height: 22px; fill: #fff; }
 
-    .brand-logo svg {
-      width: 28px;
-      height: 28px;
-      fill: white;
-    }
-
-    .brand-text h1 {
-      margin: 0 0 4px;
-      font-size: 28px;
-      line-height: 1.15;
+    .brand-name {
+      font-size: 18px;
       font-weight: 800;
-      letter-spacing: 0.2px;
+      letter-spacing: -0.2px;
+      line-height: 1.2;
     }
-
-    .brand-text p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
+    .brand-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
 
     .userbox {
-      min-width: 280px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 14px 16px;
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow);
+      background: var(--panel-bg);
+      border: 1px solid var(--line-2);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      min-width: 220px;
     }
+    .userbox-label { color: var(--muted); font-size: 11px; margin-bottom: 2px; }
+    .userbox-value { font-size: 14px; font-weight: 700; }
+    .userbox-sub   { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
-    .userbox-label {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 4px;
-    }
-
-    .userbox-value {
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    .userbox-sub {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
+    /* ══════════════════════════════════════════════════════════
+       TOOLBAR
+       ══════════════════════════════════════════════════════════ */
     .toolbar {
       display: flex;
-      gap: 10px;
+      gap: 7px;
       flex-wrap: wrap;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      align-items: center;
     }
 
+    /* ══════════════════════════════════════════════════════════
+       BUTTONS
+       ══════════════════════════════════════════════════════════ */
     .btn {
       border: none;
-      border-radius: 14px;
-      padding: 12px 16px;
-      font-size: 14px;
+      border-radius: var(--radius-sm);
+      padding: 9px 14px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+      transition: opacity .13s, transform .13s;
+      white-space: nowrap;
+      line-height: 1;
     }
+    .btn:hover    { opacity: .88; transform: translateY(-1px); }
+    .btn:active   { transform: translateY(0); }
+    .btn:disabled { opacity: .5; cursor: default; transform: none; }
 
-    .btn:hover {
-      transform: translateY(-1px);
-    }
+    .btn-primary  { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
+    .btn-secondary{ background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--line-2); }
+    .btn-danger   { background: rgba(255,95,115,0.14); color: #ffd8dd; border: 1px solid rgba(255,95,115,0.25); }
+    .btn-success  { background: rgba(25,195,125,0.14); color: #c8ffec; border: 1px solid rgba(25,195,125,0.25); }
+    .btn-warning  { background: rgba(245,185,66,0.14); color: #fff0c4; border: 1px solid rgba(245,185,66,0.25); }
+    .btn-ghost    { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+    .btn-ghost:hover { background: var(--panel-bg); }
 
-    .btn:disabled {
-      cursor: default;
-      opacity: 0.6;
-      transform: none;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: white;
-      box-shadow: var(--shadow);
-    }
-
-    .btn-secondary {
-      background: rgba(255,255,255,0.06);
+    .row-btn {
+      border-radius: 9px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity .12s;
+      border: 1px solid var(--line-2);
+      background: rgba(255,255,255,0.05);
       color: var(--text);
-      border: 1px solid var(--line);
     }
+    .row-btn:hover { opacity: .82; }
+    .row-btn-success { background: rgba(25,195,125,0.14);  border-color: rgba(25,195,125,0.28); color: #c8ffec; }
+    .row-btn-danger  { background: rgba(255,95,115,0.14);  border-color: rgba(255,95,115,0.28); color: #ffd8dd; }
+    .row-btn-warning { background: rgba(245,185,66,0.14);  border-color: rgba(245,185,66,0.28); color: #fff0c4; }
+    .row-btn-accent  { background: rgba(90,168,255,0.14);  border-color: rgba(90,168,255,0.28); color: #c8e8ff; }
 
-    .btn-danger {
-      background: rgba(255,95,115,0.12);
-      color: #ffd7dc;
-      border: 1px solid rgba(255,95,115,0.22);
-    }
-
-    .btn-success {
-      background: rgba(25,195,125,0.14);
-      color: #d9fff0;
-      border: 1px solid rgba(25,195,125,0.22);
-    }
-
-    .btn-warning {
-      background: rgba(245,185,66,0.16);
-      color: #fff0c8;
-      border: 1px solid rgba(245,185,66,0.24);
-    }
-
+    /* ══════════════════════════════════════════════════════════
+       KPI GRID
+       ══════════════════════════════════════════════════════════ */
     .grid-kpi {
       display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 22px;
+      grid-template-columns: repeat(7, minmax(0,1fr));
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
     .kpi-card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));
+      background: var(--panel-bg);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: var(--shadow);
-      min-height: 116px;
-    }
-
-    .kpi-label {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    .kpi-value {
-      font-size: 28px;
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 8px;
-    }
-
-    .kpi-sub {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .panel {
-      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.035));
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      padding: 15px 16px;
+      position: relative;
       overflow: hidden;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      border-radius: 3px 0 0 3px;
+    }
+    .kpi-neutral::before { background: var(--accent); }
+    .kpi-ok::before      { background: var(--success); }
+    .kpi-warn::before    { background: var(--warning); }
+    .kpi-alert::before   { background: var(--danger); }
+    .kpi-info::before    { background: var(--accent-2); }
+
+    .kpi-label { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+    .kpi-value { font-size: 28px; font-weight: 800; line-height: 1.1; }
+    .kpi-sub   { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    .kpi-ok    .kpi-value { color: var(--success); }
+    .kpi-warn  .kpi-value { color: var(--warning); }
+    .kpi-alert .kpi-value { color: var(--danger); }
+    .kpi-info  .kpi-value { color: var(--accent-2); }
+
+    /* ══════════════════════════════════════════════════════════
+       PANEL
+       ══════════════════════════════════════════════════════════ */
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 14px;
     }
 
     .panel-header {
@@ -240,1920 +209,1953 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 18px 20px;
+      padding: 13px 18px;
       border-bottom: 1px solid var(--line);
-      background: rgba(255,255,255,0.03);
       flex-wrap: wrap;
+      background: rgba(255,255,255,0.02);
     }
+    .panel-title    { font-size: 15px; font-weight: 800; margin: 0; }
+    .panel-subtitle { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
-    .panel-title {
-      font-size: 18px;
-      font-weight: 800;
-      margin: 0;
-    }
+    .panel-body { padding: 14px 18px 18px; }
 
-    .panel-subtitle {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    .panel-body {
-      padding: 18px 20px 20px;
-    }
-
-    .status-line {
-      display: flex;
-      flex-wrap: wrap;
+    /* ══════════════════════════════════════════════════════════
+       ATTENTION CARDS
+       ══════════════════════════════════════════════════════════ */
+    .attention-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
       gap: 10px;
-      margin-bottom: 16px;
     }
 
+    .ac {
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      background: var(--panel-bg);
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .ac-danger { border-color: rgba(255,95,115,.28);  background: rgba(255,95,115,.05); }
+    .ac-warn   { border-color: rgba(245,185,66,.26);  background: rgba(245,185,66,.05); }
+    .ac-info   { border-color: rgba(90,168,255,.24);  background: rgba(90,168,255,.04); }
+
+    .ac-title   { font-size: 13px; font-weight: 800; }
+    .ac-meta    { font-size: 11px; color: var(--muted); }
+    .ac-actions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 3px; }
+
+    /* ══════════════════════════════════════════════════════════
+       FILTER CHIPS
+       ══════════════════════════════════════════════════════════ */
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .fc {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line-2);
+      background: var(--chip-bg);
+      font-size: 12px; font-weight: 700;
+      cursor: pointer;
+      transition: background .13s, border-color .13s;
+      white-space: nowrap;
+    }
+    .fc:hover { background: rgba(255,255,255,.10); }
+    .fc.on           { background: rgba(90,168,255,.18); border-color: rgba(90,168,255,.50); color: #b8dcff; }
+    .fc.on-success   { background: rgba(25,195,125,.18); border-color: rgba(25,195,125,.48); color: #c0ffe0; }
+    .fc.on-warning   { background: rgba(245,185,66,.18); border-color: rgba(245,185,66,.48); color: #ffeea8; }
+    .fc.on-danger    { background: rgba(255,95,115,.18); border-color: rgba(255,95,115,.48); color: #ffd4d8; }
+    .fc.on-info      { background: rgba(123,104,255,.18);border-color: rgba(123,104,255,.48);color: #d8d0ff; }
+
+    /* chips-summary */
     .chip {
-      padding: 8px 12px;
+      padding: 6px 11px;
       border-radius: 999px;
       background: var(--chip-bg);
       border: 1px solid var(--line);
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 12px; font-weight: 700;
     }
 
-    .filters {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
+    .status-line { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
 
+    /* ══════════════════════════════════════════════════════════
+       INPUTS
+       ══════════════════════════════════════════════════════════ */
     .input, .select, .textarea {
       width: 100%;
       background: var(--input-bg);
       border: 1px solid var(--line-2);
       color: var(--text);
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 14px;
+      border-radius: var(--radius-sm);
+      padding: 10px 13px;
+      font-size: 13px;
       outline: none;
+      transition: border-color .14s;
     }
+    .input:focus, .select:focus, .textarea:focus { border-color: rgba(90,168,255,.55); }
+    .input::placeholder, .textarea::placeholder  { color: #5a6e92; }
+    .textarea { min-height: 82px; resize: vertical; }
+    .select { appearance: auto; color-scheme: dark; background-color: #192040; }
+    .select option { background: #192040; }
 
-    .input::placeholder,
-    .textarea::placeholder {
-      color: #95a5c7;
-    }
+    .search-input { max-width: 280px; padding: 8px 13px; font-size: 12px; }
 
-    .textarea {
-      min-height: 92px;
-      resize: vertical;
-    }
-
-    .select {
-      appearance: auto;
-      color-scheme: dark;
-      background-color: #1f2746;
-      color: #ecf2ff;
-    }
-
-    .select option {
-      background: #1f2746;
-      color: #ecf2ff;
-    }
-
-    .filter-input {
-      max-width: 320px;
-    }
-
+    /* ══════════════════════════════════════════════════════════
+       TABLES
+       ══════════════════════════════════════════════════════════ */
     .table-wrap {
-      overflow: auto;
+      overflow-x: auto;
       border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      background: rgba(0,0,0,.12);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1180px;
-    }
+    table { width: 100%; border-collapse: collapse; }
 
     th, td {
       text-align: left;
       vertical-align: top;
-      padding: 14px 14px;
+      padding: 10px 12px;
       border-bottom: 1px solid var(--line);
-      font-size: 14px;
+      font-size: 13px;
     }
+    tr:last-child td { border-bottom: none; }
 
     th {
-      position: sticky;
-      top: 0;
-      z-index: 1;
+      position: sticky; top: 0; z-index: 2;
       background: var(--sticky-bg);
-      color: #d7e5ff;
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      backdrop-filter: blur(10px);
+      color: #c0d4f0;
+      font-size: 11px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .07em;
+      white-space: nowrap;
+      backdrop-filter: blur(8px);
     }
 
-    tr:hover td {
-      background: rgba(255,255,255,0.03);
-    }
+    tr:hover td { background: rgba(255,255,255,.024); }
 
-    .muted {
-      color: var(--muted);
-    }
-
-    .small {
-      font-size: 12px;
-    }
-
-    .strong {
-      font-weight: 800;
-    }
-
-    .stack {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .inline-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
+    /* ══════════════════════════════════════════════════════════
+       BADGES
+       ══════════════════════════════════════════════════════════ */
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 9px;
       border-radius: 999px;
+      font-size: 11px; font-weight: 800;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,0.05);
-      font-size: 12px;
-      font-weight: 800;
       white-space: nowrap;
     }
+    .b-ok   { background: rgba(25,195,125,.14); border-color: rgba(25,195,125,.28); color: #c4ffe8; }
+    .b-warn { background: rgba(245,185,66,.14);  border-color: rgba(245,185,66,.28);  color: #fff0b8; }
+    .b-red  { background: rgba(255,95,115,.14);  border-color: rgba(255,95,115,.28);  color: #ffd4d9; }
+    .b-info { background: rgba(90,168,255,.14);  border-color: rgba(90,168,255,.28);  color: #c4e4ff; }
+    .b-muted{ background: rgba(255,255,255,.06); border-color: var(--line-2);          color: var(--muted); }
+    .b-vio  { background: rgba(123,104,255,.14); border-color: rgba(123,104,255,.28); color: #d8d0ff; }
 
-    .badge-success {
-      background: rgba(25,195,125,0.14);
-      border-color: rgba(25,195,125,0.26);
-      color: #d8fff1;
-    }
+    /* ══════════════════════════════════════════════════════════
+       HELPERS
+       ══════════════════════════════════════════════════════════ */
+    .muted   { color: var(--muted); }
+    .small   { font-size: 11px; }
+    .strong  { font-weight: 800; }
+    .mono    { font-family: 'Courier New', monospace; }
+    .nowrap  { white-space: nowrap; }
 
-    .badge-warning {
-      background: rgba(245,185,66,0.16);
-      border-color: rgba(245,185,66,0.28);
-      color: #fff1cc;
-    }
+    .stack   { display: flex; flex-direction: column; gap: 3px; }
+    .row-act { display: flex; flex-wrap: wrap; gap: 5px; }
+    .inline-badges { display: flex; flex-wrap: wrap; gap: 4px; }
 
-    .badge-danger {
-      background: rgba(255,95,115,0.16);
-      border-color: rgba(255,95,115,0.28);
-      color: #ffd9df;
-    }
-
-    .badge-info {
-      background: rgba(90,168,255,0.16);
-      border-color: rgba(90,168,255,0.28);
-      color: #dcebff;
-    }
-
-    .row-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .row-btn {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 8px 10px;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .row-btn:hover {
-      background: rgba(255,255,255,0.08);
-    }
-
-    .row-btn-danger {
-      border-color: rgba(255,95,115,0.24);
-      background: rgba(255,95,115,0.10);
-      color: #ffdce1;
-    }
-
-    .row-btn-success {
-      border-color: rgba(25,195,125,0.24);
-      background: rgba(25,195,125,0.10);
-      color: #d9fff0;
-    }
-
-    .row-btn-warning {
-      border-color: rgba(245,185,66,0.24);
-      background: rgba(245,185,66,0.12);
-      color: #fff1cc;
+    .empty {
+      padding: 22px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line-2);
+      border-radius: 14px;
     }
 
     .activity-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
     }
 
     .activity-mini {
       border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px;
-      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: var(--panel-bg);
     }
+    .activity-mini-label { color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+    .activity-mini-value { font-size: 22px; font-weight: 800; }
 
-    .activity-mini-label {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
-
-    .activity-mini-value {
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    .forms-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .field label {
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .field.full {
-      grid-column: 1 / -1;
-    }
-
-    .helper {
-      color: var(--muted);
-      font-size: 12px;
-    }
+    /* forms-grid */
+    .forms-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid    { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .field        { display: flex; flex-direction: column; gap: 6px; }
+    .field label  { font-size: 12px; color: var(--muted); font-weight: 700; }
+    .field.full   { grid-column: 1 / -1; }
+    .helper       { font-size: 11px; color: var(--muted); }
 
     .modules-box {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 4px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-top: 3px;
     }
-
     .module-option {
       border: 1px solid var(--line);
-      background: rgba(255,255,255,0.04);
-      border-radius: 14px;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 48px;
+      background: var(--panel-bg);
+      border-radius: 11px;
+      padding: 8px 11px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .module-option input { transform: scale(1.1); }
+
+    .footer-note { margin-top: 10px; color: var(--muted); font-size: 11px; }
+
+    /* ══════════════════════════════════════════════════════════
+       MODAL (просмотр событий клиента)
+       ══════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,.65);
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #111a38;
+      border: 1px solid var(--line-2);
+      border-radius: var(--radius);
+      box-shadow: 0 32px 80px rgba(0,0,0,.6);
+      width: 100%; max-width: 860px;
+      max-height: 88vh;
+      display: flex; flex-direction: column;
+      overflow: hidden;
     }
 
-    .module-option input {
-      transform: scale(1.15);
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .modal-title { font-size: 15px; font-weight: 800; }
+    .modal-close {
+      background: none; border: none; color: var(--muted);
+      font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    .modal-body {
+      overflow-y: auto;
+      padding: 16px 18px 20px;
+      flex: 1;
     }
 
-    .empty {
-      padding: 24px;
-      color: var(--muted);
-      text-align: center;
-      border: 1px dashed var(--line-2);
-      border-radius: 18px;
-      background: rgba(255,255,255,0.03);
+    /* events list */
+    .events-list { display: flex; flex-direction: column; gap: 7px; }
+    .event-item {
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-bg);
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 8px;
+      align-items: start;
     }
+    .event-time { font-size: 11px; color: var(--muted); }
+    .event-body { font-size: 12px; }
+    .event-type { font-weight: 700; margin-bottom: 2px; }
+    .event-meta { color: var(--muted); font-size: 11px; }
 
-    .footer-note {
-      margin-top: 14px;
-      color: var(--muted);
-      font-size: 12px;
-    }
+    /* Collapsed attention */
+    .collapsed-body { display: none; }
 
+    /* ══════════════════════════════════════════════════════════
+       RESPONSIVE
+       ══════════════════════════════════════════════════════════ */
     @media (max-width: 1400px) {
-      .grid-kpi {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .forms-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .modules-box {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
+      .grid-kpi    { grid-template-columns: repeat(4, 1fr); }
+      .forms-grid  { grid-template-columns: 1fr; }
+      .modules-box { grid-template-columns: repeat(3, 1fr); }
     }
-
-    @media (max-width: 920px) {
-      .page {
-        padding: 16px;
-      }
-
-      .grid-kpi {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .activity-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .modules-box {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+    @media (max-width: 1024px) {
+      .grid-kpi    { grid-template-columns: repeat(3, 1fr); }
+      .activity-grid { grid-template-columns: repeat(2, 1fr); }
     }
-
-    @media (max-width: 640px) {
-      .grid-kpi,
-      .activity-grid,
-      .modules-box {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        align-items: stretch;
-      }
-
-      .userbox {
-        width: 100%;
-      }
+    @media (max-width: 720px) {
+      .page        { padding: 12px; }
+      .grid-kpi    { grid-template-columns: repeat(2, 1fr); }
+      .activity-grid, .modules-box { grid-template-columns: repeat(2, 1fr); }
+      .form-grid   { grid-template-columns: 1fr; }
+      .topbar      { flex-direction: column; align-items: stretch; }
+      .userbox     { width: 100%; }
+    }
+    @media (max-width: 480px) {
+      .grid-kpi, .activity-grid, .modules-box { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand-logo" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2l8 4.5v11L12 22l-8-4.5v-11L12 2zm0 2.2L6 7v8l6 3.4 6-3.4V7l-6-2.8zm-3 4.3h6a1 1 0 110 2H9a1 1 0 110-2zm0 4h6a1 1 0 110 2H9a1 1 0 110-2z"/>
-          </svg>
-        </div>
-        <div class="brand-text">
-          <h1>BFC24 CONTROL — Кабинет владельца</h1>
-          <p>Управление клиентами SaaS, пользователями, подписками и активностью.</p>
-        </div>
-      </div>
+<div class="page">
 
-      <div class="userbox">
-        <div class="userbox-label">Текущий пользователь</div>
-        <div class="userbox-value" id="currentUserName">Загрузка...</div>
-        <div class="userbox-sub" id="currentUserSub">Проверяем сессию</div>
+  <!-- ══════════════════════════════════════════════════════════
+       TOPBAR
+       ══════════════════════════════════════════════════════════ -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 2l8 4.5v11L12 22l-8-4.5v-11L12 2zm0 2.2L6 7v8l6 3.4 6-3.4V7l-6-2.8zm-3 4.3h6a1 1 0 110 2H9a1 1 0 110-2zm0 4h6a1 1 0 110 2H9a1 1 0 110-2z"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">BFC24 CONTROL — Кабинет владельца</div>
+        <div class="brand-sub">Управление SaaS-клиентами, подписками, пользователями и активностью</div>
       </div>
     </div>
 
-    <div class="toolbar">
-      <button class="btn btn-primary" id="btnRefresh">Обновить данные</button>
-      <button class="btn btn-secondary" id="btnScrollTenants">К клиентам</button>
-      <button class="btn btn-secondary" id="btnScrollUsers">К пользователям</button>
-      <button class="btn btn-secondary" id="btnScrollRequests">К заявкам</button>
-      <button class="btn btn-secondary" id="btnScrollForms">К формам</button>
-      <button class="btn btn-danger" id="btnLogout">Выйти</button>
+    <div class="userbox">
+      <div class="userbox-label">Текущий пользователь</div>
+      <div class="userbox-value" id="currentUserName">Загрузка...</div>
+      <div class="userbox-sub" id="currentUserSub">Проверяем сессию</div>
     </div>
+  </div>
 
-    <div class="grid-kpi" id="kpiGrid">
-      <div class="kpi-card">
-        <div class="kpi-label">Всего клиентов</div>
-        <div class="kpi-value" id="kpiTenants">0</div>
-        <div class="kpi-sub">Все записи в кабинете владельца</div>
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <button class="btn btn-primary" id="btnRefresh">↻ Обновить данные</button>
+    <button class="btn btn-secondary" id="btnScrollAttention">⚠ Требуют внимания</button>
+    <button class="btn btn-secondary" id="btnScrollTenants">Клиенты</button>
+    <button class="btn btn-secondary" id="btnScrollRequests">Заявки</button>
+    <button class="btn btn-secondary" id="btnScrollUsers">Пользователи</button>
+    <button class="btn btn-secondary" id="btnScrollActivity">Активность</button>
+    <button class="btn btn-secondary" id="btnScrollForms">Формы</button>
+    <button class="btn btn-danger"    id="btnLogout">Выйти</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       KPI
+       ══════════════════════════════════════════════════════════ -->
+  <div class="grid-kpi">
+    <div class="kpi-card kpi-neutral">
+      <div class="kpi-label">Всего клиентов</div>
+      <div class="kpi-value" id="kpiTenants">0</div>
+      <div class="kpi-sub">в базе</div>
+    </div>
+    <div class="kpi-card kpi-ok">
+      <div class="kpi-label">Активные подписки</div>
+      <div class="kpi-value" id="kpiActive">0</div>
+      <div class="kpi-sub">subscription_status = active</div>
+    </div>
+    <div class="kpi-card kpi-warn">
+      <div class="kpi-label">Trial период</div>
+      <div class="kpi-value" id="kpiTrial">0</div>
+      <div class="kpi-sub">subscription_status = trial</div>
+    </div>
+    <div class="kpi-card kpi-alert">
+      <div class="kpi-label">Просроченные</div>
+      <div class="kpi-value" id="kpiExpired">0</div>
+      <div class="kpi-sub">subscription_status = expired</div>
+    </div>
+    <div class="kpi-card kpi-alert">
+      <div class="kpi-label">Заблокированные</div>
+      <div class="kpi-value" id="kpiBlocked">0</div>
+      <div class="kpi-sub">is_blocked или blocked</div>
+    </div>
+    <div class="kpi-card kpi-neutral">
+      <div class="kpi-label">Пользователей</div>
+      <div class="kpi-value" id="kpiUsers">0</div>
+      <div class="kpi-sub">учётных записей</div>
+    </div>
+    <div class="kpi-card kpi-info">
+      <div class="kpi-label">Открытых заявок</div>
+      <div class="kpi-value" id="kpiOpenReqs">0</div>
+      <div class="kpi-sub">new + in_progress</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ТРЕБУЮТ ВНИМАНИЯ
+       ══════════════════════════════════════════════════════════ -->
+  <section class="panel" id="attentionSection">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">⚠ Требуют внимания — <span id="attentionBadge">0</span></h2>
+        <div class="panel-subtitle">Просроченные, заблокированные, trial ≤ 7 дней, новые заявки</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Активные подписки</div>
-        <div class="kpi-value" id="kpiSubsActive">0</div>
-        <div class="kpi-sub">Активные и пробные клиенты</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Заблокированные клиенты</div>
-        <div class="kpi-value" id="kpiBlocked">0</div>
-        <div class="kpi-sub">Блокировки и просроченные подписки</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Всего пользователей</div>
-        <div class="kpi-value" id="kpiUsers">0</div>
-        <div class="kpi-sub">Учётные записи входа</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Активность за 7 дней</div>
-        <div class="kpi-value" id="kpiActivity7">0</div>
-        <div class="kpi-sub">Сумма событий по всем клиентам</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Активность за 30 дней</div>
-        <div class="kpi-value" id="kpiActivity30">0</div>
-        <div class="kpi-sub">Сумма событий по всем клиентам</div>
+      <button class="btn btn-ghost" id="btnToggleAttention">Свернуть</button>
+    </div>
+    <div class="panel-body" id="attentionBody">
+      <div class="attention-grid" id="attentionGrid">
+        <div class="ac"><div class="ac-title muted">Загрузка...</div></div>
       </div>
     </div>
+  </section>
 
-    <div class="layout">
-      <section class="panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Сводка по активности клиентов</h2>
-            <div class="panel-subtitle">Входы и реальные события по работе клиента.</div>
-          </div>
-          <div class="inline-badges">
-            <span class="badge badge-success">🟢 активен</span>
-            <span class="badge badge-warning">🟡 внимание</span>
-            <span class="badge badge-danger">🔴 заблокирован</span>
-            <span class="badge badge-info">⚪ нет активности</span>
-          </div>
-        </div>
-        <div class="panel-body">
-          <div class="activity-grid">
-            <div class="activity-mini">
-              <div class="activity-mini-label">Клиенты активны</div>
-              <div class="activity-mini-value" id="miniActive">0</div>
-            </div>
-            <div class="activity-mini">
-              <div class="activity-mini-label">Клиенты внимание</div>
-              <div class="activity-mini-value" id="miniWarning">0</div>
-            </div>
-            <div class="activity-mini">
-              <div class="activity-mini-label">Клиенты без активности</div>
-              <div class="activity-mini-value" id="miniInactive">0</div>
-            </div>
-            <div class="activity-mini">
-              <div class="activity-mini-label">Клиенты заблокированы</div>
-              <div class="activity-mini-value" id="miniBlocked">0</div>
-            </div>
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Клиент</th>
-                  <th>Последний вход</th>
-                  <th>Активность</th>
-                  <th>Операции</th>
-                  <th>Статус активности</th>
-                </tr>
-              </thead>
-              <tbody id="activityTableBody">
-                <tr>
-                  <td colspan="5" class="muted">Загрузка...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Быстрая сводка по платформе</h2>
-            <div class="panel-subtitle">Ключевые показатели владельца.</div>
-          </div>
-        </div>
-        <div class="panel-body">
-          <div class="status-line" id="summaryChips">
-            <span class="chip">Загрузка...</span>
-          </div>
-
-          <div class="footer-note">
-            Активность клиентов сейчас считается по продажам, приёмкам, списаниям,
-            денежным доходам и расходам, а также по последнему входу в систему.
-          </div>
-        </div>
-      </section>
+  <!-- ══════════════════════════════════════════════════════════
+       КЛИЕНТЫ
+       ══════════════════════════════════════════════════════════ -->
+  <section class="panel" id="tenantsSection">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Клиенты SaaS</h2>
+        <div class="panel-subtitle">Полный список с подписками, лимитами и быстрыми действиями</div>
+      </div>
+      <input class="input search-input" id="tenantSearch" placeholder="Поиск: имя, slug, email, телефон..." />
     </div>
-
-    <div class="forms-grid" id="formsSection">
-      <section class="panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title" id="tenantFormTitle">Новый клиент</h2>
-            <div class="panel-subtitle">Создание и редактирование клиента SaaS.</div>
-          </div>
-          <div class="row-actions">
-            <button class="row-btn" id="btnTenantCancelEdit" style="display:none;">Отменить редактирование</button>
-          </div>
-        </div>
-        <div class="panel-body">
-          <form id="tenantForm">
-            <input type="hidden" id="tenantId" />
-
-            <div class="form-grid">
-              <div class="field">
-                <label for="tenantName">Название клиента</label>
-                <input class="input" id="tenantName" placeholder="Например: BFC24 TEST" required />
-              </div>
-              <div class="field">
-                <label for="tenantSlug">Slug</label>
-                <input class="input" id="tenantSlug" placeholder="bfc24-test" required />
-              </div>
-
-              <div class="field">
-                <label for="tenantTariffName">Тариф</label>
-                <input class="input" id="tenantTariffName" placeholder="Базовый" value="Базовый" />
-              </div>
-              <div class="field">
-                <label for="tenantPlanCode">Код тарифа</label>
-                <input class="input" id="tenantPlanCode" placeholder="basic" value="basic" />
-              </div>
-
-              <div class="field">
-                <label for="tenantSubscriptionStatus">Статус подписки</label>
-                <select class="select" id="tenantSubscriptionStatus">
-                  <option value="trial">Пробный период</option>
-                  <option value="active">Активна</option>
-                  <option value="expired">Истекла</option>
-                  <option value="blocked">Заблокирована</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="tenantStatus">Статус записи</label>
-                <select class="select" id="tenantStatus">
-                  <option value="active">Активна</option>
-                  <option value="blocked">Заблокирована</option>
-                  <option value="archived">В архиве</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label for="tenantStartAt">Начало подписки</label>
-                <input class="input" id="tenantStartAt" type="datetime-local" />
-              </div>
-              <div class="field">
-                <label for="tenantEndAt">Конец подписки</label>
-                <input class="input" id="tenantEndAt" type="datetime-local" />
-              </div>
-
-              <div class="field">
-                <label for="tenantMaxSku">Лимит SKU</label>
-                <input class="input" id="tenantMaxSku" type="number" min="0" value="1000" />
-              </div>
-              <div class="field">
-                <label for="tenantMaxLocations">Лимит мест хранения</label>
-                <input class="input" id="tenantMaxLocations" type="number" min="0" value="10" />
-              </div>
-
-              <div class="field">
-                <label for="tenantContactName">Контактное лицо</label>
-                <input class="input" id="tenantContactName" placeholder="Имя" />
-              </div>
-              <div class="field">
-                <label for="tenantContactPhone">Телефон</label>
-                <input class="input" id="tenantContactPhone" placeholder="+7..." />
-              </div>
-
-              <div class="field">
-                <label for="tenantContactEmail">Email</label>
-                <input class="input" id="tenantContactEmail" placeholder="mail@example.com" />
-              </div>
-              <div class="field">
-                <label for="tenantCode">Код клиента</label>
-                <input class="input" id="tenantCode" placeholder="BFC24-001" />
-              </div>
-
-              <div class="field">
-                <label for="tenantPhone">Доп. телефон</label>
-                <input class="input" id="tenantPhone" placeholder="+7..." />
-              </div>
-              <div class="field">
-                <label for="tenantEmail">Доп. email</label>
-                <input class="input" id="tenantEmail" placeholder="mail@example.com" />
-              </div>
-
-              <div class="field full">
-                <label>Включённые модули</label>
-                <div class="modules-box" id="tenantModulesBox">
-                  <label class="module-option"><input type="checkbox" value="items" /> Товары</label>
-                  <label class="module-option"><input type="checkbox" value="clients" /> Клиенты</label>
-                  <label class="module-option"><input type="checkbox" value="locations" /> Места хранения</label>
-                  <label class="module-option"><input type="checkbox" value="incoming" /> Приёмка</label>
-                  <label class="module-option"><input type="checkbox" value="sales" /> Продажа</label>
-                  <label class="module-option"><input type="checkbox" value="writeoff" /> Списание</label>
-                  <label class="module-option"><input type="checkbox" value="stock" /> Остатки</label>
-                  <label class="module-option"><input type="checkbox" value="movements" /> Движения</label>
-                  <label class="module-option"><input type="checkbox" value="cash" /> Деньги</label>
-                  <label class="module-option"><input type="checkbox" value="debts" /> Долги</label>
-                  <label class="module-option"><input type="checkbox" value="expenses" /> Расходы</label>
-                </div>
-              </div>
-
-              <div class="field full">
-                <label for="tenantComment">Комментарий</label>
-                <textarea class="textarea" id="tenantComment" placeholder="Внутренний комментарий"></textarea>
-              </div>
-            </div>
-
-            <div class="toolbar" style="margin-top:16px; margin-bottom:0;">
-              <button class="btn btn-primary" type="submit" id="btnTenantSave">Сохранить клиента</button>
-              <button class="btn btn-secondary" type="button" id="btnTenantReset">Очистить форму</button>
-            </div>
-          </form>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title" id="userFormTitle">Новый пользователь</h2>
-            <div class="panel-subtitle">Создание и редактирование пользователя SaaS.</div>
-          </div>
-          <div class="row-actions">
-            <button class="row-btn" id="btnUserCancelEdit" style="display:none;">Отменить редактирование</button>
-          </div>
-        </div>
-        <div class="panel-body">
-          <form id="userForm">
-            <input type="hidden" id="userId" />
-
-            <div class="form-grid">
-              <div class="field">
-                <label for="userTenantId">Клиент</label>
-                <select class="select" id="userTenantId" required></select>
-              </div>
-              <div class="field">
-                <label for="userRole">Роль</label>
-                <select class="select" id="userRole">
-                  <option value="client">Клиент</option>
-                  <option value="owner">Владелец</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label for="userUsername">Логин</label>
-                <input class="input" id="userUsername" placeholder="client1" required />
-              </div>
-              <div class="field">
-                <label for="userFullName">ФИО / имя</label>
-                <input class="input" id="userFullName" placeholder="Иван Иванов" required />
-              </div>
-
-              <div class="field full">
-                <label for="userPassword">Пароль</label>
-                <input class="input" id="userPassword" type="password" placeholder="Для нового пользователя обязателен" />
-                <div class="helper">При редактировании можно оставить пустым, если менять пароль не нужно.</div>
-              </div>
-            </div>
-
-            <div class="toolbar" style="margin-top:16px; margin-bottom:0;">
-              <button class="btn btn-primary" type="submit" id="btnUserSave">Сохранить пользователя</button>
-              <button class="btn btn-secondary" type="button" id="btnUserReset">Очистить форму</button>
-            </div>
-          </form>
-        </div>
-      </section>
+    <div class="panel-body">
+      <!-- Фильтры -->
+      <div class="filter-row">
+        <span class="fc on" data-f="all">Все</span>
+        <span class="fc" data-f="active">✅ Активные</span>
+        <span class="fc" data-f="trial">🟡 Trial</span>
+        <span class="fc" data-f="expired">🔴 Просроченные</span>
+        <span class="fc" data-f="blocked">⛔ Заблокированные</span>
+        <span class="fc" data-f="requests">📋 С заявками</span>
+      </div>
+      <div class="table-wrap">
+        <table style="min-width:1380px;">
+          <thead>
+            <tr>
+              <th style="width:180px;">ID / Клиент</th>
+              <th style="width:190px;">Статусы</th>
+              <th style="width:160px;">Контакты</th>
+              <th style="width:230px;">Подписка / лимиты</th>
+              <th style="width:160px;">Активность</th>
+              <th style="width:140px;">Польз. / Модули</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="tenantsTableBody">
+            <tr><td colspan="7" class="muted">Загрузка...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+  </section>
 
-    <section class="panel" id="tenantsSection" style="margin-bottom:18px;">
+  <!-- ══════════════════════════════════════════════════════════
+       ЗАЯВКИ НА ПРОДЛЕНИЕ
+       ══════════════════════════════════════════════════════════ -->
+  <section class="panel" id="subscriptionRequestsSection">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Заявки на продление подписки</h2>
+        <div class="panel-subtitle">Клиенты оставляют заявку из своего кабинета — берите в работу и закрывайте</div>
+      </div>
+      <input class="input search-input" id="subscriptionRequestSearch" placeholder="Поиск по клиенту, телефону..." />
+    </div>
+    <div class="panel-body">
+      <div class="status-line" id="subscriptionRequestsSummary">
+        <span class="chip">Загрузка...</span>
+      </div>
+      <div class="table-wrap">
+        <table style="min-width:900px;">
+          <thead>
+            <tr>
+              <th>ID / Клиент</th>
+              <th>Контакты</th>
+              <th>Комментарий</th>
+              <th>Статус</th>
+              <th>Создана</th>
+              <th>Обработка</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="subscriptionRequestsTableBody">
+            <tr><td colspan="7" class="muted">Загрузка...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ПОЛЬЗОВАТЕЛИ
+       ══════════════════════════════════════════════════════════ -->
+  <section class="panel" id="usersSection">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Пользователи SaaS</h2>
+        <div class="panel-subtitle">Учётные записи входа, привязанные к клиентам</div>
+      </div>
+      <input class="input search-input" id="userSearch" placeholder="Поиск: логин, имя, клиент..." />
+    </div>
+    <div class="panel-body">
+      <div class="table-wrap">
+        <table style="min-width:820px;">
+          <thead>
+            <tr>
+              <th>ID / Логин</th>
+              <th>Имя</th>
+              <th>Роль</th>
+              <th>Клиент</th>
+              <th>Статус</th>
+              <th>Последний вход</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="7" class="muted">Загрузка...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       АКТИВНОСТЬ
+       ══════════════════════════════════════════════════════════ -->
+  <section class="panel" id="activitySection">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Активность клиентов</h2>
+        <div class="panel-subtitle">Входы, продажи, приёмки за 7 и 30 дней. Нажмите «События» для детального просмотра</div>
+      </div>
+      <div class="inline-badges">
+        <span class="badge b-ok">🟢 активен</span>
+        <span class="badge b-warn">🟡 внимание</span>
+        <span class="badge b-red">🔴 заблокирован</span>
+        <span class="badge b-info">⚪ нет активности</span>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="activity-grid">
+        <div class="activity-mini">
+          <div class="activity-mini-label">Активных клиентов</div>
+          <div class="activity-mini-value" id="miniActive">0</div>
+        </div>
+        <div class="activity-mini">
+          <div class="activity-mini-label">Требуют внимания</div>
+          <div class="activity-mini-value" id="miniWarning">0</div>
+        </div>
+        <div class="activity-mini">
+          <div class="activity-mini-label">Без активности</div>
+          <div class="activity-mini-value" id="miniInactive">0</div>
+        </div>
+        <div class="activity-mini">
+          <div class="activity-mini-label">Заблокированы</div>
+          <div class="activity-mini-value" id="miniBlocked">0</div>
+        </div>
+      </div>
+
+      <div class="status-line" id="summaryChips">
+        <span class="chip">Загрузка...</span>
+      </div>
+
+      <div class="table-wrap">
+        <table style="min-width:800px;">
+          <thead>
+            <tr>
+              <th>Клиент</th>
+              <th>Последний вход</th>
+              <th>События 7 / 30 дн</th>
+              <th>Продажи · Приёмки · Списания</th>
+              <th>Статус</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="activityTableBody">
+            <tr><td colspan="6" class="muted">Загрузка...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="footer-note">
+        Активность считается по продажам, приёмкам, списаниям, денежным операциям и последнему входу.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ФОРМЫ
+       ══════════════════════════════════════════════════════════ -->
+  <div class="forms-grid" id="formsSection">
+
+    <!-- Форма клиента -->
+    <section class="panel">
       <div class="panel-header">
         <div>
-          <h2 class="panel-title">Клиенты SaaS</h2>
-          <div class="panel-subtitle">Полный список клиентов, подписок, лимитов и активности.</div>
+          <h2 class="panel-title" id="tenantFormTitle">Новый клиент</h2>
+          <div class="panel-subtitle">Создание и редактирование клиента SaaS</div>
         </div>
-        <input class="input filter-input" id="tenantSearch" placeholder="Поиск по клиенту, slug, email, телефону..." />
+        <button class="row-btn" id="btnTenantCancelEdit" style="display:none;">Отменить</button>
       </div>
       <div class="panel-body">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID / Клиент</th>
-                <th>Статусы</th>
-                <th>Контакты</th>
-                <th>Подписка и лимиты</th>
-                <th>Активность</th>
-                <th>Модули</th>
-                <th>Пользователи</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody id="tenantsTableBody">
-              <tr>
-                <td colspan="8" class="muted">Загрузка...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <form id="tenantForm">
+          <input type="hidden" id="tenantId" />
+          <div class="form-grid">
+            <div class="field">
+              <label for="tenantName">Название клиента *</label>
+              <input class="input" id="tenantName" placeholder="Например: BFC24 TEST" required />
+            </div>
+            <div class="field">
+              <label for="tenantSlug">Slug *</label>
+              <input class="input" id="tenantSlug" placeholder="bfc24-test" required />
+            </div>
+            <div class="field">
+              <label for="tenantTariffName">Тариф</label>
+              <input class="input" id="tenantTariffName" placeholder="Базовый" value="Базовый" />
+            </div>
+            <div class="field">
+              <label for="tenantPlanCode">Код тарифа</label>
+              <input class="input" id="tenantPlanCode" placeholder="basic" value="basic" />
+            </div>
+            <div class="field">
+              <label for="tenantSubscriptionStatus">Статус подписки</label>
+              <select class="select" id="tenantSubscriptionStatus">
+                <option value="trial">Пробный период</option>
+                <option value="active">Активна</option>
+                <option value="expired">Истекла</option>
+                <option value="blocked">Заблокирована</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="tenantStatus">Статус записи</label>
+              <select class="select" id="tenantStatus">
+                <option value="active">Активна</option>
+                <option value="blocked">Заблокирована</option>
+                <option value="archived">В архиве</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="tenantStartAt">Начало подписки</label>
+              <input class="input" id="tenantStartAt" type="datetime-local" />
+            </div>
+            <div class="field">
+              <label for="tenantEndAt">Конец подписки</label>
+              <input class="input" id="tenantEndAt" type="datetime-local" />
+            </div>
+            <div class="field">
+              <label for="tenantMaxSku">Лимит SKU</label>
+              <input class="input" id="tenantMaxSku" type="number" min="0" value="1000" />
+            </div>
+            <div class="field">
+              <label for="tenantMaxLocations">Лимит мест хранения</label>
+              <input class="input" id="tenantMaxLocations" type="number" min="0" value="10" />
+            </div>
+            <div class="field">
+              <label for="tenantMaxUsers">Лимит пользователей</label>
+              <input class="input" id="tenantMaxUsers" type="number" min="0" value="3" />
+            </div>
+            <div class="field">
+              <label for="tenantContactName">Контактное лицо</label>
+              <input class="input" id="tenantContactName" placeholder="Имя" />
+            </div>
+            <div class="field">
+              <label for="tenantContactPhone">Телефон контакта</label>
+              <input class="input" id="tenantContactPhone" placeholder="+7..." />
+            </div>
+            <div class="field">
+              <label for="tenantContactEmail">Email контакта</label>
+              <input class="input" id="tenantContactEmail" placeholder="mail@example.com" />
+            </div>
+            <div class="field">
+              <label for="tenantCode">Код клиента</label>
+              <input class="input" id="tenantCode" placeholder="BFC24-001" />
+            </div>
+            <div class="field">
+              <label for="tenantPhone">Доп. телефон</label>
+              <input class="input" id="tenantPhone" placeholder="+7..." />
+            </div>
+            <div class="field">
+              <label for="tenantEmail">Доп. email</label>
+              <input class="input" id="tenantEmail" placeholder="mail@example.com" />
+            </div>
+            <div class="field full">
+              <label>Включённые модули</label>
+              <div class="modules-box" id="tenantModulesBox">
+                <label class="module-option"><input type="checkbox" value="items" /> Товары</label>
+                <label class="module-option"><input type="checkbox" value="clients" /> Клиенты</label>
+                <label class="module-option"><input type="checkbox" value="locations" /> Места хранения</label>
+                <label class="module-option"><input type="checkbox" value="incoming" /> Приёмка</label>
+                <label class="module-option"><input type="checkbox" value="sales" /> Продажа</label>
+                <label class="module-option"><input type="checkbox" value="writeoff" /> Списание</label>
+                <label class="module-option"><input type="checkbox" value="stock" /> Остатки</label>
+                <label class="module-option"><input type="checkbox" value="movements" /> Движения</label>
+                <label class="module-option"><input type="checkbox" value="cash" /> Деньги</label>
+                <label class="module-option"><input type="checkbox" value="debts" /> Долги</label>
+                <label class="module-option"><input type="checkbox" value="expenses" /> Расходы</label>
+              </div>
+            </div>
+            <div class="field full">
+              <label for="tenantComment">Комментарий (внутренний)</label>
+              <textarea class="textarea" id="tenantComment" placeholder="Внутренняя заметка"></textarea>
+            </div>
+          </div>
+          <div class="toolbar" style="margin-top:12px;margin-bottom:0;">
+            <button class="btn btn-primary" type="submit">Сохранить клиента</button>
+            <button class="btn btn-secondary" type="button" id="btnTenantReset">Очистить</button>
+          </div>
+        </form>
       </div>
     </section>
 
-    <section class="panel" id="usersSection">
+    <!-- Форма пользователя -->
+    <section class="panel">
       <div class="panel-header">
         <div>
-          <h2 class="panel-title">Пользователи SaaS</h2>
-          <div class="panel-subtitle">Учётные записи входа, привязанные к клиентам.</div>
+          <h2 class="panel-title" id="userFormTitle">Новый пользователь</h2>
+          <div class="panel-subtitle">Создание и редактирование пользователя SaaS</div>
         </div>
-        <input class="input filter-input" id="userSearch" placeholder="Поиск по логину, имени, клиенту..." />
+        <button class="row-btn" id="btnUserCancelEdit" style="display:none;">Отменить</button>
       </div>
       <div class="panel-body">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID / Логин</th>
-                <th>Имя</th>
-                <th>Роль</th>
-                <th>Клиент</th>
-                <th>Статусы</th>
-                <th>Последний вход</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody id="usersTableBody">
-              <tr>
-                <td colspan="7" class="muted">Загрузка...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel" id="subscriptionRequestsSection" style="margin-top:18px;">
-      <div class="panel-header">
-        <div>
-          <h2 class="panel-title">Заявки на продление подписки</h2>
-          <div class="panel-subtitle">Клиенты оставляют заявку из своего кабинета. Здесь их можно взять в работу и закрыть.</div>
-        </div>
-        <input class="input filter-input" id="subscriptionRequestSearch" placeholder="Поиск по клиенту, телефону, email, комментарию..." />
-      </div>
-      <div class="panel-body">
-        <div class="status-line" id="subscriptionRequestsSummary">
-          <span class="chip">Загрузка...</span>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID / Клиент</th>
-                <th>Контакты</th>
-                <th>Комментарий</th>
-                <th>Статус</th>
-                <th>Создана</th>
-                <th>Обработка</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody id="subscriptionRequestsTableBody">
-              <tr>
-                <td colspan="7" class="muted">Загрузка...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <form id="userForm">
+          <input type="hidden" id="userId" />
+          <div class="form-grid">
+            <div class="field">
+              <label for="userTenantId">Клиент</label>
+              <select class="select" id="userTenantId" required></select>
+            </div>
+            <div class="field">
+              <label for="userRole">Роль</label>
+              <select class="select" id="userRole">
+                <option value="client">Клиент</option>
+                <option value="owner">Владелец</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="userUsername">Логин *</label>
+              <input class="input" id="userUsername" placeholder="client1" required />
+            </div>
+            <div class="field">
+              <label for="userFullName">ФИО / имя *</label>
+              <input class="input" id="userFullName" placeholder="Иван Иванов" required />
+            </div>
+            <div class="field full">
+              <label for="userPassword">Пароль</label>
+              <input class="input" id="userPassword" type="password" placeholder="Для нового пользователя обязателен" />
+              <div class="helper">При редактировании оставьте пустым, если не меняете пароль.</div>
+            </div>
+          </div>
+          <div class="toolbar" style="margin-top:12px;margin-bottom:0;">
+            <button class="btn btn-primary" type="submit">Сохранить пользователя</button>
+            <button class="btn btn-secondary" type="button" id="btnUserReset">Очистить</button>
+          </div>
+        </form>
       </div>
     </section>
   </div>
 
-  <script src="/js/config.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/app-ui.js"></script>
+</div><!-- /page -->
 
-  <script>
-    const state = {
-      me: null,
-      tenants: [],
-      users: [],
-      activitySummary: [],
-      subscriptionRequests: [],
-      tenantSearch: "",
-      userSearch: "",
-      subscriptionRequestSearch: "",
-      editingTenantId: null,
-      editingUserId: null
-    };
+<!-- ══════════════════════════════════════════════════════════
+     МОДАЛЬНОЕ ОКНО СОБЫТИЙ КЛИЕНТА
+     ══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="eventsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="eventsModalTitle">События клиента</div>
+      <button class="modal-close" id="eventsModalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="eventsModalContent">
+        <div class="muted">Загрузка...</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    const el = {
-      currentUserName: document.getElementById("currentUserName"),
-      currentUserSub: document.getElementById("currentUserSub"),
+<script src="/js/config.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/app-ui.js"></script>
 
-      btnRefresh: document.getElementById("btnRefresh"),
-      btnLogout: document.getElementById("btnLogout"),
-      btnScrollTenants: document.getElementById("btnScrollTenants"),
-      btnScrollUsers: document.getElementById("btnScrollUsers"),
-      btnScrollRequests: document.getElementById("btnScrollRequests"),
-      btnScrollForms: document.getElementById("btnScrollForms"),
+<script>
+/* ══════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════ */
+const state = {
+  me:                    null,
+  tenants:               [],
+  users:                 [],
+  activitySummary:       [],
+  subscriptionRequests:  [],
+  tenantSearch:          "",
+  userSearch:            "",
+  subscriptionRequestSearch: "",
+  tenantFilter:          "all",
+  editingTenantId:       null,
+  editingUserId:         null,
+  attentionCollapsed:    false
+};
 
-      kpiTenants: document.getElementById("kpiTenants"),
-      kpiSubsActive: document.getElementById("kpiSubsActive"),
-      kpiBlocked: document.getElementById("kpiBlocked"),
-      kpiUsers: document.getElementById("kpiUsers"),
-      kpiActivity7: document.getElementById("kpiActivity7"),
-      kpiActivity30: document.getElementById("kpiActivity30"),
+/* ══════════════════════════════════════════════════════════
+   EL REFS
+   ══════════════════════════════════════════════════════════ */
+const el = {
+  currentUserName:  document.getElementById("currentUserName"),
+  currentUserSub:   document.getElementById("currentUserSub"),
 
-      miniActive: document.getElementById("miniActive"),
-      miniWarning: document.getElementById("miniWarning"),
-      miniInactive: document.getElementById("miniInactive"),
-      miniBlocked: document.getElementById("miniBlocked"),
+  btnRefresh:           document.getElementById("btnRefresh"),
+  btnLogout:            document.getElementById("btnLogout"),
+  btnScrollAttention:   document.getElementById("btnScrollAttention"),
+  btnScrollTenants:     document.getElementById("btnScrollTenants"),
+  btnScrollRequests:    document.getElementById("btnScrollRequests"),
+  btnScrollUsers:       document.getElementById("btnScrollUsers"),
+  btnScrollActivity:    document.getElementById("btnScrollActivity"),
+  btnScrollForms:       document.getElementById("btnScrollForms"),
+  btnToggleAttention:   document.getElementById("btnToggleAttention"),
 
-      summaryChips: document.getElementById("summaryChips"),
-      activityTableBody: document.getElementById("activityTableBody"),
-      tenantsTableBody: document.getElementById("tenantsTableBody"),
-      usersTableBody: document.getElementById("usersTableBody"),
-      subscriptionRequestsSummary: document.getElementById("subscriptionRequestsSummary"),
-      subscriptionRequestsTableBody: document.getElementById("subscriptionRequestsTableBody"),
+  kpiTenants:   document.getElementById("kpiTenants"),
+  kpiActive:    document.getElementById("kpiActive"),
+  kpiTrial:     document.getElementById("kpiTrial"),
+  kpiExpired:   document.getElementById("kpiExpired"),
+  kpiBlocked:   document.getElementById("kpiBlocked"),
+  kpiUsers:     document.getElementById("kpiUsers"),
+  kpiOpenReqs:  document.getElementById("kpiOpenReqs"),
 
-      tenantSearch: document.getElementById("tenantSearch"),
-      userSearch: document.getElementById("userSearch"),
-      subscriptionRequestSearch: document.getElementById("subscriptionRequestSearch"),
+  miniActive:   document.getElementById("miniActive"),
+  miniWarning:  document.getElementById("miniWarning"),
+  miniInactive: document.getElementById("miniInactive"),
+  miniBlocked:  document.getElementById("miniBlocked"),
 
-      tenantForm: document.getElementById("tenantForm"),
-      tenantFormTitle: document.getElementById("tenantFormTitle"),
-      tenantId: document.getElementById("tenantId"),
-      tenantName: document.getElementById("tenantName"),
-      tenantSlug: document.getElementById("tenantSlug"),
-      tenantTariffName: document.getElementById("tenantTariffName"),
-      tenantPlanCode: document.getElementById("tenantPlanCode"),
-      tenantSubscriptionStatus: document.getElementById("tenantSubscriptionStatus"),
-      tenantStatus: document.getElementById("tenantStatus"),
-      tenantStartAt: document.getElementById("tenantStartAt"),
-      tenantEndAt: document.getElementById("tenantEndAt"),
-      tenantMaxSku: document.getElementById("tenantMaxSku"),
-      tenantMaxLocations: document.getElementById("tenantMaxLocations"),
-      tenantContactName: document.getElementById("tenantContactName"),
-      tenantContactPhone: document.getElementById("tenantContactPhone"),
-      tenantContactEmail: document.getElementById("tenantContactEmail"),
-      tenantCode: document.getElementById("tenantCode"),
-      tenantPhone: document.getElementById("tenantPhone"),
-      tenantEmail: document.getElementById("tenantEmail"),
-      tenantComment: document.getElementById("tenantComment"),
-      tenantModulesBox: document.getElementById("tenantModulesBox"),
-      btnTenantReset: document.getElementById("btnTenantReset"),
-      btnTenantCancelEdit: document.getElementById("btnTenantCancelEdit"),
+  summaryChips:                  document.getElementById("summaryChips"),
+  attentionGrid:                 document.getElementById("attentionGrid"),
+  attentionBadge:                document.getElementById("attentionBadge"),
+  attentionBody:                 document.getElementById("attentionBody"),
+  activityTableBody:             document.getElementById("activityTableBody"),
+  tenantsTableBody:              document.getElementById("tenantsTableBody"),
+  usersTableBody:                document.getElementById("usersTableBody"),
+  subscriptionRequestsSummary:   document.getElementById("subscriptionRequestsSummary"),
+  subscriptionRequestsTableBody: document.getElementById("subscriptionRequestsTableBody"),
 
-      userForm: document.getElementById("userForm"),
-      userFormTitle: document.getElementById("userFormTitle"),
-      userId: document.getElementById("userId"),
-      userTenantId: document.getElementById("userTenantId"),
-      userRole: document.getElementById("userRole"),
-      userUsername: document.getElementById("userUsername"),
-      userFullName: document.getElementById("userFullName"),
-      userPassword: document.getElementById("userPassword"),
-      btnUserReset: document.getElementById("btnUserReset"),
-      btnUserCancelEdit: document.getElementById("btnUserCancelEdit"),
+  tenantSearch:              document.getElementById("tenantSearch"),
+  userSearch:                document.getElementById("userSearch"),
+  subscriptionRequestSearch: document.getElementById("subscriptionRequestSearch"),
 
-      tenantsSection: document.getElementById("tenantsSection"),
-      usersSection: document.getElementById("usersSection"),
-      subscriptionRequestsSection: document.getElementById("subscriptionRequestsSection"),
-      formsSection: document.getElementById("formsSection")
-    };
+  tenantForm:               document.getElementById("tenantForm"),
+  tenantFormTitle:          document.getElementById("tenantFormTitle"),
+  tenantId:                 document.getElementById("tenantId"),
+  tenantName:               document.getElementById("tenantName"),
+  tenantSlug:               document.getElementById("tenantSlug"),
+  tenantTariffName:         document.getElementById("tenantTariffName"),
+  tenantPlanCode:           document.getElementById("tenantPlanCode"),
+  tenantSubscriptionStatus: document.getElementById("tenantSubscriptionStatus"),
+  tenantStatus:             document.getElementById("tenantStatus"),
+  tenantStartAt:            document.getElementById("tenantStartAt"),
+  tenantEndAt:              document.getElementById("tenantEndAt"),
+  tenantMaxSku:             document.getElementById("tenantMaxSku"),
+  tenantMaxLocations:       document.getElementById("tenantMaxLocations"),
+  tenantMaxUsers:           document.getElementById("tenantMaxUsers"),
+  tenantContactName:        document.getElementById("tenantContactName"),
+  tenantContactPhone:       document.getElementById("tenantContactPhone"),
+  tenantContactEmail:       document.getElementById("tenantContactEmail"),
+  tenantCode:               document.getElementById("tenantCode"),
+  tenantPhone:              document.getElementById("tenantPhone"),
+  tenantEmail:              document.getElementById("tenantEmail"),
+  tenantComment:            document.getElementById("tenantComment"),
+  tenantModulesBox:         document.getElementById("tenantModulesBox"),
+  btnTenantReset:           document.getElementById("btnTenantReset"),
+  btnTenantCancelEdit:      document.getElementById("btnTenantCancelEdit"),
 
-    function getToken() {
-      return localStorage.getItem("token");
-    }
+  userForm:          document.getElementById("userForm"),
+  userFormTitle:     document.getElementById("userFormTitle"),
+  userId:            document.getElementById("userId"),
+  userTenantId:      document.getElementById("userTenantId"),
+  userRole:          document.getElementById("userRole"),
+  userUsername:      document.getElementById("userUsername"),
+  userFullName:      document.getElementById("userFullName"),
+  userPassword:      document.getElementById("userPassword"),
+  btnUserReset:      document.getElementById("btnUserReset"),
+  btnUserCancelEdit: document.getElementById("btnUserCancelEdit"),
 
-    function clearAuth() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-    }
+  tenantsSection:              document.getElementById("tenantsSection"),
+  usersSection:                document.getElementById("usersSection"),
+  subscriptionRequestsSection: document.getElementById("subscriptionRequestsSection"),
+  activitySection:             document.getElementById("activitySection"),
+  attentionSection:            document.getElementById("attentionSection"),
+  formsSection:                document.getElementById("formsSection"),
 
-    function safeText(value) {
-      if (window.escapeHtml) return escapeHtml(String(value ?? ""));
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;");
-    }
+  eventsModal:        document.getElementById("eventsModal"),
+  eventsModalTitle:   document.getElementById("eventsModalTitle"),
+  eventsModalContent: document.getElementById("eventsModalContent"),
+  eventsModalClose:   document.getElementById("eventsModalClose")
+};
 
-    function dt(value) {
-      if (!value) return "—";
-      if (window.displayDateTime) return displayDateTime(value);
-      try {
-        return new Date(value).toLocaleString("ru-RU");
-      } catch (_) {
-        return value;
-      }
-    }
+/* ══════════════════════════════════════════════════════════
+   AUTH
+   ══════════════════════════════════════════════════════════ */
+function getToken()  { return localStorage.getItem("token"); }
+function clearAuth() { localStorage.removeItem("token"); localStorage.removeItem("user"); }
 
-    function toLocalValue(value) {
-      if (!value) return "";
-      if (window.toDatetimeLocalValue) return toDatetimeLocalValue(value);
-      try {
-        const d = new Date(value);
-        const p = (n) => String(n).padStart(2, "0");
-        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
-      } catch (_) {
-        return "";
-      }
-    }
+/* ══════════════════════════════════════════════════════════
+   UTILITY
+   ══════════════════════════════════════════════════════════ */
+function safe(v) {
+  if (window.escapeHtml) return escapeHtml(String(v ?? ""));
+  return String(v ?? "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
 
-    function parseModules(value) {
-      if (!value) return [];
-      if (Array.isArray(value)) return value;
-      try {
-        const parsed = typeof value === "string" ? JSON.parse(value) : value;
-        return Array.isArray(parsed) ? parsed : [];
-      } catch (_) {
-        return [];
-      }
-    }
+function dt(v) {
+  if (!v) return "—";
+  if (window.displayDateTime) return displayDateTime(v);
+  try { return new Date(v).toLocaleString("ru-RU"); } catch(_) { return v; }
+}
 
-    function getCheckedModules() {
-      return Array.from(el.tenantModulesBox.querySelectorAll('input[type="checkbox"]:checked'))
-        .map((input) => input.value);
-    }
+function d(v) {
+  if (!v) return "—";
+  try { return new Date(v).toLocaleDateString("ru-RU"); } catch(_) { return v; }
+}
 
-    function setCheckedModules(modules) {
-      const set = new Set(modules || []);
-      el.tenantModulesBox.querySelectorAll('input[type="checkbox"]').forEach((input) => {
-        input.checked = set.has(input.value);
+function toLocalVal(v) {
+  if (!v) return "";
+  if (window.toDatetimeLocalValue) return toDatetimeLocalValue(v);
+  try {
+    const x = new Date(v);
+    const p = n => String(n).padStart(2,"0");
+    return `${x.getFullYear()}-${p(x.getMonth()+1)}-${p(x.getDate())}T${p(x.getHours())}:${p(x.getMinutes())}`;
+  } catch(_) { return ""; }
+}
+
+function num(v, fb = 0) { const n = Number(v); return Number.isFinite(n) ? n : fb; }
+
+function daysLeft(endAt) {
+  if (!endAt) return null;
+  return Math.ceil((new Date(endAt).getTime() - Date.now()) / 86400000);
+}
+
+function parseMods(v) {
+  if (!v) return [];
+  if (Array.isArray(v)) return v;
+  try { const p = typeof v === "string" ? JSON.parse(v) : v; return Array.isArray(p) ? p : []; }
+  catch(_) { return []; }
+}
+
+function getCheckedMods() {
+  return Array.from(el.tenantModulesBox.querySelectorAll('input[type="checkbox"]:checked'))
+    .map(i => i.value);
+}
+
+function setCheckedMods(mods) {
+  const s = new Set(mods || []);
+  el.tenantModulesBox.querySelectorAll('input[type="checkbox"]')
+    .forEach(i => i.checked = s.has(i.value));
+}
+
+function slugify(v) {
+  return String(v||"").trim().toLowerCase()
+    .replace(/ё/g,"е").replace(/[^a-zа-я0-9]+/gi,"-").replace(/^-+|-+$/g,"");
+}
+
+/* ══════════════════════════════════════════════════════════
+   LABEL / BADGE HELPERS
+   ══════════════════════════════════════════════════════════ */
+function mapRole(r) {
+  const v = String(r||"").toLowerCase();
+  if (v==="owner")  return "Владелец";
+  if (v==="client") return "Клиент";
+  return r || "—";
+}
+
+function mapSubStatus(s) {
+  const v = String(s||"").toLowerCase();
+  if (v==="trial")   return "Пробный";
+  if (v==="active")  return "Активна";
+  if (v==="expired") return "Истекла";
+  if (v==="blocked") return "Заблокирована";
+  return s || "—";
+}
+
+function mapReqStatus(s) {
+  const v = String(s||"").toLowerCase();
+  if (v==="new")          return "Новая";
+  if (v==="in_progress")  return "В работе";
+  if (v==="done")         return "Завершена";
+  if (v==="cancelled")    return "Отменена";
+  return s || "—";
+}
+
+function subBadge(s) {
+  const v = String(s||"").toLowerCase();
+  if (v==="active")  return `<span class="badge b-ok">✅ Активна</span>`;
+  if (v==="trial")   return `<span class="badge b-warn">🟡 Пробный</span>`;
+  if (v==="expired") return `<span class="badge b-red">🔴 Истекла</span>`;
+  if (v==="blocked") return `<span class="badge b-red">⛔ Заблок.</span>`;
+  return `<span class="badge b-muted">${safe(s||"—")}</span>`;
+}
+
+function reqBadge(s) {
+  const v = String(s||"").toLowerCase();
+  if (v==="new")         return `<span class="badge b-info">📋 Новая</span>`;
+  if (v==="in_progress") return `<span class="badge b-warn">⚙ В работе</span>`;
+  if (v==="done")        return `<span class="badge b-ok">✅ Завершена</span>`;
+  if (v==="cancelled")   return `<span class="badge b-red">❌ Отменена</span>`;
+  return `<span class="badge b-muted">${safe(s||"—")}</span>`;
+}
+
+function actBadge(s) {
+  const v = String(s||"").toLowerCase();
+  if (v==="active")   return `<span class="badge b-ok">🟢 активен</span>`;
+  if (v==="warning")  return `<span class="badge b-warn">🟡 внимание</span>`;
+  if (v==="blocked")  return `<span class="badge b-red">🔴 заблокирован</span>`;
+  return `<span class="badge b-info">⚪ нет активности</span>`;
+}
+
+function boolBadge(v, t, f) {
+  return v
+    ? `<span class="badge b-ok">${safe(t)}</span>`
+    : `<span class="badge b-muted">${safe(f)}</span>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   API CALLS
+   ══════════════════════════════════════════════════════════ */
+async function apiGet(url)         { return API.get(url); }
+async function apiPost(url, body)  { return API.post(url, body); }
+async function apiPut(url, body)   { return API.put(url, body); }
+async function apiPatch(url, body) { return API.patch(url, body); }
+
+function showError(err) {
+  console.error("[owner-dashboard]", err);
+  const txt = window.translateError
+    ? translateError(err?.error || err?.message || err)
+    : (err?.error || err?.message || String(err));
+  alert(txt || "Произошла ошибка");
+}
+
+/* ══════════════════════════════════════════════════════════
+   DATA HELPERS
+   ══════════════════════════════════════════════════════════ */
+function tenantsWithActivity() {
+  const m = new Map(state.activitySummary.map(i => [String(i.id), i]));
+  return state.tenants.map(t => ({ ...t, activity: m.get(String(t.id)) || {} }));
+}
+
+function openRequestTenantIds() {
+  return new Set(
+    state.subscriptionRequests
+      .filter(r => ["new","in_progress"].includes(String(r.status||"").toLowerCase()))
+      .map(r => String(r.tenant_id))
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   FILL USER
+   ══════════════════════════════════════════════════════════ */
+function fillCurrentUser() {
+  const me = state.me;
+  if (!me) {
+    el.currentUserName.textContent = "Нет данных";
+    el.currentUserSub.textContent  = "Сессия не определена";
+    return;
+  }
+  el.currentUserName.textContent = me.full_name || me.username || "Пользователь";
+  el.currentUserSub.textContent  = `${mapRole(me.role)}${me.username ? " · @" + me.username : ""}`;
+}
+
+function fillTenantSelect() {
+  el.userTenantId.innerHTML = [
+    `<option value="">Выберите клиента</option>`,
+    ...state.tenants.map(t =>
+      `<option value="${safe(t.id)}">${safe(t.name)} (#${safe(t.id)})</option>`)
+  ].join("");
+}
+
+/* ══════════════════════════════════════════════════════════
+   KPI
+   ══════════════════════════════════════════════════════════ */
+function renderKpis() {
+  const tenants = tenantsWithActivity();
+  const active   = tenants.filter(t => String(t.subscription_status||"").toLowerCase() === "active").length;
+  const trial    = tenants.filter(t => String(t.subscription_status||"").toLowerCase() === "trial").length;
+  const expired  = tenants.filter(t => String(t.subscription_status||"").toLowerCase() === "expired").length;
+  const blocked  = tenants.filter(t => t.is_blocked || String(t.subscription_status||"").toLowerCase() === "blocked").length;
+  const openReqs = state.subscriptionRequests.filter(r => ["new","in_progress"].includes(String(r.status||"").toLowerCase())).length;
+  const act7  = tenants.reduce((s,t) => s + num(t.activity?.activity_7d), 0);
+  const act30 = tenants.reduce((s,t) => s + num(t.activity?.activity_30d), 0);
+
+  el.kpiTenants.textContent  = tenants.length;
+  el.kpiActive.textContent   = active;
+  el.kpiTrial.textContent    = trial;
+  el.kpiExpired.textContent  = expired;
+  el.kpiBlocked.textContent  = blocked;
+  el.kpiUsers.textContent    = state.users.length;
+  el.kpiOpenReqs.textContent = openReqs;
+
+  el.miniActive.textContent   = tenants.filter(t => t.activity?.activity_status === "active").length;
+  el.miniWarning.textContent  = tenants.filter(t => t.activity?.activity_status === "warning").length;
+  el.miniInactive.textContent = tenants.filter(t => !t.activity?.activity_status || t.activity?.activity_status === "inactive").length;
+  el.miniBlocked.textContent  = tenants.filter(t => t.activity?.activity_status === "blocked").length;
+
+  el.summaryChips.innerHTML = [
+    `<span class="chip">Клиентов: <b>${tenants.length}</b></span>`,
+    `<span class="chip">Пользователей: <b>${state.users.length}</b></span>`,
+    `<span class="chip">Активных: <b>${active}</b></span>`,
+    `<span class="chip">Trial: <b>${trial}</b></span>`,
+    `<span class="chip">Просрочено: <b>${expired}</b></span>`,
+    `<span class="chip">Заблокировано: <b>${blocked}</b></span>`,
+    `<span class="chip">Заявок открыто: <b>${openReqs}</b></span>`,
+    `<span class="chip">События 7 дн: <b>${act7}</b></span>`,
+    `<span class="chip">События 30 дн: <b>${act30}</b></span>`
+  ].join("");
+}
+
+/* ══════════════════════════════════════════════════════════
+   ATTENTION
+   ══════════════════════════════════════════════════════════ */
+function renderAttention() {
+  const tenants = tenantsWithActivity();
+  const cards   = [];
+
+  // Просроченные
+  tenants.filter(t => String(t.subscription_status||"").toLowerCase() === "expired").forEach(t => {
+    const days = daysLeft(t.subscription_end_at);
+    cards.push({ cls:"ac-danger",
+      title: `🔴 ${safe(t.name)}`,
+      meta:  `Подписка истекла · #${safe(t.id)} · ${safe(t.slug||"—")}`,
+      label: `Окончание: ${d(t.subscription_end_at)}${days!==null ? ` (${Math.abs(days)} дн. назад)` : ""}`,
+      actions: [
+        `<button class="row-btn row-btn-accent" onclick="editTenant('${safe(t.id)}')">✏ Редактировать</button>`,
+        `<button class="row-btn row-btn-warning" onclick="toggleTenantActive('${safe(t.id)}')">${t.is_active===false?"✅ Включить":"⏸ Выключить"}</button>`
+      ]
+    });
+  });
+
+  // Заблокированные
+  tenants.filter(t => t.is_blocked).forEach(t => {
+    cards.push({ cls:"ac-danger",
+      title: `⛔ ${safe(t.name)}`,
+      meta:  `Клиент заблокирован · #${safe(t.id)}`,
+      label: `Подписка: ${mapSubStatus(t.subscription_status)}`,
+      actions: [
+        `<button class="row-btn row-btn-success" onclick="toggleTenantBlock('${safe(t.id)}')">🔓 Разблокировать</button>`,
+        `<button class="row-btn row-btn-accent" onclick="editTenant('${safe(t.id)}')">✏ Редактировать</button>`
+      ]
+    });
+  });
+
+  // Trial ≤ 7 дней
+  tenants.filter(t => String(t.subscription_status||"").toLowerCase() === "trial").forEach(t => {
+    const days = daysLeft(t.subscription_end_at);
+    if (days !== null && days <= 7) {
+      cards.push({ cls:"ac-warn",
+        title: `🟡 ${safe(t.name)}`,
+        meta:  `Trial заканчивается · #${safe(t.id)}`,
+        label: `Осталось: ${days} дн. — ${d(t.subscription_end_at)}`,
+        actions: [
+          `<button class="row-btn row-btn-accent" onclick="editTenant('${safe(t.id)}')">✏ Продлить / изменить</button>`
+        ]
       });
     }
+  });
 
-    function slugify(value) {
-      return String(value || "")
-        .trim()
-        .toLowerCase()
-        .replace(/ё/g, "е")
-        .replace(/[^a-zа-я0-9]+/gi, "-")
-        .replace(/^-+|-+$/g, "");
-    }
-
-    function numberValue(v, fallback = 0) {
-      const n = Number(v);
-      return Number.isFinite(n) ? n : fallback;
-    }
-
-    function daysLeft(endAt) {
-      if (!endAt) return null;
-      const end = new Date(endAt).getTime();
-      const now = Date.now();
-      return Math.ceil((end - now) / (1000 * 60 * 60 * 24));
-    }
-
-    function mapRole(role) {
-      const v = String(role || "").toLowerCase();
-      if (v === "owner") return "Владелец";
-      if (v === "client") return "Клиент";
-      return role || "—";
-    }
-
-    function mapActivityStatus(status) {
-      const v = String(status || "").toLowerCase();
-      if (v === "active") return "активен";
-      if (v === "warning") return "внимание";
-      if (v === "blocked") return "заблокирован";
-      if (v === "inactive") return "нет активности";
-      return status || "—";
-    }
-
-    function mapSubscriptionStatus(status) {
-      const v = String(status || "").toLowerCase();
-      if (v === "trial") return "Пробный период";
-      if (v === "active") return "Активна";
-      if (v === "expired") return "Истекла";
-      if (v === "blocked") return "Заблокирована";
-      return status || "—";
-    }
-
-    function mapTenantStatus(status) {
-      const v = String(status || "").toLowerCase();
-      if (v === "active") return "Активна";
-      if (v === "blocked") return "Заблокирована";
-      if (v === "archived") return "В архиве";
-      return status || "—";
-    }
-
-    function mapRequestStatus(status) {
-      const v = String(status || "").toLowerCase();
-      if (v === "new") return "Новая";
-      if (v === "in_progress") return "В работе";
-      if (v === "done") return "Завершена";
-      if (v === "cancelled") return "Отменена";
-      return status || "—";
-    }
-
-    function requestStatusBadge(status) {
-      const v = String(status || "").toLowerCase();
-      if (v === "new") return `<span class="badge badge-info">новая</span>`;
-      if (v === "in_progress") return `<span class="badge badge-warning">в работе</span>`;
-      if (v === "done") return `<span class="badge badge-success">завершена</span>`;
-      if (v === "cancelled") return `<span class="badge badge-danger">отменена</span>`;
-      return `<span class="badge">${safeText(status || "—")}</span>`;
-    }
-
-    function activityBadge(status) {
-      const v = String(status || "").toLowerCase();
-      if (v === "active") return `<span class="badge badge-success">🟢 активен</span>`;
-      if (v === "warning") return `<span class="badge badge-warning">🟡 внимание</span>`;
-      if (v === "blocked") return `<span class="badge badge-danger">🔴 заблокирован</span>`;
-      return `<span class="badge badge-info">⚪ нет активности</span>`;
-    }
-
-    function boolBadge(value, textTrue, textFalse) {
-      return value
-        ? `<span class="badge badge-success">${safeText(textTrue)}</span>`
-        : `<span class="badge badge-info">${safeText(textFalse)}</span>`;
-    }
-
-    function buildTenantMapWithActivity() {
-      const activityMap = new Map(
-        state.activitySummary.map((item) => [String(item.id), item])
-      );
-
-      return state.tenants.map((tenant) => {
-        const activity = activityMap.get(String(tenant.id)) || {};
-        return { ...tenant, activity };
+  // Открытые заявки
+  state.subscriptionRequests
+    .filter(r => ["new","in_progress"].includes(String(r.status||"").toLowerCase()))
+    .forEach(item => {
+      const isNew = String(item.status||"").toLowerCase() === "new";
+      cards.push({ cls:"ac-info",
+        title: `📋 ${isNew ? "Новая заявка" : "В работе"}: ${safe(item.tenant_name||"—")}`,
+        meta:  `Заявка #${safe(item.id)} · ${safe(item.contact_name||"—")} · ${safe(item.phone||"—")}`,
+        label: `Создана: ${d(item.created_at)}`,
+        actions: [
+          `<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safe(item.id)}')">✅ Активировать 30 дней</button>`,
+          `<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safe(item.id)}','in_progress')">⚙ Взять в работу</button>`,
+          `<button class="row-btn row-btn-danger"  onclick="updateSubscriptionRequestStatus('${safe(item.id)}','cancelled')">❌ Отменить</button>`
+        ]
       });
-    }
+    });
 
-    async function apiGet(url) {
-      return API.get(url);
-    }
+  el.attentionBadge.textContent = cards.length;
 
-    async function apiPost(url, body) {
-      return API.post(url, body);
-    }
+  if (!cards.length) {
+    el.attentionGrid.innerHTML = `
+      <div class="ac" style="border-color:rgba(25,195,125,.26);background:rgba(25,195,125,.05);">
+        <div class="ac-title" style="color:var(--success);">✅ Всё в порядке</div>
+        <div class="ac-meta">Нет клиентов, требующих срочного внимания</div>
+      </div>`;
+    return;
+  }
 
-    async function apiPut(url, body) {
-      return API.put(url, body);
-    }
+  el.attentionGrid.innerHTML = cards.map(c => `
+    <div class="ac ${c.cls}">
+      <div class="ac-title">${c.title}</div>
+      <div class="ac-meta">${c.meta}</div>
+      <div class="ac-meta">${c.label}</div>
+      <div class="ac-actions">${c.actions.join("")}</div>
+    </div>
+  `).join("");
+}
 
-    async function apiPatch(url, body) {
-      return API.patch(url, body);
-    }
+/* ══════════════════════════════════════════════════════════
+   ACTIVITY TABLE
+   ══════════════════════════════════════════════════════════ */
+function renderActivityTable() {
+  const tenants = tenantsWithActivity();
+  if (!tenants.length) {
+    el.activityTableBody.innerHTML = `<tr><td colspan="6"><div class="empty">Нет данных по активности</div></td></tr>`;
+    return;
+  }
 
-    function showError(error) {
-      console.error("[owner-dashboard] error payload:", error);
-      const text = window.translateError
-        ? translateError(error?.error || error?.message || error)
-        : (error?.error || error?.message || String(error));
-      alert(text || "Произошла ошибка");
-    }
-
-    function fillCurrentUser() {
-      const me = state.me;
-      if (!me) {
-        el.currentUserName.textContent = "Нет данных";
-        el.currentUserSub.textContent = "Сессия не определена";
-        return;
-      }
-
-      el.currentUserName.textContent = `${me.full_name || me.username || "Пользователь"}`;
-      el.currentUserSub.textContent = `${mapRole(me.role)}${me.username ? " · @" + me.username : ""}`;
-    }
-
-    function fillTenantSelect() {
-      const options = [
-        `<option value="">Выберите клиента</option>`,
-        ...state.tenants.map((tenant) => {
-          return `<option value="${safeText(tenant.id)}">${safeText(tenant.name)} (#${safeText(tenant.id)})</option>`;
-        })
-      ];
-      el.userTenantId.innerHTML = options.join("");
-    }
-
-    function renderKpis() {
-      const tenants = buildTenantMapWithActivity();
-      const totalTenants = tenants.length;
-      const totalUsers = state.users.length;
-      const activeSubs = tenants.filter((t) => ["active", "trial"].includes(String(t.subscription_status || "").toLowerCase())).length;
-      const blocked = tenants.filter((t) => {
-        const subscriptionStatus = String(t.subscription_status || "").toLowerCase();
-        const activityStatus = String(t.activity?.activity_status || "").toLowerCase();
-        return t.is_blocked || t.is_active === false || subscriptionStatus === "blocked" || subscriptionStatus === "expired" || activityStatus === "blocked";
-      }).length;
-      const activity7 = tenants.reduce((sum, t) => sum + numberValue(t.activity?.activity_7d, 0), 0);
-      const activity30 = tenants.reduce((sum, t) => sum + numberValue(t.activity?.activity_30d, 0), 0);
-
-      el.kpiTenants.textContent = totalTenants;
-      el.kpiSubsActive.textContent = activeSubs;
-      el.kpiBlocked.textContent = blocked;
-      el.kpiUsers.textContent = totalUsers;
-      el.kpiActivity7.textContent = activity7;
-      el.kpiActivity30.textContent = activity30;
-
-      const activeCount = tenants.filter((t) => t.activity?.activity_status === "active").length;
-      const warningCount = tenants.filter((t) => t.activity?.activity_status === "warning").length;
-      const inactiveCount = tenants.filter((t) => t.activity?.activity_status === "inactive").length;
-      const blockedCount = tenants.filter((t) => t.activity?.activity_status === "blocked").length;
-
-      el.miniActive.textContent = activeCount;
-      el.miniWarning.textContent = warningCount;
-      el.miniInactive.textContent = inactiveCount;
-      el.miniBlocked.textContent = blockedCount;
-
-      el.summaryChips.innerHTML = [
-        `<span class="chip">Клиентов: <b>${totalTenants}</b></span>`,
-        `<span class="chip">Пользователей: <b>${totalUsers}</b></span>`,
-        `<span class="chip">События 7 дней: <b>${activity7}</b></span>`,
-        `<span class="chip">События 30 дней: <b>${activity30}</b></span>`,
-        `<span class="chip">Подписок активных/пробных: <b>${activeSubs}</b></span>`,
-        `<span class="chip">Проблемных клиентов: <b>${blocked}</b></span>`
-      ].join("");
-    }
-
-    function renderActivityTable() {
-      const tenants = buildTenantMapWithActivity();
-
-      if (!tenants.length) {
-        el.activityTableBody.innerHTML = `<tr><td colspan="5"><div class="empty">Нет данных по активности</div></td></tr>`;
-        return;
-      }
-
-      el.activityTableBody.innerHTML = tenants.map((tenant) => {
-        const a = tenant.activity || {};
-        return `
-          <tr>
-            <td>
-              <div class="stack">
-                <div class="strong">#${safeText(tenant.id)} — ${safeText(tenant.name)}</div>
-                <div class="muted small">${safeText(tenant.slug || "—")}</div>
-              </div>
-            </td>
-            <td>
-              <div class="stack">
-                <div>${safeText(dt(a.last_login_at))}</div>
-                <div class="muted small">${a.last_login_at ? "последняя активная сессия" : "ещё не входил"}</div>
-              </div>
-            </td>
-            <td>
-              <div class="stack">
-                <div>За 7 дней: <span class="strong">${safeText(a.activity_7d ?? 0)}</span></div>
-                <div>За 30 дней: <span class="strong">${safeText(a.activity_30d ?? 0)}</span></div>
-              </div>
-            </td>
-            <td>
-              <div class="stack">
-                <div>Продажи: <span class="strong">${safeText(a.sales_7d ?? 0)}</span> / ${safeText(a.sales_30d ?? 0)}</div>
-                <div>Приёмки: <span class="strong">${safeText(a.receipts_7d ?? 0)}</span> / ${safeText(a.receipts_30d ?? 0)}</div>
-                <div>Списания: <span class="strong">${safeText(a.writeoffs_7d ?? 0)}</span> / ${safeText(a.writeoffs_30d ?? 0)}</div>
-                <div>Доходы: <span class="strong">${safeText(a.cash_income_7d ?? 0)}</span> / ${safeText(a.cash_income_30d ?? 0)}</div>
-                <div>Расходы: <span class="strong">${safeText(a.cash_expense_7d ?? 0)}</span> / ${safeText(a.cash_expense_30d ?? 0)}</div>
-              </div>
-            </td>
-            <td>${activityBadge(a.activity_status || "inactive")}</td>
-          </tr>
-        `;
-      }).join("");
-    }
-
-    function renderTenantsTable() {
-      const q = state.tenantSearch.trim().toLowerCase();
-      const rows = buildTenantMapWithActivity().filter((tenant) => {
-        if (!q) return true;
-        const haystack = [
-          tenant.id,
-          tenant.name,
-          tenant.slug,
-          tenant.contact_name,
-          tenant.contact_phone,
-          tenant.contact_email,
-          tenant.phone,
-          tenant.email,
-          tenant.code,
-          tenant.tariff_name,
-          tenant.subscription_status
-        ].map((v) => String(v || "").toLowerCase()).join(" ");
-        return haystack.includes(q);
-      });
-
-      if (!rows.length) {
-        el.tenantsTableBody.innerHTML = `<tr><td colspan="8"><div class="empty">Клиенты не найдены</div></td></tr>`;
-        return;
-      }
-
-      const usersCountMap = state.users.reduce((map, user) => {
-        const key = String(user.tenant_id || "");
-        map.set(key, (map.get(key) || 0) + 1);
-        return map;
-      }, new Map());
-
-      el.tenantsTableBody.innerHTML = rows.map((tenant) => {
-        const modules = parseModules(tenant.enabled_modules);
-        const a = tenant.activity || {};
-        const subscriptionDaysLeft = daysLeft(tenant.subscription_end_at);
-
-        const statusBadges = [
-          boolBadge(tenant.is_active !== false, "активен", "не активен"),
-          tenant.is_blocked
-            ? `<span class="badge badge-danger">заблокирован</span>`
-            : `<span class="badge badge-success">не заблокирован</span>`,
-          tenant.subscription_status === "expired"
-            ? `<span class="badge badge-danger">подписка истекла</span>`
-            : tenant.subscription_status === "blocked"
-              ? `<span class="badge badge-danger">подписка заблокирована</span>`
-              : tenant.subscription_status === "trial"
-                ? `<span class="badge badge-warning">пробный период</span>`
-                : `<span class="badge badge-success">подписка активна</span>`
-        ].join("");
-
-        const contactLines = [
-          tenant.contact_name ? `<div>${safeText(tenant.contact_name)}</div>` : "",
-          tenant.contact_phone ? `<div class="muted small">${safeText(tenant.contact_phone)}</div>` : "",
-          tenant.contact_email ? `<div class="muted small">${safeText(tenant.contact_email)}</div>` : "",
-          tenant.phone ? `<div class="muted small">доп. тел.: ${safeText(tenant.phone)}</div>` : "",
-          tenant.email ? `<div class="muted small">доп. email: ${safeText(tenant.email)}</div>` : ""
-        ].filter(Boolean).join("") || "—";
-
-        const subscriptionInfo = `
+  el.activityTableBody.innerHTML = tenants.map(t => {
+    const a = t.activity || {};
+    return `
+      <tr>
+        <td>
           <div class="stack">
-            <div><span class="strong">Тариф:</span> ${safeText(tenant.tariff_name || "—")}</div>
-            <div><span class="strong">Код тарифа:</span> ${safeText(tenant.plan_code || "—")}</div>
-            <div><span class="strong">Подписка:</span> ${safeText(mapSubscriptionStatus(tenant.subscription_status))}</div>
-            <div><span class="strong">Статус:</span> ${safeText(mapTenantStatus(tenant.status))}</div>
-            <div><span class="strong">Начало:</span> ${safeText(dt(tenant.subscription_start_at))}</div>
-            <div><span class="strong">Окончание:</span> ${safeText(dt(tenant.subscription_end_at))}</div>
-            <div><span class="strong">Осталось дней:</span> ${subscriptionDaysLeft === null ? "—" : safeText(subscriptionDaysLeft)}</div>
-            <div><span class="strong">SKU:</span> ${safeText(tenant.max_sku ?? "—")} · <span class="strong">МХ:</span> ${safeText(tenant.max_locations ?? "—")}</div>
+            <div class="strong">#${safe(t.id)} — ${safe(t.name)}</div>
+            <div class="muted small">${safe(t.slug||"—")}</div>
           </div>
-        `;
-
-        const activityInfo = `
+        </td>
+        <td>
           <div class="stack">
-            <div>${activityBadge(a.activity_status || "inactive")}</div>
-            <div class="muted small">Последний вход: ${safeText(dt(a.last_login_at))}</div>
-            <div class="muted small">События 7 / 30: ${safeText(a.activity_7d ?? 0)} / ${safeText(a.activity_30d ?? 0)}</div>
-            <div class="muted small">Продажи 7 / 30: ${safeText(a.sales_7d ?? 0)} / ${safeText(a.sales_30d ?? 0)}</div>
-            <div class="muted small">Приёмки 7 / 30: ${safeText(a.receipts_7d ?? 0)} / ${safeText(a.receipts_30d ?? 0)}</div>
-            <div class="muted small">Списания 7 / 30: ${safeText(a.writeoffs_7d ?? 0)} / ${safeText(a.writeoffs_30d ?? 0)}</div>
-            <div class="muted small">Доходы 7 / 30: ${safeText(a.cash_income_7d ?? 0)} / ${safeText(a.cash_income_30d ?? 0)}</div>
-            <div class="muted small">Расходы 7 / 30: ${safeText(a.cash_expense_7d ?? 0)} / ${safeText(a.cash_expense_30d ?? 0)}</div>
+            <div class="small">${safe(dt(a.last_login_at))}</div>
+            <div class="muted small">${a.last_login_at ? "последняя сессия" : "ещё не входил"}</div>
           </div>
-        `;
+        </td>
+        <td>
+          <div class="stack">
+            <div class="small">7 дн: <span class="strong">${safe(a.activity_7d??0)}</span></div>
+            <div class="muted small">30 дн: ${safe(a.activity_30d??0)}</div>
+          </div>
+        </td>
+        <td>
+          <div class="stack small muted">
+            <div>Продажи: <span class="strong">${safe(a.sales_7d??0)}</span>/${safe(a.sales_30d??0)}</div>
+            <div>Приёмки: <span class="strong">${safe(a.receipts_7d??0)}</span>/${safe(a.receipts_30d??0)}</div>
+            <div>Списания: <span class="strong">${safe(a.writeoffs_7d??0)}</span>/${safe(a.writeoffs_30d??0)}</div>
+          </div>
+        </td>
+        <td>${actBadge(a.activity_status||"inactive")}</td>
+        <td>
+          <button class="row-btn row-btn-accent" onclick="openTenantEvents('${safe(t.id)}','${safe(t.name)}')">📋 События</button>
+        </td>
+      </tr>`;
+  }).join("");
+}
 
-        const modulesHtml = modules.length
-          ? `<div class="inline-badges">${modules.map((m) => `<span class="badge">${safeText(m)}</span>`).join("")}</div>`
-          : `<span class="muted">—</span>`;
+/* ══════════════════════════════════════════════════════════
+   EVENTS MODAL
+   ══════════════════════════════════════════════════════════ */
+async function openTenantEvents(id, name) {
+  el.eventsModalTitle.textContent = `События клиента: ${name} (#${id})`;
+  el.eventsModalContent.innerHTML = `<div class="muted">Загрузка...</div>`;
+  el.eventsModal.classList.add("open");
 
-        const usersCount = usersCountMap.get(String(tenant.id)) || 0;
+  try {
+    const data = await apiGet(`/owner-activity/tenant/${id}/events`);
+    const events = Array.isArray(data?.events) ? data.events : [];
 
-        return `
-          <tr>
-            <td>
-              <div class="stack">
-                <div class="strong">#${safeText(tenant.id)} — ${safeText(tenant.name)}</div>
-                <div class="muted small">slug: ${safeText(tenant.slug || "—")}</div>
-                <div class="muted small">code: ${safeText(tenant.code || "—")}</div>
+    if (!events.length) {
+      el.eventsModalContent.innerHTML = `<div class="empty">Нет событий по этому клиенту</div>`;
+      return;
+    }
+
+    el.eventsModalContent.innerHTML = `
+      <div class="events-list">
+        ${events.map(ev => {
+          const type = ev.event_type || ev.type || "Событие";
+          const meta = [
+            ev.username ? `👤 ${safe(ev.username)}` : "",
+            ev.item_name ? `📦 ${safe(ev.item_name)}` : "",
+            ev.amount != null ? `💰 ${safe(ev.amount)}` : "",
+            ev.qty != null ? `кол-во: ${safe(ev.qty)}` : "",
+            ev.location_name ? `📍 ${safe(ev.location_name)}` : "",
+            ev.comment ? `💬 ${safe(ev.comment)}` : ""
+          ].filter(Boolean).join(" · ");
+          return `
+            <div class="event-item">
+              <div class="event-time">${safe(dt(ev.created_at || ev.event_time || ev.date))}</div>
+              <div class="event-body">
+                <div class="event-type">${safe(type)}</div>
+                ${meta ? `<div class="event-meta">${meta}</div>` : ""}
               </div>
-            </td>
-            <td><div class="inline-badges">${statusBadges}</div></td>
-            <td>${contactLines}</td>
-            <td>${subscriptionInfo}</td>
-            <td>${activityInfo}</td>
-            <td>${modulesHtml}</td>
-            <td>
-              <div class="stack">
-                <div class="strong">${safeText(usersCount)}</div>
-                <div class="muted small">пользователей</div>
-              </div>
-            </td>
-            <td>
-              <div class="row-actions">
-                <button class="row-btn" onclick="editTenant('${safeText(tenant.id)}')">Редактировать</button>
-                <button class="row-btn row-btn-warning" onclick="toggleTenantActive('${safeText(tenant.id)}')">${tenant.is_active === false ? "Включить" : "Выключить"}</button>
-                <button class="row-btn ${tenant.is_blocked ? "row-btn-success" : "row-btn-danger"}" onclick="toggleTenantBlock('${safeText(tenant.id)}')">${tenant.is_blocked ? "Разблокировать" : "Блокировать"}</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join("");
+            </div>`;
+        }).join("")}
+      </div>`;
+  } catch(err) {
+    el.eventsModalContent.innerHTML = `<div class="empty" style="color:var(--danger);">Ошибка загрузки событий: ${safe(err?.message||String(err))}</div>`;
+  }
+}
+
+function closeEventsModal() {
+  el.eventsModal.classList.remove("open");
+}
+
+/* ══════════════════════════════════════════════════════════
+   TENANTS FILTER CHIPS
+   ══════════════════════════════════════════════════════════ */
+function setFilterActive(val) {
+  state.tenantFilter = val;
+  document.querySelectorAll(".fc").forEach(chip => {
+    const f = chip.dataset.f;
+    chip.className = "fc";
+    if (f === val) {
+      if (f === "all")      chip.classList.add("on");
+      else if (f === "active")   chip.classList.add("on-success");
+      else if (f === "trial")    chip.classList.add("on-warning");
+      else if (f === "expired")  chip.classList.add("on-danger");
+      else if (f === "blocked")  chip.classList.add("on-danger");
+      else if (f === "requests") chip.classList.add("on-info");
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   TENANTS TABLE
+   ══════════════════════════════════════════════════════════ */
+function renderTenantsTable() {
+  const q      = state.tenantSearch.trim().toLowerCase();
+  const filter = state.tenantFilter;
+  const tenants = tenantsWithActivity();
+  const reqIds  = openRequestTenantIds();
+
+  const rows = tenants.filter(t => {
+    const sub = String(t.subscription_status||"").toLowerCase();
+    if (filter === "active"   && sub !== "active")  return false;
+    if (filter === "trial"    && sub !== "trial")   return false;
+    if (filter === "expired"  && sub !== "expired") return false;
+    if (filter === "blocked"  && !t.is_blocked && sub !== "blocked") return false;
+    if (filter === "requests" && !reqIds.has(String(t.id))) return false;
+    if (!q) return true;
+    return [t.id, t.name, t.slug, t.contact_name, t.contact_phone, t.contact_email,
+            t.phone, t.email, t.code, t.tariff_name, t.subscription_status]
+      .map(v => String(v||"").toLowerCase()).join(" ").includes(q);
+  });
+
+  if (!rows.length) {
+    el.tenantsTableBody.innerHTML = `<tr><td colspan="7"><div class="empty">Клиенты не найдены</div></td></tr>`;
+    return;
+  }
+
+  const usersCount = state.users.reduce((m,u) => {
+    const k = String(u.tenant_id||"");
+    m.set(k, (m.get(k)||0) + 1);
+    return m;
+  }, new Map());
+
+  el.tenantsTableBody.innerHTML = rows.map(t => {
+    const a    = t.activity || {};
+    const mods = parseMods(t.enabled_modules);
+    const days = daysLeft(t.subscription_end_at);
+    const uc   = usersCount.get(String(t.id)) || 0;
+    const hasReq = reqIds.has(String(t.id));
+    const sub  = String(t.subscription_status||"").toLowerCase();
+
+    const daysLine = days === null ? "" :
+      days < 0  ? `<div class="small" style="color:var(--danger);">Истекла ${Math.abs(days)} дн. назад</div>` :
+      days <= 7 ? `<div class="small" style="color:var(--warning);">Осталось: ${days} дн.</div>` :
+                  `<div class="small muted">Осталось: ${days} дн.</div>`;
+
+    const contact = [
+      t.contact_name  ? `<div>${safe(t.contact_name)}</div>` : "",
+      t.contact_phone ? `<div class="muted small">${safe(t.contact_phone)}</div>` : "",
+      t.contact_email ? `<div class="muted small">${safe(t.contact_email)}</div>` : ""
+    ].filter(Boolean).join("") || `<span class="muted">—</span>`;
+
+    const modsHtml = mods.length
+      ? mods.map(m => `<span class="badge b-muted" style="padding:2px 7px;font-size:10px;">${safe(m)}</span>`).join("")
+      : `<span class="muted small">нет</span>`;
+
+    return `
+      <tr>
+        <td>
+          <div class="stack">
+            <div class="strong">#${safe(t.id)} — ${safe(t.name)}</div>
+            <div class="muted small mono">slug: ${safe(t.slug||"—")}</div>
+            ${t.code ? `<div class="muted small mono">code: ${safe(t.code)}</div>` : ""}
+            ${hasReq ? `<span class="badge b-info" style="margin-top:3px;font-size:10px;">📋 есть заявка</span>` : ""}
+          </div>
+        </td>
+        <td>
+          <div class="inline-badges">
+            ${subBadge(t.subscription_status)}
+            ${t.is_active === false ? `<span class="badge b-muted">⏸ выключен</span>` : ""}
+            ${t.is_blocked ? `<span class="badge b-red">⛔ блок</span>` : ""}
+          </div>
+        </td>
+        <td>${contact}</td>
+        <td>
+          <div class="stack small">
+            <div><span class="muted">Тариф:</span> ${safe(t.tariff_name||"—")}</div>
+            <div><span class="muted">Начало:</span> ${d(t.subscription_start_at)}</div>
+            <div><span class="muted">Конец:</span>  ${d(t.subscription_end_at)}</div>
+            ${daysLine}
+            <div class="muted">SKU: ${safe(t.max_sku??"—")} · МХ: ${safe(t.max_locations??"—")}</div>
+          </div>
+        </td>
+        <td>
+          <div class="stack">
+            ${actBadge(a.activity_status||"inactive")}
+            <div class="muted small">Вход: ${safe(dt(a.last_login_at))}</div>
+            <div class="muted small">7/30: ${safe(a.activity_7d??0)}/${safe(a.activity_30d??0)}</div>
+          </div>
+        </td>
+        <td>
+          <div class="stack">
+            <div class="small"><b>${safe(uc)}</b> <span class="muted">польз.</span></div>
+            <div class="inline-badges" style="margin-top:4px;">${modsHtml}</div>
+          </div>
+        </td>
+        <td>
+          <div class="row-act">
+            <button class="row-btn row-btn-accent" onclick="editTenant('${safe(t.id)}')">✏ Ред.</button>
+            <button class="row-btn row-btn-warning" onclick="toggleTenantActive('${safe(t.id)}')">${t.is_active===false ? "✅ Вкл" : "⏸ Выкл"}</button>
+            <button class="row-btn ${t.is_blocked ? "row-btn-success" : "row-btn-danger"}" onclick="toggleTenantBlock('${safe(t.id)}')">${t.is_blocked ? "🔓 Разблок." : "🔒 Блок."}</button>
+            <button class="row-btn" onclick="openTenantEvents('${safe(t.id)}','${safe(t.name)}')">📋 События</button>
+          </div>
+        </td>
+      </tr>`;
+  }).join("");
+}
+
+/* ══════════════════════════════════════════════════════════
+   USERS TABLE
+   ══════════════════════════════════════════════════════════ */
+function renderUsersTable() {
+  const tenantsById = new Map(state.tenants.map(t => [String(t.id), t]));
+  const q = state.userSearch.trim().toLowerCase();
+
+  const rows = state.users.filter(u => {
+    if (!q) return true;
+    const t = tenantsById.get(String(u.tenant_id||""));
+    return [u.id, u.username, u.full_name, u.role, t?.name, t?.slug]
+      .map(v => String(v||"").toLowerCase()).join(" ").includes(q);
+  });
+
+  if (!rows.length) {
+    el.usersTableBody.innerHTML = `<tr><td colspan="7"><div class="empty">Пользователи не найдены</div></td></tr>`;
+    return;
+  }
+
+  el.usersTableBody.innerHTML = rows.map(u => {
+    const t = tenantsById.get(String(u.tenant_id||""));
+    return `
+      <tr>
+        <td>
+          <div class="stack">
+            <div class="strong">#${safe(u.id)}</div>
+            <div class="mono small">${safe(u.username||"—")}</div>
+          </div>
+        </td>
+        <td>${safe(u.full_name||"—")}</td>
+        <td><span class="badge b-vio">${safe(mapRole(u.role))}</span></td>
+        <td>${t
+          ? `<div class="stack"><div class="strong">${safe(t.name)}</div><div class="muted small">#${safe(t.id)}</div></div>`
+          : `<span class="muted">—</span>`}</td>
+        <td>
+          <div class="inline-badges">
+            ${u.is_active===false ? `<span class="badge b-muted">⏸ не активен</span>` : `<span class="badge b-ok">активен</span>`}
+            ${u.is_blocked ? `<span class="badge b-red">⛔ заблок.</span>` : ""}
+          </div>
+        </td>
+        <td class="muted small nowrap">${safe(dt(u.last_login_at))}</td>
+        <td>
+          <div class="row-act">
+            <button class="row-btn row-btn-accent" onclick="editUser('${safe(u.id)}')">✏ Ред.</button>
+            <button class="row-btn row-btn-warning" onclick="toggleUserActive('${safe(u.id)}')">${u.is_active===false ? "✅ Вкл" : "⏸ Выкл"}</button>
+            <button class="row-btn ${u.is_blocked ? "row-btn-success" : "row-btn-danger"}" onclick="toggleUserBlock('${safe(u.id)}')">${u.is_blocked ? "🔓 Разблок." : "🔒 Блок."}</button>
+            <button class="row-btn row-btn-warning" onclick="resetUserPassword('${safe(u.id)}')">🔑 Пароль</button>
+          </div>
+        </td>
+      </tr>`;
+  }).join("");
+}
+
+/* ══════════════════════════════════════════════════════════
+   SUBSCRIPTION REQUESTS TABLE
+   ══════════════════════════════════════════════════════════ */
+function renderSubscriptionRequestsTable() {
+  const q    = state.subscriptionRequestSearch.trim().toLowerCase();
+  const all  = state.subscriptionRequests;
+  const rows = all.filter(item => {
+    if (!q) return true;
+    return [item.id, item.tenant_id, item.tenant_name, item.contact_name,
+            item.phone, item.email, item.comment, item.status,
+            item.processed_by_username, item.processed_by_full_name]
+      .map(v => String(v||"").toLowerCase()).join(" ").includes(q);
+  });
+
+  const tot    = all.length;
+  const newCnt = all.filter(r => String(r.status||"").toLowerCase() === "new").length;
+  const inpCnt = all.filter(r => String(r.status||"").toLowerCase() === "in_progress").length;
+  const donCnt = all.filter(r => String(r.status||"").toLowerCase() === "done").length;
+  const canCnt = all.filter(r => String(r.status||"").toLowerCase() === "cancelled").length;
+
+  el.subscriptionRequestsSummary.innerHTML = [
+    `<span class="chip">Всего: <b>${tot}</b></span>`,
+    `<span class="chip">Новые: <b>${newCnt}</b></span>`,
+    `<span class="chip">В работе: <b>${inpCnt}</b></span>`,
+    `<span class="chip">Завершены: <b>${donCnt}</b></span>`,
+    `<span class="chip">Отменены: <b>${canCnt}</b></span>`
+  ].join("");
+
+  if (!rows.length) {
+    el.subscriptionRequestsTableBody.innerHTML = `<tr><td colspan="7"><div class="empty">Заявки не найдены</div></td></tr>`;
+    return;
+  }
+
+  el.subscriptionRequestsTableBody.innerHTML = rows.map(item => {
+    const status  = String(item.status||"").toLowerCase();
+    const actions = [];
+
+    if (status === "new") {
+      actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safe(item.id)}')">✅ Активировать 30 дн.</button>`);
+      actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safe(item.id)}','in_progress')">⚙ Взять в работу</button>`);
+      actions.push(`<button class="row-btn row-btn-danger"  onclick="updateSubscriptionRequestStatus('${safe(item.id)}','cancelled')">❌ Отменить</button>`);
+    } else if (status === "in_progress") {
+      actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safe(item.id)}')">✅ Активировать 30 дн.</button>`);
+      actions.push(`<button class="row-btn row-btn-success" onclick="updateSubscriptionRequestStatus('${safe(item.id)}','done')">✔ Завершить</button>`);
+      actions.push(`<button class="row-btn row-btn-danger"  onclick="updateSubscriptionRequestStatus('${safe(item.id)}','cancelled')">❌ Отменить</button>`);
+    } else if (status === "done") {
+      actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safe(item.id)}')">🔄 +30 дней</button>`);
+      actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safe(item.id)}','in_progress')">↩ Вернуть</button>`);
+    } else if (status === "cancelled") {
+      actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safe(item.id)}')">✅ Активировать 30 дн.</button>`);
+      actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safe(item.id)}','in_progress')">↩ Возобновить</button>`);
     }
 
-    function renderUsersTable() {
-      const tenantsById = new Map(state.tenants.map((t) => [String(t.id), t]));
-      const q = state.userSearch.trim().toLowerCase();
+    const procHtml = item.processed_at
+      ? `<div class="stack"><div class="small">${safe(dt(item.processed_at))}</div><div class="muted small">${safe(item.processed_by_full_name||item.processed_by_username||("user #"+(item.processed_by||"—")))}</div></div>`
+      : `<span class="muted">—</span>`;
 
-      const rows = state.users.filter((user) => {
-        if (!q) return true;
-        const tenant = tenantsById.get(String(user.tenant_id || ""));
-        const haystack = [
-          user.id,
-          user.username,
-          user.full_name,
-          user.role,
-          tenant?.name,
-          tenant?.slug
-        ].map((v) => String(v || "").toLowerCase()).join(" ");
-        return haystack.includes(q);
-      });
+    return `
+      <tr>
+        <td>
+          <div class="stack">
+            <div class="strong">#${safe(item.id)} — ${safe(item.tenant_name||"—")}</div>
+            <div class="muted small">tenant: ${safe(item.tenant_id||"—")}</div>
+          </div>
+        </td>
+        <td>
+          <div class="stack small">
+            <div>${safe(item.contact_name||"—")}</div>
+            <div class="muted">${safe(item.phone||"—")}</div>
+            <div class="muted">${safe(item.email||"—")}</div>
+          </div>
+        </td>
+        <td class="small">${item.comment ? safe(item.comment) : `<span class="muted">—</span>`}</td>
+        <td>
+          <div class="stack">
+            ${reqBadge(item.status)}
+            <div class="muted small">${safe(mapReqStatus(item.status))}</div>
+          </div>
+        </td>
+        <td class="small nowrap">${safe(dt(item.created_at))}</td>
+        <td>${procHtml}</td>
+        <td>
+          <div class="row-act">${actions.join("")||`<span class="muted">—</span>`}</div>
+        </td>
+      </tr>`;
+  }).join("");
+}
 
-      if (!rows.length) {
-        el.usersTableBody.innerHTML = `<tr><td colspan="7"><div class="empty">Пользователи не найдены</div></td></tr>`;
-        return;
-      }
+/* ══════════════════════════════════════════════════════════
+   FORM RESET
+   ══════════════════════════════════════════════════════════ */
+function resetTenantForm() {
+  state.editingTenantId            = null;
+  el.tenantFormTitle.textContent   = "Новый клиент";
+  el.btnTenantCancelEdit.style.display = "none";
+  el.tenantId.value                = "";
+  el.tenantName.value              = "";
+  el.tenantSlug.value              = "";
+  el.tenantTariffName.value        = "Базовый";
+  el.tenantPlanCode.value          = "basic";
+  el.tenantSubscriptionStatus.value = "trial";
+  el.tenantStatus.value            = "active";
+  el.tenantStartAt.value           = "";
+  el.tenantEndAt.value             = "";
+  el.tenantMaxSku.value            = "1000";
+  el.tenantMaxLocations.value      = "10";
+  el.tenantMaxUsers.value          = "3";
+  el.tenantContactName.value       = "";
+  el.tenantContactPhone.value      = "";
+  el.tenantContactEmail.value      = "";
+  el.tenantCode.value              = "";
+  el.tenantPhone.value             = "";
+  el.tenantEmail.value             = "";
+  el.tenantComment.value           = "";
+  setCheckedMods([]);
+}
 
-      el.usersTableBody.innerHTML = rows.map((user) => {
-        const tenant = tenantsById.get(String(user.tenant_id || ""));
-        return `
-          <tr>
-            <td>
-              <div class="stack">
-                <div class="strong">#${safeText(user.id)} — ${safeText(user.username || "—")}</div>
-              </div>
-            </td>
-            <td>${safeText(user.full_name || "—")}</td>
-            <td><span class="badge badge-info">${safeText(mapRole(user.role))}</span></td>
-            <td>
-              ${tenant
-                ? `<div class="stack">
-                    <div class="strong">${safeText(tenant.name)}</div>
-                    <div class="muted small">#${safeText(tenant.id)} · ${safeText(tenant.slug || "")}</div>
-                  </div>`
-                : `<span class="muted">—</span>`}
-            </td>
-            <td>
-              <div class="inline-badges">
-                ${user.is_active === false
-                  ? `<span class="badge badge-danger">не активен</span>`
-                  : `<span class="badge badge-success">активен</span>`}
-                ${user.is_blocked
-                  ? `<span class="badge badge-danger">заблокирован</span>`
-                  : `<span class="badge badge-success">не заблокирован</span>`}
-              </div>
-            </td>
-            <td>${safeText(dt(user.last_login_at))}</td>
-            <td>
-              <div class="row-actions">
-                <button class="row-btn" onclick="editUser('${safeText(user.id)}')">Редактировать</button>
-                <button class="row-btn row-btn-warning" onclick="toggleUserActive('${safeText(user.id)}')">${user.is_active === false ? "Включить" : "Выключить"}</button>
-                <button class="row-btn ${user.is_blocked ? "row-btn-success" : "row-btn-danger"}" onclick="toggleUserBlock('${safeText(user.id)}')">${user.is_blocked ? "Разблокировать" : "Блокировать"}</button>
-                <button class="row-btn row-btn-warning" onclick="resetUserPassword('${safeText(user.id)}')">Сбросить пароль</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join("");
+function resetUserForm() {
+  state.editingUserId            = null;
+  el.userFormTitle.textContent   = "Новый пользователь";
+  el.btnUserCancelEdit.style.display = "none";
+  el.userId.value                = "";
+  el.userTenantId.value          = "";
+  el.userRole.value              = "client";
+  el.userUsername.value          = "";
+  el.userFullName.value          = "";
+  el.userPassword.value          = "";
+}
+
+/* ══════════════════════════════════════════════════════════
+   LOAD FUNCTIONS
+   ══════════════════════════════════════════════════════════ */
+async function loadMe() {
+  const data = await apiGet("/auth/me");
+  if (!data?.ok || !data.user) throw new Error(data?.error || "failed_to_load_auth_me");
+  if (data.user.role !== "owner") { window.location.href = "/index.html"; return; }
+  state.me = data.user;
+  fillCurrentUser();
+}
+
+async function loadTenants() {
+  const data = await apiGet("/owner-admin/tenants");
+  if (!data?.ok) throw new Error(data?.error || "failed_to_load_tenants");
+  state.tenants = Array.isArray(data.tenants) ? data.tenants : [];
+}
+
+async function loadUsers() {
+  const data = await apiGet("/owner-admin/users");
+  if (!data?.ok) throw new Error(data?.error || "failed_to_load_users");
+  state.users = Array.isArray(data.users) ? data.users : [];
+}
+
+async function loadActivitySummary() {
+  const data = await apiGet("/owner-activity/summary");
+  if (!data?.ok) throw new Error(data?.error || "failed_to_load_owner_activity_summary");
+  state.activitySummary = Array.isArray(data.summary) ? data.summary : [];
+}
+
+async function loadSubscriptionRequests() {
+  const data = await apiGet("/owner-admin/subscription-requests");
+  if (!data?.ok) throw new Error(data?.error || "failed_to_load_subscription_requests");
+  state.subscriptionRequests = Array.isArray(data.items) ? data.items : [];
+}
+
+/* ══════════════════════════════════════════════════════════
+   REFRESH ALL
+   ══════════════════════════════════════════════════════════ */
+async function refreshAll() {
+  try {
+    el.btnRefresh.disabled    = true;
+    el.btnRefresh.textContent = "↻ Обновляем...";
+
+    await loadMe();
+    await Promise.all([
+      loadTenants(),
+      loadUsers(),
+      loadActivitySummary(),
+      loadSubscriptionRequests()
+    ]);
+
+    fillTenantSelect();
+    renderKpis();
+    renderAttention();
+    renderActivityTable();
+    renderTenantsTable();
+    renderUsersTable();
+    renderSubscriptionRequestsTable();
+  } catch (err) {
+    console.error("[owner-dashboard] refreshAll error:", err);
+    showError(err);
+  } finally {
+    el.btnRefresh.disabled    = false;
+    el.btnRefresh.textContent = "↻ Обновить данные";
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   SAVE TENANT
+   ══════════════════════════════════════════════════════════ */
+async function saveTenant(event) {
+  event.preventDefault();
+  const id = el.tenantId.value.trim();
+  const payload = {
+    name:                  el.tenantName.value.trim(),
+    slug:                  el.tenantSlug.value.trim() || slugify(el.tenantName.value),
+    tariff_name:           el.tenantTariffName.value.trim() || "Базовый",
+    plan_code:             el.tenantPlanCode.value.trim() || "basic",
+    subscription_status:   el.tenantSubscriptionStatus.value,
+    status:                el.tenantStatus.value,
+    subscription_start_at: el.tenantStartAt.value ? new Date(el.tenantStartAt.value).toISOString() : null,
+    subscription_end_at:   el.tenantEndAt.value   ? new Date(el.tenantEndAt.value).toISOString()   : null,
+    max_sku:               num(el.tenantMaxSku.value, 1000),
+    max_locations:         num(el.tenantMaxLocations.value, 10),
+    max_users:             num(el.tenantMaxUsers.value, 3),
+    contact_name:          el.tenantContactName.value.trim()  || null,
+    contact_phone:         el.tenantContactPhone.value.trim() || null,
+    contact_email:         el.tenantContactEmail.value.trim() || null,
+    code:                  el.tenantCode.value.trim()  || null,
+    phone:                 el.tenantPhone.value.trim() || null,
+    email:                 el.tenantEmail.value.trim() || null,
+    comment:               el.tenantComment.value.trim() || null,
+    enabled_modules:       getCheckedMods()
+  };
+
+  if (!payload.name) { alert("Название клиента обязательно"); return; }
+  if (!payload.slug) { alert("Slug обязателен"); return; }
+
+  try {
+    if (id) {
+      const r = await apiPut(`/owner-admin/tenants/${id}`, payload);
+      if (!r?.ok) throw r;
+      alert("Клиент обновлён");
+    } else {
+      const r = await apiPost("/owner-admin/tenants", payload);
+      if (!r?.ok) throw r;
+      alert("Клиент создан");
     }
+    resetTenantForm();
+    await refreshAll();
+  } catch (err) {
+    console.error("[owner-dashboard] saveTenant:", err);
+    showError(err);
+  }
+}
 
-    function renderSubscriptionRequestsTable() {
-      const q = state.subscriptionRequestSearch.trim().toLowerCase();
-      const rows = state.subscriptionRequests.filter((item) => {
-        if (!q) return true;
-        const haystack = [
-          item.id,
-          item.tenant_id,
-          item.tenant_name,
-          item.contact_name,
-          item.phone,
-          item.email,
-          item.comment,
-          item.status,
-          item.processed_by_username,
-          item.processed_by_full_name
-        ].map((v) => String(v || "").toLowerCase()).join(" ");
-        return haystack.includes(q);
-      });
+/* ══════════════════════════════════════════════════════════
+   SAVE USER
+   ══════════════════════════════════════════════════════════ */
+async function saveUser(event) {
+  event.preventDefault();
+  const id = el.userId.value.trim();
+  const payload = {
+    tenant_id: el.userTenantId.value ? Number(el.userTenantId.value) : null,
+    role:      el.userRole.value,
+    username:  el.userUsername.value.trim(),
+    full_name: el.userFullName.value.trim()
+  };
 
-      const total = state.subscriptionRequests.length;
-      const newCount = state.subscriptionRequests.filter((item) => String(item.status || "").toLowerCase() === "new").length;
-      const inProgressCount = state.subscriptionRequests.filter((item) => String(item.status || "").toLowerCase() === "in_progress").length;
-      const doneCount = state.subscriptionRequests.filter((item) => String(item.status || "").toLowerCase() === "done").length;
-      const cancelledCount = state.subscriptionRequests.filter((item) => String(item.status || "").toLowerCase() === "cancelled").length;
+  if (!payload.username)  { alert("Логин обязателен"); return; }
+  if (!payload.full_name) { alert("Имя обязательно");  return; }
+  if (!id && !el.userPassword.value.trim()) { alert("Для нового пользователя пароль обязателен"); return; }
+  if (!id && !payload.tenant_id && payload.role !== "owner") { alert("Для пользователя-клиента нужно выбрать клиента"); return; }
 
-      el.subscriptionRequestsSummary.innerHTML = [
-        `<span class="chip">Всего: <b>${total}</b></span>`,
-        `<span class="chip">Новые: <b>${newCount}</b></span>`,
-        `<span class="chip">В работе: <b>${inProgressCount}</b></span>`,
-        `<span class="chip">Завершены: <b>${doneCount}</b></span>`,
-        `<span class="chip">Отменены: <b>${cancelledCount}</b></span>`
-      ].join("");
-
-      if (!rows.length) {
-        el.subscriptionRequestsTableBody.innerHTML = `<tr><td colspan="7"><div class="empty">Заявки не найдены</div></td></tr>`;
-        return;
+  try {
+    if (id) {
+      const r = await apiPut(`/owner-admin/users/${id}`, payload);
+      if (!r?.ok) throw r;
+      if (el.userPassword.value.trim()) {
+        const r2 = await apiPost(`/owner-admin/users/${id}/reset-password`, { password: el.userPassword.value.trim() });
+        if (!r2?.ok) throw r2;
       }
-
-      el.subscriptionRequestsTableBody.innerHTML = rows.map((item) => {
-        const actions = [];
-        const status = String(item.status || "").toLowerCase();
-
-        if (status === "new") {
-          actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safeText(item.id)}')">Активировать на 30 дней</button>`);
-          actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'in_progress')">Взять в работу</button>`);
-          actions.push(`<button class="row-btn row-btn-danger" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'cancelled')">Отменить</button>`);
-        } else if (status === "in_progress") {
-          actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safeText(item.id)}')">Активировать на 30 дней</button>`);
-          actions.push(`<button class="row-btn row-btn-success" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'done')">Завершить</button>`);
-          actions.push(`<button class="row-btn row-btn-danger" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'cancelled')">Отменить</button>`);
-        } else if (status === "done") {
-          actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safeText(item.id)}')">Продлить ещё на 30 дней</button>`);
-          actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'in_progress')">Вернуть в работу</button>`);
-        } else if (status === "cancelled") {
-          actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safeText(item.id)}')">Активировать на 30 дней</button>`);
-          actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'in_progress')">Возобновить</button>`);
-        }
-
-        const processedInfo = item.processed_at
-          ? `<div class="stack">
-              <div>${safeText(dt(item.processed_at))}</div>
-              <div class="muted small">${safeText(item.processed_by_full_name || item.processed_by_username || ("user #" + (item.processed_by || "—")))}</div>
-            </div>`
-          : `<span class="muted">—</span>`;
-
-        return `
-          <tr>
-            <td>
-              <div class="stack">
-                <div class="strong">#${safeText(item.id)} — ${safeText(item.tenant_name || "—")}</div>
-                <div class="muted small">tenant_id: ${safeText(item.tenant_id || "—")}</div>
-              </div>
-            </td>
-            <td>
-              <div class="stack">
-                <div>${safeText(item.contact_name || "—")}</div>
-                <div class="muted small">${safeText(item.phone || "—")}</div>
-                <div class="muted small">${safeText(item.email || "—")}</div>
-              </div>
-            </td>
-            <td>${item.comment ? safeText(item.comment) : `<span class="muted">—</span>`}</td>
-            <td>
-              <div class="stack">
-                <div>${requestStatusBadge(item.status)}</div>
-                <div class="muted small">${safeText(mapRequestStatus(item.status))}</div>
-              </div>
-            </td>
-            <td>${safeText(dt(item.created_at))}</td>
-            <td>${processedInfo}</td>
-            <td>
-              <div class="row-actions">
-                ${actions.join("") || `<span class="muted">—</span>`}
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join("");
+      alert("Пользователь обновлён");
+    } else {
+      payload.password = el.userPassword.value.trim();
+      const r = await apiPost("/owner-admin/users", payload);
+      if (!r?.ok) throw r;
+      alert("Пользователь создан");
     }
+    resetUserForm();
+    await refreshAll();
+  } catch (err) {
+    console.error("[owner-dashboard] saveUser:", err);
+    showError(err);
+  }
+}
 
-    function resetTenantForm() {
-      state.editingTenantId = null;
-      el.tenantFormTitle.textContent = "Новый клиент";
-      el.btnTenantCancelEdit.style.display = "none";
-      el.tenantId.value = "";
-      el.tenantName.value = "";
-      el.tenantSlug.value = "";
-      el.tenantTariffName.value = "Базовый";
-      el.tenantPlanCode.value = "basic";
-      el.tenantSubscriptionStatus.value = "trial";
-      el.tenantStatus.value = "active";
-      el.tenantStartAt.value = "";
-      el.tenantEndAt.value = "";
-      el.tenantMaxSku.value = "1000";
-      el.tenantMaxLocations.value = "10";
-      el.tenantContactName.value = "";
-      el.tenantContactPhone.value = "";
-      el.tenantContactEmail.value = "";
-      el.tenantCode.value = "";
-      el.tenantPhone.value = "";
-      el.tenantEmail.value = "";
-      el.tenantComment.value = "";
-      setCheckedModules([]);
+/* ══════════════════════════════════════════════════════════
+   WINDOW ACTIONS
+   ══════════════════════════════════════════════════════════ */
+window.editTenant = function(id) {
+  const t = state.tenants.find(x => String(x.id) === String(id));
+  if (!t) return;
+  state.editingTenantId            = String(id);
+  el.tenantFormTitle.textContent   = `Редактирование клиента #${t.id}`;
+  el.btnTenantCancelEdit.style.display = "inline-flex";
+  el.tenantId.value                = t.id ?? "";
+  el.tenantName.value              = t.name ?? "";
+  el.tenantSlug.value              = t.slug ?? "";
+  el.tenantTariffName.value        = t.tariff_name ?? "Базовый";
+  el.tenantPlanCode.value          = t.plan_code ?? "basic";
+  el.tenantSubscriptionStatus.value= t.subscription_status ?? "trial";
+  el.tenantStatus.value            = t.status ?? "active";
+  el.tenantStartAt.value           = toLocalVal(t.subscription_start_at);
+  el.tenantEndAt.value             = toLocalVal(t.subscription_end_at);
+  el.tenantMaxSku.value            = t.max_sku ?? 1000;
+  el.tenantMaxLocations.value      = t.max_locations ?? 10;
+  el.tenantMaxUsers.value          = t.max_users ?? 3;
+  el.tenantContactName.value       = t.contact_name ?? "";
+  el.tenantContactPhone.value      = t.contact_phone ?? "";
+  el.tenantContactEmail.value      = t.contact_email ?? "";
+  el.tenantCode.value              = t.code ?? "";
+  el.tenantPhone.value             = t.phone ?? "";
+  el.tenantEmail.value             = t.email ?? "";
+  el.tenantComment.value           = t.comment ?? "";
+  setCheckedMods(parseMods(t.enabled_modules));
+  el.formsSection.scrollIntoView({ behavior:"smooth", block:"start" });
+};
+
+window.editUser = function(id) {
+  const u = state.users.find(x => String(x.id) === String(id));
+  if (!u) return;
+  state.editingUserId            = String(id);
+  el.userFormTitle.textContent   = `Редактирование пользователя #${u.id}`;
+  el.btnUserCancelEdit.style.display = "inline-flex";
+  el.userId.value                = u.id ?? "";
+  el.userTenantId.value          = u.tenant_id ?? "";
+  el.userRole.value              = u.role ?? "client";
+  el.userUsername.value          = u.username ?? "";
+  el.userFullName.value          = u.full_name ?? "";
+  el.userPassword.value          = "";
+  el.formsSection.scrollIntoView({ behavior:"smooth", block:"start" });
+};
+
+window.toggleTenantActive = async function(id) {
+  if (!confirm("Переключить активность клиента?")) return;
+  try {
+    const r = await apiPatch(`/owner-admin/tenants/${id}/toggle-active`, {});
+    if (!r?.ok) throw r;
+    await refreshAll();
+  } catch(err) { console.error(err); showError(err); }
+};
+
+window.toggleTenantBlock = async function(id) {
+  try {
+    const t = state.tenants.find(x => String(x.id) === String(id));
+    let payload = {};
+    if (!t?.is_blocked) {
+      const reason = prompt("Укажи причину блокировки", "manual_block_by_owner");
+      if (reason === null) return;
+      payload = { reason: reason.trim() || "manual_block_by_owner" };
     }
+    const r = await apiPatch(`/owner-admin/tenants/${id}/toggle-block`, payload);
+    if (!r?.ok) throw r;
+    await refreshAll();
+  } catch(err) { console.error(err); showError(err); }
+};
 
-    function resetUserForm() {
-      state.editingUserId = null;
-      el.userFormTitle.textContent = "Новый пользователь";
-      el.btnUserCancelEdit.style.display = "none";
-      el.userId.value = "";
-      el.userTenantId.value = "";
-      el.userRole.value = "client";
-      el.userUsername.value = "";
-      el.userFullName.value = "";
-      el.userPassword.value = "";
+window.toggleUserActive = async function(id) {
+  if (!confirm("Переключить активность пользователя?")) return;
+  try {
+    const r = await apiPatch(`/owner-admin/users/${id}/toggle-active`, {});
+    if (!r?.ok) throw r;
+    await refreshAll();
+  } catch(err) { console.error(err); showError(err); }
+};
+
+window.toggleUserBlock = async function(id) {
+  if (!confirm("Переключить блокировку пользователя?")) return;
+  try {
+    const r = await apiPatch(`/owner-admin/users/${id}/toggle-block`, {});
+    if (!r?.ok) throw r;
+    await refreshAll();
+  } catch(err) { console.error(err); showError(err); }
+};
+
+window.resetUserPassword = async function(id) {
+  const pw = prompt("Введите новый пароль");
+  if (pw === null) return;
+  if (!pw.trim()) { alert("Пароль не может быть пустым"); return; }
+  try {
+    const r = await apiPost(`/owner-admin/users/${id}/reset-password`, { password: pw.trim() });
+    if (!r?.ok) throw r;
+    alert("Пароль обновлён");
+  } catch(err) { console.error(err); showError(err); }
+};
+
+window.updateSubscriptionRequestStatus = async function(id, status) {
+  const labels = { in_progress:"в работу", done:"завершена", cancelled:"отменена" };
+  if (!confirm(`Изменить статус заявки #${id} на "${labels[status]||status}"?`)) return;
+  try {
+    const r = await apiPatch(`/owner-admin/subscription-requests/${id}/status`, { status });
+    if (!r?.ok) throw r;
+    await refreshAll();
+  } catch(err) { console.error(err); showError(err); }
+};
+
+window.activateSubscriptionRequest = async function(id) {
+  if (!confirm(`Активировать подписку по заявке #${id} на 30 дней?`)) return;
+  try {
+    const r = await apiPost(`/owner-admin/subscription-requests/${id}/activate`, { days: 30 });
+    if (!r?.ok) throw r;
+    alert("Подписка успешно активирована на 30 дней");
+    await refreshAll();
+  } catch(err) { console.error(err); showError(err); }
+};
+
+window.openTenantEvents = openTenantEvents;
+
+/* ══════════════════════════════════════════════════════════
+   BIND EVENTS
+   ══════════════════════════════════════════════════════════ */
+function bindEvents() {
+  el.btnRefresh.addEventListener("click", refreshAll);
+
+  el.btnLogout.addEventListener("click", () => {
+    clearAuth();
+    window.location.href = "/login.html";
+  });
+
+  const scrollTo = (sec) => sec.scrollIntoView({ behavior:"smooth", block:"start" });
+  el.btnScrollAttention.addEventListener("click", () => scrollTo(el.attentionSection));
+  el.btnScrollTenants.addEventListener("click",   () => scrollTo(el.tenantsSection));
+  el.btnScrollRequests.addEventListener("click",  () => scrollTo(el.subscriptionRequestsSection));
+  el.btnScrollUsers.addEventListener("click",     () => scrollTo(el.usersSection));
+  el.btnScrollActivity.addEventListener("click",  () => scrollTo(el.activitySection));
+  el.btnScrollForms.addEventListener("click",     () => scrollTo(el.formsSection));
+
+  el.btnToggleAttention.addEventListener("click", () => {
+    state.attentionCollapsed = !state.attentionCollapsed;
+    el.attentionBody.style.display = state.attentionCollapsed ? "none" : "";
+    el.btnToggleAttention.textContent = state.attentionCollapsed ? "Развернуть" : "Свернуть";
+  });
+
+  el.tenantSearch.addEventListener("input", e => {
+    state.tenantSearch = e.target.value || "";
+    renderTenantsTable();
+  });
+
+  el.userSearch.addEventListener("input", e => {
+    state.userSearch = e.target.value || "";
+    renderUsersTable();
+  });
+
+  el.subscriptionRequestSearch.addEventListener("input", e => {
+    state.subscriptionRequestSearch = e.target.value || "";
+    renderSubscriptionRequestsTable();
+  });
+
+  // Filter chips
+  document.querySelectorAll(".fc").forEach(chip => {
+    chip.addEventListener("click", () => {
+      setFilterActive(chip.dataset.f || "all");
+      renderTenantsTable();
+    });
+  });
+
+  el.tenantName.addEventListener("input", () => {
+    if (!state.editingTenantId && !el.tenantSlug.value.trim()) {
+      el.tenantSlug.value = slugify(el.tenantName.value);
     }
-
-    async function loadMe() {
-      const data = await apiGet("/auth/me");
-      if (!data?.ok || !data.user) {
-        throw new Error(data?.error || "failed_to_load_auth_me");
-      }
-
-      if (data.user.role !== "owner") {
-        window.location.href = "/index.html";
-        return;
-      }
-
-      state.me = data.user;
-      fillCurrentUser();
-    }
-
-    async function loadTenants() {
-      const data = await apiGet("/owner-admin/tenants");
-      if (!data?.ok) throw new Error(data?.error || "failed_to_load_tenants");
-      state.tenants = Array.isArray(data.tenants) ? data.tenants : [];
-    }
-
-    async function loadUsers() {
-      const data = await apiGet("/owner-admin/users");
-      if (!data?.ok) throw new Error(data?.error || "failed_to_load_users");
-      state.users = Array.isArray(data.users) ? data.users : [];
-    }
-
-    async function loadActivitySummary() {
-      const data = await apiGet("/owner-activity/summary");
-      if (!data?.ok) throw new Error(data?.error || "failed_to_load_owner_activity_summary");
-      state.activitySummary = Array.isArray(data.summary) ? data.summary : [];
-    }
-
-    async function loadSubscriptionRequests() {
-      const data = await apiGet("/owner-admin/subscription-requests");
-      if (!data?.ok) throw new Error(data?.error || "failed_to_load_subscription_requests");
-      state.subscriptionRequests = Array.isArray(data.items) ? data.items : [];
-    }
-
-    async function refreshAll() {
-      try {
-        el.btnRefresh.disabled = true;
-        el.btnRefresh.textContent = "Обновляем...";
-
-        await loadMe();
-        await Promise.all([
-          loadTenants(),
-          loadUsers(),
-          loadActivitySummary(),
-          loadSubscriptionRequests()
-        ]);
-
-        fillTenantSelect();
-        renderKpis();
-        renderActivityTable();
-        renderTenantsTable();
-        renderUsersTable();
-        renderSubscriptionRequestsTable();
-      } catch (error) {
-        console.error("[owner-dashboard] refreshAll error:", error);
-        showError(error);
-      } finally {
-        el.btnRefresh.disabled = false;
-        el.btnRefresh.textContent = "Обновить данные";
-      }
-    }
-
-    async function saveTenant(event) {
-      event.preventDefault();
-
-      const id = el.tenantId.value.trim();
-      const payload = {
-        name: el.tenantName.value.trim(),
-        slug: el.tenantSlug.value.trim() || slugify(el.tenantName.value),
-        tariff_name: el.tenantTariffName.value.trim() || "Базовый",
-        plan_code: el.tenantPlanCode.value.trim() || "basic",
-        subscription_status: el.tenantSubscriptionStatus.value,
-        status: el.tenantStatus.value,
-        subscription_start_at: el.tenantStartAt.value ? new Date(el.tenantStartAt.value).toISOString() : null,
-        subscription_end_at: el.tenantEndAt.value ? new Date(el.tenantEndAt.value).toISOString() : null,
-        max_sku: numberValue(el.tenantMaxSku.value, 1000),
-        max_locations: numberValue(el.tenantMaxLocations.value, 10),
-        contact_name: el.tenantContactName.value.trim() || null,
-        contact_phone: el.tenantContactPhone.value.trim() || null,
-        contact_email: el.tenantContactEmail.value.trim() || null,
-        code: el.tenantCode.value.trim() || null,
-        phone: el.tenantPhone.value.trim() || null,
-        email: el.tenantEmail.value.trim() || null,
-        comment: el.tenantComment.value.trim() || null,
-        enabled_modules: getCheckedModules()
-      };
-
-      if (!payload.name) {
-        alert("Название клиента обязательно");
-        return;
-      }
-
-      if (!payload.slug) {
-        alert("Slug обязателен");
-        return;
-      }
-
-      try {
-        if (id) {
-          const result = await apiPut(`/owner-admin/tenants/${id}`, payload);
-          if (!result?.ok) throw result;
-          alert("Клиент обновлён");
-        } else {
-          const result = await apiPost("/owner-admin/tenants", payload);
-          if (!result?.ok) throw result;
-          alert("Клиент создан");
-        }
-
-        resetTenantForm();
-        await refreshAll();
-      } catch (error) {
-        console.error("[owner-dashboard] saveTenant error:", error);
-        showError(error);
-      }
-    }
-
-    async function saveUser(event) {
-      event.preventDefault();
-
-      const id = el.userId.value.trim();
-      const payload = {
-        tenant_id: el.userTenantId.value ? Number(el.userTenantId.value) : null,
-        role: el.userRole.value,
-        username: el.userUsername.value.trim(),
-        full_name: el.userFullName.value.trim()
-      };
-
-      if (!payload.username) {
-        alert("Логин обязателен");
-        return;
-      }
-
-      if (!payload.full_name) {
-        alert("Имя обязательно");
-        return;
-      }
-
-      if (!id && !el.userPassword.value.trim()) {
-        alert("Для нового пользователя пароль обязателен");
-        return;
-      }
-
-      if (!id && !payload.tenant_id && payload.role !== "owner") {
-        alert("Для пользователя-клиента нужно выбрать клиента");
-        return;
-      }
-
-      try {
-        if (id) {
-          const updatePayload = { ...payload };
-          const result = await apiPut(`/owner-admin/users/${id}`, updatePayload);
-          if (!result?.ok) throw result;
-
-          if (el.userPassword.value.trim()) {
-            const resetResult = await apiPost(`/owner-admin/users/${id}/reset-password`, {
-              password: el.userPassword.value.trim()
-            });
-            if (!resetResult?.ok) throw resetResult;
-          }
-
-          alert("Пользователь обновлён");
-        } else {
-          payload.password = el.userPassword.value.trim();
-          const result = await apiPost("/owner-admin/users", payload);
-          if (!result?.ok) throw result;
-          alert("Пользователь создан");
-        }
-
-        resetUserForm();
-        await refreshAll();
-      } catch (error) {
-        console.error("[owner-dashboard] saveUser error:", error);
-        showError(error);
-      }
-    }
-
-    window.editTenant = function editTenant(id) {
-      const tenant = state.tenants.find((item) => String(item.id) === String(id));
-      if (!tenant) return;
-
-      state.editingTenantId = String(id);
-      el.tenantFormTitle.textContent = `Редактирование клиента #${tenant.id}`;
-      el.btnTenantCancelEdit.style.display = "inline-flex";
-      el.tenantId.value = tenant.id ?? "";
-      el.tenantName.value = tenant.name ?? "";
-      el.tenantSlug.value = tenant.slug ?? "";
-      el.tenantTariffName.value = tenant.tariff_name ?? "Базовый";
-      el.tenantPlanCode.value = tenant.plan_code ?? "basic";
-      el.tenantSubscriptionStatus.value = tenant.subscription_status ?? "trial";
-      el.tenantStatus.value = tenant.status ?? "active";
-      el.tenantStartAt.value = toLocalValue(tenant.subscription_start_at);
-      el.tenantEndAt.value = toLocalValue(tenant.subscription_end_at);
-      el.tenantMaxSku.value = tenant.max_sku ?? 1000;
-      el.tenantMaxLocations.value = tenant.max_locations ?? 10;
-      el.tenantContactName.value = tenant.contact_name ?? "";
-      el.tenantContactPhone.value = tenant.contact_phone ?? "";
-      el.tenantContactEmail.value = tenant.contact_email ?? "";
-      el.tenantCode.value = tenant.code ?? "";
-      el.tenantPhone.value = tenant.phone ?? "";
-      el.tenantEmail.value = tenant.email ?? "";
-      el.tenantComment.value = tenant.comment ?? "";
-      setCheckedModules(parseModules(tenant.enabled_modules));
-
-      el.formsSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    };
-
-    window.editUser = function editUser(id) {
-      const user = state.users.find((item) => String(item.id) === String(id));
-      if (!user) return;
-
-      state.editingUserId = String(id);
-      el.userFormTitle.textContent = `Редактирование пользователя #${user.id}`;
-      el.btnUserCancelEdit.style.display = "inline-flex";
-      el.userId.value = user.id ?? "";
-      el.userTenantId.value = user.tenant_id ?? "";
-      el.userRole.value = user.role ?? "client";
-      el.userUsername.value = user.username ?? "";
-      el.userFullName.value = user.full_name ?? "";
-      el.userPassword.value = "";
-
-      el.formsSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    };
-
-    window.toggleTenantActive = async function toggleTenantActive(id) {
-      if (!confirm("Переключить активность клиента?")) return;
-
-      try {
-        const result = await apiPatch(`/owner-admin/tenants/${id}/toggle-active`, {});
-        if (!result?.ok) throw result;
-        await refreshAll();
-      } catch (error) {
-        console.error("[owner-dashboard] toggleTenantActive error:", error);
-        showError(error);
-      }
-    };
-
-    window.toggleTenantBlock = async function toggleTenantBlock(id) {
-      try {
-        const tenant = state.tenants.find((t) => String(t.id) === String(id));
-        const isBlocked = !!tenant?.is_blocked;
-
-        let payload = {};
-        if (!isBlocked) {
-          const reason = prompt("Укажи причину блокировки клиента", "manual_block_by_owner");
-          if (reason === null) return;
-          payload = { reason: reason.trim() || "manual_block_by_owner" };
-        }
-
-        const result = await apiPatch(`/owner-admin/tenants/${id}/toggle-block`, payload);
-        if (!result?.ok) throw result;
-        await refreshAll();
-      } catch (error) {
-        console.error("[owner-dashboard] toggleTenantBlock error:", error);
-        showError(error);
-      }
-    };
-
-    window.toggleUserActive = async function toggleUserActive(id) {
-      if (!confirm("Переключить активность пользователя?")) return;
-
-      try {
-        const result = await apiPatch(`/owner-admin/users/${id}/toggle-active`, {});
-        if (!result?.ok) throw result;
-        await refreshAll();
-      } catch (error) {
-        console.error("[owner-dashboard] toggleUserActive error:", error);
-        showError(error);
-      }
-    };
-
-    window.toggleUserBlock = async function toggleUserBlock(id) {
-      if (!confirm("Переключить блокировку пользователя?")) return;
-
-      try {
-        const result = await apiPatch(`/owner-admin/users/${id}/toggle-block`, {});
-        if (!result?.ok) throw result;
-        await refreshAll();
-      } catch (error) {
-        console.error("[owner-dashboard] toggleUserBlock error:", error);
-        showError(error);
-      }
-    };
-
-    window.resetUserPassword = async function resetUserPassword(id) {
-      const password = prompt("Введите новый пароль");
-      if (password === null) return;
-      if (!password.trim()) {
-        alert("Пароль не может быть пустым");
-        return;
-      }
-
-      try {
-        const result = await apiPost(`/owner-admin/users/${id}/reset-password`, {
-          password: password.trim()
-        });
-        if (!result?.ok) throw result;
-        alert("Пароль обновлён");
-      } catch (error) {
-        console.error("[owner-dashboard] resetUserPassword error:", error);
-        showError(error);
-      }
-    };
-
-    window.updateSubscriptionRequestStatus = async function updateSubscriptionRequestStatus(id, status) {
-      const statusMap = {
-        in_progress: "в работу",
-        done: "завершена",
-        cancelled: "отменена"
-      };
-
-      if (!confirm(`Изменить статус заявки #${id} на "${statusMap[status] || status}"?`)) return;
-
-      try {
-        const result = await apiPatch(`/owner-admin/subscription-requests/${id}/status`, { status });
-        if (!result?.ok) throw result;
-        await refreshAll();
-      } catch (error) {
-        console.error("[owner-dashboard] updateSubscriptionRequestStatus error:", error);
-        showError(error);
-      }
-    };
-
-
-    window.activateSubscriptionRequest = async function activateSubscriptionRequest(id) {
-      if (!confirm(`Активировать подписку по заявке #${id} на 30 дней? Заявка будет автоматически завершена.`)) return;
-
-      try {
-        const result = await apiPost(`/owner-admin/subscription-requests/${id}/activate`, { days: 30 });
-        if (!result?.ok) throw result;
-        alert("Подписка успешно активирована на 30 дней");
-        await refreshAll();
-      } catch (error) {
-        console.error("[owner-dashboard] activateSubscriptionRequest error:", error);
-        showError(error);
-      }
-    };
-
-    function bindEvents() {
-      el.btnRefresh.addEventListener("click", refreshAll);
-
-      el.btnLogout.addEventListener("click", () => {
-        clearAuth();
-        window.location.href = "/login.html";
-      });
-
-      el.btnScrollTenants.addEventListener("click", () => {
-        el.tenantsSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-
-      el.btnScrollUsers.addEventListener("click", () => {
-        el.usersSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-
-      el.btnScrollRequests.addEventListener("click", () => {
-        el.subscriptionRequestsSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-
-      el.btnScrollForms.addEventListener("click", () => {
-        el.formsSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-
-      el.tenantSearch.addEventListener("input", (e) => {
-        state.tenantSearch = e.target.value || "";
-        renderTenantsTable();
-      });
-
-      el.userSearch.addEventListener("input", (e) => {
-        state.userSearch = e.target.value || "";
-        renderUsersTable();
-      });
-
-      el.subscriptionRequestSearch.addEventListener("input", (e) => {
-        state.subscriptionRequestSearch = e.target.value || "";
-        renderSubscriptionRequestsTable();
-      });
-
-      el.tenantName.addEventListener("input", () => {
-        if (!state.editingTenantId && !el.tenantSlug.value.trim()) {
-          el.tenantSlug.value = slugify(el.tenantName.value);
-        }
-      });
-
-      el.tenantForm.addEventListener("submit", saveTenant);
-      el.userForm.addEventListener("submit", saveUser);
-
-      el.btnTenantReset.addEventListener("click", resetTenantForm);
-      el.btnUserReset.addEventListener("click", resetUserForm);
-
-      el.btnTenantCancelEdit.addEventListener("click", resetTenantForm);
-      el.btnUserCancelEdit.addEventListener("click", resetUserForm);
-    }
-
-    async function bootstrap() {
-      const token = getToken();
-      if (!token) {
-        window.location.href = "/login.html";
-        return;
-      }
-
-      bindEvents();
-      resetTenantForm();
-      resetUserForm();
-      await refreshAll();
-    }
-
-    bootstrap();
-  </script>
+  });
+
+  el.tenantForm.addEventListener("submit", saveTenant);
+  el.userForm.addEventListener("submit",   saveUser);
+
+  el.btnTenantReset.addEventListener("click",      resetTenantForm);
+  el.btnUserReset.addEventListener("click",        resetUserForm);
+  el.btnTenantCancelEdit.addEventListener("click", resetTenantForm);
+  el.btnUserCancelEdit.addEventListener("click",   resetUserForm);
+
+  // Modal
+  el.eventsModalClose.addEventListener("click", closeEventsModal);
+  el.eventsModal.addEventListener("click", e => {
+    if (e.target === el.eventsModal) closeEventsModal();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeEventsModal();
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   BOOTSTRAP
+   ══════════════════════════════════════════════════════════ */
+async function bootstrap() {
+  if (!getToken()) { window.location.href = "/login.html"; return; }
+  bindEvents();
+  resetTenantForm();
+  resetUserForm();
+  await refreshAll();
+}
+
+bootstrap();
+</script>
 </body>
 </html>
