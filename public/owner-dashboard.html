@@ -640,6 +640,7 @@
       <button class="btn btn-primary" id="btnRefresh">Обновить данные</button>
       <button class="btn btn-secondary" id="btnScrollTenants">К клиентам</button>
       <button class="btn btn-secondary" id="btnScrollUsers">К пользователям</button>
+      <button class="btn btn-secondary" id="btnScrollRequests">К заявкам</button>
       <button class="btn btn-secondary" id="btnScrollForms">К формам</button>
       <button class="btn btn-danger" id="btnLogout">Выйти</button>
     </div>
@@ -996,6 +997,42 @@
         </div>
       </div>
     </section>
+
+    <section class="panel" id="subscriptionRequestsSection" style="margin-top:18px;">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Заявки на продление подписки</h2>
+          <div class="panel-subtitle">Клиенты оставляют заявку из своего кабинета. Здесь их можно взять в работу и закрыть.</div>
+        </div>
+        <input class="input filter-input" id="subscriptionRequestSearch" placeholder="Поиск по клиенту, телефону, email, комментарию..." />
+      </div>
+      <div class="panel-body">
+        <div class="status-line" id="subscriptionRequestsSummary">
+          <span class="chip">Загрузка...</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID / Клиент</th>
+                <th>Контакты</th>
+                <th>Комментарий</th>
+                <th>Статус</th>
+                <th>Создана</th>
+                <th>Обработка</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="subscriptionRequestsTableBody">
+              <tr>
+                <td colspan="7" class="muted">Загрузка...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script src="/js/config.js"></script>
@@ -1008,8 +1045,10 @@
       tenants: [],
       users: [],
       activitySummary: [],
+      subscriptionRequests: [],
       tenantSearch: "",
       userSearch: "",
+      subscriptionRequestSearch: "",
       editingTenantId: null,
       editingUserId: null
     };
@@ -1022,6 +1061,7 @@
       btnLogout: document.getElementById("btnLogout"),
       btnScrollTenants: document.getElementById("btnScrollTenants"),
       btnScrollUsers: document.getElementById("btnScrollUsers"),
+      btnScrollRequests: document.getElementById("btnScrollRequests"),
       btnScrollForms: document.getElementById("btnScrollForms"),
 
       kpiTenants: document.getElementById("kpiTenants"),
@@ -1040,9 +1080,12 @@
       activityTableBody: document.getElementById("activityTableBody"),
       tenantsTableBody: document.getElementById("tenantsTableBody"),
       usersTableBody: document.getElementById("usersTableBody"),
+      subscriptionRequestsSummary: document.getElementById("subscriptionRequestsSummary"),
+      subscriptionRequestsTableBody: document.getElementById("subscriptionRequestsTableBody"),
 
       tenantSearch: document.getElementById("tenantSearch"),
       userSearch: document.getElementById("userSearch"),
+      subscriptionRequestSearch: document.getElementById("subscriptionRequestSearch"),
 
       tenantForm: document.getElementById("tenantForm"),
       tenantFormTitle: document.getElementById("tenantFormTitle"),
@@ -1081,6 +1124,7 @@
 
       tenantsSection: document.getElementById("tenantsSection"),
       usersSection: document.getElementById("usersSection"),
+      subscriptionRequestsSection: document.getElementById("subscriptionRequestsSection"),
       formsSection: document.getElementById("formsSection")
     };
 
@@ -1199,6 +1243,24 @@
       if (v === "blocked") return "Заблокирована";
       if (v === "archived") return "В архиве";
       return status || "—";
+    }
+
+    function mapRequestStatus(status) {
+      const v = String(status || "").toLowerCase();
+      if (v === "new") return "Новая";
+      if (v === "in_progress") return "В работе";
+      if (v === "done") return "Завершена";
+      if (v === "cancelled") return "Отменена";
+      return status || "—";
+    }
+
+    function requestStatusBadge(status) {
+      const v = String(status || "").toLowerCase();
+      if (v === "new") return `<span class="badge badge-info">новая</span>`;
+      if (v === "in_progress") return `<span class="badge badge-warning">в работе</span>`;
+      if (v === "done") return `<span class="badge badge-success">завершена</span>`;
+      if (v === "cancelled") return `<span class="badge badge-danger">отменена</span>`;
+      return `<span class="badge">${safeText(status || "—")}</span>`;
     }
 
     function activityBadge(status) {
@@ -1545,6 +1607,101 @@
       }).join("");
     }
 
+    function renderSubscriptionRequestsTable() {
+      const q = state.subscriptionRequestSearch.trim().toLowerCase();
+      const rows = state.subscriptionRequests.filter((item) => {
+        if (!q) return true;
+        const haystack = [
+          item.id,
+          item.tenant_id,
+          item.tenant_name,
+          item.contact_name,
+          item.phone,
+          item.email,
+          item.comment,
+          item.status,
+          item.processed_by_username,
+          item.processed_by_full_name
+        ].map((v) => String(v || "").toLowerCase()).join(" ");
+        return haystack.includes(q);
+      });
+
+      const total = state.subscriptionRequests.length;
+      const newCount = state.subscriptionRequests.filter((item) => String(item.status || "").toLowerCase() === "new").length;
+      const inProgressCount = state.subscriptionRequests.filter((item) => String(item.status || "").toLowerCase() === "in_progress").length;
+      const doneCount = state.subscriptionRequests.filter((item) => String(item.status || "").toLowerCase() === "done").length;
+      const cancelledCount = state.subscriptionRequests.filter((item) => String(item.status || "").toLowerCase() === "cancelled").length;
+
+      el.subscriptionRequestsSummary.innerHTML = [
+        `<span class="chip">Всего: <b>${total}</b></span>`,
+        `<span class="chip">Новые: <b>${newCount}</b></span>`,
+        `<span class="chip">В работе: <b>${inProgressCount}</b></span>`,
+        `<span class="chip">Завершены: <b>${doneCount}</b></span>`,
+        `<span class="chip">Отменены: <b>${cancelledCount}</b></span>`
+      ].join("");
+
+      if (!rows.length) {
+        el.subscriptionRequestsTableBody.innerHTML = `<tr><td colspan="7"><div class="empty">Заявки не найдены</div></td></tr>`;
+        return;
+      }
+
+      el.subscriptionRequestsTableBody.innerHTML = rows.map((item) => {
+        const actions = [];
+        const status = String(item.status || "").toLowerCase();
+
+        if (status === "new") {
+          actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'in_progress')">Взять в работу</button>`);
+          actions.push(`<button class="row-btn row-btn-danger" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'cancelled')">Отменить</button>`);
+        } else if (status === "in_progress") {
+          actions.push(`<button class="row-btn row-btn-success" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'done')">Завершить</button>`);
+          actions.push(`<button class="row-btn row-btn-danger" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'cancelled')">Отменить</button>`);
+        } else if (status === "done") {
+          actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'in_progress')">Вернуть в работу</button>`);
+        } else if (status === "cancelled") {
+          actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'in_progress')">Возобновить</button>`);
+        }
+
+        const processedInfo = item.processed_at
+          ? `<div class="stack">
+              <div>${safeText(dt(item.processed_at))}</div>
+              <div class="muted small">${safeText(item.processed_by_full_name || item.processed_by_username || ("user #" + (item.processed_by || "—")))}</div>
+            </div>`
+          : `<span class="muted">—</span>`;
+
+        return `
+          <tr>
+            <td>
+              <div class="stack">
+                <div class="strong">#${safeText(item.id)} — ${safeText(item.tenant_name || "—")}</div>
+                <div class="muted small">tenant_id: ${safeText(item.tenant_id || "—")}</div>
+              </div>
+            </td>
+            <td>
+              <div class="stack">
+                <div>${safeText(item.contact_name || "—")}</div>
+                <div class="muted small">${safeText(item.phone || "—")}</div>
+                <div class="muted small">${safeText(item.email || "—")}</div>
+              </div>
+            </td>
+            <td>${item.comment ? safeText(item.comment) : `<span class="muted">—</span>`}</td>
+            <td>
+              <div class="stack">
+                <div>${requestStatusBadge(item.status)}</div>
+                <div class="muted small">${safeText(mapRequestStatus(item.status))}</div>
+              </div>
+            </td>
+            <td>${safeText(dt(item.created_at))}</td>
+            <td>${processedInfo}</td>
+            <td>
+              <div class="row-actions">
+                ${actions.join("") || `<span class="muted">—</span>`}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
     function resetTenantForm() {
       state.editingTenantId = null;
       el.tenantFormTitle.textContent = "Новый клиент";
@@ -1615,6 +1772,12 @@
       state.activitySummary = Array.isArray(data.summary) ? data.summary : [];
     }
 
+    async function loadSubscriptionRequests() {
+      const data = await apiGet("/owner-admin/subscription-requests");
+      if (!data?.ok) throw new Error(data?.error || "failed_to_load_subscription_requests");
+      state.subscriptionRequests = Array.isArray(data.items) ? data.items : [];
+    }
+
     async function refreshAll() {
       try {
         el.btnRefresh.disabled = true;
@@ -1624,7 +1787,8 @@
         await Promise.all([
           loadTenants(),
           loadUsers(),
-          loadActivitySummary()
+          loadActivitySummary(),
+          loadSubscriptionRequests()
         ]);
 
         fillTenantSelect();
@@ -1632,6 +1796,7 @@
         renderActivityTable();
         renderTenantsTable();
         renderUsersTable();
+        renderSubscriptionRequestsTable();
       } catch (error) {
         console.error("[owner-dashboard] refreshAll error:", error);
         showError(error);
@@ -1882,6 +2047,25 @@
       }
     };
 
+    window.updateSubscriptionRequestStatus = async function updateSubscriptionRequestStatus(id, status) {
+      const statusMap = {
+        in_progress: "в работу",
+        done: "завершена",
+        cancelled: "отменена"
+      };
+
+      if (!confirm(`Изменить статус заявки #${id} на "${statusMap[status] || status}"?`)) return;
+
+      try {
+        const result = await apiPatch(`/owner-admin/subscription-requests/${id}/status`, { status });
+        if (!result?.ok) throw result;
+        await refreshAll();
+      } catch (error) {
+        console.error("[owner-dashboard] updateSubscriptionRequestStatus error:", error);
+        showError(error);
+      }
+    };
+
     function bindEvents() {
       el.btnRefresh.addEventListener("click", refreshAll);
 
@@ -1898,6 +2082,10 @@
         el.usersSection.scrollIntoView({ behavior: "smooth", block: "start" });
       });
 
+      el.btnScrollRequests.addEventListener("click", () => {
+        el.subscriptionRequestsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
       el.btnScrollForms.addEventListener("click", () => {
         el.formsSection.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -1910,6 +2098,11 @@
       el.userSearch.addEventListener("input", (e) => {
         state.userSearch = e.target.value || "";
         renderUsersTable();
+      });
+
+      el.subscriptionRequestSearch.addEventListener("input", (e) => {
+        state.subscriptionRequestSearch = e.target.value || "";
+        renderSubscriptionRequestsTable();
       });
 
       el.tenantName.addEventListener("input", () => {
