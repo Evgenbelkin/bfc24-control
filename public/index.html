@@ -302,6 +302,195 @@
       background: var(--accent-hover);
     }
 
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.56);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-dialog {
+      width: 100%;
+      max-width: 560px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 22px 22px 14px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .modal-close {
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text-main);
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 1;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.18s ease;
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover {
+      border-color: rgba(37, 99, 235, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .modal-body {
+      padding: 18px 22px 22px;
+    }
+
+    .modal-subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin: 0 0 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--text-main);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      box-shadow: var(--shadow-sm);
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .input:focus,
+    .textarea:focus {
+      border-color: rgba(37, 99, 235, 0.42);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+
+    .textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .helper-text {
+      margin-top: 6px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text-main);
+    }
+
+    .btn-primary {
+      background: var(--accent-color);
+      color: #fff;
+      border-color: var(--accent-color);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .status-box {
+      margin-top: 14px;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .status-box.open {
+      display: block;
+    }
+
+    .status-box.success {
+      background: #eefbf3;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .status-box.error {
+      background: #fff5f5;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
     @media (max-width: 768px) {
       .toolbar {
         justify-content: flex-start;
@@ -322,6 +511,28 @@
     }
 
     @media (max-width: 480px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-dialog {
+        max-width: 100%;
+      }
+
+      .modal-header,
+      .modal-body {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .modal-actions {
+        flex-direction: column;
+      }
+
+      .modal-actions .btn {
+        width: 100%;
+      }
+
       body {
         padding: 20px 14px 28px;
       }
@@ -634,6 +845,27 @@
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
 
+
+      <div class="card" id="subscriptionCard">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="12" y="18" width="40" height="28" rx="6" stroke-width="2.4"/>
+                <path class="stroke-main" d="M12 28H52" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M22 38H30" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M38 13V25" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M33 20L38 25L43 20" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3>Продлить подписку</h3>
+          <div class="muted">Оставить заявку на продление доступа и связаться с владельцем</div>
+        </div>
+        <div class="card__footer">Отправить заявку</div>
+      </div>
+
       <div class="card card--logout" id="logoutCard">
         <div class="card__content">
           <div class="card__top">
@@ -650,6 +882,49 @@
           <div class="muted" data-i18n="index.logoutDesc">Очистить токен и выйти из системы</div>
         </div>
         <div class="card__footer" data-i18n="index.logoutButton">Выйти</div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="subscriptionModal" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="subscriptionModalTitle">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="subscriptionModalTitle">Продление подписки</h2>
+          <p class="modal-subtitle">Оставь контакты, и заявка сразу попадёт в кабинет владельца.</p>
+        </div>
+        <button type="button" class="modal-close" id="subscriptionModalClose" aria-label="Закрыть">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="subscriptionForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="subscriptionContactName">Контактное лицо</label>
+              <input class="input" id="subscriptionContactName" name="contact_name" placeholder="Например: Евгений" />
+            </div>
+            <div class="field">
+              <label for="subscriptionPhone">Телефон</label>
+              <input class="input" id="subscriptionPhone" name="phone" placeholder="+7..." />
+            </div>
+            <div class="field full">
+              <label for="subscriptionEmail">Email</label>
+              <input class="input" id="subscriptionEmail" name="email" type="email" placeholder="mail@example.com" />
+            </div>
+            <div class="field full">
+              <label for="subscriptionComment">Комментарий</label>
+              <textarea class="textarea" id="subscriptionComment" name="comment" placeholder="Например: хочу продлить подписку на 1 месяц, удобно связаться в Telegram или по телефону"></textarea>
+              <div class="helper-text">Нужно заполнить телефон или email. Можно указать оба.</div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="subscriptionCancelBtn">Отмена</button>
+            <button type="submit" class="btn btn-primary" id="subscriptionSubmitBtn">Отправить заявку</button>
+          </div>
+
+          <div class="status-box" id="subscriptionStatusBox"></div>
+        </form>
       </div>
     </div>
   </div>
@@ -878,6 +1153,130 @@
         window.location.href = "/login.html";
       }
     }
+
+
+    const subscriptionModal = document.getElementById("subscriptionModal");
+    const subscriptionCard = document.getElementById("subscriptionCard");
+    const subscriptionForm = document.getElementById("subscriptionForm");
+    const subscriptionStatusBox = document.getElementById("subscriptionStatusBox");
+    const subscriptionSubmitBtn = document.getElementById("subscriptionSubmitBtn");
+    const subscriptionCancelBtn = document.getElementById("subscriptionCancelBtn");
+    const subscriptionModalClose = document.getElementById("subscriptionModalClose");
+
+    function openSubscriptionModal() {
+      if (!subscriptionModal) return;
+      subscriptionStatusBox.className = "status-box";
+      subscriptionStatusBox.textContent = "";
+      subscriptionModal.classList.add("open");
+      subscriptionModal.setAttribute("aria-hidden", "false");
+
+      const savedUserRaw = localStorage.getItem("user");
+      if (savedUserRaw) {
+        try {
+          const savedUser = normalizeUserPayload(JSON.parse(savedUserRaw));
+          const contactNameInput = document.getElementById("subscriptionContactName");
+          const emailInput = document.getElementById("subscriptionEmail");
+
+          if (contactNameInput && !contactNameInput.value && savedUser?.full_name) {
+            contactNameInput.value = savedUser.full_name;
+          }
+
+          if (emailInput && !emailInput.value && savedUser?.email) {
+            emailInput.value = savedUser.email;
+          }
+        } catch (_) {}
+      }
+    }
+
+    function closeSubscriptionModal() {
+      if (!subscriptionModal) return;
+      subscriptionModal.classList.remove("open");
+      subscriptionModal.setAttribute("aria-hidden", "true");
+    }
+
+    function setSubscriptionStatus(type, message) {
+      if (!subscriptionStatusBox) return;
+      subscriptionStatusBox.className = "status-box open " + (type || "success");
+      subscriptionStatusBox.textContent = message || "";
+    }
+
+    async function submitSubscriptionRequest(event) {
+      event.preventDefault();
+
+      const payload = {
+        contact_name: document.getElementById("subscriptionContactName")?.value?.trim() || "",
+        phone: document.getElementById("subscriptionPhone")?.value?.trim() || "",
+        email: document.getElementById("subscriptionEmail")?.value?.trim() || "",
+        comment: document.getElementById("subscriptionComment")?.value?.trim() || ""
+      };
+
+      if (!payload.phone && !payload.email) {
+        setSubscriptionStatus("error", "Укажи телефон или email.");
+        return;
+      }
+
+      subscriptionSubmitBtn.disabled = true;
+      subscriptionCancelBtn.disabled = true;
+      subscriptionModalClose.disabled = true;
+      setSubscriptionStatus("success", "Отправляем заявку...");
+
+      try {
+        const data = window.API && typeof window.API.post === "function"
+          ? await window.API.post("/subscription-requests", payload)
+          : await requestFallback("POST", "/subscription-requests", payload);
+
+        if (!data || data.ok === false) {
+          throw new Error(data?.error || data?.message || "request_failed");
+        }
+
+        setSubscriptionStatus("success", "Заявка отправлена. Скоро с тобой свяжутся по указанным контактам.");
+
+        if (subscriptionForm) {
+          subscriptionForm.reset();
+        }
+
+        setTimeout(() => {
+          closeSubscriptionModal();
+        }, 1200);
+      } catch (error) {
+        setSubscriptionStatus("error", Ui.translateError(error?.message || error || "internal_server_error"));
+      } finally {
+        subscriptionSubmitBtn.disabled = false;
+        subscriptionCancelBtn.disabled = false;
+        subscriptionModalClose.disabled = false;
+      }
+    }
+
+
+    if (subscriptionCard) {
+      subscriptionCard.addEventListener("click", openSubscriptionModal);
+    }
+
+    if (subscriptionModal) {
+      subscriptionModal.addEventListener("click", (event) => {
+        if (event.target === subscriptionModal) {
+          closeSubscriptionModal();
+        }
+      });
+    }
+
+    if (subscriptionModalClose) {
+      subscriptionModalClose.addEventListener("click", closeSubscriptionModal);
+    }
+
+    if (subscriptionCancelBtn) {
+      subscriptionCancelBtn.addEventListener("click", closeSubscriptionModal);
+    }
+
+    if (subscriptionForm) {
+      subscriptionForm.addEventListener("submit", submitSubscriptionRequest);
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && subscriptionModal?.classList.contains("open")) {
+        closeSubscriptionModal();
+      }
+    });
 
     document.getElementById("logoutCard").addEventListener("click", () => {
       localStorage.removeItem("token");
