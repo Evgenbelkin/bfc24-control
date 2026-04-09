@@ -57,6 +57,33 @@
         ownerRedirectTitle: "Вы вошли как владелец системы",
         ownerRedirectText: "Для вас используется отдельный кабинет управления SaaS.",
         ownerRedirectButton: "Перейти в кабинет владельца"
+        subscription: {
+  cardTitle: "Продлить подписку",
+  cardDesc: "Оставить заявку на продление доступа",
+  cardButton: "Отправить заявку",
+
+  modalTitle: "Продление подписки",
+  modalSubtitle: "Оставь контакты, и заявка сразу попадёт в кабинет владельца.",
+
+  contactName: "Контактное лицо",
+  phone: "Телефон",
+  email: "Email",
+  comment: "Комментарий",
+
+  contactNamePlaceholder: "Ваше имя",
+  phonePlaceholder: "+7...",
+  emailPlaceholder: "mail@example.com",
+  commentPlaceholder: "Например: хочу продлить подписку на 1 месяц",
+
+  helper: "Нужно заполнить телефон или email. Можно указать оба.",
+
+  cancel: "Отмена",
+  submit: "Отправить заявку",
+
+  errorRequired: "Укажи телефон или email",
+  sending: "Отправляем заявку...",
+  success: "Заявка отправлена! Владелец свяжется с вами"
+}
       },
 
       clients: {
@@ -807,6 +834,33 @@
         ownerRedirectTitle: "You are signed in as the system owner",
         ownerRedirectText: "A separate SaaS management dashboard is used for your account.",
         ownerRedirectButton: "Go to owner dashboard"
+        subscription: {
+  cardTitle: "Extend subscription",
+  cardDesc: "Send a request to extend access",
+  cardButton: "Send request",
+
+  modalTitle: "Subscription renewal",
+  modalSubtitle: "Leave your contacts and the owner will receive your request.",
+
+  contactName: "Contact name",
+  phone: "Phone",
+  email: "Email",
+  comment: "Comment",
+
+  contactNamePlaceholder: "Your name",
+  phonePlaceholder: "+7...",
+  emailPlaceholder: "mail@example.com",
+  commentPlaceholder: "For example: I want to extend for 1 month",
+
+  helper: "Provide phone or email. You can provide both.",
+
+  cancel: "Cancel",
+  submit: "Send request",
+
+  errorRequired: "Enter phone or email",
+  sending: "Sending request...",
+  success: "Request sent! Owner will contact you"
+}
       },
 
       clients: {
@@ -1557,6 +1611,33 @@
         ownerRedirectTitle: "您当前以系统所有者身份登录",
         ownerRedirectText: "您的账号使用独立的 SaaS 管理后台。",
         ownerRedirectButton: "进入所有者后台"
+        subscription: {
+  cardTitle: "延长订阅",
+  cardDesc: "发送续费申请",
+  cardButton: "发送申请",
+
+  modalTitle: "订阅续费",
+  modalSubtitle: "填写联系方式，申请会发送给系统 владельца。",
+
+  contactName: "联系人",
+  phone: "电话",
+  email: "邮箱",
+  comment: "备注",
+
+  contactNamePlaceholder: "您的姓名",
+  phonePlaceholder: "+7...",
+  emailPlaceholder: "mail@example.com",
+  commentPlaceholder: "例如：续费1个月",
+
+  helper: "填写电话或邮箱，可以两个都填。",
+
+  cancel: "取消",
+  submit: "发送申请",
+
+  errorRequired: "请输入电话或邮箱",
+  sending: "发送中...",
+  success: "申请已发送！"
+}
       },
 
       clients: {

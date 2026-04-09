@@ -860,10 +860,10 @@
             </div>
             <div class="card__arrow">→</div>
           </div>
-          <h3>Продлить подписку</h3>
-          <div class="muted">Оставить заявку на продление доступа и связаться с владельцем</div>
+          <h3 data-i18n="index.subscriptionTitle">Продлить подписку</h3>
+          <div class="muted" data-i18n="index.subscriptionDesc">Оставить заявку на продление доступа и связаться с владельцем</div>
         </div>
-        <div class="card__footer">Отправить заявку</div>
+        <div class="card__footer" data-i18n="index.subscriptionButton">Отправить заявку</div>
       </div>
 
       <div class="card card--logout" id="logoutCard">
@@ -891,36 +891,36 @@
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="subscriptionModalTitle">
       <div class="modal-header">
         <div>
-          <h2 class="modal-title" id="subscriptionModalTitle">Продление подписки</h2>
-          <p class="modal-subtitle">Оставь контакты, и заявка сразу попадёт в кабинет владельца.</p>
+          <h2 class="modal-title" id="subscriptionModalTitle" data-i18n="index.subscriptionModalTitle">Продление подписки</h2>
+          <p class="modal-subtitle" data-i18n="index.subscriptionModalSubtitle">Оставь контакты, и заявка сразу попадёт в кабинет владельца.</p>
         </div>
-        <button type="button" class="modal-close" id="subscriptionModalClose" aria-label="Закрыть">×</button>
+        <button type="button" class="modal-close" id="subscriptionModalClose" aria-label="Закрыть" data-i18n-title="index.subscriptionClose">×</button>
       </div>
       <div class="modal-body">
         <form id="subscriptionForm">
           <div class="form-grid">
             <div class="field">
-              <label for="subscriptionContactName">Контактное лицо</label>
-              <input class="input" id="subscriptionContactName" name="contact_name" placeholder="Например: Евгений" />
+              <label for="subscriptionContactName" data-i18n="index.subscriptionContactNameLabel">Контактное лицо</label>
+              <input class="input" id="subscriptionContactName" name="contact_name" placeholder="Например: Евгений" data-i18n-placeholder="index.subscriptionContactNamePlaceholder" />
             </div>
             <div class="field">
-              <label for="subscriptionPhone">Телефон</label>
-              <input class="input" id="subscriptionPhone" name="phone" placeholder="+7..." />
+              <label for="subscriptionPhone" data-i18n="index.subscriptionPhoneLabel">Телефон</label>
+              <input class="input" id="subscriptionPhone" name="phone" placeholder="+7..." data-i18n-placeholder="index.subscriptionPhonePlaceholder" />
             </div>
             <div class="field full">
-              <label for="subscriptionEmail">Email</label>
-              <input class="input" id="subscriptionEmail" name="email" type="email" placeholder="mail@example.com" />
+              <label for="subscriptionEmail" data-i18n="index.subscriptionEmailLabel">Email</label>
+              <input class="input" id="subscriptionEmail" name="email" type="email" placeholder="mail@example.com" data-i18n-placeholder="index.subscriptionEmailPlaceholder" />
             </div>
             <div class="field full">
-              <label for="subscriptionComment">Комментарий</label>
-              <textarea class="textarea" id="subscriptionComment" name="comment" placeholder="Например: хочу продлить подписку на 1 месяц, удобно связаться в Telegram или по телефону"></textarea>
-              <div class="helper-text">Нужно заполнить телефон или email. Можно указать оба.</div>
+              <label for="subscriptionComment" data-i18n="index.subscriptionCommentLabel">Комментарий</label>
+              <textarea class="textarea" id="subscriptionComment" name="comment" placeholder="Например: хочу продлить подписку на 1 месяц, удобно связаться в Telegram или по телефону" data-i18n-placeholder="index.subscriptionCommentPlaceholder"></textarea>
+              <div class="helper-text" data-i18n="index.subscriptionHelperText">Нужно заполнить телефон или email. Можно указать оба.</div>
             </div>
           </div>
 
           <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" id="subscriptionCancelBtn">Отмена</button>
-            <button type="submit" class="btn btn-primary" id="subscriptionSubmitBtn">Отправить заявку</button>
+            <button type="button" class="btn btn-secondary" id="subscriptionCancelBtn" data-i18n="index.subscriptionCancel">Отмена</button>
+            <button type="submit" class="btn btn-primary" id="subscriptionSubmitBtn" data-i18n="index.subscriptionSubmit">Отправить заявку</button>
           </div>
 
           <div class="status-box" id="subscriptionStatusBox"></div>
@@ -1211,14 +1211,14 @@
       };
 
       if (!payload.phone && !payload.email) {
-        setSubscriptionStatus("error", "Укажи телефон или email.");
+        setSubscriptionStatus("error", i18n.t("index.subscriptionValidationError"));
         return;
       }
 
       subscriptionSubmitBtn.disabled = true;
       subscriptionCancelBtn.disabled = true;
       subscriptionModalClose.disabled = true;
-      setSubscriptionStatus("success", "Отправляем заявку...");
+      setSubscriptionStatus("success", i18n.t("index.subscriptionSending"));
 
       try {
         const data = window.API && typeof window.API.post === "function"
@@ -1229,7 +1229,7 @@
           throw new Error(data?.error || data?.message || "request_failed");
         }
 
-        setSubscriptionStatus("success", "Заявка отправлена. Скоро с тобой свяжутся по указанным контактам.");
+        setSubscriptionStatus("success", i18n.t("index.subscriptionSuccess"));
 
         if (subscriptionForm) {
           subscriptionForm.reset();
