@@ -1650,14 +1650,18 @@
         const status = String(item.status || "").toLowerCase();
 
         if (status === "new") {
+          actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safeText(item.id)}')">Активировать на 30 дней</button>`);
           actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'in_progress')">Взять в работу</button>`);
           actions.push(`<button class="row-btn row-btn-danger" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'cancelled')">Отменить</button>`);
         } else if (status === "in_progress") {
+          actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safeText(item.id)}')">Активировать на 30 дней</button>`);
           actions.push(`<button class="row-btn row-btn-success" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'done')">Завершить</button>`);
           actions.push(`<button class="row-btn row-btn-danger" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'cancelled')">Отменить</button>`);
         } else if (status === "done") {
+          actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safeText(item.id)}')">Продлить ещё на 30 дней</button>`);
           actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'in_progress')">Вернуть в работу</button>`);
         } else if (status === "cancelled") {
+          actions.push(`<button class="row-btn row-btn-success" onclick="activateSubscriptionRequest('${safeText(item.id)}')">Активировать на 30 дней</button>`);
           actions.push(`<button class="row-btn row-btn-warning" onclick="updateSubscriptionRequestStatus('${safeText(item.id)}', 'in_progress')">Возобновить</button>`);
         }
 
@@ -2062,6 +2066,21 @@
         await refreshAll();
       } catch (error) {
         console.error("[owner-dashboard] updateSubscriptionRequestStatus error:", error);
+        showError(error);
+      }
+    };
+
+
+    window.activateSubscriptionRequest = async function activateSubscriptionRequest(id) {
+      if (!confirm(`Активировать подписку по заявке #${id} на 30 дней? Заявка будет автоматически завершена.`)) return;
+
+      try {
+        const result = await apiPost(`/owner-admin/subscription-requests/${id}/activate`, { days: 30 });
+        if (!result?.ok) throw result;
+        alert("Подписка успешно активирована на 30 дней");
+        await refreshAll();
+      } catch (error) {
+        console.error("[owner-dashboard] activateSubscriptionRequest error:", error);
         showError(error);
       }
     };
