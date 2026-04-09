@@ -27,6 +27,9 @@ const ownerAdminRoutes = require("./routes/owner-admin");
 const ownerActivityRoutes = require("./routes/owner-activity");
 const reportsRoutes = require("./routes/reports");
 
+// 🔥 ДОБАВЛЕНО
+const subscriptionRequestsRoutes = require("./routes/subscription-requests");
+
 const app = express();
 
 const PORT = Number(process.env.PORT || 3003);
@@ -94,6 +97,9 @@ app.use("/cash", cashRoutes);
 app.use("/expenses", expensesRoutes);
 app.use("/owner-admin", ownerAdminRoutes);
 app.use("/reports", reportsRoutes);
+
+// 🔥 ДОБАВЛЕНО (ВАЖНО — ДО owner-activity можно, это норм)
+app.use("/", subscriptionRequestsRoutes);
 
 // owner only
 app.use("/owner-activity", authRequired, requireRole("owner"), ownerActivityRoutes);
