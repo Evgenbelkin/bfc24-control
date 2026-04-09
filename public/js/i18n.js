@@ -56,7 +56,7 @@
         logoutButton: "Выйти",
         ownerRedirectTitle: "Вы вошли как владелец системы",
         ownerRedirectText: "Для вас используется отдельный кабинет управления SaaS.",
-        ownerRedirectButton: "Перейти в кабинет владельца"
+        ownerRedirectButton: "Перейти в кабинет владельца",
         subscription: {
   cardTitle: "Продлить подписку",
   cardDesc: "Оставить заявку на продление доступа",
@@ -833,7 +833,7 @@
         logoutButton: "Logout",
         ownerRedirectTitle: "You are signed in as the system owner",
         ownerRedirectText: "A separate SaaS management dashboard is used for your account.",
-        ownerRedirectButton: "Go to owner dashboard"
+        ownerRedirectButton: "Go to owner dashboard",
         subscription: {
   cardTitle: "Extend subscription",
   cardDesc: "Send a request to extend access",
@@ -1610,7 +1610,7 @@
         logoutButton: "退出登录",
         ownerRedirectTitle: "您当前以系统所有者身份登录",
         ownerRedirectText: "您的账号使用独立的 SaaS 管理后台。",
-        ownerRedirectButton: "进入所有者后台"
+        ownerRedirectButton: "进入所有者后台",
         subscription: {
   cardTitle: "延长订阅",
   cardDesc: "发送续费申请",
