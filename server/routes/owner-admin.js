@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const pool = require('../db');
 const { authRequired } = require('../middleware/auth');
-const { requirePermission } = require('../middleware/permissions');
+const { requirePermission, checkTenantUserLimit } = require('../middleware/permissions');
 
 const router = express.Router();
 
@@ -1175,6 +1175,15 @@ router.post(
           error: 'full_name_required',
           message: 'Имя обязательно',
         });
+      }
+
+      if (tenantId) {
+        const limitCheck = await checkTenantUserLimit(tenantId);
+
+        if (!limitCheck.ok) {
+          await client.query('ROLLBACK');
+          return res.status(403).json(limitCheck);
+        }
       }
 
       const duplicate = await client.query(
