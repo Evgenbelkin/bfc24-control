@@ -1,634 +1,164 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const pool = require('../db');
-const { authRequired, requireRole } = require('../middleware/auth');
+const { authRequired } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissions');
 
 const router = express.Router();
 
 router.use(authRequired);
-router.use(requireRole('owner'));
 
-const SALT_ROUNDS = 10;
-const SUBSCRIPTION_STATUSES = ['trial', 'active', 'expired', 'blocked'];
-const USER_ROLES = ['owner', 'client'];
-const TENANT_STATUSES = ['active', 'blocked', 'archived'];
-
-function normalizeModules(value) {
-  if (Array.isArray(value)) return value;
-  if (typeof value === 'string') {
-    try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-  return [];
+function toBool(value, fallback = false) {
+  if (typeof value === 'boolean') return value;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return fallback;
 }
 
-function buildTenantResponse(row) {
-  return {
-    id: row.id,
-    name: row.name,
-    slug: row.slug,
-    code: row.code,
-    status: row.status,
-    subscription_status: row.subscription_status,
-    plan_code: row.plan_code,
-    tariff_name: row.tariff_name,
-    contact_name: row.contact_name,
-    contact_phone: row.contact_phone,
-    contact_email: row.contact_email,
-    phone: row.phone,
-    email: row.email,
-    comment: row.comment,
-    subscription_start_at: row.subscription_start_at,
-    subscription_end_at: row.subscription_end_at,
-    max_sku: row.max_sku,
-    max_locations: row.max_locations,
-    enabled_modules: row.enabled_modules || [],
-    is_active: row.is_active,
-    is_blocked: row.is_blocked,
-    block_reason: row.block_reason,
-    created_at: row.created_at,
-    updated_at: row.updated_at
-  };
-}
-
-function buildUserResponse(row) {
-  return {
-    id: row.id,
-    tenant_id: row.tenant_id,
-    username: row.username,
-    full_name: row.full_name,
-    role: row.role,
-    is_active: row.is_active,
-    is_blocked: row.is_blocked,
-    last_login_at: row.last_login_at,
-    created_at: row.created_at,
-    updated_at: row.updated_at
-  };
-}
-
-function makeSlug(value) {
-  return String(value || '')
+function slugify(value = '') {
+  return String(value)
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9а-яё]+/gi, '-')
+    .replace(/ё/g, 'е')
+    .replace(/[^a-zа-я0-9]+/gi, '-')
     .replace(/^-+|-+$/g, '')
     .replace(/-+/g, '-');
 }
 
-async function ensureUniqueTenantSlug(baseSlug, excludeId = null) {
-  let slug = makeSlug(baseSlug || 'client');
-  if (!slug) slug = 'client';
+function normalizeNullableText(value) {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  const v = String(value).trim();
+  return v === '' ? null : v;
+}
 
-  let counter = 1;
-  while (true) {
-    const candidate = counter === 1 ? slug : `${slug}-${counter}`;
-    const params = excludeId ? [candidate, excludeId] : [candidate];
-    const sql = excludeId
-      ? `SELECT 1 FROM saas.tenants WHERE slug = $1 AND id <> $2 LIMIT 1`
-      : `SELECT 1 FROM saas.tenants WHERE slug = $1 LIMIT 1`;
+function normalizeText(value, fallback = '') {
+  if (value === undefined || value === null) return fallback;
+  return String(value).trim();
+}
 
-    const { rows } = await pool.query(sql, params);
-    if (rows.length === 0) return candidate;
-    counter += 1;
+function parseIntOrNull(value) {
+  if (value === undefined || value === null || value === '') return null;
+  const n = Number(value);
+  return Number.isInteger(n) ? n : null;
+}
+
+function parseJsonArray(value, fallback = []) {
+  if (Array.isArray(value)) return value;
+  if (value === undefined || value === null || value === '') return fallback;
+  try {
+    const parsed = typeof value === 'string' ? JSON.parse(value) : value;
+    return Array.isArray(parsed) ? parsed : fallback;
+  } catch {
+    return fallback;
   }
 }
 
-async function ensureUniqueTenantCode(baseCode, excludeId = null) {
-  const normalized = String(baseCode || '')
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-  let code = normalized || 'CLIENT';
-  let counter = 1;
-
-  while (true) {
-    const candidate = counter === 1 ? code : `${code}-${counter}`;
-    const params = excludeId ? [candidate, excludeId] : [candidate];
-    const sql = excludeId
-      ? `SELECT 1 FROM saas.tenants WHERE code = $1 AND id <> $2 LIMIT 1`
-      : `SELECT 1 FROM saas.tenants WHERE code = $1 LIMIT 1`;
-
-    const { rows } = await pool.query(sql, params);
-    if (rows.length === 0) return candidate;
-    counter += 1;
-  }
-}
-
-function deriveTenantStatus(subscriptionStatus, isBlocked) {
-  if (isBlocked) return 'blocked';
-  if (subscriptionStatus === 'blocked') return 'blocked';
+function deriveTenantStatus({
+  is_blocked,
+  subscription_status,
+}) {
+  if (is_blocked === true) return 'blocked';
+  if (subscription_status === 'blocked') return 'blocked';
   return 'active';
 }
 
-async function validateTenantPayload(payload, tenantId = null) {
-  const name = String(payload.name || '').trim();
-  if (!name) {
-    return { ok: false, error: 'name_required' };
-  }
-
-  const subscriptionStatus = String(
-    payload.subscription_status || 'trial'
-  ).trim().toLowerCase();
-
-  if (!SUBSCRIPTION_STATUSES.includes(subscriptionStatus)) {
-    return { ok: false, error: 'invalid_subscription_status' };
-  }
-
-  const maxSku = Number(payload.max_sku ?? 1000);
-  const maxLocations = Number(payload.max_locations ?? 10);
-
-  if (!Number.isInteger(maxSku) || maxSku < 0) {
-    return { ok: false, error: 'invalid_max_sku' };
-  }
-
-  if (!Number.isInteger(maxLocations) || maxLocations < 0) {
-    return { ok: false, error: 'invalid_max_locations' };
-  }
-
-  const slug = await ensureUniqueTenantSlug(payload.slug || name, tenantId);
-  const code = await ensureUniqueTenantCode(payload.code || name, tenantId);
-
-  const enabledModules = normalizeModules(payload.enabled_modules);
-
-  const phone = payload.phone != null ? String(payload.phone).trim() : null;
-  const email = payload.email != null ? String(payload.email).trim() : null;
-  const contactName =
-    payload.contact_name != null
-      ? String(payload.contact_name).trim()
-      : null;
-
-  const planCode = String(payload.plan_code || payload.tariff_name || 'basic')
-    .trim()
-    .toLowerCase();
-  const tariffName = String(payload.tariff_name || payload.plan_code || 'basic')
-    .trim()
-    .toLowerCase();
-
-  const isActive =
-    payload.is_active === undefined ? true : Boolean(payload.is_active);
-  const isBlocked =
-    payload.is_blocked === undefined ? false : Boolean(payload.is_blocked);
-
-  const status = deriveTenantStatus(subscriptionStatus, isBlocked);
-
-  if (!TENANT_STATUSES.includes(status)) {
-    return { ok: false, error: 'invalid_status' };
-  }
-
-  return {
-    ok: true,
-    data: {
-      name,
-      slug,
-      code,
-      status,
-      subscription_status: subscriptionStatus,
-      plan_code: planCode,
-      tariff_name: tariffName,
-      contact_name: contactName,
-      contact_phone: phone,
-      contact_email: email,
-      phone,
-      email,
-      comment: payload.comment != null ? String(payload.comment).trim() : null,
-      subscription_start_at: payload.subscription_start_at || null,
-      subscription_end_at: payload.subscription_end_at || null,
-      max_sku: maxSku,
-      max_locations: maxLocations,
-      enabled_modules: JSON.stringify(enabledModules),
-      is_active: isActive,
-      is_blocked: isBlocked,
-      block_reason:
-        payload.block_reason != null ? String(payload.block_reason).trim() : null
-    }
-  };
-}
-
-async function validateUserPayload(payload, userId = null) {
-  const tenantId =
-    payload.tenant_id === null || payload.tenant_id === undefined || payload.tenant_id === ''
-      ? null
-      : Number(payload.tenant_id);
-
-  const username = String(payload.username || '').trim();
-  const fullName = String(payload.full_name || '').trim();
-  const role = String(payload.role || 'client').trim().toLowerCase();
-
-  if (!username) {
-    return { ok: false, error: 'username_required' };
-  }
-
-  if (!fullName) {
-    return { ok: false, error: 'full_name_required' };
-  }
-
-  if (!USER_ROLES.includes(role)) {
-    return { ok: false, error: 'invalid_role' };
-  }
-
-  if (role === 'client' && !tenantId) {
-    return { ok: false, error: 'tenant_id_required_for_client' };
-  }
-
-  if (role === 'owner' && tenantId) {
-    return { ok: false, error: 'owner_must_have_null_tenant_id' };
-  }
-
-  if (tenantId) {
-    const tenantCheck = await pool.query(
-      `SELECT id FROM saas.tenants WHERE id = $1 LIMIT 1`,
-      [tenantId]
-    );
-    if (tenantCheck.rows.length === 0) {
-      return { ok: false, error: 'tenant_not_found' };
-    }
-  }
-
-  const usernameCheckParams = userId ? [username, userId] : [username];
-  const usernameCheckSql = userId
-    ? `SELECT id FROM saas.users WHERE username = $1 AND id <> $2 LIMIT 1`
-    : `SELECT id FROM saas.users WHERE username = $1 LIMIT 1`;
-
-  const usernameCheck = await pool.query(usernameCheckSql, usernameCheckParams);
-  if (usernameCheck.rows.length > 0) {
-    return { ok: false, error: 'username_already_exists' };
-  }
-
-  const isActive =
-    payload.is_active === undefined ? true : Boolean(payload.is_active);
-  const isBlocked =
-    payload.is_blocked === undefined ? false : Boolean(payload.is_blocked);
-
-  return {
-    ok: true,
-    data: {
-      tenant_id: tenantId,
-      username,
-      full_name: fullName,
-      role,
-      is_active: isActive,
-      is_blocked: isBlocked
-    }
-  };
-}
-
-/* =========================================================
-   TENANTS
-========================================================= */
-
-router.get('/tenants', async (req, res) => {
+async function logOwnerAction({
+  req,
+  actionCode,
+  entityType,
+  entityId,
+  entityLabel,
+  details = {},
+  tenantId = null,
+}) {
   try {
-    const { rows } = await pool.query(`
+    await pool.query(
+      `
+        INSERT INTO audit.activity_log (
+          tenant_id,
+          user_id,
+          action_code,
+          entity_type,
+          entity_id,
+          entity_label,
+          details_json,
+          ip_address,
+          user_agent
+        )
+        VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9)
+      `,
+      [
+        tenantId,
+        req.user?.id || null,
+        actionCode,
+        entityType || null,
+        entityId ? String(entityId) : null,
+        entityLabel || null,
+        JSON.stringify(details || {}),
+        req.ip || null,
+        req.headers['user-agent'] || null,
+      ]
+    );
+  } catch (error) {
+    console.error('[owner-admin.logOwnerAction] error:', error);
+  }
+}
+
+async function getTenantById(id) {
+  const { rows } = await pool.query(
+    `
       SELECT
-        t.*,
-        (
-          SELECT COUNT(*)
-          FROM saas.users u
-          WHERE u.tenant_id = t.id
-        )::int AS users_count
+        t.id,
+        t.name,
+        t.slug,
+        t.code,
+        t.status,
+        t.subscription_status,
+        t.plan_code,
+        t.tariff_name,
+        t.tariff_id,
+        t.contact_name,
+        t.contact_phone,
+        t.contact_email,
+        t.phone,
+        t.email,
+        t.comment,
+        t.subscription_start_at,
+        t.subscription_end_at,
+        t.max_users,
+        t.max_sku,
+        t.max_locations,
+        t.enabled_modules,
+        t.is_active,
+        t.is_blocked,
+        t.block_reason,
+        t.showcase_enabled,
+        t.showcase_slug,
+        t.showcase_settings,
+        t.created_at,
+        t.updated_at
       FROM saas.tenants t
-      ORDER BY t.id DESC
-    `);
+      WHERE t.id = $1
+      LIMIT 1
+    `,
+    [id]
+  );
 
-    return res.json({
-      ok: true,
-      tenants: rows.map((row) => ({
-        ...buildTenantResponse(row),
-        users_count: row.users_count
-      }))
-    });
-  } catch (error) {
-    console.error('[GET /owner-admin/tenants] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error' });
-  }
-});
+  return rows[0] || null;
+}
 
-router.get('/tenants/:id', async (req, res) => {
-  try {
-    const tenantId = Number(req.params.id);
-    if (!tenantId) {
-      return res.status(400).json({ ok: false, error: 'invalid_tenant_id' });
-    }
-
-    const tenantResult = await pool.query(
-      `SELECT * FROM saas.tenants WHERE id = $1 LIMIT 1`,
-      [tenantId]
-    );
-
-    if (tenantResult.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: 'tenant_not_found' });
-    }
-
-    const usersResult = await pool.query(
-      `
-      SELECT id, tenant_id, username, full_name, role, is_active, is_blocked, last_login_at, created_at, updated_at
-      FROM saas.users
-      WHERE tenant_id = $1
-      ORDER BY id DESC
-      `,
-      [tenantId]
-    );
-
-    return res.json({
-      ok: true,
-      tenant: buildTenantResponse(tenantResult.rows[0]),
-      users: usersResult.rows.map(buildUserResponse)
-    });
-  } catch (error) {
-    console.error('[GET /owner-admin/tenants/:id] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error' });
-  }
-});
-
-router.post('/tenants', async (req, res) => {
-  try {
-    const validated = await validateTenantPayload(req.body || {});
-    if (!validated.ok) {
-      return res.status(400).json({ ok: false, error: validated.error });
-    }
-
-    const d = validated.data;
-
-    const { rows } = await pool.query(
-      `
-      INSERT INTO saas.tenants (
-        name,
-        slug,
-        status,
-        plan_code,
-        contact_name,
-        contact_phone,
-        contact_email,
-        comment,
-        code,
-        phone,
-        email,
-        tariff_name,
-        subscription_status,
-        subscription_start_at,
-        subscription_end_at,
-        max_sku,
-        max_locations,
-        enabled_modules,
-        is_active,
-        is_blocked,
-        block_reason,
-        created_at,
-        updated_at
-      )
-      VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8,
-        $9, $10, $11, $12, $13, $14, $15,
-        $16, $17, $18::jsonb, $19, $20, $21,
-        NOW(), NOW()
-      )
-      RETURNING *
-      `,
-      [
-        d.name,
-        d.slug,
-        d.status,
-        d.plan_code,
-        d.contact_name,
-        d.contact_phone,
-        d.contact_email,
-        d.comment,
-        d.code,
-        d.phone,
-        d.email,
-        d.tariff_name,
-        d.subscription_status,
-        d.subscription_start_at,
-        d.subscription_end_at,
-        d.max_sku,
-        d.max_locations,
-        d.enabled_modules,
-        d.is_active,
-        d.is_blocked,
-        d.block_reason
-      ]
-    );
-
-    return res.status(201).json({
-      ok: true,
-      tenant: buildTenantResponse(rows[0])
-    });
-  } catch (error) {
-    console.error('[POST /owner-admin/tenants] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error', details: error.message });
-  }
-});
-
-router.put('/tenants/:id', async (req, res) => {
-  try {
-    const tenantId = Number(req.params.id);
-    if (!tenantId) {
-      return res.status(400).json({ ok: false, error: 'invalid_tenant_id' });
-    }
-
-    const exists = await pool.query(
-      `SELECT id FROM saas.tenants WHERE id = $1 LIMIT 1`,
-      [tenantId]
-    );
-    if (exists.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: 'tenant_not_found' });
-    }
-
-    const validated = await validateTenantPayload(req.body || {}, tenantId);
-    if (!validated.ok) {
-      return res.status(400).json({ ok: false, error: validated.error });
-    }
-
-    const d = validated.data;
-
-    const { rows } = await pool.query(
-      `
-      UPDATE saas.tenants
-      SET
-        name = $1,
-        slug = $2,
-        status = $3,
-        plan_code = $4,
-        contact_name = $5,
-        contact_phone = $6,
-        contact_email = $7,
-        comment = $8,
-        code = $9,
-        phone = $10,
-        email = $11,
-        tariff_name = $12,
-        subscription_status = $13,
-        subscription_start_at = $14,
-        subscription_end_at = $15,
-        max_sku = $16,
-        max_locations = $17,
-        enabled_modules = $18::jsonb,
-        is_active = $19,
-        is_blocked = $20,
-        block_reason = $21,
-        updated_at = NOW()
-      WHERE id = $22
-      RETURNING *
-      `,
-      [
-        d.name,
-        d.slug,
-        d.status,
-        d.plan_code,
-        d.contact_name,
-        d.contact_phone,
-        d.contact_email,
-        d.comment,
-        d.code,
-        d.phone,
-        d.email,
-        d.tariff_name,
-        d.subscription_status,
-        d.subscription_start_at,
-        d.subscription_end_at,
-        d.max_sku,
-        d.max_locations,
-        d.enabled_modules,
-        d.is_active,
-        d.is_blocked,
-        d.block_reason,
-        tenantId
-      ]
-    );
-
-    return res.json({
-      ok: true,
-      tenant: buildTenantResponse(rows[0])
-    });
-  } catch (error) {
-    console.error('[PUT /owner-admin/tenants/:id] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error', details: error.message });
-  }
-});
-
-router.patch('/tenants/:id/toggle-active', async (req, res) => {
-  try {
-    const tenantId = Number(req.params.id);
-    if (!tenantId) {
-      return res.status(400).json({ ok: false, error: 'invalid_tenant_id' });
-    }
-
-    const existing = await pool.query(
-      `SELECT * FROM saas.tenants WHERE id = $1 LIMIT 1`,
-      [tenantId]
-    );
-
-    if (existing.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: 'tenant_not_found' });
-    }
-
-    const tenant = existing.rows[0];
-    const nextIsActive = !tenant.is_active;
-
-    const { rows } = await pool.query(
-      `
-      UPDATE saas.tenants
-      SET
-        is_active = $2,
-        updated_at = NOW()
-      WHERE id = $1
-      RETURNING *
-      `,
-      [tenantId, nextIsActive]
-    );
-
-    return res.json({
-      ok: true,
-      tenant: buildTenantResponse(rows[0])
-    });
-  } catch (error) {
-    console.error('[PATCH /owner-admin/tenants/:id/toggle-active] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error' });
-  }
-});
-
-router.patch('/tenants/:id/toggle-block', async (req, res) => {
-  try {
-    const tenantId = Number(req.params.id);
-    if (!tenantId) {
-      return res.status(400).json({ ok: false, error: 'invalid_tenant_id' });
-    }
-
-    const existing = await pool.query(
-      `SELECT * FROM saas.tenants WHERE id = $1 LIMIT 1`,
-      [tenantId]
-    );
-
-    if (existing.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: 'tenant_not_found' });
-    }
-
-    const tenant = existing.rows[0];
-    const nextIsBlocked = !tenant.is_blocked;
-    const reason =
-      req.body && req.body.block_reason != null
-        ? String(req.body.block_reason).trim()
-        : null;
-
-    let nextStatus = tenant.status;
-    let nextSubscriptionStatus = tenant.subscription_status;
-    let nextBlockReason = null;
-
-    if (nextIsBlocked) {
-      nextStatus = 'blocked';
-      nextSubscriptionStatus = 'blocked';
-      nextBlockReason = reason || 'manual block';
-    } else {
-      nextStatus = 'active';
-      nextSubscriptionStatus =
-        tenant.subscription_status === 'blocked' ? 'active' : tenant.subscription_status;
-      nextBlockReason = null;
-    }
-
-    const { rows } = await pool.query(
-      `
-      UPDATE saas.tenants
-      SET
-        is_blocked = $2,
-        block_reason = $3,
-        status = $4,
-        subscription_status = $5,
-        updated_at = NOW()
-      WHERE id = $1
-      RETURNING *
-      `,
-      [tenantId, nextIsBlocked, nextBlockReason, nextStatus, nextSubscriptionStatus]
-    );
-
-    return res.json({
-      ok: true,
-      tenant: buildTenantResponse(rows[0])
-    });
-  } catch (error) {
-    console.error('[PATCH /owner-admin/tenants/:id/toggle-block] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error', details: error.message });
-  }
-});
-
-/* =========================================================
-   USERS
-========================================================= */
-
-router.get('/users', async (req, res) => {
-  try {
-    const { rows } = await pool.query(`
+async function getUserById(id) {
+  const { rows } = await pool.query(
+    `
       SELECT
         u.id,
-        u.tenant_id,
         u.username,
         u.full_name,
         u.role,
+        u.tenant_id,
+        u.email,
+        u.phone,
         u.is_active,
         u.is_blocked,
         u.last_login_at,
@@ -636,282 +166,1487 @@ router.get('/users', async (req, res) => {
         u.updated_at,
         t.name AS tenant_name
       FROM saas.users u
-      LEFT JOIN saas.tenants t ON t.id = u.tenant_id
-      ORDER BY u.id DESC
-    `);
-
-    return res.json({
-      ok: true,
-      users: rows.map((row) => ({
-        ...buildUserResponse(row),
-        tenant_name: row.tenant_name
-      }))
-    });
-  } catch (error) {
-    console.error('[GET /owner-admin/users] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error' });
-  }
-});
-
-router.get('/users/:id', async (req, res) => {
-  try {
-    const userId = Number(req.params.id);
-    if (!userId) {
-      return res.status(400).json({ ok: false, error: 'invalid_user_id' });
-    }
-
-    const { rows } = await pool.query(
-      `
-      SELECT
-        u.id,
-        u.tenant_id,
-        u.username,
-        u.full_name,
-        u.role,
-        u.is_active,
-        u.is_blocked,
-        u.last_login_at,
-        u.created_at,
-        u.updated_at,
-        t.name AS tenant_name
-      FROM saas.users u
-      LEFT JOIN saas.tenants t ON t.id = u.tenant_id
+      LEFT JOIN saas.tenants t
+        ON t.id = u.tenant_id
       WHERE u.id = $1
       LIMIT 1
-      `,
-      [userId]
-    );
+    `,
+    [id]
+  );
 
-    if (rows.length === 0) {
-      return res.status(404).json({ ok: false, error: 'user_not_found' });
-    }
+  return rows[0] || null;
+}
 
-    return res.json({
-      ok: true,
-      user: {
-        ...buildUserResponse(rows[0]),
-        tenant_name: rows[0].tenant_name
+router.get(
+  '/tenants',
+  requirePermission('owner.tenants.read'),
+  async (req, res) => {
+    try {
+      const search = normalizeText(req.query.search);
+      const status = normalizeText(req.query.status);
+      const subscriptionStatus = normalizeText(req.query.subscription_status);
+      const isActive = req.query.is_active;
+      const isBlocked = req.query.is_blocked;
+
+      const where = [];
+      const params = [];
+      let p = 1;
+
+      if (search) {
+        where.push(`
+          (
+            t.name ILIKE $${p}
+            OR t.slug ILIKE $${p}
+            OR COALESCE(t.code, '') ILIKE $${p}
+            OR COALESCE(t.phone, '') ILIKE $${p}
+            OR COALESCE(t.email, '') ILIKE $${p}
+            OR COALESCE(t.contact_name, '') ILIKE $${p}
+          )
+        `);
+        params.push(`%${search}%`);
+        p++;
       }
-    });
-  } catch (error) {
-    console.error('[GET /owner-admin/users/:id] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error' });
+
+      if (status) {
+        where.push(`t.status = $${p}`);
+        params.push(status);
+        p++;
+      }
+
+      if (subscriptionStatus) {
+        where.push(`t.subscription_status = $${p}`);
+        params.push(subscriptionStatus);
+        p++;
+      }
+
+      if (isActive !== undefined && isActive !== '') {
+        where.push(`t.is_active = $${p}`);
+        params.push(toBool(isActive));
+        p++;
+      }
+
+      if (isBlocked !== undefined && isBlocked !== '') {
+        where.push(`t.is_blocked = $${p}`);
+        params.push(toBool(isBlocked));
+        p++;
+      }
+
+      const sql = `
+        SELECT
+          t.id,
+          t.name,
+          t.slug,
+          t.code,
+          t.status,
+          t.subscription_status,
+          t.plan_code,
+          t.tariff_name,
+          t.tariff_id,
+          tr.code AS tariff_code,
+          tr.name AS tariff_title,
+          t.contact_name,
+          t.contact_phone,
+          t.contact_email,
+          t.phone,
+          t.email,
+          t.comment,
+          t.subscription_start_at,
+          t.subscription_end_at,
+          t.max_users,
+          t.max_sku,
+          t.max_locations,
+          t.enabled_modules,
+          t.is_active,
+          t.is_blocked,
+          t.block_reason,
+          t.showcase_enabled,
+          t.showcase_slug,
+          t.showcase_settings,
+          t.created_at,
+          t.updated_at,
+          COALESCE(u.users_count, 0) AS users_count
+        FROM saas.tenants t
+        LEFT JOIN saas.tariffs tr
+          ON tr.id = t.tariff_id
+        LEFT JOIN (
+          SELECT tenant_id, COUNT(*)::int AS users_count
+          FROM saas.users
+          GROUP BY tenant_id
+        ) u
+          ON u.tenant_id = t.id
+        ${where.length ? `WHERE ${where.join(' AND ')}` : ''}
+        ORDER BY t.id DESC
+      `;
+
+      const { rows } = await pool.query(sql, params);
+
+      return res.json({
+        ok: true,
+        tenants: rows,
+      });
+    } catch (error) {
+      console.error('[owner-admin.GET /tenants] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_tenants_list_failed',
+        message: 'Не удалось получить список клиентов',
+      });
+    }
   }
-});
+);
 
-router.post('/users', async (req, res) => {
-  try {
-    const password = String(req.body?.password || '').trim();
-    if (!password || password.length < 4) {
-      return res.status(400).json({ ok: false, error: 'invalid_password' });
+router.get(
+  '/tenants/:id',
+  requirePermission('owner.tenants.read'),
+  async (req, res) => {
+    try {
+      const tenantId = parseIntOrNull(req.params.id);
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: 'tenant_id_invalid',
+          message: 'Некорректный tenant_id',
+        });
+      }
+
+      const { rows } = await pool.query(
+        `
+          SELECT
+            t.id,
+            t.name,
+            t.slug,
+            t.code,
+            t.status,
+            t.subscription_status,
+            t.plan_code,
+            t.tariff_name,
+            t.tariff_id,
+            tr.code AS tariff_code,
+            tr.name AS tariff_title,
+            t.contact_name,
+            t.contact_phone,
+            t.contact_email,
+            t.phone,
+            t.email,
+            t.comment,
+            t.subscription_start_at,
+            t.subscription_end_at,
+            t.max_users,
+            t.max_sku,
+            t.max_locations,
+            t.enabled_modules,
+            t.is_active,
+            t.is_blocked,
+            t.block_reason,
+            t.showcase_enabled,
+            t.showcase_slug,
+            t.showcase_settings,
+            t.created_at,
+            t.updated_at
+          FROM saas.tenants t
+          LEFT JOIN saas.tariffs tr
+            ON tr.id = t.tariff_id
+          WHERE t.id = $1
+          LIMIT 1
+        `,
+        [tenantId]
+      );
+
+      const tenant = rows[0];
+      if (!tenant) {
+        return res.status(404).json({
+          ok: false,
+          error: 'tenant_not_found',
+          message: 'Клиент не найден',
+        });
+      }
+
+      return res.json({
+        ok: true,
+        tenant,
+      });
+    } catch (error) {
+      console.error('[owner-admin.GET /tenants/:id] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_tenant_read_failed',
+        message: 'Не удалось получить клиента',
+      });
     }
-
-    const validated = await validateUserPayload(req.body || {});
-    if (!validated.ok) {
-      return res.status(400).json({ ok: false, error: validated.error });
-    }
-
-    const d = validated.data;
-    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-
-    const { rows } = await pool.query(
-      `
-      INSERT INTO saas.users (
-        tenant_id,
-        username,
-        password_hash,
-        full_name,
-        role,
-        is_active,
-        is_blocked,
-        created_at,
-        updated_at
-      )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
-      RETURNING id, tenant_id, username, full_name, role, is_active, is_blocked, last_login_at, created_at, updated_at
-      `,
-      [
-        d.tenant_id,
-        d.username,
-        passwordHash,
-        d.full_name,
-        d.role,
-        d.is_active,
-        d.is_blocked
-      ]
-    );
-
-    return res.status(201).json({
-      ok: true,
-      user: buildUserResponse(rows[0])
-    });
-  } catch (error) {
-    console.error('[POST /owner-admin/users] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error', details: error.message });
   }
-});
+);
 
-router.put('/users/:id', async (req, res) => {
-  try {
-    const userId = Number(req.params.id);
-    if (!userId) {
-      return res.status(400).json({ ok: false, error: 'invalid_user_id' });
+router.post(
+  '/tenants',
+  requirePermission('owner.tenants.create'),
+  async (req, res) => {
+    try {
+      const name = normalizeText(req.body.name);
+      let slug = normalizeText(req.body.slug);
+      const code = normalizeNullableText(req.body.code);
+      const planCode = normalizeText(req.body.plan_code, 'basic');
+      const tariffName = normalizeText(req.body.tariff_name, 'basic');
+      let subscriptionStatus = normalizeText(req.body.subscription_status, 'trial');
+      const contactName = normalizeNullableText(req.body.contact_name);
+      const contactPhone = normalizeNullableText(req.body.contact_phone);
+      const contactEmail = normalizeNullableText(req.body.contact_email);
+      const phone = normalizeNullableText(req.body.phone);
+      const email = normalizeNullableText(req.body.email);
+      const comment = normalizeNullableText(req.body.comment);
+      const subscriptionStartAt = req.body.subscription_start_at || null;
+      const subscriptionEndAt = req.body.subscription_end_at || null;
+      const maxUsers = parseIntOrNull(req.body.max_users) ?? 3;
+      const maxSku = parseIntOrNull(req.body.max_sku) ?? 1000;
+      const maxLocations = parseIntOrNull(req.body.max_locations) ?? 10;
+      const enabledModules = parseJsonArray(req.body.enabled_modules, []);
+      const isActive = req.body.is_active === undefined ? true : toBool(req.body.is_active, true);
+      const isBlocked = req.body.is_blocked === undefined ? false : toBool(req.body.is_blocked, false);
+      const blockReason = normalizeNullableText(req.body.block_reason);
+      const tariffId = parseIntOrNull(req.body.tariff_id);
+      const showcaseEnabled = toBool(req.body.showcase_enabled, false);
+      const showcaseSlug = normalizeNullableText(req.body.showcase_slug);
+      const showcaseSettings =
+        req.body.showcase_settings && typeof req.body.showcase_settings === 'object'
+          ? req.body.showcase_settings
+          : {};
+
+      if (!name) {
+        return res.status(400).json({
+          ok: false,
+          error: 'name_required',
+          message: 'Название клиента обязательно',
+        });
+      }
+
+      if (!slug) {
+        slug = slugify(name);
+      }
+
+      if (!slug) {
+        return res.status(400).json({
+          ok: false,
+          error: 'slug_required',
+          message: 'Slug обязателен',
+        });
+      }
+
+      if (!['trial', 'active', 'expired', 'blocked'].includes(subscriptionStatus)) {
+        subscriptionStatus = 'trial';
+      }
+
+      const status = deriveTenantStatus({
+        is_blocked: isBlocked,
+        subscription_status: subscriptionStatus,
+      });
+
+      const duplicateSlug = await pool.query(
+        `SELECT 1 FROM saas.tenants WHERE slug = $1 LIMIT 1`,
+        [slug]
+      );
+
+      if (duplicateSlug.rows.length) {
+        return res.status(409).json({
+          ok: false,
+          error: 'slug_exists',
+          message: 'Клиент с таким slug уже существует',
+        });
+      }
+
+      const { rows } = await pool.query(
+        `
+          INSERT INTO saas.tenants (
+            name,
+            slug,
+            code,
+            status,
+            plan_code,
+            tariff_name,
+            tariff_id,
+            contact_name,
+            contact_phone,
+            contact_email,
+            phone,
+            email,
+            comment,
+            subscription_status,
+            subscription_start_at,
+            subscription_end_at,
+            max_users,
+            max_sku,
+            max_locations,
+            enabled_modules,
+            is_active,
+            is_blocked,
+            block_reason,
+            showcase_enabled,
+            showcase_slug,
+            showcase_settings
+          )
+          VALUES (
+            $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
+            $11,$12,$13,$14,$15,$16,$17,$18,$19,$20::jsonb,
+            $21,$22,$23,$24,$25,$26::jsonb
+          )
+          RETURNING *
+        `,
+        [
+          name,
+          slug,
+          code,
+          status,
+          planCode,
+          tariffName,
+          tariffId,
+          contactName,
+          contactPhone,
+          contactEmail,
+          phone,
+          email,
+          comment,
+          subscriptionStatus,
+          subscriptionStartAt,
+          subscriptionEndAt,
+          maxUsers,
+          maxSku,
+          maxLocations,
+          JSON.stringify(enabledModules),
+          isActive,
+          isBlocked,
+          blockReason,
+          showcaseEnabled,
+          showcaseSlug,
+          JSON.stringify(showcaseSettings),
+        ]
+      );
+
+      const tenant = rows[0];
+
+      await logOwnerAction({
+        req,
+        actionCode: 'owner.tenant.create',
+        entityType: 'tenant',
+        entityId: tenant.id,
+        entityLabel: tenant.name,
+        details: {
+          subscription_status: tenant.subscription_status,
+          tariff_id: tenant.tariff_id,
+          max_users: tenant.max_users,
+          max_sku: tenant.max_sku,
+          max_locations: tenant.max_locations,
+        },
+      });
+
+      return res.status(201).json({
+        ok: true,
+        tenant,
+      });
+    } catch (error) {
+      console.error('[owner-admin.POST /tenants] error:', error);
+
+      if (String(error.message || '').includes('duplicate key')) {
+        return res.status(409).json({
+          ok: false,
+          error: 'tenant_duplicate',
+          message: 'Клиент с такими данными уже существует',
+        });
+      }
+
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_tenant_create_failed',
+        message: 'Не удалось создать клиента',
+      });
     }
-
-    const exists = await pool.query(
-      `SELECT id FROM saas.users WHERE id = $1 LIMIT 1`,
-      [userId]
-    );
-    if (exists.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: 'user_not_found' });
-    }
-
-    const validated = await validateUserPayload(req.body || {}, userId);
-    if (!validated.ok) {
-      return res.status(400).json({ ok: false, error: validated.error });
-    }
-
-    const d = validated.data;
-
-    const { rows } = await pool.query(
-      `
-      UPDATE saas.users
-      SET
-        tenant_id = $1,
-        username = $2,
-        full_name = $3,
-        role = $4,
-        is_active = $5,
-        is_blocked = $6,
-        updated_at = NOW()
-      WHERE id = $7
-      RETURNING id, tenant_id, username, full_name, role, is_active, is_blocked, last_login_at, created_at, updated_at
-      `,
-      [
-        d.tenant_id,
-        d.username,
-        d.full_name,
-        d.role,
-        d.is_active,
-        d.is_blocked,
-        userId
-      ]
-    );
-
-    return res.json({
-      ok: true,
-      user: buildUserResponse(rows[0])
-    });
-  } catch (error) {
-    console.error('[PUT /owner-admin/users/:id] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error' });
   }
-});
+);
 
-router.patch('/users/:id/toggle-active', async (req, res) => {
-  try {
-    const userId = Number(req.params.id);
-    if (!userId) {
-      return res.status(400).json({ ok: false, error: 'invalid_user_id' });
+router.put(
+  '/tenants/:id',
+  requirePermission('owner.tenants.update'),
+  async (req, res) => {
+    try {
+      const tenantId = parseIntOrNull(req.params.id);
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: 'tenant_id_invalid',
+          message: 'Некорректный tenant_id',
+        });
+      }
+
+      const current = await getTenantById(tenantId);
+      if (!current) {
+        return res.status(404).json({
+          ok: false,
+          error: 'tenant_not_found',
+          message: 'Клиент не найден',
+        });
+      }
+
+      const name = normalizeText(req.body.name);
+      let slug = normalizeText(req.body.slug);
+      const code = normalizeNullableText(req.body.code);
+      const planCode = normalizeText(req.body.plan_code, current.plan_code || 'basic');
+      const tariffName = normalizeText(req.body.tariff_name, current.tariff_name || 'basic');
+      let subscriptionStatus = normalizeText(
+        req.body.subscription_status,
+        current.subscription_status || 'trial'
+      );
+      const contactName = normalizeNullableText(
+        req.body.contact_name !== undefined ? req.body.contact_name : current.contact_name
+      );
+      const contactPhone = normalizeNullableText(
+        req.body.contact_phone !== undefined ? req.body.contact_phone : current.contact_phone
+      );
+      const contactEmail = normalizeNullableText(
+        req.body.contact_email !== undefined ? req.body.contact_email : current.contact_email
+      );
+      const phone = normalizeNullableText(
+        req.body.phone !== undefined ? req.body.phone : current.phone
+      );
+      const email = normalizeNullableText(
+        req.body.email !== undefined ? req.body.email : current.email
+      );
+      const comment = normalizeNullableText(
+        req.body.comment !== undefined ? req.body.comment : current.comment
+      );
+      const subscriptionStartAt =
+        req.body.subscription_start_at !== undefined
+          ? req.body.subscription_start_at
+          : current.subscription_start_at;
+      const subscriptionEndAt =
+        req.body.subscription_end_at !== undefined
+          ? req.body.subscription_end_at
+          : current.subscription_end_at;
+      const maxUsers = parseIntOrNull(
+        req.body.max_users !== undefined ? req.body.max_users : current.max_users
+      );
+      const maxSku = parseIntOrNull(
+        req.body.max_sku !== undefined ? req.body.max_sku : current.max_sku
+      );
+      const maxLocations = parseIntOrNull(
+        req.body.max_locations !== undefined ? req.body.max_locations : current.max_locations
+      );
+      const enabledModules =
+        req.body.enabled_modules !== undefined
+          ? parseJsonArray(req.body.enabled_modules, [])
+          : Array.isArray(current.enabled_modules)
+          ? current.enabled_modules
+          : [];
+      const isActive =
+        req.body.is_active !== undefined ? toBool(req.body.is_active) : current.is_active;
+      const isBlocked =
+        req.body.is_blocked !== undefined ? toBool(req.body.is_blocked) : current.is_blocked;
+      const blockReason = normalizeNullableText(
+        req.body.block_reason !== undefined ? req.body.block_reason : current.block_reason
+      );
+      const tariffId =
+        req.body.tariff_id !== undefined
+          ? parseIntOrNull(req.body.tariff_id)
+          : current.tariff_id;
+      const showcaseEnabled =
+        req.body.showcase_enabled !== undefined
+          ? toBool(req.body.showcase_enabled)
+          : current.showcase_enabled;
+      const showcaseSlug = normalizeNullableText(
+        req.body.showcase_slug !== undefined ? req.body.showcase_slug : current.showcase_slug
+      );
+      const showcaseSettings =
+        req.body.showcase_settings !== undefined &&
+        req.body.showcase_settings &&
+        typeof req.body.showcase_settings === 'object'
+          ? req.body.showcase_settings
+          : current.showcase_settings || {};
+
+      if (!name) {
+        return res.status(400).json({
+          ok: false,
+          error: 'name_required',
+          message: 'Название клиента обязательно',
+        });
+      }
+
+      if (!slug) {
+        slug = slugify(name);
+      }
+
+      if (!slug) {
+        return res.status(400).json({
+          ok: false,
+          error: 'slug_required',
+          message: 'Slug обязателен',
+        });
+      }
+
+      if (!['trial', 'active', 'expired', 'blocked'].includes(subscriptionStatus)) {
+        subscriptionStatus = current.subscription_status || 'trial';
+      }
+
+      const status = deriveTenantStatus({
+        is_blocked: isBlocked,
+        subscription_status: subscriptionStatus,
+      });
+
+      const duplicateSlug = await pool.query(
+        `SELECT 1 FROM saas.tenants WHERE slug = $1 AND id <> $2 LIMIT 1`,
+        [slug, tenantId]
+      );
+
+      if (duplicateSlug.rows.length) {
+        return res.status(409).json({
+          ok: false,
+          error: 'slug_exists',
+          message: 'Клиент с таким slug уже существует',
+        });
+      }
+
+      const { rows } = await pool.query(
+        `
+          UPDATE saas.tenants
+          SET
+            name = $1,
+            slug = $2,
+            code = $3,
+            status = $4,
+            plan_code = $5,
+            tariff_name = $6,
+            tariff_id = $7,
+            contact_name = $8,
+            contact_phone = $9,
+            contact_email = $10,
+            phone = $11,
+            email = $12,
+            comment = $13,
+            subscription_status = $14,
+            subscription_start_at = $15,
+            subscription_end_at = $16,
+            max_users = $17,
+            max_sku = $18,
+            max_locations = $19,
+            enabled_modules = $20::jsonb,
+            is_active = $21,
+            is_blocked = $22,
+            block_reason = $23,
+            showcase_enabled = $24,
+            showcase_slug = $25,
+            showcase_settings = $26::jsonb
+          WHERE id = $27
+          RETURNING *
+        `,
+        [
+          name,
+          slug,
+          code,
+          status,
+          planCode,
+          tariffName,
+          tariffId,
+          contactName,
+          contactPhone,
+          contactEmail,
+          phone,
+          email,
+          comment,
+          subscriptionStatus,
+          subscriptionStartAt,
+          subscriptionEndAt,
+          maxUsers,
+          maxSku,
+          maxLocations,
+          JSON.stringify(enabledModules),
+          isActive,
+          isBlocked,
+          blockReason,
+          showcaseEnabled,
+          showcaseSlug,
+          JSON.stringify(showcaseSettings),
+          tenantId,
+        ]
+      );
+
+      const tenant = rows[0];
+
+      await logOwnerAction({
+        req,
+        actionCode: 'owner.tenant.update',
+        entityType: 'tenant',
+        entityId: tenant.id,
+        entityLabel: tenant.name,
+        details: {
+          before: current,
+          after: tenant,
+        },
+      });
+
+      return res.json({
+        ok: true,
+        tenant,
+      });
+    } catch (error) {
+      console.error('[owner-admin.PUT /tenants/:id] error:', error);
+
+      if (String(error.message || '').includes('duplicate key')) {
+        return res.status(409).json({
+          ok: false,
+          error: 'tenant_duplicate',
+          message: 'Клиент с такими данными уже существует',
+        });
+      }
+
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_tenant_update_failed',
+        message: 'Не удалось обновить клиента',
+      });
     }
-
-    const { rows } = await pool.query(
-      `
-      UPDATE saas.users
-      SET
-        is_active = NOT is_active,
-        updated_at = NOW()
-      WHERE id = $1
-      RETURNING id, tenant_id, username, full_name, role, is_active, is_blocked, last_login_at, created_at, updated_at
-      `,
-      [userId]
-    );
-
-    if (rows.length === 0) {
-      return res.status(404).json({ ok: false, error: 'user_not_found' });
-    }
-
-    return res.json({
-      ok: true,
-      user: buildUserResponse(rows[0])
-    });
-  } catch (error) {
-    console.error('[PATCH /owner-admin/users/:id/toggle-active] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error' });
   }
-});
+);
 
-router.patch('/users/:id/toggle-block', async (req, res) => {
-  try {
-    const userId = Number(req.params.id);
-    if (!userId) {
-      return res.status(400).json({ ok: false, error: 'invalid_user_id' });
+router.patch(
+  '/tenants/:id/toggle-active',
+  requirePermission('owner.tenants.update'),
+  async (req, res) => {
+    try {
+      const tenantId = parseIntOrNull(req.params.id);
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: 'tenant_id_invalid',
+          message: 'Некорректный tenant_id',
+        });
+      }
+
+      const current = await getTenantById(tenantId);
+      if (!current) {
+        return res.status(404).json({
+          ok: false,
+          error: 'tenant_not_found',
+          message: 'Клиент не найден',
+        });
+      }
+
+      const nextIsActive = !current.is_active;
+
+      const { rows } = await pool.query(
+        `
+          UPDATE saas.tenants
+          SET is_active = $1
+          WHERE id = $2
+          RETURNING *
+        `,
+        [nextIsActive, tenantId]
+      );
+
+      const tenant = rows[0];
+
+      await logOwnerAction({
+        req,
+        actionCode: 'owner.tenant.toggle_active',
+        entityType: 'tenant',
+        entityId: tenant.id,
+        entityLabel: tenant.name,
+        details: {
+          before_is_active: current.is_active,
+          after_is_active: tenant.is_active,
+        },
+      });
+
+      return res.json({
+        ok: true,
+        tenant,
+      });
+    } catch (error) {
+      console.error('[owner-admin.PATCH /tenants/:id/toggle-active] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_tenant_toggle_active_failed',
+        message: 'Не удалось изменить активность клиента',
+      });
     }
-
-    const { rows } = await pool.query(
-      `
-      UPDATE saas.users
-      SET
-        is_blocked = NOT is_blocked,
-        updated_at = NOW()
-      WHERE id = $1
-      RETURNING id, tenant_id, username, full_name, role, is_active, is_blocked, last_login_at, created_at, updated_at
-      `,
-      [userId]
-    );
-
-    if (rows.length === 0) {
-      return res.status(404).json({ ok: false, error: 'user_not_found' });
-    }
-
-    return res.json({
-      ok: true,
-      user: buildUserResponse(rows[0])
-    });
-  } catch (error) {
-    console.error('[PATCH /owner-admin/users/:id/toggle-block] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error' });
   }
-});
+);
 
-router.post('/users/:id/reset-password', async (req, res) => {
-  try {
-    const userId = Number(req.params.id);
-    if (!userId) {
-      return res.status(400).json({ ok: false, error: 'invalid_user_id' });
+router.patch(
+  '/tenants/:id/toggle-block',
+  requirePermission('owner.tenants.update'),
+  async (req, res) => {
+    try {
+      const tenantId = parseIntOrNull(req.params.id);
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: 'tenant_id_invalid',
+          message: 'Некорректный tenant_id',
+        });
+      }
+
+      const current = await getTenantById(tenantId);
+      if (!current) {
+        return res.status(404).json({
+          ok: false,
+          error: 'tenant_not_found',
+          message: 'Клиент не найден',
+        });
+      }
+
+      const nextBlocked = !current.is_blocked;
+      const reasonFromBody = normalizeNullableText(req.body.block_reason);
+
+      let nextSubscriptionStatus = current.subscription_status;
+      let nextBlockReason = current.block_reason;
+
+      if (nextBlocked) {
+        nextSubscriptionStatus = 'blocked';
+        nextBlockReason = reasonFromBody || current.block_reason || 'Заблокировано owner';
+      } else {
+        nextSubscriptionStatus =
+          current.subscription_status === 'blocked' ? 'active' : current.subscription_status;
+        nextBlockReason = null;
+      }
+
+      const nextStatus = deriveTenantStatus({
+        is_blocked: nextBlocked,
+        subscription_status: nextSubscriptionStatus,
+      });
+
+      const { rows } = await pool.query(
+        `
+          UPDATE saas.tenants
+          SET
+            is_blocked = $1,
+            status = $2,
+            subscription_status = $3,
+            block_reason = $4
+          WHERE id = $5
+          RETURNING *
+        `,
+        [nextBlocked, nextStatus, nextSubscriptionStatus, nextBlockReason, tenantId]
+      );
+
+      const tenant = rows[0];
+
+      await logOwnerAction({
+        req,
+        actionCode: 'owner.tenant.toggle_block',
+        entityType: 'tenant',
+        entityId: tenant.id,
+        entityLabel: tenant.name,
+        details: {
+          before_is_blocked: current.is_blocked,
+          after_is_blocked: tenant.is_blocked,
+          before_subscription_status: current.subscription_status,
+          after_subscription_status: tenant.subscription_status,
+          block_reason: tenant.block_reason,
+        },
+      });
+
+      return res.json({
+        ok: true,
+        tenant,
+      });
+    } catch (error) {
+      console.error('[owner-admin.PATCH /tenants/:id/toggle-block] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_tenant_toggle_block_failed',
+        message: 'Не удалось изменить блокировку клиента',
+      });
     }
-
-    const newPassword = String(req.body?.password || '').trim();
-    if (!newPassword || newPassword.length < 4) {
-      return res.status(400).json({ ok: false, error: 'invalid_password' });
-    }
-
-    const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
-
-    const { rows } = await pool.query(
-      `
-      UPDATE saas.users
-      SET
-        password_hash = $1,
-        updated_at = NOW()
-      WHERE id = $2
-      RETURNING id, tenant_id, username, full_name, role, is_active, is_blocked, last_login_at, created_at, updated_at
-      `,
-      [passwordHash, userId]
-    );
-
-    if (rows.length === 0) {
-      return res.status(404).json({ ok: false, error: 'user_not_found' });
-    }
-
-    return res.json({
-      ok: true,
-      user: buildUserResponse(rows[0])
-    });
-  } catch (error) {
-    console.error('[POST /owner-admin/users/:id/reset-password] error:', error);
-    return res.status(500).json({ ok: false, error: 'internal_error' });
   }
-});
+);
+
+router.get(
+  '/users',
+  requirePermission('owner.users.read'),
+  async (req, res) => {
+    try {
+      const search = normalizeText(req.query.search);
+      const role = normalizeText(req.query.role);
+      const tenantId = parseIntOrNull(req.query.tenant_id);
+      const isActive = req.query.is_active;
+      const isBlocked = req.query.is_blocked;
+
+      const where = [];
+      const params = [];
+      let p = 1;
+
+      if (search) {
+        where.push(`
+          (
+            u.username ILIKE $${p}
+            OR u.full_name ILIKE $${p}
+            OR COALESCE(u.email, '') ILIKE $${p}
+            OR COALESCE(u.phone, '') ILIKE $${p}
+            OR COALESCE(t.name, '') ILIKE $${p}
+          )
+        `);
+        params.push(`%${search}%`);
+        p++;
+      }
+
+      if (role) {
+        where.push(`u.role = $${p}`);
+        params.push(role);
+        p++;
+      }
+
+      if (tenantId) {
+        where.push(`u.tenant_id = $${p}`);
+        params.push(tenantId);
+        p++;
+      }
+
+      if (isActive !== undefined && isActive !== '') {
+        where.push(`u.is_active = $${p}`);
+        params.push(toBool(isActive));
+        p++;
+      }
+
+      if (isBlocked !== undefined && isBlocked !== '') {
+        where.push(`u.is_blocked = $${p}`);
+        params.push(toBool(isBlocked));
+        p++;
+      }
+
+      const sql = `
+        SELECT
+          u.id,
+          u.username,
+          u.full_name,
+          u.role,
+          u.tenant_id,
+          u.email,
+          u.phone,
+          u.is_active,
+          u.is_blocked,
+          u.last_login_at,
+          u.created_at,
+          u.updated_at,
+          t.name AS tenant_name,
+          COALESCE(roles.roles_json, '[]'::json) AS rbac_roles
+        FROM saas.users u
+        LEFT JOIN saas.tenants t
+          ON t.id = u.tenant_id
+        LEFT JOIN (
+          SELECT
+            ur.user_id,
+            json_agg(r.code ORDER BY r.code) AS roles_json
+          FROM saas.user_roles ur
+          JOIN saas.roles r ON r.id = ur.role_id
+          GROUP BY ur.user_id
+        ) roles
+          ON roles.user_id = u.id
+        ${where.length ? `WHERE ${where.join(' AND ')}` : ''}
+        ORDER BY u.id DESC
+      `;
+
+      const { rows } = await pool.query(sql, params);
+
+      return res.json({
+        ok: true,
+        users: rows,
+      });
+    } catch (error) {
+      console.error('[owner-admin.GET /users] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_users_list_failed',
+        message: 'Не удалось получить список пользователей',
+      });
+    }
+  }
+);
+
+router.get(
+  '/users/:id',
+  requirePermission('owner.users.read'),
+  async (req, res) => {
+    try {
+      const userId = parseIntOrNull(req.params.id);
+      if (!userId) {
+        return res.status(400).json({
+          ok: false,
+          error: 'user_id_invalid',
+          message: 'Некорректный user_id',
+        });
+      }
+
+      const { rows } = await pool.query(
+        `
+          SELECT
+            u.id,
+            u.username,
+            u.full_name,
+            u.role,
+            u.tenant_id,
+            u.email,
+            u.phone,
+            u.is_active,
+            u.is_blocked,
+            u.last_login_at,
+            u.created_at,
+            u.updated_at,
+            t.name AS tenant_name,
+            COALESCE(roles.roles_json, '[]'::json) AS rbac_roles
+          FROM saas.users u
+          LEFT JOIN saas.tenants t
+            ON t.id = u.tenant_id
+          LEFT JOIN (
+            SELECT
+              ur.user_id,
+              json_agg(r.code ORDER BY r.code) AS roles_json
+            FROM saas.user_roles ur
+            JOIN saas.roles r ON r.id = ur.role_id
+            GROUP BY ur.user_id
+          ) roles
+            ON roles.user_id = u.id
+          WHERE u.id = $1
+          LIMIT 1
+        `,
+        [userId]
+      );
+
+      const user = rows[0];
+      if (!user) {
+        return res.status(404).json({
+          ok: false,
+          error: 'user_not_found',
+          message: 'Пользователь не найден',
+        });
+      }
+
+      return res.json({
+        ok: true,
+        user,
+      });
+    } catch (error) {
+      console.error('[owner-admin.GET /users/:id] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_user_read_failed',
+        message: 'Не удалось получить пользователя',
+      });
+    }
+  }
+);
+
+router.post(
+  '/users',
+  requirePermission('owner.users.create'),
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      const username = normalizeText(req.body.username);
+      const password = normalizeText(req.body.password);
+      const fullName = normalizeText(req.body.full_name);
+      const role = normalizeText(req.body.role, 'client');
+      const tenantId = parseIntOrNull(req.body.tenant_id);
+      const email = normalizeNullableText(req.body.email);
+      const phone = normalizeNullableText(req.body.phone);
+      const isActive = req.body.is_active === undefined ? true : toBool(req.body.is_active, true);
+      const isBlocked = req.body.is_blocked === undefined ? false : toBool(req.body.is_blocked, false);
+      const rbacRolesInput = parseJsonArray(req.body.rbac_roles, []);
+
+      if (!username) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          ok: false,
+          error: 'username_required',
+          message: 'Логин обязателен',
+        });
+      }
+
+      if (!password) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          ok: false,
+          error: 'password_required',
+          message: 'Пароль обязателен',
+        });
+      }
+
+      if (!fullName) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          ok: false,
+          error: 'full_name_required',
+          message: 'Имя обязательно',
+        });
+      }
+
+      const duplicate = await client.query(
+        `SELECT 1 FROM saas.users WHERE username = $1 LIMIT 1`,
+        [username]
+      );
+
+      if (duplicate.rows.length) {
+        await client.query('ROLLBACK');
+        return res.status(409).json({
+          ok: false,
+          error: 'username_exists',
+          message: 'Пользователь с таким логином уже существует',
+        });
+      }
+
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      const insertResult = await client.query(
+        `
+          INSERT INTO saas.users (
+            username,
+            password_hash,
+            full_name,
+            role,
+            tenant_id,
+            email,
+            phone,
+            is_active,
+            is_blocked
+          )
+          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+          RETURNING id, username, full_name, role, tenant_id, email, phone, is_active, is_blocked, created_at, updated_at
+        `,
+        [
+          username,
+          passwordHash,
+          fullName,
+          role,
+          tenantId,
+          email,
+          phone,
+          isActive,
+          isBlocked,
+        ]
+      );
+
+      const user = insertResult.rows[0];
+
+      let roleCodesToAssign = Array.isArray(rbacRolesInput) && rbacRolesInput.length
+        ? rbacRolesInput
+        : role === 'owner'
+        ? ['owner']
+        : ['tenant_owner'];
+
+      roleCodesToAssign = [...new Set(roleCodesToAssign.map((v) => String(v).trim()).filter(Boolean))];
+
+      if (roleCodesToAssign.length) {
+        const rolesResult = await client.query(
+          `
+            SELECT id, code
+            FROM saas.roles
+            WHERE code = ANY($1::text[])
+              AND is_active = TRUE
+          `,
+          [roleCodesToAssign]
+        );
+
+        for (const row of rolesResult.rows) {
+          await client.query(
+            `
+              INSERT INTO saas.user_roles (user_id, role_id)
+              VALUES ($1, $2)
+              ON CONFLICT (user_id, role_id) DO NOTHING
+            `,
+            [user.id, row.id]
+          );
+        }
+      }
+
+      await client.query('COMMIT');
+
+      await logOwnerAction({
+        req,
+        actionCode: 'owner.user.create',
+        entityType: 'user',
+        entityId: user.id,
+        entityLabel: user.username,
+        tenantId: user.tenant_id,
+        details: {
+          role: user.role,
+          rbac_roles: roleCodesToAssign,
+        },
+      });
+
+      return res.status(201).json({
+        ok: true,
+        user,
+      });
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('[owner-admin.POST /users] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_user_create_failed',
+        message: 'Не удалось создать пользователя',
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+router.put(
+  '/users/:id',
+  requirePermission('owner.users.update'),
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      const userId = parseIntOrNull(req.params.id);
+      if (!userId) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          ok: false,
+          error: 'user_id_invalid',
+          message: 'Некорректный user_id',
+        });
+      }
+
+      const current = await getUserById(userId);
+      if (!current) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({
+          ok: false,
+          error: 'user_not_found',
+          message: 'Пользователь не найден',
+        });
+      }
+
+      const username = normalizeText(req.body.username, current.username);
+      const fullName = normalizeText(req.body.full_name, current.full_name);
+      const role = normalizeText(req.body.role, current.role);
+      const tenantId =
+        req.body.tenant_id !== undefined ? parseIntOrNull(req.body.tenant_id) : current.tenant_id;
+      const email = normalizeNullableText(
+        req.body.email !== undefined ? req.body.email : current.email
+      );
+      const phone = normalizeNullableText(
+        req.body.phone !== undefined ? req.body.phone : current.phone
+      );
+      const isActive =
+        req.body.is_active !== undefined ? toBool(req.body.is_active) : current.is_active;
+      const isBlocked =
+        req.body.is_blocked !== undefined ? toBool(req.body.is_blocked) : current.is_blocked;
+      const rbacRolesInput =
+        req.body.rbac_roles !== undefined ? parseJsonArray(req.body.rbac_roles, []) : null;
+
+      if (!username) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          ok: false,
+          error: 'username_required',
+          message: 'Логин обязателен',
+        });
+      }
+
+      if (!fullName) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          ok: false,
+          error: 'full_name_required',
+          message: 'Имя обязательно',
+        });
+      }
+
+      const duplicate = await client.query(
+        `SELECT 1 FROM saas.users WHERE username = $1 AND id <> $2 LIMIT 1`,
+        [username, userId]
+      );
+
+      if (duplicate.rows.length) {
+        await client.query('ROLLBACK');
+        return res.status(409).json({
+          ok: false,
+          error: 'username_exists',
+          message: 'Пользователь с таким логином уже существует',
+        });
+      }
+
+      const { rows } = await client.query(
+        `
+          UPDATE saas.users
+          SET
+            username = $1,
+            full_name = $2,
+            role = $3,
+            tenant_id = $4,
+            email = $5,
+            phone = $6,
+            is_active = $7,
+            is_blocked = $8
+          WHERE id = $9
+          RETURNING id, username, full_name, role, tenant_id, email, phone, is_active, is_blocked, last_login_at, created_at, updated_at
+        `,
+        [username, fullName, role, tenantId, email, phone, isActive, isBlocked, userId]
+      );
+
+      const user = rows[0];
+
+      if (rbacRolesInput !== null) {
+        await client.query(`DELETE FROM saas.user_roles WHERE user_id = $1`, [userId]);
+
+        let roleCodesToAssign = [...new Set(rbacRolesInput.map((v) => String(v).trim()).filter(Boolean))];
+
+        if (!roleCodesToAssign.length) {
+          roleCodesToAssign = role === 'owner' ? ['owner'] : ['tenant_owner'];
+        }
+
+        const rolesResult = await client.query(
+          `
+            SELECT id, code
+            FROM saas.roles
+            WHERE code = ANY($1::text[])
+              AND is_active = TRUE
+          `,
+          [roleCodesToAssign]
+        );
+
+        for (const row of rolesResult.rows) {
+          await client.query(
+            `
+              INSERT INTO saas.user_roles (user_id, role_id)
+              VALUES ($1, $2)
+              ON CONFLICT (user_id, role_id) DO NOTHING
+            `,
+            [userId, row.id]
+          );
+        }
+      }
+
+      await client.query('COMMIT');
+
+      await logOwnerAction({
+        req,
+        actionCode: 'owner.user.update',
+        entityType: 'user',
+        entityId: user.id,
+        entityLabel: user.username,
+        tenantId: user.tenant_id,
+        details: {
+          before: current,
+          after: user,
+          rbac_roles_updated: rbacRolesInput,
+        },
+      });
+
+      return res.json({
+        ok: true,
+        user,
+      });
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('[owner-admin.PUT /users/:id] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_user_update_failed',
+        message: 'Не удалось обновить пользователя',
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+router.patch(
+  '/users/:id/toggle-active',
+  requirePermission('owner.users.update'),
+  async (req, res) => {
+    try {
+      const userId = parseIntOrNull(req.params.id);
+      if (!userId) {
+        return res.status(400).json({
+          ok: false,
+          error: 'user_id_invalid',
+          message: 'Некорректный user_id',
+        });
+      }
+
+      const current = await getUserById(userId);
+      if (!current) {
+        return res.status(404).json({
+          ok: false,
+          error: 'user_not_found',
+          message: 'Пользователь не найден',
+        });
+      }
+
+      const { rows } = await pool.query(
+        `
+          UPDATE saas.users
+          SET is_active = NOT is_active
+          WHERE id = $1
+          RETURNING id, username, full_name, role, tenant_id, email, phone, is_active, is_blocked, last_login_at, created_at, updated_at
+        `,
+        [userId]
+      );
+
+      const user = rows[0];
+
+      await logOwnerAction({
+        req,
+        actionCode: 'owner.user.toggle_active',
+        entityType: 'user',
+        entityId: user.id,
+        entityLabel: user.username,
+        tenantId: user.tenant_id,
+        details: {
+          before_is_active: current.is_active,
+          after_is_active: user.is_active,
+        },
+      });
+
+      return res.json({
+        ok: true,
+        user,
+      });
+    } catch (error) {
+      console.error('[owner-admin.PATCH /users/:id/toggle-active] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_user_toggle_active_failed',
+        message: 'Не удалось изменить активность пользователя',
+      });
+    }
+  }
+);
+
+router.patch(
+  '/users/:id/toggle-block',
+  requirePermission('owner.users.update'),
+  async (req, res) => {
+    try {
+      const userId = parseIntOrNull(req.params.id);
+      if (!userId) {
+        return res.status(400).json({
+          ok: false,
+          error: 'user_id_invalid',
+          message: 'Некорректный user_id',
+        });
+      }
+
+      const current = await getUserById(userId);
+      if (!current) {
+        return res.status(404).json({
+          ok: false,
+          error: 'user_not_found',
+          message: 'Пользователь не найден',
+        });
+      }
+
+      const { rows } = await pool.query(
+        `
+          UPDATE saas.users
+          SET is_blocked = NOT is_blocked
+          WHERE id = $1
+          RETURNING id, username, full_name, role, tenant_id, email, phone, is_active, is_blocked, last_login_at, created_at, updated_at
+        `,
+        [userId]
+      );
+
+      const user = rows[0];
+
+      await logOwnerAction({
+        req,
+        actionCode: 'owner.user.toggle_block',
+        entityType: 'user',
+        entityId: user.id,
+        entityLabel: user.username,
+        tenantId: user.tenant_id,
+        details: {
+          before_is_blocked: current.is_blocked,
+          after_is_blocked: user.is_blocked,
+        },
+      });
+
+      return res.json({
+        ok: true,
+        user,
+      });
+    } catch (error) {
+      console.error('[owner-admin.PATCH /users/:id/toggle-block] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_user_toggle_block_failed',
+        message: 'Не удалось изменить блокировку пользователя',
+      });
+    }
+  }
+);
+
+router.post(
+  '/users/:id/reset-password',
+  requirePermission('owner.users.update'),
+  async (req, res) => {
+    try {
+      const userId = parseIntOrNull(req.params.id);
+      const newPassword = normalizeText(req.body.password);
+
+      if (!userId) {
+        return res.status(400).json({
+          ok: false,
+          error: 'user_id_invalid',
+          message: 'Некорректный user_id',
+        });
+      }
+
+      if (!newPassword) {
+        return res.status(400).json({
+          ok: false,
+          error: 'password_required',
+          message: 'Новый пароль обязателен',
+        });
+      }
+
+      const current = await getUserById(userId);
+      if (!current) {
+        return res.status(404).json({
+          ok: false,
+          error: 'user_not_found',
+          message: 'Пользователь не найден',
+        });
+      }
+
+      const passwordHash = await bcrypt.hash(newPassword, 10);
+
+      await pool.query(
+        `
+          UPDATE saas.users
+          SET password_hash = $1
+          WHERE id = $2
+        `,
+        [passwordHash, userId]
+      );
+
+      await logOwnerAction({
+        req,
+        actionCode: 'owner.user.reset_password',
+        entityType: 'user',
+        entityId: current.id,
+        entityLabel: current.username,
+        tenantId: current.tenant_id,
+        details: {
+          reset_by: req.user?.username || null,
+        },
+      });
+
+      return res.json({
+        ok: true,
+        message: 'Пароль обновлён',
+      });
+    } catch (error) {
+      console.error('[owner-admin.POST /users/:id/reset-password] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'owner_user_reset_password_failed',
+        message: 'Не удалось сбросить пароль',
+      });
+    }
+  }
+);
 
 module.exports = router;
