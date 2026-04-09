@@ -5,6 +5,7 @@
   <title>BFC24 CONTROL — Вход</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="google" content="notranslate" />
+
   <style>
     body {
       margin: 0;
@@ -22,53 +23,64 @@
       background: #fff;
       padding: 30px;
       border-radius: 14px;
-      width: 320px;
+      width: 340px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
     h2 {
       margin: 0 0 20px;
       text-align: center;
-      line-height: 1.2;
     }
 
     .lang-switch {
       display: flex;
       gap: 8px;
-      margin-bottom: 18px;
+      margin-bottom: 12px;
     }
 
     .lang-btn {
       flex: 1;
-      padding: 10px 8px;
+      padding: 8px;
       border-radius: 8px;
       border: 1px solid #cbd5e1;
       background: #e2e8f0;
-      color: #0f172a;
-      font-size: 13px;
-      font-weight: 700;
       cursor: pointer;
-      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-    }
-
-    .lang-btn:hover {
-      background: #dbe4f0;
+      font-weight: bold;
     }
 
     .lang-btn.active {
       background: #2563eb;
-      border-color: #2563eb;
       color: #fff;
+    }
+
+    .mode-switch {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #e2e8f0;
+      font-weight: bold;
+    }
+
+    .mode-btn.active {
+      background: #2563eb;
+      color: white;
     }
 
     input {
       width: 100%;
       padding: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 14px;
-      box-sizing: border-box;
     }
 
     .submit-btn {
@@ -89,91 +101,156 @@
     .error {
       color: red;
       font-size: 13px;
-      margin-bottom: 10px;
       text-align: center;
-      min-height: 16px;
+      margin-bottom: 10px;
+    }
+
+    .success {
+      color: green;
+      font-size: 13px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
+
 <body>
 
 <div class="card">
+
+  <!-- ЯЗЫК -->
   <div class="lang-switch">
-    <button type="button" class="lang-btn" data-lang="ru" data-i18n="common.languageRu">RU</button>
-    <button type="button" class="lang-btn" data-lang="en" data-i18n="common.languageEn">EN</button>
-    <button type="button" class="lang-btn" data-lang="zh" data-i18n="common.languageZh">中文</button>
+    <button type="button" class="lang-btn" data-lang="ru">RU</button>
+    <button type="button" class="lang-btn" data-lang="en">EN</button>
+    <button type="button" class="lang-btn" data-lang="zh">中文</button>
   </div>
 
-  <h2 data-i18n="login.heading">BFC24 CONTROL</h2>
+  <!-- РЕЖИМ -->
+  <div class="mode-switch">
+    <button class="mode-btn active" onclick="setMode('login')">Вход</button>
+    <button class="mode-btn" onclick="setMode('register')">Регистрация</button>
+  </div>
+
+  <h2>BFC24 CONTROL</h2>
 
   <div id="error" class="error"></div>
+  <div id="success" class="success"></div>
 
-  <input id="username" data-i18n-placeholder="login.usernamePlaceholder" autocomplete="username" />
-  <input id="password" type="password" data-i18n-placeholder="login.passwordPlaceholder" autocomplete="current-password" />
+  <!-- LOGIN -->
+  <div id="loginForm">
+    <input id="login_username" placeholder="Логин" />
+    <input id="login_password" type="password" placeholder="Пароль" />
 
-  <button type="button" class="submit-btn" onclick="login()" data-i18n="login.submit">Войти</button>
+    <button class="submit-btn" onclick="login()">Войти</button>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="registerForm" class="hidden">
+    <input id="reg_company" placeholder="Название компании" />
+    <input id="reg_name" placeholder="Имя" />
+    <input id="reg_phone" placeholder="Телефон" />
+    <input id="reg_email" placeholder="Email" />
+    <input id="reg_username" placeholder="Логин" />
+    <input id="reg_password" type="password" placeholder="Пароль" />
+
+    <button class="submit-btn" onclick="register()">Зарегистрироваться</button>
+  </div>
+
 </div>
 
-<script src="/js/config.js"></script>
-<script src="/js/api.js"></script>
-<script src="/js/app-ui.js"></script>
-<script src="/js/i18n.js"></script>
-
 <script>
-  const Ui = window.AppUI || {
-    escapeHtml: (value) => String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;"),
-    translateError: (value) => String(value || "Ошибка")
-  };
+  function setMode(mode) {
+    document.getElementById("error").textContent = "";
+    document.getElementById("success").textContent = "";
 
-  function bindLanguageButtons() {
-    document.querySelectorAll("[data-lang]").forEach((button) => {
-      button.addEventListener("click", () => {
-        i18n.setLang(button.getAttribute("data-lang"));
-      });
-    });
-  }
+    document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
 
-  async function login() {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const errorBox = document.getElementById("error");
-
-    errorBox.textContent = "";
-
-    try {
-      const res = await fetch("/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
-
-      const data = await res.json();
-
-      if (!data.ok) {
-        errorBox.textContent = Ui.translateError(data.error);
-        return;
-      }
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      if (data.user.role === "owner") {
-        window.location.href = "/owner-dashboard.html";
-      } else {
-        window.location.href = "/index.html";
-      }
-    } catch (err) {
-      errorBox.textContent = Ui.translateError(err.message) || i18n.t("common.loginConnectionError");
+    if (mode === "login") {
+      document.getElementById("loginForm").classList.remove("hidden");
+      document.getElementById("registerForm").classList.add("hidden");
+      document.querySelectorAll(".mode-btn")[0].classList.add("active");
+    } else {
+      document.getElementById("loginForm").classList.add("hidden");
+      document.getElementById("registerForm").classList.remove("hidden");
+      document.querySelectorAll(".mode-btn")[1].classList.add("active");
     }
   }
 
-  bindLanguageButtons();
-  i18n.applyTranslations();
+  async function login() {
+    const username = document.getElementById("login_username").value.trim();
+    const password = document.getElementById("login_password").value.trim();
+
+    const errorBox = document.getElementById("error");
+    errorBox.textContent = "";
+
+    const res = await fetch("/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      errorBox.textContent = data.error;
+      return;
+    }
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    if (data.user.role === "owner") {
+      window.location.href = "/owner-dashboard.html";
+    } else {
+      window.location.href = "/index.html";
+    }
+  }
+
+  async function register() {
+    const errorBox = document.getElementById("error");
+    const successBox = document.getElementById("success");
+
+    errorBox.textContent = "";
+    successBox.textContent = "";
+
+    const payload = {
+      company_name: document.getElementById("reg_company").value.trim(),
+      contact_name: document.getElementById("reg_name").value.trim(),
+      phone: document.getElementById("reg_phone").value.trim(),
+      email: document.getElementById("reg_email").value.trim(),
+      username: document.getElementById("reg_username").value.trim(),
+      password: document.getElementById("reg_password").value.trim(),
+      full_name: document.getElementById("reg_name").value.trim()
+    };
+
+    const res = await fetch("/self-registration", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      errorBox.textContent = data.error;
+      return;
+    }
+
+    successBox.textContent = "Регистрация успешна. Теперь войдите.";
+
+    // автоподстановка логина
+    document.getElementById("login_username").value = payload.username;
+
+    setMode("login");
+  }
 </script>
 
 </body>
