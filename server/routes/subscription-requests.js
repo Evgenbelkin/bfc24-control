@@ -12,41 +12,91 @@ function normalizeOptionalText(value) {
   return text || null;
 }
 
+function toBigIntOrNull(value) {
+  if (value == null || value === '') return null;
+  const num = Number(value);
+  if (!Number.isInteger(num) || num <= 0) return null;
+  return num;
+}
+
+let activityLogColumnsCache = null;
+
+async function getActivityLogColumns() {
+  if (activityLogColumnsCache) return activityLogColumnsCache;
+
+  const { rows } = await pool.query(
+    `
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'audit'
+      AND table_name = 'activity_log'
+    ORDER BY ordinal_position
+    `
+  );
+
+  activityLogColumnsCache = new Set(rows.map((r) => r.column_name));
+  return activityLogColumnsCache;
+}
+
 async function logActivity({
-  actorUserId,
+  actorUserId = null,
   tenantId = null,
-  action,
-  entityType,
+  action = null,
+  entityType = null,
   entityId = null,
   details = null,
   req = null
 }) {
   try {
+    const columns = await getActivityLogColumns();
+    if (!columns || columns.size === 0) return;
+
+    const data = {};
+
+    if (columns.has('user_id')) data.user_id = toBigIntOrNull(actorUserId);
+    if (columns.has('tenant_id')) data.tenant_id = toBigIntOrNull(tenantId);
+    if (columns.has('action')) data.action = action || null;
+    if (columns.has('event_code')) data.event_code = action || null;
+    if (columns.has('entity_type')) data.entity_type = entityType || null;
+    if (columns.has('entity_name')) data.entity_name = entityType || null;
+    if (columns.has('entity_id')) data.entity_id = entityId != null ? String(entityId) : null;
+    if (columns.has('details')) data.details = details ? JSON.stringify(details) : null;
+    if (columns.has('meta')) data.meta = details ? JSON.stringify(details) : null;
+    if (columns.has('ip_address')) data.ip_address = req?.ip || null;
+    if (columns.has('user_agent')) data.user_agent = req?.get ? req.get('user-agent') || null : null;
+    if (columns.has('created_at')) data.created_at = null;
+
+    const insertColumns = [];
+    const values = [];
+    const params = [];
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === 'created_at') {
+        insertColumns.push(key);
+        values.push('NOW()');
+        return;
+      }
+
+      insertColumns.push(key);
+
+      if (key === 'details' || key === 'meta') {
+        params.push(value);
+        values.push(`$${params.length}::jsonb`);
+        return;
+      }
+
+      params.push(value);
+      values.push(`$${params.length}`);
+    });
+
+    if (!insertColumns.length) return;
+
     await pool.query(
       `
-      INSERT INTO audit.activity_log (
-        user_id,
-        tenant_id,
-        action,
-        entity_type,
-        entity_id,
-        details,
-        ip_address,
-        user_agent,
-        created_at
-      )
-      VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, NOW())
+      INSERT INTO audit.activity_log (${insertColumns.join(', ')})
+      VALUES (${values.join(', ')})
       `,
-      [
-        actorUserId != null ? Number(actorUserId) : null,
-        tenantId != null ? Number(tenantId) : null,
-        action,
-        entityType,
-        entityId != null ? String(entityId) : null,
-        details ? JSON.stringify(details) : null,
-        req?.ip || null,
-        req?.get ? req.get('user-agent') || null : null
-      ]
+      params
     );
   } catch (error) {
     console.error('[subscription-requests] activity_log error:', error);
@@ -99,8 +149,8 @@ router.post('/subscription-requests', authRequired, async (req, res) => {
       )
       VALUES ($1, $2, $3, $4, $5, 'new', NOW(), NOW())
       RETURNING
-        id,
-        tenant_id,
+        id::text AS id,
+        tenant_id::text AS tenant_id,
         contact_name,
         phone,
         email,
@@ -109,7 +159,7 @@ router.post('/subscription-requests', authRequired, async (req, res) => {
         created_at,
         updated_at,
         processed_at,
-        processed_by
+        processed_by::text AS processed_by
       `,
       [tenantId, contactName, phone, email, comment]
     );
@@ -176,8 +226,8 @@ router.get(
 
       const sql = `
         SELECT
-          sr.id,
-          sr.tenant_id,
+          sr.id::text AS id,
+          sr.tenant_id::text AS tenant_id,
           t.name AS tenant_name,
           sr.contact_name,
           sr.phone,
@@ -187,7 +237,7 @@ router.get(
           sr.created_at,
           sr.updated_at,
           sr.processed_at,
-          sr.processed_by,
+          sr.processed_by::text AS processed_by,
           pu.username AS processed_by_username,
           pu.full_name AS processed_by_full_name
         FROM saas.subscription_requests sr
@@ -265,6 +315,8 @@ router.patch(
         return res.status(404).json({ ok: false, error: 'subscription_request_not_found' });
       }
 
+      const processedBy = toBigIntOrNull(req.user?.id);
+
       const updateResult = await pool.query(
         `
         UPDATE saas.subscription_requests
@@ -276,13 +328,13 @@ router.patch(
             ELSE NULL
           END,
           processed_by = CASE
-            WHEN $2 IN ('done', 'cancelled') THEN $3
+            WHEN $2 IN ('done', 'cancelled') THEN $3::bigint
             ELSE NULL
           END
         WHERE id = $1
         RETURNING
-          id,
-          tenant_id,
+          id::text AS id,
+          tenant_id::text AS tenant_id,
           contact_name,
           phone,
           email,
@@ -291,9 +343,9 @@ router.patch(
           created_at,
           updated_at,
           processed_at,
-          processed_by
+          processed_by::text AS processed_by
         `,
-        [id, status, req.user?.id ? Number(req.user.id) : null]
+        [id, status, processedBy]
       );
 
       const updated = updateResult.rows[0];
