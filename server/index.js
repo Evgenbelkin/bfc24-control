@@ -13,6 +13,7 @@ const { authRequired, requireRole } = require("./middleware/auth");
 
 // routes
 const authRoutes = require("./routes/auth");
+const selfRegistrationRoutes = require("./routes/self-registration");
 const itemRoutes = require("./routes/items");
 const locationRoutes = require("./routes/locations");
 const clientRoutes = require("./routes/clients");
@@ -81,6 +82,7 @@ app.get("/ping", async (req, res) => {
 
 // API routes
 app.use("/auth", authRoutes);
+app.use("/self-registration", selfRegistrationRoutes);
 app.use("/items", itemRoutes);
 app.use("/locations", locationRoutes);
 app.use("/clients", clientRoutes);
