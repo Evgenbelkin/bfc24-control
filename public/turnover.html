@@ -307,10 +307,6 @@
       font-size: 13px;
     }
 
-    .card.health .value { color: var(--ok); }
-    .card.warning .value { color: var(--warn); }
-    .card.risk .value { color: var(--risk); }
-    .card.critical .value { color: var(--critical); }
     .card.stock .value { color: var(--brand); }
 
     .status-row {
@@ -349,6 +345,135 @@
     .mini-card.critical .mini-value { color: var(--critical); }
     .mini-card.stale .mini-value { color: #7c3aed; }
     .mini-card.out .mini-value { color: #475569; }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+      align-items: start;
+    }
+
+    .chart-panel {
+      padding: 16px;
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .chart-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .chart-empty {
+      color: var(--muted);
+      font-size: 14px;
+      padding: 12px 0;
+    }
+
+    .status-chart {
+      display: grid;
+      gap: 12px;
+    }
+
+    .status-chart-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 56px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-chart-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .status-chart-track {
+      height: 12px;
+      border-radius: 999px;
+      background: #eef2f7;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .status-chart-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .status-chart-fill.healthy { background: var(--ok); }
+    .status-chart-fill.warning { background: var(--warn); }
+    .status-chart-fill.risk { background: var(--risk); }
+    .status-chart-fill.critical { background: var(--critical); }
+    .status-chart-fill.stale_no_sales { background: #7c3aed; }
+    .status-chart-fill.out_of_stock { background: #475569; }
+    .status-chart-fill.no_sales { background: #94a3b8; }
+
+    .status-chart-value {
+      font-size: 13px;
+      font-weight: 800;
+      text-align: right;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .bar-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar-item {
+      display: grid;
+      gap: 6px;
+    }
+
+    .bar-item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .bar-item-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bar-item-value {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .bar-track {
+      height: 12px;
+      border-radius: 999px;
+      background: #eef2f7;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--brand);
+    }
+
+    .bar-fill.profit {
+      background: var(--ok);
+    }
 
     .table-panel {
       overflow: hidden;
@@ -555,6 +680,10 @@
       .status-row {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 900px) {
@@ -576,6 +705,11 @@
 
       .status-row {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .status-chart-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
       }
     }
 
@@ -761,6 +895,26 @@
       </div>
     </div>
 
+    <div class="charts-grid">
+      <div class="panel chart-panel">
+        <div class="chart-title">Распределение по статусам</div>
+        <div class="chart-subtitle">Статусы считаются по текущей отфильтрованной выборке</div>
+        <div id="statusChart" class="status-chart"></div>
+      </div>
+
+      <div class="panel chart-panel">
+        <div class="chart-title">Топ по стоимости остатка</div>
+        <div class="chart-subtitle">Где сейчас заморожено больше всего денег</div>
+        <div id="stockCostChart" class="bar-list"></div>
+      </div>
+
+      <div class="panel chart-panel">
+        <div class="chart-title">Топ по потенциальной прибыли</div>
+        <div class="chart-subtitle">Какие товары дают наибольший потенциал прибыли</div>
+        <div id="profitChart" class="bar-list"></div>
+      </div>
+    </div>
+
     <div class="panel table-panel">
       <div class="table-head">
         <div>
@@ -875,7 +1029,11 @@
         tableBody: document.getElementById("tableBody"),
         sortHeaders: document.querySelectorAll("[data-sort-key]"),
         sortIndicators: document.querySelectorAll("[data-sort-indicator]"),
-        quickButtons: document.querySelectorAll("[data-quick-filter]")
+        quickButtons: document.querySelectorAll("[data-quick-filter]"),
+
+        statusChart: document.getElementById("statusChart"),
+        stockCostChart: document.getElementById("stockCostChart"),
+        profitChart: document.getElementById("profitChart")
       };
 
       function getToken() {
@@ -1189,6 +1347,96 @@
         });
       }
 
+      function renderStatusChart(rows) {
+        const statuses = [
+          "healthy",
+          "warning",
+          "risk",
+          "critical",
+          "stale_no_sales",
+          "out_of_stock"
+        ];
+
+        const counts = {};
+        statuses.forEach((s) => { counts[s] = 0; });
+        rows.forEach((row) => {
+          const key = row.turnover_status;
+          if (counts[key] !== undefined) counts[key] += 1;
+        });
+
+        const max = Math.max(1, ...statuses.map((s) => counts[s]));
+        const html = statuses.map((status) => {
+          const value = counts[status];
+          const width = value > 0 ? (value / max) * 100 : 0;
+          return `
+            <div class="status-chart-row">
+              <div class="status-chart-label">${escapeHtml(statusLabel(status))}</div>
+              <div class="status-chart-track">
+                <div class="status-chart-fill ${status}" style="width:${width}%;"></div>
+              </div>
+              <div class="status-chart-value">${formatNumber(value)}</div>
+            </div>
+          `;
+        }).join("");
+
+        els.statusChart.innerHTML = rows.length
+          ? html
+          : `<div class="chart-empty">Нет данных для графика</div>`;
+      }
+
+      function renderBarChart(container, rows, valueKey, fillClass, emptyText) {
+        if (!rows.length) {
+          container.innerHTML = `<div class="chart-empty">${escapeHtml(emptyText)}</div>`;
+          return;
+        }
+
+        const topRows = [...rows]
+          .filter((row) => Number(row[valueKey] || 0) > 0)
+          .sort((a, b) => Number(b[valueKey] || 0) - Number(a[valueKey] || 0))
+          .slice(0, 7);
+
+        if (!topRows.length) {
+          container.innerHTML = `<div class="chart-empty">${escapeHtml(emptyText)}</div>`;
+          return;
+        }
+
+        const max = Math.max(1, ...topRows.map((row) => Number(row[valueKey] || 0)));
+
+        container.innerHTML = topRows.map((row) => {
+          const value = Number(row[valueKey] || 0);
+          const width = (value / max) * 100;
+          return `
+            <div class="bar-item">
+              <div class="bar-item-top">
+                <div class="bar-item-name" title="${escapeHtml(row.name || "—")}">${escapeHtml(row.name || "—")}</div>
+                <div class="bar-item-value">${formatMoney(value)}</div>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill ${fillClass}" style="width:${width}%;"></div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function renderCharts(rows) {
+        renderStatusChart(rows);
+        renderBarChart(
+          els.stockCostChart,
+          rows,
+          "stock_cost_total",
+          "",
+          "Нет данных по стоимости остатка"
+        );
+        renderBarChart(
+          els.profitChart,
+          rows,
+          "potential_profit",
+          "profit",
+          "Нет данных по потенциальной прибыли"
+        );
+      }
+
       function renderRows(rows) {
         if (!rows.length) {
           els.table.style.display = "none";
@@ -1196,6 +1444,7 @@
           els.stateBox.className = "empty";
           els.stateBox.textContent = "Нет данных по выбранным фильтрам";
           els.tableMeta.textContent = "0 строк";
+          renderCharts([]);
           return;
         }
 
@@ -1239,6 +1488,8 @@
           `Период: ${state.periodDays} дней • ` +
           `Пороги: ${state.thresholds.yellow_days}/${state.thresholds.orange_days}/${state.thresholds.red_days} • ` +
           `Сортировка: ${getSortLabel()}`;
+
+        renderCharts(rows);
       }
 
       function getSortLabel() {
@@ -1266,6 +1517,7 @@
         els.stateBox.className = "error";
         els.stateBox.textContent = message;
         els.tableMeta.textContent = "Ошибка загрузки";
+        renderCharts([]);
       }
 
       async function loadData() {
