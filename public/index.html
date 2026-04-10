@@ -302,7 +302,6 @@
       background: var(--accent-hover);
     }
 
-
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -824,6 +823,30 @@
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
 
+      <div class="card" onclick="window.location.href='/turnover.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stroke-main" d="M14 50H50" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M18 44V34" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-main" d="M30 44V26" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-main" d="M42 44V18" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M18 30L25 24L33 29L46 16" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle class="fill-accent" cx="18" cy="30" r="2.2"/>
+                <circle class="fill-accent" cx="25" cy="24" r="2.2"/>
+                <circle class="fill-accent" cx="33" cy="29" r="2.2"/>
+                <circle class="fill-accent" cx="46" cy="16" r="2.2"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3>Оборачиваемость</h3>
+          <div class="muted">Контроль залеживания, скорости продаж и замороженных денег в остатках</div>
+        </div>
+        <div class="card__footer">Открыть модуль</div>
+      </div>
+
       <div class="card" onclick="window.location.href='/debts.html'">
         <div class="card__content">
           <div class="card__top">
@@ -844,8 +867,6 @@
         </div>
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
-
-
 
       <div class="card" onclick="window.location.href='/users.html'">
         <div class="card__content">
@@ -906,48 +927,47 @@
     </div>
   </div>
 
-
   <div class="modal-overlay" id="subscriptionModal" aria-hidden="true">
-  <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="subscriptionModalTitle">
-    <div class="modal-header">
-      <div>
-        <h2 class="modal-title" id="subscriptionModalTitle" data-i18n="index.subscription.modalTitle">Продление подписки</h2>
-        <p class="modal-subtitle" data-i18n="index.subscription.modalSubtitle">Оставь контакты, и заявка сразу попадёт в кабинет владельца.</p>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="subscriptionModalTitle">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="subscriptionModalTitle" data-i18n="index.subscription.modalTitle">Продление подписки</h2>
+          <p class="modal-subtitle" data-i18n="index.subscription.modalSubtitle">Оставь контакты, и заявка сразу попадёт в кабинет владельца.</p>
+        </div>
+        <button type="button" class="modal-close" id="subscriptionModalClose" aria-label="Закрыть" data-i18n-title="index.subscription.closeTitle">×</button>
       </div>
-      <button type="button" class="modal-close" id="subscriptionModalClose" aria-label="Закрыть" data-i18n-title="index.subscription.closeTitle">×</button>
-    </div>
-    <div class="modal-body">
-      <form id="subscriptionForm">
-        <div class="form-grid">
-          <div class="field">
-            <label for="subscriptionContactName" data-i18n="index.subscription.contactName">Контактное лицо</label>
-            <input class="input" id="subscriptionContactName" name="contact_name" placeholder="Например: Евгений" data-i18n-placeholder="index.subscription.contactNamePlaceholder" />
+      <div class="modal-body">
+        <form id="subscriptionForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="subscriptionContactName" data-i18n="index.subscription.contactName">Контактное лицо</label>
+              <input class="input" id="subscriptionContactName" name="contact_name" placeholder="Например: Евгений" data-i18n-placeholder="index.subscription.contactNamePlaceholder" />
+            </div>
+            <div class="field">
+              <label for="subscriptionPhone" data-i18n="index.subscription.phone">Телефон</label>
+              <input class="input" id="subscriptionPhone" name="phone" placeholder="+7..." data-i18n-placeholder="index.subscription.phonePlaceholder" />
+            </div>
+            <div class="field full">
+              <label for="subscriptionEmail" data-i18n="index.subscription.email">Email</label>
+              <input class="input" id="subscriptionEmail" name="email" type="email" placeholder="mail@example.com" data-i18n-placeholder="index.subscription.emailPlaceholder" />
+            </div>
+            <div class="field full">
+              <label for="subscriptionComment" data-i18n="index.subscription.comment">Комментарий</label>
+              <textarea class="textarea" id="subscriptionComment" name="comment" placeholder="Например: хочу продлить подписку на 1 месяц, удобно связаться в Telegram или по телефону" data-i18n-placeholder="index.subscription.commentPlaceholder"></textarea>
+              <div class="helper-text" data-i18n="index.subscription.helper">Нужно заполнить телефон или email. Можно указать оба.</div>
+            </div>
           </div>
-          <div class="field">
-            <label for="subscriptionPhone" data-i18n="index.subscription.phone">Телефон</label>
-            <input class="input" id="subscriptionPhone" name="phone" placeholder="+7..." data-i18n-placeholder="index.subscription.phonePlaceholder" />
-          </div>
-          <div class="field full">
-            <label for="subscriptionEmail" data-i18n="index.subscription.email">Email</label>
-            <input class="input" id="subscriptionEmail" name="email" type="email" placeholder="mail@example.com" data-i18n-placeholder="index.subscription.emailPlaceholder" />
-          </div>
-          <div class="field full">
-            <label for="subscriptionComment" data-i18n="index.subscription.comment">Комментарий</label>
-            <textarea class="textarea" id="subscriptionComment" name="comment" placeholder="Например: хочу продлить подписку на 1 месяц, удобно связаться в Telegram или по телефону" data-i18n-placeholder="index.subscription.commentPlaceholder"></textarea>
-            <div class="helper-text" data-i18n="index.subscription.helper">Нужно заполнить телефон или email. Можно указать оба.</div>
-          </div>
-        </div>
 
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" id="subscriptionCancelBtn" data-i18n="index.subscription.cancel">Отмена</button>
-          <button type="submit" class="btn btn-primary" id="subscriptionSubmitBtn" data-i18n="index.subscription.submit">Отправить заявку</button>
-        </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="subscriptionCancelBtn" data-i18n="index.subscription.cancel">Отмена</button>
+            <button type="submit" class="btn btn-primary" id="subscriptionSubmitBtn" data-i18n="index.subscription.submit">Отправить заявку</button>
+          </div>
 
-        <div class="status-box" id="subscriptionStatusBox"></div>
-      </form>
+          <div class="status-box" id="subscriptionStatusBox"></div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
@@ -1174,7 +1194,6 @@
       }
     }
 
-
     const subscriptionModal = document.getElementById("subscriptionModal");
     const subscriptionCard = document.getElementById("subscriptionCard");
     const subscriptionForm = document.getElementById("subscriptionForm");
@@ -1266,7 +1285,6 @@
         subscriptionModalClose.disabled = false;
       }
     }
-
 
     if (subscriptionCard) {
       subscriptionCard.addEventListener("click", openSubscriptionModal);
