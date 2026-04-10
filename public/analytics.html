@@ -264,6 +264,19 @@
     .margin-fill  { height:100%; border-radius:4px; transition:width .6s ease; }
     .debt-overdue { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; background:var(--danger-bg); color:#991b1b; }
 
+    /* ── Top items chart ── */
+    .analytics-split { display:grid; grid-template-columns: 1fr 1.15fr; gap:16px; align-items:start; }
+    .mini-card-surface { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:18px; }
+    .mini-card-title { margin:0 0 6px; font-size:15px; font-weight:700; letter-spacing:-.02em; }
+    .mini-card-note { margin:0 0 14px; color:var(--text-muted); font-size:13px; }
+    .top-bars { display:grid; gap:12px; }
+    .top-bar-item { display:grid; gap:6px; }
+    .top-bar-head { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .top-bar-name { font-size:13px; font-weight:600; color:var(--text-main); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .top-bar-value { font-size:13px; font-weight:700; color:var(--text-main); white-space:nowrap; }
+    .top-bar-track { height:10px; background:var(--border); border-radius:999px; overflow:hidden; }
+    .top-bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg, #2563eb 0%, #60a5fa 100%); }
+
     /* ── Empty state ── */
     .empty-state { text-align:center; padding:36px 20px; color:var(--text-muted); background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%); border:1px dashed var(--border-strong); border-radius:var(--radius-lg); }
     .empty-state-icon  { font-size:36px; margin-bottom:10px; }
@@ -287,6 +300,7 @@
       .filter-divider { display:none; }
       .pnl-bar-wrap { display:none; }
       .kpi-grid { grid-template-columns:repeat(2,1fr); }
+      .analytics-split { grid-template-columns:1fr; }
     }
     @media (max-width:480px) { .kpi-grid { grid-template-columns:1fr; } }
   </style>
@@ -796,6 +810,28 @@ function renderTopItems(data){
   const items=data.items||[];
   if (!items.length) return `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">${t("analytics.noSalesForPeriodTitle","Нет продаж за период")}</div><p class="empty-state-text">${t("analytics.expandDateRange","Попробуйте расширить диапазон дат.")}</p></div>`;
 
+  const sum=(k)=>items.reduce((s,x)=>s+(+x[k]||0),0);
+  const maxRevenue = Math.max(1, ...items.map(it => +(it.revenue||0)));
+
+  const chartHtml = `
+    <div class="mini-card-surface">
+      <h3 class="mini-card-title">${t("analytics.topItemsChartTitle","Топ по выручке")}</h3>
+      <p class="mini-card-note">${t("analytics.topItemsChartNote","Наглядное сравнение самых сильных товаров по выручке")}</p>
+      <div class="top-bars">
+        ${items.map((it, idx) => {
+          const revenue = +(it.revenue || 0);
+          const width = Math.max(4, (revenue / maxRevenue) * 100);
+          return `<div class="top-bar-item">
+            <div class="top-bar-head">
+              <div class="top-bar-name" title="${esc(it.item_name||"—")}">${idx+1}. ${esc(it.item_name||"—")}</div>
+              <div class="top-bar-value">${fmtMoney(revenue)}</div>
+            </div>
+            <div class="top-bar-track"><div class="top-bar-fill" style="width:${width}%"></div></div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+
   const rows=items.map((it,idx)=>{
     const m=+(it.margin_pct||0);
     const rClass = idx===0?"rank-1":idx===1?"rank-2":idx===2?"rank-3":"rank-n";
@@ -818,9 +854,7 @@ function renderTopItems(data){
     </tr>`;
   }).join("");
 
-  const sum=(k)=>items.reduce((s,x)=>s+(+x[k]||0),0);
-
-  return `<div class="table-wrap"><table>
+  const tableHtml = `<div class="table-wrap"><table>
     <thead><tr>
       <th style="width:36px">#</th><th>${t("analytics.tableItem","Товар")}</th>
       <th class="r">${t("analytics.tableQty","Кол-во")}</th><th class="r">${t("analytics.revenue","Выручка")}</th>
@@ -837,6 +871,8 @@ function renderTopItems(data){
       <td></td>
     </tr></tfoot>
   </table></div>`;
+
+  return `<div class="analytics-split">${chartHtml}<div>${tableHtml}</div></div>`;
 }
 
 /* ══════════════════════════════════════════════════════════
