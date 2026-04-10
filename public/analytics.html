@@ -264,7 +264,9 @@
     .margin-fill  { height:100%; border-radius:4px; transition:width .6s ease; }
     .debt-overdue { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; background:var(--danger-bg); color:#991b1b; }
 
-    /* ── Top items chart ── */
+
+
+    /* ── Problem products ── */
     .analytics-split { display:grid; grid-template-columns: 1fr 1.15fr; gap:16px; align-items:start; }
     .mini-card-surface { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:18px; }
     .mini-card-title { margin:0 0 6px; font-size:15px; font-weight:700; letter-spacing:-.02em; }
@@ -275,7 +277,13 @@
     .top-bar-name { font-size:13px; font-weight:600; color:var(--text-main); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .top-bar-value { font-size:13px; font-weight:700; color:var(--text-main); white-space:nowrap; }
     .top-bar-track { height:10px; background:var(--border); border-radius:999px; overflow:hidden; }
-    .top-bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg, #2563eb 0%, #60a5fa 100%); }
+    .top-bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg, #dc2626 0%, #f59e0b 55%, #fbbf24 100%); }
+    .problem-status-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 9px; border-radius:999px; font-size:11px; font-weight:700; }
+    .problem-status-pill.critical { background:var(--danger-bg); color:#991b1b; }
+    .problem-status-pill.risk { background:#ffedd5; color:#9a3412; }
+    .problem-status-pill.warning { background:var(--warning-bg); color:#92400e; }
+    .problem-status-pill.stale_no_sales { background:#ede9fe; color:#6d28d9; }
+    .problem-status-pill.out_of_stock { background:#e2e8f0; color:#334155; }
 
     /* ── Empty state ── */
     .empty-state { text-align:center; padding:36px 20px; color:var(--text-muted); background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%); border:1px dashed var(--border-strong); border-radius:var(--radius-lg); }
@@ -409,7 +417,6 @@
     <div id="top-items-wrap"><div class="skeleton sk-table"></div></div>
   </div>
 
-
   <!-- ════ Блок 4 — Проблемные товары ════ -->
   <div class="section">
     <div class="section-header">
@@ -538,15 +545,6 @@ document.querySelectorAll(".preset-btn").forEach(btn=>{
   });
 });
 function clearFilter(){ $from.value=""; $to.value=""; document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active")); loadAll(); }
-function inferPeriodDays(){
-  if ($from.value && $to.value) {
-    const from = new Date($from.value + "T00:00:00");
-    const to = new Date($to.value + "T00:00:00");
-    const diff = Math.round((to - from) / 86400000) + 1;
-    return Math.max(1, diff);
-  }
-  return 30;
-}
 
 /* ══════════════════════════════════════════════════════════
    API
@@ -828,33 +826,33 @@ function renderChart(daily){
    РЕНДЕР — ТОП ТОВАРОВ
    ══════════════════════════════════════════════════════════ */
 function renderTopItems(data){
-  const items=data.items||[];
+  const items = data.items || [];
   if (!items.length) return `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">${t("analytics.noSalesForPeriodTitle","Нет продаж за период")}</div><p class="empty-state-text">${t("analytics.expandDateRange","Попробуйте расширить диапазон дат.")}</p></div>`;
 
-  const sum=(k)=>items.reduce((s,x)=>s+(+x[k]||0),0);
-  const maxRevenue = Math.max(1, ...items.map(it => +(it.revenue||0)));
+  const sorted = [...items].sort((a,b)=> (+b.revenue||0) - (+a.revenue||0));
+  const maxRevenue = Math.max(1, ...sorted.map(it => +it.revenue || 0));
 
   const chartHtml = `
     <div class="mini-card-surface">
-      <h3 class="mini-card-title">${t("analytics.topItemsChartTitle","Топ по выручке")}</h3>
-      <p class="mini-card-note">${t("analytics.topItemsChartNote","Наглядное сравнение самых сильных товаров по выручке")}</p>
+      <h3 class="mini-card-title">${t("analytics.topItemsChartTitle","График top товаров")}</h3>
+      <p class="mini-card-note">${t("analytics.topItemsChartNote","Сравнение товаров по выручке за выбранный период")}</p>
       <div class="top-bars">
-        ${items.map((it, idx) => {
-          const revenue = +(it.revenue || 0);
-          const width = Math.max(4, (revenue / maxRevenue) * 100);
-          return `<div class="top-bar-item">
-            <div class="top-bar-head">
-              <div class="top-bar-name" title="${esc(it.item_name||"—")}">${idx+1}. ${esc(it.item_name||"—")}</div>
-              <div class="top-bar-value">${fmtMoney(revenue)}</div>
-            </div>
-            <div class="top-bar-track"><div class="top-bar-fill" style="width:${width}%"></div></div>
-          </div>`;
+        ${sorted.slice(0, 8).map((it, idx) => {
+          const width = Math.max(3, ((+it.revenue || 0) / maxRevenue) * 100);
+          return `
+            <div class="top-bar-item">
+              <div class="top-bar-head">
+                <div class="top-bar-name">${idx + 1}. ${esc(it.item_name || "—")}</div>
+                <div class="top-bar-value">${fmtMoney(it.revenue)}</div>
+              </div>
+              <div class="top-bar-track"><div class="top-bar-fill" style="width:${width}%"></div></div>
+            </div>`;
         }).join("")}
       </div>
     </div>`;
 
-  const rows=items.map((it,idx)=>{
-    const m=+(it.margin_pct||0);
+  const rows = sorted.map((it,idx)=>{
+    const m = +(it.margin_pct||0);
     const rClass = idx===0?"rank-1":idx===1?"rank-2":idx===2?"rank-3":"rank-n";
     return `<tr>
       <td><span class="rank-badge ${rClass}">${idx+1}</span></td>
@@ -875,6 +873,8 @@ function renderTopItems(data){
     </tr>`;
   }).join("");
 
+  const sum=(k)=>sorted.reduce((s,x)=>s+(+x[k]||0),0);
+
   const tableHtml = `<div class="table-wrap"><table>
     <thead><tr>
       <th style="width:36px">#</th><th>${t("analytics.tableItem","Товар")}</th>
@@ -884,13 +884,113 @@ function renderTopItems(data){
     </tr></thead>
     <tbody>${rows}</tbody>
     <tfoot><tr>
-      <td colspan="2">${tf("analytics.topTotal",{count:items.length},`Итого топ-${items.length}`)}</td>
+      <td colspan="2">${tf("analytics.topTotal",{count:sorted.length},`Итого топ-${sorted.length}`)}</td>
       <td class="r">${fmt(sum("qty_sold"),0)}</td>
       <td class="r">${fmtMoney(sum("revenue"))}</td>
       <td class="r">${fmtMoney(sum("cogs"))}</td>
       <td class="r">${fmtMoney(sum("gross_profit"))}</td>
       <td></td>
     </tr></tfoot>
+  </table></div>`;
+
+  return `<div class="analytics-split">${chartHtml}<div>${tableHtml}</div></div>`;
+}
+
+function statusLabel(status) {
+  switch (status) {
+    case 'healthy': return 'Норма';
+    case 'warning': return 'Замедление';
+    case 'risk': return 'Риск';
+    case 'critical': return 'Критично';
+    case 'stale_no_sales': return 'Без продаж';
+    case 'out_of_stock': return 'Нет остатка';
+    default: return status || '—';
+  }
+}
+
+function statusClass(status) {
+  switch (status) {
+    case 'critical': return 'critical';
+    case 'risk': return 'risk';
+    case 'warning': return 'warning';
+    case 'stale_no_sales': return 'stale_no_sales';
+    case 'out_of_stock': return 'out_of_stock';
+    default: return 'warning';
+  }
+}
+
+function problemPriority(status) {
+  switch (status) {
+    case 'critical': return 5;
+    case 'risk': return 4;
+    case 'warning': return 3;
+    case 'stale_no_sales': return 2;
+    case 'out_of_stock': return 1;
+    default: return 0;
+  }
+}
+
+function renderProblemProducts(data) {
+  const items = Array.isArray(data.items) ? data.items : [];
+  const problems = items
+    .filter((row) => ['critical', 'risk', 'warning', 'stale_no_sales'].includes(row.turnover_status))
+    .sort((a, b) => {
+      const byPriority = problemPriority(b.turnover_status) - problemPriority(a.turnover_status);
+      if (byPriority !== 0) return byPriority;
+      return (+b.stock_cost_total || 0) - (+a.stock_cost_total || 0);
+    });
+
+  if (!problems.length) {
+    return `<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-title">Проблемных товаров нет</div><p class="empty-state-text">По выбранному периоду и текущим правилам проблемные товары не найдены.</p></div>`;
+  }
+
+  const chartItems = problems.slice(0, 8);
+  const maxCost = Math.max(1, ...chartItems.map((it) => +it.stock_cost_total || 0));
+
+  const chartHtml = `
+    <div class="mini-card-surface">
+      <h3 class="mini-card-title">График проблемных товаров</h3>
+      <p class="mini-card-note">Сортировка по уровню риска и стоимости остатка</p>
+      <div class="top-bars">
+        ${chartItems.map((it, idx) => {
+          const width = Math.max(3, ((+it.stock_cost_total || 0) / maxCost) * 100);
+          return `
+            <div class="top-bar-item">
+              <div class="top-bar-head">
+                <div class="top-bar-name">${idx + 1}. ${esc(it.name || '—')}</div>
+                <div class="top-bar-value">${fmtMoney(it.stock_cost_total)}</div>
+              </div>
+              <div class="top-bar-track"><div class="top-bar-fill" style="width:${width}%"></div></div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+
+  const rowsHtml = problems.map((row) => `
+    <tr>
+      <td>
+        <div style="font-weight:600">${esc(row.name || '—')}</div>
+        <div class="cell-muted" style="font-size:12px">${esc(row.sku || row.barcode || '')}</div>
+      </td>
+      <td><span class="problem-status-pill ${statusClass(row.turnover_status)}">${statusLabel(row.turnover_status)}</span></td>
+      <td class="r">${fmt(row.qty_on_hand,0)}</td>
+      <td class="r">${fmtMoney(row.stock_cost_total)}</td>
+      <td class="r ${+row.potential_profit >= 0 ? 'cell-success' : 'cell-danger'}">${fmtMoney(row.potential_profit)}</td>
+      <td class="r">${row.days_on_hand == null ? '—' : fmt(row.days_on_hand,1)}</td>
+      <td class="r">${fmt(row.sold_qty_period,0)}</td>
+    </tr>`).join('');
+
+  const tableHtml = `<div class="table-wrap"><table>
+    <thead><tr>
+      <th>Товар</th>
+      <th>Статус</th>
+      <th class="r">Остаток</th>
+      <th class="r">Стоимость остатка</th>
+      <th class="r">Потенц. прибыль</th>
+      <th class="r">Дней остатка</th>
+      <th class="r">Продано</th>
+    </tr></thead>
+    <tbody>${rowsHtml}</tbody>
   </table></div>`;
 
   return `<div class="analytics-split">${chartHtml}<div>${tableHtml}</div></div>`;
@@ -1022,86 +1122,6 @@ function renderSyncCheck(sv){
       <thead><tr><th>${t("analytics.tableItem","Товар")}</th><th>ID</th><th>${t("analytics.inStock","В stock")}</th><th>${t("analytics.inBatches","В batches")}</th><th>${t("analytics.difference","Разница")}</th><th>${t("analytics.severity","Степень")}</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>`;
-}
-
-function statusLabel(status) {
-  switch (status) {
-    case 'healthy':
-      return 'Норма';
-    case 'warning':
-      return 'Замедление';
-    case 'risk':
-      return 'Риск';
-    case 'critical':
-      return 'Критично';
-    case 'stale_no_sales':
-      return 'Без продаж';
-    case 'out_of_stock':
-      return 'Нет остатка';
-    default:
-      return status || '-';
-  }
-}
-
-
-function renderProblemProducts(turnoverData){
-  const rows = Array.isArray(turnoverData?.items) ? turnoverData.items : [];
-  if (!rows.length) {
-    return `<div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-title">Нет проблемных товаров</div><p class="empty-state-text">Для выбранного периода не найдено товаров с зависанием, риском или критичным статусом.</p></div>`;
-  }
-
-  const severity = { critical: 4, risk: 3, warning: 2, stale_no_sales: 1, out_of_stock: 0, healthy: -1 };
-  const filtered = rows
-    .filter((r) => ["critical","risk","warning","stale_no_sales"].includes(r.turnover_status))
-    .sort((a, b) => {
-      const sa = severity[a.turnover_status] ?? -1;
-      const sb = severity[b.turnover_status] ?? -1;
-      if (sb !== sa) return sb - sa;
-      return (+b.stock_cost_total || 0) - (+a.stock_cost_total || 0);
-    })
-    .slice(0, 12);
-
-  if (!filtered.length) {
-    return `<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-title">Критичных товаров нет</div><p class="empty-state-text">В выбранном периоде система не нашла проблемных позиций.</p></div>`;
-  }
-
-  const rowsHtml = filtered.map((r) => {
-    const status = statusLabel(r.turnover_status);
-    const stockCost = +r.stock_cost_total || 0;
-    const profit = +r.potential_profit || 0;
-    const days = r.days_on_hand == null ? "—" : fmt(r.days_on_hand, 1);
-    const statusClass =
-      r.turnover_status === "critical" ? "cell-danger" :
-      r.turnover_status === "risk" ? "cell-warning" :
-      r.turnover_status === "warning" ? "cell-warning" :
-      r.turnover_status === "stale_no_sales" ? "" : "";
-
-    return `<tr>
-      <td>
-        <div style="font-weight:600">${esc(r.name || "—")}</div>
-        <div class="cell-muted" style="font-size:12px">${esc(r.sku || r.barcode || "")}</div>
-      </td>
-      <td><span class="${statusClass}">${esc(status)}</span></td>
-      <td class="r">${fmt(r.qty_on_hand, 0)}</td>
-      <td class="r">${fmtMoney(stockCost)}</td>
-      <td class="r">${fmtMoney(profit)}</td>
-      <td class="r">${days}</td>
-      <td class="r">${fmt(r.sold_qty_period, 0)}</td>
-    </tr>`;
-  }).join("");
-
-  return `<div class="table-wrap"><table>
-    <thead><tr>
-      <th>Товар</th>
-      <th>Статус</th>
-      <th class="r">Остаток</th>
-      <th class="r">Стоимость остатка</th>
-      <th class="r">Потенц. прибыль</th>
-      <th class="r">Дней остатка</th>
-      <th class="r">Продано</th>
-    </tr></thead>
-    <tbody>${rowsHtml}</tbody>
-  </table></div>`;
 }
 
 /* ══════════════════════════════════════════════════════════
