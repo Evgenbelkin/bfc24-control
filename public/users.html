@@ -761,7 +761,6 @@
       els.username.value  = user.username || "";
       els.fullName.value  = user.full_name || "";
       els.password.value  = "";
-      /* логин менять нельзя при редактировании — только full_name и пароль */
       els.username.setAttribute("readonly", "readonly");
       clearSubmitStatus();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -860,7 +859,7 @@
         renderLoadingRow();
         setPageStatus("users.loadingStatus", { tenantId }, "info");
 
-        const data = await apiGet(`/owner-admin/users?tenant_id=${tenantId}`);
+        const data = await apiGet(`/users?tenant_id=${tenantId}`);
         usersData = extractList(data, ["users", "data", "rows"]).map(normalizeUser);
 
         renderTable();
@@ -892,26 +891,20 @@
         }
 
         if (editId) {
-          /* При редактировании: только full_name (и пароль если задан) */
-          if (!fullName) {
-            throw new Error(i18n.t("users.fullNameRequired"));
-          }
-
           const body = {
             tenant_id: tenantId,
             full_name: fullName
           };
 
           setSubmitStatus("users.savingUpdate", { id: editId }, "info");
-          await apiPut(`/owner-admin/users/${editId}`, body);
+          await apiPut(`/users/${editId}`, body);
 
           if (password) {
-            await apiPost(`/owner-admin/users/${editId}/reset-password`, { password });
+            await apiPost(`/users/${editId}/reset-password`, { password });
           }
 
           setSubmitStatus("users.updatedSuccess", { id: editId }, "success");
         } else {
-          /* Создание: требуются логин и пароль */
           if (!username) {
             throw new Error(i18n.t("users.usernameRequired"));
           }
@@ -929,12 +922,7 @@
           };
 
           setSubmitStatus("users.savingCreate", {}, "info");
-          const result = await apiPost("/owner-admin/users", body);
-
-          /* Проверяем limit_reached от backend */
-          if (result && result.limit_reached) {
-            throw new Error(i18n.t("users.limitReached"));
-          }
+          await apiPost("/users", body);
 
           setSubmitStatus("users.createdSuccess", {}, "success");
         }
@@ -943,7 +931,12 @@
         await loadData();
       } catch (err) {
         const errCode = err.message || "";
-        const isLimitError = errCode === "limit_reached" || errCode.includes("limit_reached");
+        const isLimitError =
+          errCode === "limit_reached" ||
+          errCode.includes("limit_reached") ||
+          errCode === "users_limit_exceeded" ||
+          errCode.includes("users_limit_exceeded");
+
         const errorText = isLimitError
           ? i18n.t("users.limitReached")
           : Ui.translateError(errCode);
@@ -963,7 +956,7 @@
 
         if (!confirm(confirmText)) return;
 
-        await apiPatch(`/owner-admin/users/${id}/toggle-active`, {});
+        await apiPatch(`/users/${id}/toggle-active`, {});
         await loadData();
       } catch (err) {
         setSubmitStatus("users.actionError", { error: Ui.translateError(err.message) }, "error");
@@ -981,7 +974,7 @@
 
         if (!confirm(confirmText)) return;
 
-        await apiPatch(`/owner-admin/users/${id}/toggle-block`, {});
+        await apiPatch(`/users/${id}/toggle-block`, {});
         await loadData();
       } catch (err) {
         setSubmitStatus("users.actionError", { error: Ui.translateError(err.message) }, "error");
@@ -1002,7 +995,7 @@
           return;
         }
 
-        await apiPost(`/owner-admin/users/${id}/reset-password`, { password: trimmed });
+        await apiPost(`/users/${id}/reset-password`, { password: trimmed });
         setSubmitStatus("users.passwordResetSuccess", { name }, "success");
       } catch (err) {
         setSubmitStatus("users.actionError", { error: Ui.translateError(err.message) }, "error");
