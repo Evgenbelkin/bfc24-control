@@ -1024,6 +1024,25 @@ function renderSyncCheck(sv){
     </table></div>`;
 }
 
+function statusLabel(status) {
+  switch (status) {
+    case 'healthy':
+      return 'Норма';
+    case 'warning':
+      return 'Замедление';
+    case 'risk':
+      return 'Риск';
+    case 'critical':
+      return 'Критично';
+    case 'stale_no_sales':
+      return 'Без продаж';
+    case 'out_of_stock':
+      return 'Нет остатка';
+    default:
+      return status || '-';
+  }
+}
+
 
 function renderProblemProducts(turnoverData){
   const rows = Array.isArray(turnoverData?.items) ? turnoverData.items : [];
