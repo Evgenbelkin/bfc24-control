@@ -26,6 +26,7 @@ const expensesRoutes = require("./routes/expenses");
 const ownerAdminRoutes = require("./routes/owner-admin");
 const ownerActivityRoutes = require("./routes/owner-activity");
 const reportsRoutes = require("./routes/reports");
+const usersRoutes = require("./routes/users");
 
 // 🔥 ДОБАВЛЕНО
 const subscriptionRequestsRoutes = require("./routes/subscription-requests");
@@ -89,6 +90,7 @@ app.use("/self-registration", selfRegistrationRoutes);
 app.use("/items", itemRoutes);
 app.use("/locations", locationRoutes);
 app.use("/clients", clientRoutes);
+app.use("/users", usersRoutes);
 app.use("/stock", stockRoutes);
 app.use("/sales", salesRoutes);
 app.use("/writeoff", writeoffRoutes);
