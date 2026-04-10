@@ -16,6 +16,7 @@
       --primary-hover:#1d4ed8;
       --success:#16a34a;
       --danger:#dc2626;
+      --warning:#d97706;
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:16px;
     }
@@ -101,6 +102,25 @@
       color:#fff;
     }
 
+    .btn-danger:hover{
+      filter:brightness(.96);
+    }
+
+    .btn-warning{
+      background:var(--warning);
+      color:#fff;
+    }
+
+    .btn-warning:hover{
+      filter:brightness(.96);
+    }
+
+    .btn-small{
+      padding:8px 12px;
+      font-size:13px;
+      border-radius:10px;
+    }
+
     .card{
       background:var(--card);
       border:1px solid #eef1f5;
@@ -123,14 +143,14 @@
 
     .form-grid{
       display:grid;
-      grid-template-columns:1fr 1fr 1fr 1fr;
+      grid-template-columns:1fr 1fr 1fr;
       gap:12px;
       align-items:end;
     }
 
     .filters{
       display:grid;
-      grid-template-columns:1.3fr 1fr 1fr 1fr 1fr auto;
+      grid-template-columns:1.4fr 1fr 1fr 1fr 1fr auto;
       gap:12px;
       align-items:end;
     }
@@ -210,7 +230,7 @@
 
     .stats{
       display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:12px;
       margin-top:14px;
     }
@@ -242,7 +262,7 @@
 
     table{
       width:100%;
-      min-width:1050px;
+      min-width:1200px;
       border-collapse:separate;
       border-spacing:0;
       background:#fff;
@@ -285,6 +305,12 @@
       color:#991b1b;
       background:#fef2f2;
       border-color:#fecaca;
+    }
+
+    .actions-cell{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
     }
 
     .empty{
@@ -346,7 +372,7 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title" data-i18n="expenses.formTitle">Добавить расход</h2>
+      <h2 class="card-title" id="formTitle" data-i18n="expenses.formTitle">Добавить расход</h2>
 
       <div class="form-grid">
         <div class="field">
@@ -365,15 +391,6 @@
             <option value="ads" data-i18n="expenses.categoryAds">Реклама</option>
             <option value="utilities" data-i18n="expenses.categoryUtilities">Коммунальные</option>
             <option value="other" data-i18n="expenses.categoryOther">Прочее</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="paymentMethodInput" data-i18n="expenses.paymentMethodLabel">Способ оплаты</label>
-          <select id="paymentMethodInput">
-            <option value="cash" data-i18n="expenses.paymentCash">Наличные</option>
-            <option value="card" data-i18n="expenses.paymentCard">Карта</option>
-            <option value="transfer" data-i18n="expenses.paymentTransfer">Перевод</option>
           </select>
         </div>
 
@@ -420,16 +437,6 @@
         </div>
 
         <div class="field">
-          <label for="paymentFilter" data-i18n="expenses.paymentFilterLabel">Способ оплаты</label>
-          <select id="paymentFilter">
-            <option value="" data-i18n="expenses.filterAll">Все</option>
-            <option value="cash" data-i18n="expenses.paymentCash">Наличные</option>
-            <option value="card" data-i18n="expenses.paymentCard">Карта</option>
-            <option value="transfer" data-i18n="expenses.paymentTransfer">Перевод</option>
-          </select>
-        </div>
-
-        <div class="field">
           <label data-i18n="expenses.quickPeriodLabel">Быстрый период</label>
           <div class="period-buttons">
             <button type="button" class="btn btn-light btn-period" id="periodTodayBtn" data-i18n="expenses.periodToday">Сегодня</button>
@@ -467,6 +474,10 @@
           <div class="stat-label" data-i18n="expenses.statsAverage">Средний расход</div>
           <div class="stat-value" id="avgExpense">0</div>
         </div>
+        <div class="stat">
+          <div class="stat-label">Максимальный расход</div>
+          <div class="stat-value" id="maxExpense">0</div>
+        </div>
       </div>
 
       <div id="pageStatus" class="status info"></div>
@@ -479,15 +490,16 @@
               <th data-i18n="expenses.tableType">Тип</th>
               <th data-i18n="expenses.tableAmount">Сумма</th>
               <th data-i18n="expenses.tableCategory">Категория</th>
-              <th data-i18n="expenses.tablePayment">Оплата</th>
               <th data-i18n="expenses.tableComment">Комментарий</th>
               <th data-i18n="expenses.tableCreatedBy">Создал</th>
-              <th data-i18n="expenses.tableDate">Дата</th>
+              <th>Дата расхода</th>
+              <th data-i18n="expenses.tableDate">Создан</th>
+              <th>Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="8" class="empty" data-i18n="expenses.loadingRows">Загрузка данных...</td>
+              <td colspan="9" class="empty" data-i18n="expenses.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -592,17 +604,30 @@
           return window.API.post(path, body);
         }
         return requestFallback("POST", path, body);
+      },
+      put(path, body) {
+        if (window.API && typeof window.API.put === "function") {
+          return window.API.put(path, body);
+        }
+        return requestFallback("PUT", path, body);
+      },
+      delete(path) {
+        if (window.API && typeof window.API.delete === "function") {
+          return window.API.delete(path);
+        }
+        return requestFallback("DELETE", path);
       }
     };
 
     let authUser = null;
     let expensesData = [];
     let activePeriod = "";
+    let editingExpenseId = null;
 
     const els = {
+      formTitle: document.getElementById("formTitle"),
       amountInput: document.getElementById("amountInput"),
       categoryInput: document.getElementById("categoryInput"),
-      paymentMethodInput: document.getElementById("paymentMethodInput"),
       expenseDateInput: document.getElementById("expenseDateInput"),
       commentInput: document.getElementById("commentInput"),
       saveBtn: document.getElementById("saveBtn"),
@@ -611,7 +636,6 @@
 
       searchInput: document.getElementById("searchInput"),
       categoryFilter: document.getElementById("categoryFilter"),
-      paymentFilter: document.getElementById("paymentFilter"),
       dateFrom: document.getElementById("dateFrom"),
       dateTo: document.getElementById("dateTo"),
       periodTodayBtn: document.getElementById("periodTodayBtn"),
@@ -623,7 +647,8 @@
       pageStatus: document.getElementById("pageStatus"),
       rowsCount: document.getElementById("rowsCount"),
       expenseTotal: document.getElementById("expenseTotal"),
-      avgExpense: document.getElementById("avgExpense")
+      avgExpense: document.getElementById("avgExpense"),
+      maxExpense: document.getElementById("maxExpense")
     };
 
     function t(key) {
@@ -632,6 +657,11 @@
 
     function tf(key, vars) {
       return window.i18n ? window.i18n.format(key, vars) : key;
+    }
+
+    function tt(key, fallback) {
+      const value = t(key);
+      return value === key ? fallback : value;
     }
 
     function goBack() {
@@ -697,29 +727,32 @@
     function formatMoney(value) {
       const n = Number(value || 0);
       if (!Number.isFinite(n)) return "0";
-      return n % 1 === 0 ? String(n) : n.toFixed(2);
+      return n.toLocaleString("ru-RU", {
+        minimumFractionDigits: n % 1 === 0 ? 0 : 2,
+        maximumFractionDigits: 2
+      });
     }
 
     function formatDate(value) {
-      return Ui.displayDateTime(value);
+      if (!value) return "";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value);
+      return d.toLocaleDateString("ru-RU");
     }
 
-    function paymentLabel(value) {
-      if (value === "cash") return t("expenses.paymentCash");
-      if (value === "card") return t("expenses.paymentCard");
-      if (value === "transfer") return t("expenses.paymentTransfer");
-      return value || "";
+    function formatDateTime(value) {
+      return Ui.displayDateTime(value);
     }
 
     function categoryLabel(value) {
       const key = String(value || "").trim().toLowerCase();
-      if (key === "rent") return t("expenses.categoryRent");
-      if (key === "salary") return t("expenses.categorySalary");
-      if (key === "purchase") return t("expenses.categoryPurchase");
-      if (key === "delivery") return t("expenses.categoryDelivery");
-      if (key === "ads") return t("expenses.categoryAds");
-      if (key === "utilities") return t("expenses.categoryUtilities");
-      if (key === "other") return t("expenses.categoryOther");
+      if (key === "rent") return t("expenses.categoryRent") !== "expenses.categoryRent" ? t("expenses.categoryRent") : "Аренда";
+      if (key === "salary") return t("expenses.categorySalary") !== "expenses.categorySalary" ? t("expenses.categorySalary") : "Зарплата";
+      if (key === "purchase") return t("expenses.categoryPurchase") !== "expenses.categoryPurchase" ? t("expenses.categoryPurchase") : "Закупка";
+      if (key === "delivery") return t("expenses.categoryDelivery") !== "expenses.categoryDelivery" ? t("expenses.categoryDelivery") : "Доставка";
+      if (key === "ads") return t("expenses.categoryAds") !== "expenses.categoryAds" ? t("expenses.categoryAds") : "Реклама";
+      if (key === "utilities") return t("expenses.categoryUtilities") !== "expenses.categoryUtilities" ? t("expenses.categoryUtilities") : "Коммунальные";
+      if (key === "other") return t("expenses.categoryOther") !== "expenses.categoryOther" ? t("expenses.categoryOther") : "Прочее";
       return CATEGORY_LABELS[key] || value || "";
     }
 
@@ -773,9 +806,9 @@
       const to = els.dateTo.value;
 
       if (!from && !to) return true;
-      if (!row.created_at) return false;
+      if (!row.expense_date) return false;
 
-      const rowDate = new Date(row.created_at);
+      const rowDate = new Date(`${row.expense_date}T12:00:00`);
       if (Number.isNaN(rowDate.getTime())) return false;
 
       if (from) {
@@ -794,20 +827,35 @@
     function normalizeExpenseRow(row) {
       return {
         id: row.id,
+        tenant_id: row.tenant_id,
         amount: Number(row.amount || 0),
         category: String(row.category || "").trim().toLowerCase(),
         category_label: row.category_label || CATEGORY_LABELS[String(row.category || "").trim().toLowerCase()] || "",
-        payment_method: row.payment_method || "",
         comment: row.comment || "",
+        expense_date: row.expense_date || "",
         created_by_username: row.created_by_username || "",
-        created_at: row.created_at || null
+        created_at: row.created_at || null,
+        updated_at: row.updated_at || null
       };
     }
 
+    function setEditMode(row) {
+      editingExpenseId = row.id;
+      els.formTitle.textContent = `${tt("expenses.formEditTitle", "Редактирование расхода")} #${row.id}`;
+      els.saveBtn.textContent = tt("expenses.updateButton", "Сохранить изменения");
+      els.amountInput.value = row.amount;
+      els.categoryInput.value = row.category || "";
+      els.expenseDateInput.value = row.expense_date || "";
+      els.commentInput.value = row.comment || "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
     function clearForm() {
+      editingExpenseId = null;
+      els.formTitle.textContent = tt("expenses.formTitle", "Добавить расход");
+      els.saveBtn.textContent = tt("expenses.saveButton", "Сохранить расход");
       els.amountInput.value = "";
       els.categoryInput.value = "";
-      els.paymentMethodInput.value = "cash";
       setDefaultExpenseDate();
       els.commentInput.value = "";
       hideStatus(els.formStatus);
@@ -816,11 +864,9 @@
     function getFilteredRows() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
       const category = (els.categoryFilter.value || "").trim().toLowerCase();
-      const payment = els.paymentFilter.value;
 
       return expensesData
         .filter(row => !category || row.category === category)
-        .filter(row => !payment || row.payment_method === payment)
         .filter(row => isInDateRange(row))
         .filter(row => {
           if (!search) return true;
@@ -829,7 +875,7 @@
             categoryLabel(row.category),
             row.comment,
             row.created_by_username,
-            paymentLabel(row.payment_method)
+            row.expense_date
           ].join(" ").toLowerCase();
 
           return text.includes(search);
@@ -839,10 +885,12 @@
     function updateStats(rows) {
       const total = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
       const average = rows.length ? total / rows.length : 0;
+      const max = rows.length ? Math.max(...rows.map(row => Number(row.amount || 0))) : 0;
 
       els.rowsCount.textContent = String(rows.length);
       els.expenseTotal.textContent = formatMoney(total);
       els.avgExpense.textContent = formatMoney(average);
+      els.maxExpense.textContent = formatMoney(max);
     }
 
     function renderTable() {
@@ -852,7 +900,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="8" class="empty">${escapeHtml(t("expenses.noData"))}</td>
+            <td colspan="9" class="empty">${escapeHtml(tt("expenses.noData", "Нет данных"))}</td>
           </tr>
         `;
         return;
@@ -861,13 +909,19 @@
       els.tbody.innerHTML = rows.map(row => `
         <tr>
           <td>${escapeHtml(row.id)}</td>
-          <td><span class="badge badge-expense">${escapeHtml(t("expenses.badgeExpense"))}</span></td>
+          <td><span class="badge badge-expense">${escapeHtml(tt("expenses.badgeExpense", "Расход"))}</span></td>
           <td>${escapeHtml(formatMoney(row.amount))}</td>
           <td>${escapeHtml(categoryLabel(row.category))}</td>
-          <td>${escapeHtml(paymentLabel(row.payment_method))}</td>
           <td>${escapeHtml(row.comment)}</td>
-          <td>${escapeHtml(row.created_by_username || t("expenses.noUser"))}</td>
-          <td>${escapeHtml(formatDate(row.created_at))}</td>
+          <td>${escapeHtml(row.created_by_username || tt("expenses.noUser", "—"))}</td>
+          <td>${escapeHtml(formatDate(row.expense_date))}</td>
+          <td>${escapeHtml(formatDateTime(row.created_at))}</td>
+          <td>
+            <div class="actions-cell">
+              <button type="button" class="btn btn-warning btn-small" onclick="editExpense('${String(row.id).replace(/'/g, "\\'")}')">${escapeHtml(tt("expenses.editButton", "Изменить"))}</button>
+              <button type="button" class="btn btn-danger btn-small" onclick="deleteExpense('${String(row.id).replace(/'/g, "\\'")}')">${escapeHtml(tt("expenses.deleteButton", "Удалить"))}</button>
+            </div>
+          </td>
         </tr>
       `).join("");
     }
@@ -890,7 +944,7 @@
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="8" class="empty">${escapeHtml(t("expenses.loadErrorRow"))}</td>
+            <td colspan="9" class="empty">${escapeHtml(tt("expenses.loadErrorRow", "Ошибка загрузки данных"))}</td>
           </tr>
         `;
         showStatus(els.pageStatus, tf("expenses.loadErrorStatus", { error: Ui.translateError(err.message) }), "error");
@@ -902,34 +956,54 @@
         const tenantId = getTenantId();
         const amount = Number(els.amountInput.value || 0);
         const category = String(els.categoryInput.value || "").trim();
-        const paymentMethod = String(els.paymentMethodInput.value || "").trim();
         const expenseDate = String(els.expenseDateInput.value || "").trim();
         const comment = String(els.commentInput.value || "").trim();
 
         if (!Number.isFinite(amount) || amount <= 0) {
-          throw new Error(t("expenses.amountInvalid"));
+          throw new Error(tt("expenses.amountInvalid", "Некорректная сумма"));
         }
 
         if (!category) {
-          throw new Error(t("expenses.categoryRequired"));
+          throw new Error(tt("expenses.categoryRequired", "Выбери категорию"));
         }
 
-        if (!paymentMethod) {
-          throw new Error(t("expenses.paymentRequired"));
+        if (!expenseDate) {
+          throw new Error(tt("expenses.expenseDateRequired", "Укажи дату расхода"));
         }
 
-        showStatus(els.formStatus, t("expenses.savingStatus"), "info");
+        showStatus(
+          els.formStatus,
+          editingExpenseId
+            ? tt("expenses.updatingStatus", "Обновление расхода...")
+            : tt("expenses.savingStatus", "Сохранение расхода..."),
+          "info"
+        );
 
-        await ApiBridge.post("/expenses", {
-          tenant_id: tenantId,
-          amount,
-          category,
-          payment_method: paymentMethod,
-          expense_date: expenseDate || null,
-          comment: comment || null
-        });
+        if (editingExpenseId) {
+          await ApiBridge.put(`/expenses/${editingExpenseId}`, {
+            amount,
+            category,
+            expense_date: expenseDate,
+            comment: comment || null
+          });
+        } else {
+          await ApiBridge.post("/expenses", {
+            tenant_id: tenantId,
+            amount,
+            category,
+            expense_date: expenseDate,
+            comment: comment || null
+          });
+        }
 
-        showStatus(els.formStatus, t("expenses.savedStatus"), "success");
+        showStatus(
+          els.formStatus,
+          editingExpenseId
+            ? tt("expenses.updatedStatus", "Расход обновлён")
+            : tt("expenses.savedStatus", "Расход сохранён"),
+          "success"
+        );
+
         clearForm();
         await loadData();
       } catch (err) {
@@ -937,13 +1011,44 @@
       }
     }
 
+    async function removeExpense(id) {
+      const ok = window.confirm(tt("expenses.deleteConfirm", "Удалить этот расход?"));
+      if (!ok) return;
+
+      try {
+        showStatus(els.pageStatus, tt("expenses.deletingStatus", "Удаление расхода..."), "info");
+        await ApiBridge.delete(`/expenses/${id}`);
+
+        if (String(editingExpenseId) === String(id)) {
+          clearForm();
+        }
+
+        await loadData();
+        showStatus(els.pageStatus, tt("expenses.deletedStatus", "Расход удалён"), "success");
+      } catch (err) {
+        showStatus(els.pageStatus, tf("expenses.deleteErrorStatus", { error: Ui.translateError(err.message) }), "error");
+      }
+    }
+
+    window.editExpense = function(id) {
+      const row = expensesData.find(item => String(item.id) === String(id));
+      if (!row) {
+        showStatus(els.pageStatus, tt("expenses.rowNotFound", "Запись не найдена"), "error");
+        return;
+      }
+      setEditMode(row);
+    };
+
+    window.deleteExpense = function(id) {
+      removeExpense(id);
+    };
+
     function bindEvents() {
       els.saveBtn.addEventListener("click", saveExpense);
       els.clearBtn.addEventListener("click", clearForm);
 
       els.searchInput.addEventListener("input", renderTable);
       els.categoryFilter.addEventListener("change", renderTable);
-      els.paymentFilter.addEventListener("change", renderTable);
 
       els.dateFrom.addEventListener("change", () => {
         clearActivePeriod();
@@ -966,6 +1071,18 @@
           window.i18n.applyTranslations();
           window.i18n.renderLanguageSwitcher("langSwitcher");
         }
+
+        if (editingExpenseId) {
+          const row = expensesData.find(item => String(item.id) === String(editingExpenseId));
+          if (row) {
+            els.formTitle.textContent = `${tt("expenses.formEditTitle", "Редактирование расхода")} #${row.id}`;
+            els.saveBtn.textContent = tt("expenses.updateButton", "Сохранить изменения");
+          }
+        } else {
+          els.formTitle.textContent = tt("expenses.formTitle", "Добавить расход");
+          els.saveBtn.textContent = tt("expenses.saveButton", "Сохранить расход");
+        }
+
         renderTable();
       });
     }
