@@ -667,6 +667,189 @@
 
   <script>
     (function () {
+      const fallbackTranslations = {
+        ru: {
+          common: {
+            backToMenu: '← Назад в меню',
+            dateFrom: 'Дата от',
+            dateTo: 'Дата до',
+            quickPeriods: 'Быстрые периоды',
+            today: 'Сегодня',
+            last7Days: '7 дней',
+            last30Days: '30 дней',
+            thisMonth: 'Этот месяц',
+            allPeriod: 'Весь период',
+            apply: 'Применить',
+            reset: 'Сбросить',
+            refresh: 'Обновить',
+            loading: 'Загрузка...',
+            error: 'Ошибка'
+          },
+          topItems: {
+            documentTitle: 'BFC24 CONTROL — Top Items',
+            title: 'Top Items',
+            subtitle: 'Анализ выручки, себестоимости, прибыли и маржи по товарам. Эта страница показывает, на каких позициях бизнес зарабатывает больше всего.',
+            badge: 'Аналитика по товарам',
+            limitLabel: 'Показать',
+            all: 'Все',
+            searchLabel: 'Поиск по товару',
+            searchPlaceholder: 'Название товара...',
+            unknownItem: 'Без названия',
+            rank: 'ТОП',
+            empty: 'За выбранный период нет данных по продажам товаров.',
+            footerNote: 'Показатели считаются по продажам за выбранный период. Себестоимость берётся из данных продажи/FIFO-слоя, если он уже записан в sale_items.',
+            cards: {
+              positions: 'Позиций в выборке',
+              positionsSub: 'Товаров с продажами за период',
+              revenue: 'Выручка',
+              revenueSub: 'Суммарная выручка по выбранным товарам',
+              cogs: 'Себестоимость',
+              cogsSub: 'Суммарная стоимость проданных товаров',
+              profit: 'Валовая прибыль',
+              marginSub: 'Средняя маржа по выборке: 0%',
+              marginSubFormatted: 'Средняя маржа по выборке: {margin}'
+            },
+            summary: {
+              title: 'Лидеры периода',
+              subtitle: 'Краткая выжимка по самым сильным товарам'
+            },
+            table: {
+              title: 'Таблица top items',
+              subtitle: 'Сортировка по прибыли по убыванию'
+            },
+            columns: {
+              item: 'Товар',
+              qty: 'Кол-во',
+              avgPrice: 'Средняя цена',
+              revenue: 'Выручка',
+              cogs: 'Себестоимость',
+              profit: 'Прибыль',
+              margin: 'Маржа'
+            }
+          }
+        },
+        en: {
+          common: {
+            backToMenu: '← Back to menu',
+            dateFrom: 'Date from',
+            dateTo: 'Date to',
+            quickPeriods: 'Quick periods',
+            today: 'Today',
+            last7Days: '7 days',
+            last30Days: '30 days',
+            thisMonth: 'This month',
+            allPeriod: 'All period',
+            apply: 'Apply',
+            reset: 'Reset',
+            refresh: 'Refresh',
+            loading: 'Loading...',
+            error: 'Error'
+          },
+          topItems: {
+            documentTitle: 'BFC24 CONTROL — Top Items',
+            title: 'Top Items',
+            subtitle: 'Revenue, COGS, profit and margin analysis by product. This page shows which items generate the most money.',
+            badge: 'Product analytics',
+            limitLabel: 'Show',
+            all: 'All',
+            searchLabel: 'Search item',
+            searchPlaceholder: 'Item name...',
+            unknownItem: 'Untitled item',
+            rank: 'TOP',
+            empty: 'No product sales data for the selected period.',
+            footerNote: 'Metrics are calculated from sales for the selected period. COGS is taken from sale/FIFO data when it is already stored in sale_items.',
+            cards: {
+              positions: 'Items in sample',
+              positionsSub: 'Products with sales in the selected period',
+              revenue: 'Revenue',
+              revenueSub: 'Total revenue for selected items',
+              cogs: 'COGS',
+              cogsSub: 'Total cost of sold products',
+              profit: 'Gross profit',
+              marginSub: 'Average margin in sample: 0%',
+              marginSubFormatted: 'Average margin in sample: {margin}'
+            },
+            summary: {
+              title: 'Period leaders',
+              subtitle: 'Quick view of the strongest products'
+            },
+            table: {
+              title: 'Top items table',
+              subtitle: 'Sorted by profit descending'
+            },
+            columns: {
+              item: 'Item',
+              qty: 'Qty',
+              avgPrice: 'Avg price',
+              revenue: 'Revenue',
+              cogs: 'COGS',
+              profit: 'Profit',
+              margin: 'Margin'
+            }
+          }
+        },
+        zh: {
+          common: {
+            backToMenu: '← 返回菜单',
+            dateFrom: '开始日期',
+            dateTo: '结束日期',
+            quickPeriods: '快捷周期',
+            today: '今天',
+            last7Days: '7天',
+            last30Days: '30天',
+            thisMonth: '本月',
+            allPeriod: '全部期间',
+            apply: '应用',
+            reset: '重置',
+            refresh: '刷新',
+            loading: '加载中...',
+            error: '错误'
+          },
+          topItems: {
+            documentTitle: 'BFC24 CONTROL — Top Items',
+            title: 'Top Items',
+            subtitle: '按商品分析收入、成本、利润和利润率。这个页面显示哪些商品最赚钱。',
+            badge: '商品分析',
+            limitLabel: '显示',
+            all: '全部',
+            searchLabel: '搜索商品',
+            searchPlaceholder: '商品名称...',
+            unknownItem: '未命名商品',
+            rank: 'TOP',
+            empty: '所选期间内没有商品销售数据。',
+            footerNote: '指标基于所选期间的销售数据计算。商品成本取自 sale_items 中已写入的销售/FIFO 数据。',
+            cards: {
+              positions: '样本商品数',
+              positionsSub: '所选期间内有销售的商品',
+              revenue: '收入',
+              revenueSub: '所选商品总收入',
+              cogs: '销售成本',
+              cogsSub: '已售商品总成本',
+              profit: '毛利润',
+              marginSub: '样本平均利润率：0%',
+              marginSubFormatted: '样本平均利润率：{margin}'
+            },
+            summary: {
+              title: '期间领先商品',
+              subtitle: '最强商品的快速摘要'
+            },
+            table: {
+              title: 'Top items 表',
+              subtitle: '按利润从高到低排序'
+            },
+            columns: {
+              item: '商品',
+              qty: '数量',
+              avgPrice: '平均售价',
+              revenue: '收入',
+              cogs: '成本',
+              profit: '利润',
+              margin: '利润率'
+            }
+          }
+        }
+      };
+
       const state = {
         rows: [],
         filteredRows: [],
@@ -703,22 +886,65 @@
       };
 
       function getCurrentLang() {
-        return (window.i18n && typeof window.i18n.getLang === 'function')
-          ? window.i18n.getLang()
-          : (localStorage.getItem('lang') || 'ru');
+        if (window.i18n && typeof window.i18n.getLang === 'function') {
+          return window.i18n.getLang();
+        }
+        try {
+          return localStorage.getItem('lang') || 'ru';
+        } catch (e) {
+          return 'ru';
+        }
+      }
+
+      function deepGet(obj, path) {
+        return String(path || '')
+          .split('.')
+          .reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
       }
 
       function t(key, fallback) {
         if (window.i18n && typeof window.i18n.t === 'function') {
-          return window.i18n.t(key) || fallback || key;
+          const value = window.i18n.t(key);
+          if (value && value !== key) return value;
         }
-        return fallback || key;
+
+        const lang = getCurrentLang();
+        const fallbackValue =
+          deepGet(fallbackTranslations[lang], key) ??
+          deepGet(fallbackTranslations.ru, key);
+
+        return fallbackValue || fallback || key;
+      }
+
+      function applyFallbackTranslations() {
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+          const key = el.getAttribute('data-i18n');
+          const value = t(key, el.textContent);
+          if (value) el.textContent = value;
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+          const key = el.getAttribute('data-i18n-placeholder');
+          const value = t(key, el.getAttribute('placeholder') || '');
+          if (value) el.setAttribute('placeholder', value);
+        });
+
+        const allOption = els.topLimit.querySelector('option[value="0"]');
+        if (allOption) {
+          allOption.textContent = t('topItems.all', 'Все');
+        }
       }
 
       function applyTranslations() {
         if (window.i18n && typeof window.i18n.apply === 'function') {
-          window.i18n.apply();
+          try {
+            window.i18n.apply();
+          } catch (e) {
+            console.error('[top-items] i18n.apply error:', e);
+          }
         }
+
+        applyFallbackTranslations();
         document.title = t('topItems.documentTitle', 'BFC24 CONTROL — Top Items');
         updateCards(state.filteredRows);
         renderSummary(state.filteredRows);
@@ -741,9 +967,23 @@
           .replace(/'/g, '&#39;');
       }
 
+      function translateErrorMessage(message) {
+        if (window.appUI && typeof window.appUI.translateError === 'function') {
+          return window.appUI.translateError(message);
+        }
+        return message;
+      }
+
+      function getLocale() {
+        const lang = getCurrentLang();
+        if (lang === 'ru') return 'ru-RU';
+        if (lang === 'zh') return 'zh-CN';
+        return 'en-US';
+      }
+
       function formatNumber(value, fractionDigits = 0) {
         const num = Number(value || 0);
-        return new Intl.NumberFormat(getCurrentLang() === 'ru' ? 'ru-RU' : getCurrentLang(), {
+        return new Intl.NumberFormat(getLocale(), {
           minimumFractionDigits: fractionDigits,
           maximumFractionDigits: fractionDigits
         }).format(num);
@@ -751,7 +991,7 @@
 
       function formatMoney(value) {
         const num = Number(value || 0);
-        return new Intl.NumberFormat(getCurrentLang() === 'ru' ? 'ru-RU' : getCurrentLang(), {
+        return new Intl.NumberFormat(getLocale(), {
           minimumFractionDigits: 0,
           maximumFractionDigits: 2
         }).format(num);
@@ -759,7 +999,7 @@
 
       function formatPercent(value) {
         const num = Number(value || 0);
-        return new Intl.NumberFormat(getCurrentLang() === 'ru' ? 'ru-RU' : getCurrentLang(), {
+        return new Intl.NumberFormat(getLocale(), {
           minimumFractionDigits: 0,
           maximumFractionDigits: 2
         }).format(num) + '%';
@@ -851,7 +1091,13 @@
         return {
           index: index + 1,
           item_id: pickValue(row, ['item_id', 'id', 'product_id'], ''),
-          item_name: String(pickValue(row, ['item_name', 'name', 'product_name', 'title'], t('topItems.unknownItem', 'Без названия')) || t('topItems.unknownItem', 'Без названия')),
+          item_name: String(
+            pickValue(
+              row,
+              ['item_name', 'name', 'product_name', 'title'],
+              t('topItems.unknownItem', 'Без названия')
+            ) || t('topItems.unknownItem', 'Без названия')
+          ),
           qty_sold: qty,
           avg_price: avgPrice,
           revenue,
@@ -953,7 +1199,7 @@
         els.cardRevenue.textContent = formatMoney(revenue);
         els.cardCogs.textContent = formatMoney(cogs);
         els.cardProfit.textContent = formatMoney(profit);
-        els.cardMarginSub.textContent = t('topItems.cards.marginSubFormatted', 'Средняя маржа по выборке: {margin}%')
+        els.cardMarginSub.textContent = t('topItems.cards.marginSubFormatted', 'Средняя маржа по выборке: {margin}')
           .replace('{margin}', formatPercent(margin));
       }
 
@@ -1039,6 +1285,56 @@
         `).join('');
       }
 
+      function getToken() {
+        try {
+          return (
+            localStorage.getItem('token') ||
+            sessionStorage.getItem('token') ||
+            ''
+          );
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function getApiBase() {
+        if (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) {
+          return window.APP_CONFIG.API_BASE_URL;
+        }
+        return '';
+      }
+
+      async function apiGet(path) {
+        if (window.api && typeof window.api.get === 'function') {
+          return window.api.get(path);
+        }
+
+        if (typeof window.apiGet === 'function') {
+          return window.apiGet(path);
+        }
+
+        if (typeof window.apiFetch === 'function') {
+          return window.apiFetch(path, { method: 'GET' });
+        }
+
+        const token = getToken();
+        const res = await fetch(getApiBase() + path, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: 'Bearer ' + token } : {})
+          }
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const err = new Error(data.error || 'request_failed');
+          err.payload = data;
+          throw err;
+        }
+        return data;
+      }
+
       async function loadTopItems() {
         setLoading(true);
         clearError();
@@ -1047,7 +1343,7 @@
           const params = getQueryParams();
           const endpoint = '/reports/top-items' + (params.toString() ? `?${params.toString()}` : '');
 
-          const response = await window.api.get(endpoint);
+          const response = await apiGet(endpoint);
           const rawRows = extractRows(response);
           const normalized = rawRows.map(normalizeRow);
           state.rows = sortRows(normalized);
@@ -1058,12 +1354,15 @@
           renderSummary(state.filteredRows);
           renderTable(state.filteredRows);
         } catch (error) {
+          console.error('[top-items] load error:', error);
           setLoading(false);
 
-          let message = error && error.message ? error.message : t('common.error', 'Ошибка');
-          if (window.appUI && typeof window.appUI.translateError === 'function') {
-            message = window.appUI.translateError(message);
-          }
+          let message =
+            (error && error.payload && error.payload.error) ||
+            (error && error.message) ||
+            t('common.error', 'Ошибка');
+
+          message = translateErrorMessage(message);
 
           setError(message);
           updateCards([]);
@@ -1096,9 +1395,11 @@
         els.langSwitcher.addEventListener('change', (e) => {
           const lang = e.target.value;
           localStorage.setItem('lang', lang);
+
           if (window.i18n && typeof window.i18n.setLang === 'function') {
             window.i18n.setLang(lang);
           }
+
           applyTranslations();
         });
 
@@ -1111,196 +1412,18 @@
       }
 
       function extendI18n() {
-        if (!window.i18n || typeof window.i18n.add !== 'function') return;
-
-        window.i18n.add({
-          ru: {
-            common: {
-              backToMenu: '← Назад в меню',
-              dateFrom: 'Дата от',
-              dateTo: 'Дата до',
-              quickPeriods: 'Быстрые периоды',
-              today: 'Сегодня',
-              last7Days: '7 дней',
-              last30Days: '30 дней',
-              thisMonth: 'Этот месяц',
-              allPeriod: 'Весь период',
-              apply: 'Применить',
-              reset: 'Сбросить',
-              refresh: 'Обновить',
-              loading: 'Загрузка...',
-              error: 'Ошибка'
-            },
-            topItems: {
-              documentTitle: 'BFC24 CONTROL — Top Items',
-              title: 'Top Items',
-              subtitle: 'Анализ выручки, себестоимости, прибыли и маржи по товарам. Эта страница показывает, на каких позициях бизнес зарабатывает больше всего.',
-              badge: 'Аналитика по товарам',
-              limitLabel: 'Показать',
-              all: 'Все',
-              searchLabel: 'Поиск по товару',
-              searchPlaceholder: 'Название товара...',
-              unknownItem: 'Без названия',
-              rank: 'ТОП',
-              empty: 'За выбранный период нет данных по продажам товаров.',
-              footerNote: 'Показатели считаются по продажам за выбранный период. Себестоимость берётся из данных продажи/FIFO-слоя, если он уже записан в sale_items.',
-              cards: {
-                positions: 'Позиций в выборке',
-                positionsSub: 'Товаров с продажами за период',
-                revenue: 'Выручка',
-                revenueSub: 'Суммарная выручка по выбранным товарам',
-                cogs: 'Себестоимость',
-                cogsSub: 'Суммарная стоимость проданных товаров',
-                profit: 'Валовая прибыль',
-                marginSub: 'Средняя маржа по выборке: 0%',
-                marginSubFormatted: 'Средняя маржа по выборке: {margin}'
-              },
-              summary: {
-                title: 'Лидеры периода',
-                subtitle: 'Краткая выжимка по самым сильным товарам'
-              },
-              table: {
-                title: 'Таблица top items',
-                subtitle: 'Сортировка по прибыли по убыванию'
-              },
-              columns: {
-                item: 'Товар',
-                qty: 'Кол-во',
-                avgPrice: 'Средняя цена',
-                revenue: 'Выручка',
-                cogs: 'Себестоимость',
-                profit: 'Прибыль',
-                margin: 'Маржа'
-              }
-            }
-          },
-          en: {
-            common: {
-              backToMenu: '← Back to menu',
-              dateFrom: 'Date from',
-              dateTo: 'Date to',
-              quickPeriods: 'Quick periods',
-              today: 'Today',
-              last7Days: '7 days',
-              last30Days: '30 days',
-              thisMonth: 'This month',
-              allPeriod: 'All period',
-              apply: 'Apply',
-              reset: 'Reset',
-              refresh: 'Refresh',
-              loading: 'Loading...',
-              error: 'Error'
-            },
-            topItems: {
-              documentTitle: 'BFC24 CONTROL — Top Items',
-              title: 'Top Items',
-              subtitle: 'Revenue, COGS, profit and margin analysis by product. This page shows which items generate the most money.',
-              badge: 'Product analytics',
-              limitLabel: 'Show',
-              all: 'All',
-              searchLabel: 'Search item',
-              searchPlaceholder: 'Item name...',
-              unknownItem: 'Untitled item',
-              rank: 'TOP',
-              empty: 'No product sales data for the selected period.',
-              footerNote: 'Metrics are calculated from sales for the selected period. COGS is taken from sale/FIFO data when it is already stored in sale_items.',
-              cards: {
-                positions: 'Items in sample',
-                positionsSub: 'Products with sales in the selected period',
-                revenue: 'Revenue',
-                revenueSub: 'Total revenue for selected items',
-                cogs: 'COGS',
-                cogsSub: 'Total cost of sold products',
-                profit: 'Gross profit',
-                marginSub: 'Average margin in sample: 0%',
-                marginSubFormatted: 'Average margin in sample: {margin}'
-              },
-              summary: {
-                title: 'Period leaders',
-                subtitle: 'Quick view of the strongest products'
-              },
-              table: {
-                title: 'Top items table',
-                subtitle: 'Sorted by profit descending'
-              },
-              columns: {
-                item: 'Item',
-                qty: 'Qty',
-                avgPrice: 'Avg price',
-                revenue: 'Revenue',
-                cogs: 'COGS',
-                profit: 'Profit',
-                margin: 'Margin'
-              }
-            }
-          },
-          zh: {
-            common: {
-              backToMenu: '← 返回菜单',
-              dateFrom: '开始日期',
-              dateTo: '结束日期',
-              quickPeriods: '快捷周期',
-              today: '今天',
-              last7Days: '7天',
-              last30Days: '30天',
-              thisMonth: '本月',
-              allPeriod: '全部期间',
-              apply: '应用',
-              reset: '重置',
-              refresh: '刷新',
-              loading: '加载中...',
-              error: '错误'
-            },
-            topItems: {
-              documentTitle: 'BFC24 CONTROL — Top Items',
-              title: 'Top Items',
-              subtitle: '按商品分析收入、成本、利润和利润率。这个页面显示哪些商品最赚钱。',
-              badge: '商品分析',
-              limitLabel: '显示',
-              all: '全部',
-              searchLabel: '搜索商品',
-              searchPlaceholder: '商品名称...',
-              unknownItem: '未命名商品',
-              rank: 'TOP',
-              empty: '所选期间内没有商品销售数据。',
-              footerNote: '指标基于所选期间的销售数据计算。商品成本取自 sale_items 中已写入的销售/FIFO 数据。',
-              cards: {
-                positions: '样本商品数',
-                positionsSub: '所选期间内有销售的商品',
-                revenue: '收入',
-                revenueSub: '所选商品总收入',
-                cogs: '销售成本',
-                cogsSub: '已售商品总成本',
-                profit: '毛利润',
-                marginSub: '样本平均利润率：0%',
-                marginSubFormatted: '样本平均利润率：{margin}'
-              },
-              summary: {
-                title: '期间领先商品',
-                subtitle: '最强商品的快速摘要'
-              },
-              table: {
-                title: 'Top items 表',
-                subtitle: '按利润从高到低排序'
-              },
-              columns: {
-                item: '商品',
-                qty: '数量',
-                avgPrice: '平均售价',
-                revenue: '收入',
-                cogs: '成本',
-                profit: '利润',
-                margin: '利润率'
-              }
-            }
-          }
-        });
+        if (window.i18n && typeof window.i18n.add === 'function') {
+          window.i18n.add(fallbackTranslations);
+        }
       }
 
       async function init() {
         try {
           if (window.api && typeof window.api.authGuard === 'function') {
             await window.api.authGuard();
+          } else if (!getToken()) {
+            window.location.href = '/login.html';
+            return;
           }
 
           extendI18n();
@@ -1315,10 +1438,15 @@
           applyTranslations();
           await loadTopItems();
         } catch (error) {
-          let message = error && error.message ? error.message : t('common.error', 'Ошибка');
-          if (window.appUI && typeof window.appUI.translateError === 'function') {
-            message = window.appUI.translateError(message);
-          }
+          console.error('[top-items] init error:', error);
+
+          let message =
+            (error && error.payload && error.payload.error) ||
+            (error && error.message) ||
+            t('common.error', 'Ошибка');
+
+          message = translateErrorMessage(message);
+
           setLoading(false);
           setError(message);
         }
