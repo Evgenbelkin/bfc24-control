@@ -409,6 +409,17 @@
     <div id="top-items-wrap"><div class="skeleton sk-table"></div></div>
   </div>
 
+
+  <!-- ════ Блок 4 — Проблемные товары ════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-red">⚠️</div>
+      <h2 class="section-title">Проблемные товары</h2>
+      <span class="section-note" id="problem-note">оборачиваемость и риск</span>
+    </div>
+    <div id="problem-products-wrap"><div class="skeleton sk-table"></div></div>
+  </div>
+
   <!-- ════ Блок 4 — Долги ════ -->
   <div class="section">
     <div class="section-header">
@@ -527,6 +538,15 @@ document.querySelectorAll(".preset-btn").forEach(btn=>{
   });
 });
 function clearFilter(){ $from.value=""; $to.value=""; document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active")); loadAll(); }
+function inferPeriodDays(){
+  if ($from.value && $to.value) {
+    const from = new Date($from.value + "T00:00:00");
+    const to = new Date($to.value + "T00:00:00");
+    const diff = Math.round((to - from) / 86400000) + 1;
+    return Math.max(1, diff);
+  }
+  return 30;
+}
 
 /* ══════════════════════════════════════════════════════════
    API
@@ -568,7 +588,7 @@ function showError(m){ document.getElementById("alert-text").textContent=m; docu
 
 const DATA_BLOCKS = [
   "pnl-kpi-grid","pnl-funnel-wrap","expenses-wrap",
-  "chart-wrap","top-items-wrap",
+  "chart-wrap","top-items-wrap","problem-products-wrap",
   "debts-kpi-grid","debts-table-wrap",
   "stock-kpi-grid","sync-body",
 ];
@@ -597,6 +617,7 @@ function showSkeletons(){
   document.getElementById("expenses-wrap").innerHTML   = "";
   document.getElementById("chart-wrap").innerHTML      = '<div class="skeleton sk-chart"></div>';
   document.getElementById("top-items-wrap").innerHTML  = '<div class="skeleton sk-table"></div>';
+  document.getElementById("problem-products-wrap").innerHTML = '<div class="skeleton sk-table"></div>';
   document.getElementById("debts-kpi-grid").innerHTML  = Array(4).fill('<div class="skeleton sk-kpi"></div>').join("");
   document.getElementById("debts-table-wrap").innerHTML= '<div class="skeleton sk-table" style="height:180px"></div>';
   document.getElementById("stock-kpi-grid").innerHTML  = Array(3).fill('<div class="skeleton sk-kpi"></div>').join("");
@@ -1003,6 +1024,67 @@ function renderSyncCheck(sv){
     </table></div>`;
 }
 
+
+function renderProblemProducts(turnoverData){
+  const rows = Array.isArray(turnoverData?.items) ? turnoverData.items : [];
+  if (!rows.length) {
+    return `<div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-title">Нет проблемных товаров</div><p class="empty-state-text">Для выбранного периода не найдено товаров с зависанием, риском или критичным статусом.</p></div>`;
+  }
+
+  const severity = { critical: 4, risk: 3, warning: 2, stale_no_sales: 1, out_of_stock: 0, healthy: -1 };
+  const filtered = rows
+    .filter((r) => ["critical","risk","warning","stale_no_sales"].includes(r.turnover_status))
+    .sort((a, b) => {
+      const sa = severity[a.turnover_status] ?? -1;
+      const sb = severity[b.turnover_status] ?? -1;
+      if (sb !== sa) return sb - sa;
+      return (+b.stock_cost_total || 0) - (+a.stock_cost_total || 0);
+    })
+    .slice(0, 12);
+
+  if (!filtered.length) {
+    return `<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-title">Критичных товаров нет</div><p class="empty-state-text">В выбранном периоде система не нашла проблемных позиций.</p></div>`;
+  }
+
+  const rowsHtml = filtered.map((r) => {
+    const status = statusLabel(r.turnover_status);
+    const stockCost = +r.stock_cost_total || 0;
+    const profit = +r.potential_profit || 0;
+    const days = r.days_on_hand == null ? "—" : fmt(r.days_on_hand, 1);
+    const statusClass =
+      r.turnover_status === "critical" ? "cell-danger" :
+      r.turnover_status === "risk" ? "cell-warning" :
+      r.turnover_status === "warning" ? "cell-warning" :
+      r.turnover_status === "stale_no_sales" ? "" : "";
+
+    return `<tr>
+      <td>
+        <div style="font-weight:600">${esc(r.name || "—")}</div>
+        <div class="cell-muted" style="font-size:12px">${esc(r.sku || r.barcode || "")}</div>
+      </td>
+      <td><span class="${statusClass}">${esc(status)}</span></td>
+      <td class="r">${fmt(r.qty_on_hand, 0)}</td>
+      <td class="r">${fmtMoney(stockCost)}</td>
+      <td class="r">${fmtMoney(profit)}</td>
+      <td class="r">${days}</td>
+      <td class="r">${fmt(r.sold_qty_period, 0)}</td>
+    </tr>`;
+  }).join("");
+
+  return `<div class="table-wrap"><table>
+    <thead><tr>
+      <th>Товар</th>
+      <th>Статус</th>
+      <th class="r">Остаток</th>
+      <th class="r">Стоимость остатка</th>
+      <th class="r">Потенц. прибыль</th>
+      <th class="r">Дней остатка</th>
+      <th class="r">Продано</th>
+    </tr></thead>
+    <tbody>${rowsHtml}</tbody>
+  </table></div>`;
+}
+
 /* ══════════════════════════════════════════════════════════
    ГЛАВНАЯ ЗАГРУЗКА
    ══════════════════════════════════════════════════════════ */
@@ -1019,10 +1101,12 @@ async function loadAll(){
   const qTop = buildQuery({limit:10});
   const qTid = buildTenantOnly();
 
-  const [pnlR, dailyR, topR, debtsR, svR] = await Promise.allSettled([
+  const periodDays = inferPeriodDays();
+  const [pnlR, dailyR, topR, turnR, debtsR, svR] = await Promise.allSettled([
     apiFetch(`/reports/pnl?${q}`),
     apiFetch(`/reports/pnl-daily?${q}`),
     apiFetch(`/reports/top-items?${qTop}`),
+    apiFetch(`/reports/turnover?tenant_id=${getEffectiveTenantId()}&period_days=${periodDays}`),
     apiFetch(`/reports/debts-summary?${qTid}`),
     apiFetch(`/reports/stock-value?${qTid}`),
   ]);
@@ -1057,6 +1141,14 @@ async function loadAll(){
     document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorTopItemsTitle","Ошибка топ товаров")}</div><p class="empty-state-text">${esc(topR.reason?.message||"")}</p></div>`;
   }
 
+  /* Проблемные товары */
+  if (turnR.status==="fulfilled"){
+    document.getElementById("problem-note").textContent = `период ${fmt(periodDays,0)} дн.`;
+    document.getElementById("problem-products-wrap").innerHTML = renderProblemProducts(turnR.value);
+  } else if (turnR.reason?.message!=="unauthorized"){
+    document.getElementById("problem-products-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">Ошибка проблемных товаров</div><p class="empty-state-text">${esc(turnR.reason?.message||"")}</p></div>`;
+  }
+
   /* Долги */
   if (debtsR.status==="fulfilled"){
     const s=debtsR.value.summary||{};
@@ -1079,7 +1171,7 @@ async function loadAll(){
   }
 
   /* Общая ошибка */
-  if ([pnlR,dailyR,topR,debtsR,svR].every(r=>r.status==="rejected")&&pnlR.reason?.message!=="unauthorized")
+  if ([pnlR,dailyR,topR,turnR,debtsR,svR].every(r=>r.status==="rejected")&&pnlR.reason?.message!=="unauthorized")
     showError(t("analytics.errorLoadPrefix","Не удалось загрузить данные: ")+(pnlR.reason?.message||t("analytics.serverError","Ошибка сервера")));
 
   hideLoader();
