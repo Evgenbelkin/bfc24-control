@@ -39,12 +39,6 @@
       --chart-rev: #2563eb;
       --chart-net: #16a34a;
       --chart-neg: #dc2626;
-      --turn-healthy: #16a34a;
-      --turn-warning: #d97706;
-      --turn-risk: #ea580c;
-      --turn-critical: #dc2626;
-      --turn-stale: #7c3aed;
-      --turn-out: #475569;
     }
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; min-height: 100%; }
@@ -56,13 +50,16 @@
       line-height: 1.45;
     }
 
+    /* ── Shell ── */
     .shell { max-width: var(--container); margin: 0 auto; padding: 28px 18px 56px; }
 
+    /* ── Header ── */
     .page-header { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-bottom:24px; flex-wrap:wrap; }
     .page-title  { margin:0 0 4px; font-size:clamp(26px,4vw,40px); font-weight:800; letter-spacing:-.03em; line-height:1.05; }
     .page-subtitle { margin:0; color:var(--text-muted); font-size:15px; }
     .header-right { display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex-shrink:0; }
 
+    /* ── Buttons ── */
     .btn {
       display:inline-flex; align-items:center; gap:7px; min-height:42px;
       padding:0 16px; border:1px solid transparent; border-radius:var(--radius-sm);
@@ -85,6 +82,7 @@
     #langSwitcher .btn-light:hover { border-color:var(--border-strong); color:var(--text-main); }
     #langSwitcher .btn-light.active { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
 
+    /* ── Filter bar ── */
     .filter-bar {
       display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;
       padding:18px 20px; background:var(--surface); border:1px solid var(--border);
@@ -115,6 +113,7 @@
     }
     .preset-btn:hover, .preset-btn.active { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
 
+    /* ── Loader / alerts ── */
     .load-bar {
       display:none; align-items:center; gap:10px; padding:14px 18px;
       background:var(--accent-soft); border:1px solid rgba(37,99,235,.2);
@@ -140,8 +139,9 @@
     .alert-info    { background:var(--accent-soft); border-color:#bfdbfe; color:#1e40af; }
     .alert-icon    { font-size:16px; flex-shrink:0; margin-top:1px; }
 
+    /* ── Sections ── */
     .section { margin-bottom:32px; }
-    .section-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+    .section-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
     .section-icon {
       width:34px; height:34px; border-radius:9px;
       display:flex; align-items:center; justify-content:center;
@@ -154,6 +154,7 @@
     .section-title { font-size:17px; font-weight:700; letter-spacing:-.02em; margin:0; }
     .section-note  { font-size:13px; color:var(--text-muted); margin:0 0 0 auto; }
 
+    /* ── KPI grid ── */
     .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
     .kpi-card {
       position:relative; background:var(--surface); border:1px solid var(--border);
@@ -185,6 +186,7 @@
     .badge-red    { background:var(--danger-bg);  color:#991b1b; }
     .badge-amber  { background:var(--warning-bg); color:#92400e; }
 
+    /* ── P&L funnel ── */
     .pnl-funnel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); overflow:hidden; }
     .pnl-row { display:flex; align-items:center; padding:14px 20px; gap:16px; border-bottom:1px solid var(--border); transition:background var(--transition); }
     .pnl-row:last-child { border-bottom:none; }
@@ -198,11 +200,13 @@
     .pnl-bar    { height:100%; border-radius:3px; transition:width .5s ease; }
     .pnl-amount { font-size:15px; font-weight:700; text-align:right; min-width:130px; font-variant-numeric:tabular-nums; }
 
+    /* ── Expenses ── */
     .expense-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
     .exp-pill     { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px 16px; box-shadow:var(--shadow-xs); display:flex; flex-direction:column; gap:5px; }
     .exp-label    { font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
     .exp-val      { font-size:18px; font-weight:700; }
 
+    /* ── Chart ── */
     .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:20px 20px 12px; }
     .chart-legend { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:14px; }
     .chart-legend-item { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text-muted); }
@@ -217,6 +221,7 @@
     }
     .chart-tooltip.visible { opacity:1; transform:translateY(0); }
 
+    /* ── Tables ── */
     .table-wrap { width:100%; overflow-x:auto; border-radius:var(--radius-md); border:1px solid var(--border); background:#fff; }
     table { width:100%; border-collapse:collapse; min-width:540px; }
     thead th {
@@ -237,69 +242,35 @@
     .cell-warning { color:var(--warning); font-weight:600; }
     .cell-success { color:var(--success); font-weight:600; }
 
+    /* ── Rank badge ── */
     .rank-badge { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; font-size:11px; font-weight:700; }
     .rank-1 { background:#fef3c7; color:#92400e; }
     .rank-2 { background:#e2e8f0; color:#475569; }
     .rank-3 { background:#fee2e2; color:#991b1b; }
     .rank-n { background:#f1f5f9; color:#64748b; }
 
+    /* ── Margin mini bar ── */
     .margin-mini { display:flex; align-items:center; gap:6px; }
     .margin-mini-bar { flex:1; height:5px; background:var(--border); border-radius:3px; overflow:hidden; min-width:40px; }
     .margin-mini-fill { height:100%; border-radius:3px; }
     .margin-mini-val { font-size:12px; font-weight:700; min-width:38px; text-align:right; }
 
+    /* ── Progress bar (debts) ── */
     .progress-wrap { height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin-top:8px; }
     .progress-fill { height:100%; border-radius:3px; transition:width .6s ease; }
 
+    /* ── Misc ── */
     .margin-track { height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:6px; }
     .margin-fill  { height:100%; border-radius:4px; transition:width .6s ease; }
     .debt-overdue { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; background:var(--danger-bg); color:#991b1b; }
 
-    .turnover-grid {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-    }
-    .turnover-chart-list { display:grid; gap:12px; }
-    .turnover-chart-row { display:grid; grid-template-columns:160px 1fr 56px; gap:12px; align-items:center; }
-    .turnover-chart-label { font-size:13px; font-weight:600; color:var(--text-main); }
-    .turnover-chart-track { height:10px; background:var(--border); border-radius:999px; overflow:hidden; }
-    .turnover-chart-fill { height:100%; border-radius:999px; }
-    .turnover-chart-fill.healthy { background:var(--turn-healthy); }
-    .turnover-chart-fill.warning { background:var(--turn-warning); }
-    .turnover-chart-fill.risk { background:var(--turn-risk); }
-    .turnover-chart-fill.critical { background:var(--turn-critical); }
-    .turnover-chart-fill.stale_no_sales { background:var(--turn-stale); }
-    .turnover-chart-fill.out_of_stock { background:var(--turn-out); }
-    .turnover-chart-val { text-align:right; font-size:13px; font-weight:700; }
-    .turnover-top-card {
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:var(--radius-lg);
-      box-shadow:var(--shadow-md);
-      padding:18px;
-    }
-    .turnover-top-title { font-size:15px; font-weight:700; margin:0 0 10px; }
-    .turnover-top-list { display:grid; gap:10px; }
-    .turnover-top-item { padding:12px 14px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--surface-2); }
-    .turnover-top-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:4px; }
-    .turnover-top-name { font-size:14px; font-weight:700; line-height:1.35; }
-    .turnover-top-status {
-      display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:999px;
-      font-size:11px; font-weight:700;
-    }
-    .turnover-top-status.healthy { background:var(--success-bg); color:#166534; }
-    .turnover-top-status.warning { background:var(--warning-bg); color:#92400e; }
-    .turnover-top-status.risk { background:#ffedd5; color:#9a3412; }
-    .turnover-top-status.critical { background:var(--danger-bg); color:#991b1b; }
-    .turnover-top-status.stale_no_sales { background:#ede9fe; color:#6d28d9; }
-    .turnover-top-status.out_of_stock { background:#e2e8f0; color:#334155; }
-
+    /* ── Empty state ── */
     .empty-state { text-align:center; padding:36px 20px; color:var(--text-muted); background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%); border:1px dashed var(--border-strong); border-radius:var(--radius-lg); }
     .empty-state-icon  { font-size:36px; margin-bottom:10px; }
     .empty-state-title { font-size:16px; font-weight:700; color:var(--text-main); margin:0 0 4px; }
     .empty-state-text  { font-size:14px; margin:0; }
 
+    /* ── Skeletons ── */
     .skeleton { background:linear-gradient(90deg,#e8edf5 25%,#f4f7fc 50%,#e8edf5 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
     @keyframes shimmer { to { background-position:-200% 0; } }
     .sk-kpi    { height:100px; border-radius:var(--radius-lg); }
@@ -307,6 +278,7 @@
     .sk-chart  { height:230px; border-radius:var(--radius-lg); }
     .sk-table  { height:240px; border-radius:var(--radius-lg); }
 
+    /* ── Responsive ── */
     @media (max-width:768px) {
       .shell { padding:16px 12px 40px; }
       .page-header { flex-direction:column; }
@@ -315,8 +287,6 @@
       .filter-divider { display:none; }
       .pnl-bar-wrap { display:none; }
       .kpi-grid { grid-template-columns:repeat(2,1fr); }
-      .turnover-grid { grid-template-columns:1fr; }
-      .turnover-chart-row { grid-template-columns:1fr; gap:6px; }
     }
     @media (max-width:480px) { .kpi-grid { grid-template-columns:1fr; } }
   </style>
@@ -327,6 +297,7 @@
 
 <div class="shell">
 
+  <!-- Шапка -->
   <div class="page-header">
     <div>
       <h1 class="page-title" data-i18n="analytics.heading">📊 Аналитика</h1>
@@ -342,6 +313,7 @@
     </div>
   </div>
 
+  <!-- Фильтр -->
   <div class="filter-bar">
     <div class="filter-field" id="tenant-field">
       <label data-i18n="analytics.tenantIdLabel">Tenant ID</label>
@@ -372,6 +344,7 @@
     </div>
   </div>
 
+  <!-- Статус -->
   <div class="load-bar" id="load-bar"><div class="spinner"></div><span id="load-text" data-i18n="analytics.loading">Загрузка…</span></div>
   <div class="alert alert-danger" id="alert-error"><span class="alert-icon">⚠️</span><span id="alert-text" data-i18n="analytics.errorGeneric">Ошибка</span></div>
   <div class="alert alert-warning" id="alert-auth">
@@ -386,6 +359,7 @@
     <div style="font-size:13px;color:#92400e;padding-left:26px" data-i18n-html="analytics.noTenantExample">Например: <code>analytics.html?tenant_id=3</code></div>
   </div>
 
+  <!-- ════ Блок 1 — P&L ════ -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-blue">💰</div>
@@ -401,6 +375,7 @@
     <div style="margin-top:16px" id="expenses-wrap"></div>
   </div>
 
+  <!-- ════ Блок 2 — Динамика ════ -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-blue">📈</div>
@@ -410,6 +385,7 @@
     <div id="chart-wrap"><div class="skeleton sk-chart"></div></div>
   </div>
 
+  <!-- ════ Блок 3 — Топ товаров ════ -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-amber">🏆</div>
@@ -419,6 +395,7 @@
     <div id="top-items-wrap"><div class="skeleton sk-table"></div></div>
   </div>
 
+  <!-- ════ Блок 4 — Долги ════ -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-red">💳</div>
@@ -432,6 +409,7 @@
     <div style="margin-top:16px" id="debts-table-wrap"><div class="skeleton sk-table" style="height:180px"></div></div>
   </div>
 
+  <!-- ════ Блок 5 — Склад ════ -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-green">📦</div>
@@ -443,26 +421,7 @@
     </div>
   </div>
 
-  <div class="section">
-    <div class="section-header">
-      <div class="section-icon icon-amber">📊</div>
-      <h2 class="section-title">Оборачиваемость</h2>
-      <span class="section-note" id="turnover-note">Проблемные товары и распределение статусов</span>
-    </div>
-
-    <div class="kpi-grid" id="turnover-kpi-grid">
-      <div class="skeleton sk-kpi"></div>
-      <div class="skeleton sk-kpi"></div>
-      <div class="skeleton sk-kpi"></div>
-      <div class="skeleton sk-kpi"></div>
-    </div>
-
-    <div style="margin-top:16px" class="turnover-grid">
-      <div id="turnover-chart-wrap"><div class="skeleton sk-chart"></div></div>
-      <div id="turnover-top-wrap"><div class="skeleton sk-chart"></div></div>
-    </div>
-  </div>
-
+  <!-- ════ Блок 6 — Расхождения ════ -->
   <div class="section">
     <div class="section-header">
       <div class="section-icon icon-red">⚠️</div>
@@ -472,43 +431,47 @@
     <div id="sync-body"><div class="skeleton" style="height:60px;border-radius:var(--radius-md)"></div></div>
   </div>
 
-</div>
+</div><!-- /shell -->
 
 <script src="/js/i18n.js"></script>
 <script>
 "use strict";
 
+/* ══════════════════════════════════════════════════════════
+   УТИЛИТЫ
+   ══════════════════════════════════════════════════════════ */
 const API_BASE = "";
 function getToken() { return localStorage.getItem("token") || ""; }
 function getUser()  { try { return JSON.parse(localStorage.getItem("user")); } catch { return null; } }
 
 function getEffectiveTenantId() {
+  /* Приоритет: 1) поле ввода  2) localStorage  3) null */
   const fv = document.getElementById("tenant-id-input").value.trim();
   if (fv !== "") { const n = Number(fv); if (Number.isInteger(n) && n > 0) return n; }
   const u = getUser();
-  if (u && u.tenant_id != null && u.tenant_id !== "") {
-    const n = Number(u.tenant_id);
-    if (Number.isInteger(n) && n > 0) return n;
-  }
+  if (u && u.tenant_id != null && u.tenant_id !== "") { const n = Number(u.tenant_id); if (Number.isInteger(n) && n > 0) return n; }
   return null;
 }
 
 function fmt(n, d=0) {
   if (n == null || isNaN(+n)) return "—";
-  return new Intl.NumberFormat(getIntlLocale(), { minimumFractionDigits:d, maximumFractionDigits:d }).format(+n);
+  return new Intl.NumberFormat(getIntlLocale(),{minimumFractionDigits:d,maximumFractionDigits:d}).format(+n);
 }
 function fmtMoney(n) {
   if (n == null || isNaN(+n)) return "—";
-  return new Intl.NumberFormat(getIntlLocale(), { minimumFractionDigits:2, maximumFractionDigits:2 }).format(+n);
+  return new Intl.NumberFormat(getIntlLocale(),{minimumFractionDigits:2,maximumFractionDigits:2}).format(+n);
 }
-function esc(v) { return String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function sign(n) { return +n >= 0 ? "positive" : "negative"; }
-function mClr(p) { return +p >= 30 ? "#16a34a" : +p >= 15 ? "#d97706" : "#dc2626"; }
+function esc(v) { return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function sign(n)  { return +n >= 0 ? "positive" : "negative"; }
+function mClr(p)  { return +p >= 30 ? "#16a34a" : +p >= 15 ? "#d97706" : "#dc2626"; }
 function t(path, fallback){ return window.i18n ? i18n.t(path) : (fallback ?? path); }
 function tf(path, vars, fallback){ return window.i18n ? i18n.format(path, vars) : (fallback ?? path); }
 function getCurrentLang(){ return window.i18n ? i18n.getLang() : "ru"; }
 function getIntlLocale(){ return getCurrentLang()==="en" ? "en-US" : getCurrentLang()==="zh" ? "zh-CN" : "ru-RU"; }
 
+/* ══════════════════════════════════════════════════════════
+   AUTH + TENANT INIT
+   ══════════════════════════════════════════════════════════ */
 (function(){ if (!getToken()) window.location.href = "/login.html"; })();
 
 (function initTenant(){
@@ -516,121 +479,104 @@ function getIntlLocale(){ return getCurrentLang()==="en" ? "en-US" : getCurrentL
   const ut  = p.get("tenant_id");
   const inp = document.getElementById("tenant-id-input");
   if (ut && Number.isInteger(+ut) && +ut > 0) {
-    inp.value = ut;
-    inp.classList.add("from-url");
-    inp.title = t("analytics.tenantIdFromUrlTitle","tenant_id из URL");
+    inp.value = ut; inp.classList.add("from-url"); inp.title = t("analytics.tenantIdFromUrlTitle","tenant_id из URL");
   } else {
     const u = getUser();
     if (u && u.tenant_id != null) {
       inp.value = +u.tenant_id;
-      if (u.role === "client") {
-        inp.readOnly = true;
-        inp.style.opacity = ".6";
-        inp.title = t("analytics.yourTenantIdTitle","Ваш tenant_id");
-      }
+      if (u.role === "client") { inp.readOnly = true; inp.style.opacity = ".6"; inp.title = t("analytics.yourTenantIdTitle","Ваш tenant_id"); }
     }
   }
   inp.addEventListener("input", () => { inp.classList.remove("from-url"); inp.title = ""; });
 })();
 
+/* ══════════════════════════════════════════════════════════
+   ФИЛЬТР / ПРЕСЕТЫ
+   ══════════════════════════════════════════════════════════ */
 const $from = document.getElementById("date-from");
 const $to   = document.getElementById("date-to");
 
 function isoDate(d){ return d.toISOString().split("T")[0]; }
 function applyPreset(p){
   const now = new Date(), today = isoDate(now);
-  if (p==="7") {
-    const d=new Date(); d.setDate(d.getDate()-6); $from.value=isoDate(d); $to.value=today;
-  } else if(p==="30"){
-    const d=new Date(); d.setDate(d.getDate()-29); $from.value=isoDate(d); $to.value=today;
-  } else if(p==="90"){
-    const d=new Date(); d.setDate(d.getDate()-89); $from.value=isoDate(d); $to.value=today;
-  } else if(p==="month"){
-    $from.value=isoDate(new Date(now.getFullYear(),now.getMonth(),1)); $to.value=today;
-  } else if(p==="year") {
-    $from.value=`${now.getFullYear()}-01-01`; $to.value=today;
-  }
+  if (p==="7")     { const d=new Date(); d.setDate(d.getDate()-6);   $from.value=isoDate(d); $to.value=today; }
+  else if(p==="30"){ const d=new Date(); d.setDate(d.getDate()-29);  $from.value=isoDate(d); $to.value=today; }
+  else if(p==="90"){ const d=new Date(); d.setDate(d.getDate()-89);  $from.value=isoDate(d); $to.value=today; }
+  else if(p==="month"){ $from.value=isoDate(new Date(now.getFullYear(),now.getMonth(),1)); $to.value=today; }
+  else if(p==="year") { $from.value=`${now.getFullYear()}-01-01`; $to.value=today; }
 }
 applyPreset("30");
 document.querySelectorAll(".preset-btn").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    applyPreset(btn.dataset.preset);
-    loadAll();
+    btn.classList.add("active"); applyPreset(btn.dataset.preset); loadAll();
   });
 });
-function clearFilter(){
-  $from.value="";
-  $to.value="";
-  document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active"));
-  loadAll();
-}
+function clearFilter(){ $from.value=""; $to.value=""; document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active")); loadAll(); }
 
+/* ══════════════════════════════════════════════════════════
+   API
+   ══════════════════════════════════════════════════════════ */
 async function apiFetch(path){
-  const res = await fetch(API_BASE+path,{ headers:{ Authorization:"Bearer "+getToken() } });
-  if (res.status===401 || res.status===403){
-    document.getElementById("alert-auth").classList.add("visible");
-    throw new Error("unauthorized");
-  }
+  const res = await fetch(API_BASE+path,{headers:{Authorization:"Bearer "+getToken()}});
+  if (res.status===401||res.status===403){ document.getElementById("alert-auth").classList.add("visible"); throw new Error("unauthorized"); }
   const data = await res.json();
-  if (!res.ok || data.ok===false) throw new Error(data.error || "HTTP "+res.status);
+  if (!res.ok||data.ok===false) throw new Error(data.error||"HTTP "+res.status);
   return data;
 }
 
 function buildQuery(extra={}){
-  const p = new URLSearchParams();
-  const tid = getEffectiveTenantId();
-  if (tid) p.set("tenant_id", tid);
-  if ($from.value) p.set("date_from", $from.value);
-  if ($to.value)   p.set("date_to", $to.value);
-  Object.entries(extra).forEach(([k,v]) => p.set(k,v));
+  const p=new URLSearchParams();
+  const tid=getEffectiveTenantId();
+  if (tid)         p.set("tenant_id",tid);
+  if ($from.value) p.set("date_from",$from.value);
+  if ($to.value)   p.set("date_to",$to.value);
+  Object.entries(extra).forEach(([k,v])=>p.set(k,v));
   return p.toString();
 }
 function buildTenantOnly(){
-  const p = new URLSearchParams();
-  const tid = getEffectiveTenantId();
-  if (tid) p.set("tenant_id", tid);
+  const p=new URLSearchParams();
+  const tid=getEffectiveTenantId();
+  if (tid) p.set("tenant_id",tid);
   return p.toString();
 }
+
+/* ══════════════════════════════════════════════════════════
+   UI STATE
+   ══════════════════════════════════════════════════════════ */
+function showLoader(text=t("analytics.loading","Загрузка…")){
+  document.getElementById("load-text").textContent=text;
+  document.getElementById("load-bar").classList.add("visible");
+  document.getElementById("alert-error").classList.remove("visible");
+}
+function hideLoader(){ document.getElementById("load-bar").classList.remove("visible"); }
+function showError(m){ document.getElementById("alert-text").textContent=m; document.getElementById("alert-error").classList.add("visible"); }
 
 const DATA_BLOCKS = [
   "pnl-kpi-grid","pnl-funnel-wrap","expenses-wrap",
   "chart-wrap","top-items-wrap",
   "debts-kpi-grid","debts-table-wrap",
-  "stock-kpi-grid","turnover-kpi-grid","turnover-chart-wrap","turnover-top-wrap",
-  "sync-body",
+  "stock-kpi-grid","sync-body",
 ];
 
-function showLoader(text=t("analytics.loading","Загрузка…")){
-  document.getElementById("load-text").textContent = text;
-  document.getElementById("load-bar").classList.add("visible");
-  document.getElementById("alert-error").classList.remove("visible");
-}
-function hideLoader(){ document.getElementById("load-bar").classList.remove("visible"); }
-function showError(m){
-  document.getElementById("alert-text").textContent = m;
-  document.getElementById("alert-error").classList.add("visible");
-}
 function checkTenant(){
   const has = getEffectiveTenantId() !== null;
-  document.getElementById("alert-no-tenant").classList.toggle("visible", !has);
-  DATA_BLOCKS.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.visibility = has ? "" : "hidden";
-  });
+  document.getElementById("alert-no-tenant").classList.toggle("visible",!has);
+  DATA_BLOCKS.forEach(id=>{ const el=document.getElementById(id); if(el) el.style.visibility=has?"":"hidden"; });
   return has;
 }
+
 function updateSubtitle(){
-  const u = getUser(), tid = getEffectiveTenantId();
-  const parts = [t("analytics.subtitleBase","Финансовый отчёт"),"BFC24 CONTROL"];
+  const u=getUser(), tid=getEffectiveTenantId();
+  const parts=[t("analytics.subtitleBase","Финансовый отчёт"),"BFC24 CONTROL"];
   if (u?.company_name) parts.push(u.company_name);
   if (tid) parts.push(tf("analytics.tenantNumber",{id:tid},`Tenant #${tid}`));
-  if ($from.value && $to.value) parts.push(`${$from.value} — ${$to.value}`);
+  if ($from.value&&$to.value) parts.push(`${$from.value} — ${$to.value}`);
   else if ($from.value) parts.push(tf("analytics.fromShort",{date:$from.value},`с ${$from.value}`));
-  else if ($to.value) parts.push(tf("analytics.toShort",{date:$to.value},`по ${$to.value}`));
-  document.getElementById("subtitle").textContent = parts.join(" · ");
+  else if ($to.value)   parts.push(tf("analytics.toShort",{date:$to.value},`по ${$to.value}`));
+  document.getElementById("subtitle").textContent=parts.join(" · ");
 }
+
 function showSkeletons(){
   document.getElementById("pnl-kpi-grid").innerHTML    = Array(6).fill('<div class="skeleton sk-kpi"></div>').join("");
   document.getElementById("pnl-funnel-wrap").innerHTML = '<div class="skeleton sk-funnel"></div>';
@@ -640,30 +586,31 @@ function showSkeletons(){
   document.getElementById("debts-kpi-grid").innerHTML  = Array(4).fill('<div class="skeleton sk-kpi"></div>').join("");
   document.getElementById("debts-table-wrap").innerHTML= '<div class="skeleton sk-table" style="height:180px"></div>';
   document.getElementById("stock-kpi-grid").innerHTML  = Array(3).fill('<div class="skeleton sk-kpi"></div>').join("");
-  document.getElementById("turnover-kpi-grid").innerHTML = Array(4).fill('<div class="skeleton sk-kpi"></div>').join("");
-  document.getElementById("turnover-chart-wrap").innerHTML = '<div class="skeleton sk-chart"></div>';
-  document.getElementById("turnover-top-wrap").innerHTML = '<div class="skeleton sk-chart"></div>';
   document.getElementById("sync-body").innerHTML       = '<div class="skeleton" style="height:60px;border-radius:var(--radius-md)"></div>';
 }
+
 function blockError(id,title,msg){
   const el=document.getElementById(id);
   if (el) el.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">❌</div><div class="empty-state-title">${esc(title)}</div><p class="empty-state-text">${esc(msg)}</p></div>`;
 }
 
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — P&L KPI
+   ══════════════════════════════════════════════════════════ */
 function renderPnlKpi(pnl){
   const gm=+(pnl.gross_margin_pct||0), nm=+(pnl.net_margin_pct||0);
   return [
-    {color:"c-blue",  label:t("analytics.revenue","Выручка"), value:fmtMoney(pnl.revenue),
-     sub:+pnl.total_discount>0 ? tf("analytics.discountsValue",{value:fmtMoney(pnl.total_discount)},`Скидки: ${fmtMoney(pnl.total_discount)}`) : tf("analytics.salesCountValue",{value:fmt(pnl.sales_count)},`Продаж: ${fmt(pnl.sales_count)}`)},
-    {color:"c-amber", label:t("analytics.cogs","Себестоимость продаж"), value:fmtMoney(pnl.cogs), sub:tf("analytics.fifoPositions",{value:fmt(pnl.line_items_count)},`FIFO · ${fmt(pnl.line_items_count)} поз.`)},
+    {color:"c-blue",  label:t("analytics.revenue","Выручка"),               value:fmtMoney(pnl.revenue),
+     sub: +pnl.total_discount>0 ? tf("analytics.discountsValue",{value:fmtMoney(pnl.total_discount)},`Скидки: ${fmtMoney(pnl.total_discount)}`) : tf("analytics.salesCountValue",{value:fmt(pnl.sales_count)},`Продаж: ${fmt(pnl.sales_count)}`)},
+    {color:"c-amber", label:t("analytics.cogs","Себестоимость продаж"),   value:fmtMoney(pnl.cogs), sub:tf("analytics.fifoPositions",{value:fmt(pnl.line_items_count)},`FIFO · ${fmt(pnl.line_items_count)} поз.`)},
     {color:+pnl.gross_profit>=0?"c-green":"c-red", label:t("analytics.grossProfit","Валовая прибыль"),
      value:fmtMoney(pnl.gross_profit), vc:sign(pnl.gross_profit),
      badge:{text:`${gm.toFixed(1)}%`, cls:gm>=15?"badge-green":"badge-red"}},
-    {color:"c-red", label:t("analytics.operatingExpenses","Операционные расходы"), value:fmtMoney(pnl.operating_expenses), sub:t("analytics.opexShort","Аренда, ЗП, реклама…")},
+    {color:"c-red",   label:t("analytics.operatingExpenses","Операционные расходы"),   value:fmtMoney(pnl.operating_expenses), sub:t("analytics.opexShort","Аренда, ЗП, реклама…")},
     {color:+pnl.net_profit>=0?"c-green":"c-red", label:t("analytics.netProfit","Чистая прибыль"),
      value:fmtMoney(pnl.net_profit), vc:sign(pnl.net_profit),
      badge:{text:`${nm.toFixed(1)}%`, cls:nm>=10?"badge-green":nm>=0?"badge-amber":"badge-red"}},
-    {color:"c-purple",label:t("analytics.grossMargin","Маржа валовая"), value:`${gm.toFixed(2)}%`,
+    {color:"c-purple",label:t("analytics.grossMargin","Маржа валовая"),          value:`${gm.toFixed(2)}%`,
      extra:`<div class="margin-track"><div class="margin-fill" style="width:${Math.min(Math.max(gm,0),100)}%;background:${mClr(gm)}"></div></div>`,
      sub:tf("analytics.netMarginValue",{value:nm.toFixed(2)},`Чистая маржа: ${nm.toFixed(2)}%`)},
   ].map(c=>`
@@ -676,6 +623,9 @@ function renderPnlKpi(pnl){
     </div>`).join("");
 }
 
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — P&L ВОРОНКА
+   ══════════════════════════════════════════════════════════ */
 function renderPnlFunnel(pnl){
   const rev=+(pnl.revenue)||1;
   const rows=[
@@ -699,36 +649,35 @@ function renderPnlFunnel(pnl){
   }</div>`;
 }
 
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — РАСХОДЫ
+   ══════════════════════════════════════════════════════════ */
 function renderExpenses(pnl){
   const bd=pnl.expenses_breakdown||{};
-  const labels={
-    rent:t("analytics.expenseRent","Аренда"),
-    salary:t("analytics.expenseSalary","Зарплата"),
-    delivery:t("analytics.expenseDelivery","Доставка"),
-    ads:t("analytics.expenseAds","Реклама"),
-    utilities:t("analytics.expenseUtilities","Коммунальные"),
-    other:t("analytics.expenseOther","Прочее"),
-    uncategorized:t("analytics.expenseUncategorized","Без категории")
-  };
-  const pills = Object.entries(labels)
-    .filter(([k]) => +(bd[k]||0) > 0)
-    .map(([k,l]) => `<div class="exp-pill"><div class="exp-label">${esc(l)}</div><div class="exp-val">${fmtMoney(bd[k])}</div></div>`)
-    .join("");
+  const LABELS={rent:t("analytics.expenseRent","Аренда"),salary:t("analytics.expenseSalary","Зарплата"),delivery:t("analytics.expenseDelivery","Доставка"),ads:t("analytics.expenseAds","Реклама"),utilities:t("analytics.expenseUtilities","Коммунальные"),other:t("analytics.expenseOther","Прочее"),uncategorized:t("analytics.expenseUncategorized","Без категории")};
+  const pills=Object.entries(LABELS).filter(([k])=>+(bd[k]||0)>0)
+    .map(([k,l])=>`<div class="exp-pill"><div class="exp-label">${esc(l)}</div><div class="exp-val">${fmtMoney(bd[k])}</div></div>`).join("");
   if (!pills) return "";
   return `<div style="margin-top:12px"><div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">${t("analytics.expensesByCategory","Расходы по категориям")}</div><div class="expense-grid">${pills}</div></div>`;
 }
 
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — SVG-ГРАФИК (pnl-daily)
+   Чистый SVG, без внешних библиотек.
+   Две линии: выручка и чистая прибыль.
+   ══════════════════════════════════════════════════════════ */
 function renderChart(daily){
-  if (!daily || !daily.length) return `
+  if (!daily||!daily.length) return `
     <div class="empty-state"><div class="empty-state-icon">📉</div>
     <div class="empty-state-title">${t("analytics.noDataForPeriodTitle","Нет данных за период")}</div>
     <p class="empty-state-text">${t("analytics.expandDateRange","Попробуйте расширить диапазон дат.")}</p></div>`;
 
+  /* Размеры */
   const VW=900, PL=64, PR=16, PT=12, PB=34;
   const CW=VW-PL-PR, CH=190, VH=CH+PT+PB;
 
-  const revenues = daily.map(d=>+d.revenue||0);
-  const profits  = daily.map(d=>+d.net_profit||0);
+  const revenues = daily.map(d=>+d.revenue);
+  const profits  = daily.map(d=>+d.net_profit);
   const allVals  = [...revenues,...profits];
   const dMin = Math.min(0,...allVals);
   const dMax = Math.max(...allVals,1);
@@ -739,17 +688,23 @@ function renderChart(daily){
   function py(v){ return PT+CH - ((v-dMin)/span)*CH; }
   function pts(arr){ return arr.map((v,i)=>`${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" "); }
 
+  /* Y-grid */
   const YTICKS=5;
   const yGrid = Array.from({length:YTICKS+1},(_,i)=>{ const v=dMin+(span/YTICKS)*i; return {v,y:py(v)}; });
 
+  /* X-labels */
   const maxL = Math.min(10,n);
   const step = Math.max(1,Math.floor(n/maxL));
   const xLbls = daily.map((d,i)=>({i,date:d.date})).filter((_,i)=>i%step===0||i===n-1);
 
+  /* Area path */
   const z = py(0).toFixed(1);
   const areaPath = `M ${px(0).toFixed(1)},${z} `+revenues.map((v,i)=>`L ${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" ")+` L ${px(n-1).toFixed(1)},${z} Z`;
+
+  /* Ширина колонки для hit-зон */
   const colW = n>1 ? CW/(n-1) : CW;
 
+  /* Форматы */
   function fmtAxis(v){ const a=Math.abs(v); if(a>=1e6) return (v/1e6).toFixed(1)+"M"; if(a>=1000) return (v/1000).toFixed(0)+"k"; return v.toFixed(0); }
   function fmtD(iso){ const[,m,d]=iso.split("-"); return `${d}.${m}`; }
 
@@ -765,22 +720,38 @@ function renderChart(daily){
       <svg id="${uid}" viewBox="0 0 ${VW} ${VH}" width="100%" style="height:${VH}px;cursor:crosshair">
         <defs>
           <linearGradient id="gr-${uid}" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#2563eb" stop-opacity=".14"/>
+            <stop offset="0%"   stop-color="#2563eb" stop-opacity=".14"/>
             <stop offset="100%" stop-color="#2563eb" stop-opacity=".01"/>
           </linearGradient>
           <clipPath id="cl-${uid}"><rect x="${PL}" y="${PT}" width="${CW}" height="${CH}"/></clipPath>
         </defs>
 
         ${yGrid.map(t=>`
-          <line x1="${PL}" y1="${t.y.toFixed(1)}" x2="${VW-PR}" y2="${t.y.toFixed(1)}" stroke="#dbe4f0" stroke-width="1" ${t.v===0?"":'stroke-dasharray="4 3"'}/>
-          <text x="${PL-6}" y="${t.y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" font-size="11" font-family="Inter,sans-serif" fill="#94a3b8">${fmtAxis(t.v)}</text>`).join("")}
+          <line x1="${PL}" y1="${t.y.toFixed(1)}" x2="${VW-PR}" y2="${t.y.toFixed(1)}"
+                stroke="#dbe4f0" stroke-width="1" ${t.v===0?"":'stroke-dasharray="4 3"'}/>
+          <text x="${PL-6}" y="${t.y.toFixed(1)}" text-anchor="end" dominant-baseline="middle"
+                font-size="11" font-family="Inter,sans-serif" fill="#94a3b8">${fmtAxis(t.v)}</text>`).join("")}
 
         <line x1="${PL}" y1="${z}" x2="${VW-PR}" y2="${z}" stroke="#94a3b8" stroke-width="1"/>
-        <path d="${areaPath}" fill="url(#gr-${uid})" clip-path="url(#cl-${uid})"/>
-        <polyline points="${pts(revenues)}" fill="none" stroke="var(--chart-rev)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#cl-${uid})"/>
-        <polyline points="${pts(profits)}" fill="none" stroke="var(--chart-net)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#cl-${uid})"/>
 
-        <line id="cur-${uid}" x1="0" y1="${PT}" x2="0" y2="${PT+CH}" stroke="var(--chart-rev)" stroke-width="1" stroke-dasharray="4 3" opacity="0" pointer-events="none"/>
+        <path d="${areaPath}" fill="url(#gr-${uid})" clip-path="url(#cl-${uid})"/>
+
+        <polyline points="${pts(revenues)}" fill="none" stroke="var(--chart-rev)"
+                  stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"
+                  clip-path="url(#cl-${uid})"/>
+
+        <polyline points="${pts(profits)}" fill="none" stroke="var(--chart-net)"
+                  stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+                  clip-path="url(#cl-${uid})"/>
+
+        ${n<=60 ? revenues.map((v,i)=>`<circle cx="${px(i).toFixed(1)}" cy="${py(v).toFixed(1)}" r="3"
+            fill="#fff" stroke="var(--chart-rev)" stroke-width="2" pointer-events="none" clip-path="url(#cl-${uid})"/>`).join("") : ""}
+        ${n<=60 ? profits.map((v,i)=>`<circle cx="${px(i).toFixed(1)}" cy="${py(v).toFixed(1)}" r="2.5"
+            fill="#fff" stroke="${v>=0?"var(--chart-net)":"var(--chart-neg)"}" stroke-width="2"
+            pointer-events="none" clip-path="url(#cl-${uid})"/>`).join("") : ""}
+
+        <line id="cur-${uid}" x1="0" y1="${PT}" x2="0" y2="${PT+CH}" stroke="var(--chart-rev)"
+              stroke-width="1" stroke-dasharray="4 3" opacity="0" pointer-events="none"/>
 
         ${daily.map((d,i)=>{
           const cx=px(i), hw=colW/2;
@@ -788,11 +759,12 @@ function renderChart(daily){
             fill="transparent"
             data-date="${esc(d.date)}"
             data-rev="${d.revenue}" data-net="${d.net_profit}"
-            data-gp="${d.gross_profit||0}" data-exp="${d.expenses||0}"
+            data-gp="${d.gross_profit}" data-exp="${d.expenses}"
             data-cx="${cx.toFixed(1)}"/>`;
         }).join("")}
 
-        ${xLbls.map(l=>`<text x="${px(l.i).toFixed(1)}" y="${PT+CH+20}" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#94a3b8">${fmtD(l.date)}</text>`).join("")}
+        ${xLbls.map(l=>`<text x="${px(l.i).toFixed(1)}" y="${PT+CH+20}" text-anchor="middle"
+            font-size="10" font-family="Inter,sans-serif" fill="#94a3b8">${fmtD(l.date)}</text>`).join("")}
       </svg>
     </div>
   </div>`;
@@ -806,7 +778,7 @@ function renderChart(daily){
       r.addEventListener("mouseenter",e=>{
         const d=e.currentTarget.dataset;
         cur.setAttribute("x1",d.cx); cur.setAttribute("x2",d.cx); cur.setAttribute("opacity","1");
-        tt.innerHTML=`<strong>${esc(d.date)}</strong><br>${t("analytics.revenue","Выручка")}: ${fmtMoney(d.rev)}<br>${t("analytics.grossProfitShort","Вал. прибыль")}: ${fmtMoney(d.gp)}<br>${t("analytics.expensesShort","Расходы")}: ${fmtMoney(d.exp)}<br>${t("analytics.netProfitShort","Чист. прибыль")}: ${fmtMoney(d.net)}`;
+        tt.innerHTML=`<strong>${esc(d.date)}</strong><br>${t("analytics.revenue","Выручка")}:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${fmtMoney(d.rev)}<br>${t("analytics.grossProfitShort","Вал. прибыль")}:&nbsp;${fmtMoney(d.gp)}<br>${t("analytics.expensesShort","Расходы")}:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${fmtMoney(d.exp)}<br>${t("analytics.netProfitShort","Чист. прибыль")}:${fmtMoney(d.net)}`;
         tt.classList.add("visible");
       });
       r.addEventListener("mousemove",e=>{ tt.style.left=(e.clientX+14)+"px"; tt.style.top=(e.clientY-10)+"px"; });
@@ -817,122 +789,127 @@ function renderChart(daily){
   return svg;
 }
 
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — ТОП ТОВАРОВ
+   ══════════════════════════════════════════════════════════ */
 function renderTopItems(data){
-  const items = data.items || data.rows || [];
+  const items=data.items||[];
   if (!items.length) return `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">${t("analytics.noSalesForPeriodTitle","Нет продаж за период")}</div><p class="empty-state-text">${t("analytics.expandDateRange","Попробуйте расширить диапазон дат.")}</p></div>`;
 
-  const rows = items.map((it,idx)=>{
-    const qty = +(it.qty_sold ?? it.qty ?? it.quantity ?? 0);
-    const revenue = +(it.revenue ?? 0);
-    const cogs = +(it.cogs ?? 0);
-    const profit = +(it.profit ?? (revenue - cogs));
-    const margin = revenue > 0 ? ((profit / revenue) * 100) : +(it.margin_pct ?? 0);
-    const avgPrice = qty > 0 ? revenue / qty : +(it.avg_price ?? 0);
-
-    const rankClass = idx===0?"rank-1":idx===1?"rank-2":idx===2?"rank-3":"rank-n";
+  const rows=items.map((it,idx)=>{
+    const m=+(it.margin_pct||0);
+    const rClass = idx===0?"rank-1":idx===1?"rank-2":idx===2?"rank-3":"rank-n";
     return `<tr>
-      <td><span class="rank-badge ${rankClass}">${idx+1}</span></td>
-      <td><span style="font-weight:600">${esc(it.item_name || it.name || "—")}</span></td>
-      <td class="r">${fmt(qty,0)}</td>
-      <td class="r">${fmtMoney(avgPrice)}</td>
-      <td class="r">${fmtMoney(revenue)}</td>
-      <td class="r">${fmtMoney(cogs)}</td>
-      <td class="r ${profit>=0?"cell-success":"cell-danger"}">${fmtMoney(profit)}</td>
-      <td class="r">
+      <td><span class="rank-badge ${rClass}">${idx+1}</span></td>
+      <td>
+        <div style="font-weight:600">${esc(it.item_name||"—")}</div>
+        <div class="cell-muted" style="font-size:12px">${esc(it.sku||it.barcode||"")}</div>
+      </td>
+      <td class="r">${fmt(it.qty_sold,0)}&nbsp;<span style="font-size:11px;color:var(--text-muted)">${esc(it.unit||t("analytics.piecesShort","шт"))}</span></td>
+      <td class="r">${fmtMoney(it.revenue)}</td>
+      <td class="r">${fmtMoney(it.cogs)}</td>
+      <td class="r ${+it.gross_profit>=0?"cell-success":"cell-danger"}">${fmtMoney(it.gross_profit)}</td>
+      <td>
         <div class="margin-mini">
-          <div class="margin-mini-bar"><div class="margin-mini-fill" style="width:${Math.min(Math.max(margin,0),100)}%;background:${mClr(margin)}"></div></div>
-          <div class="margin-mini-val">${fmt(margin,1)}%</div>
+          <div class="margin-mini-bar"><div class="margin-mini-fill" style="width:${Math.min(Math.max(m,0),100)}%;background:${mClr(m)}"></div></div>
+          <div class="margin-mini-val">${m.toFixed(1)}%</div>
         </div>
       </td>
     </tr>`;
   }).join("");
 
-  return `
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>${t("analytics.item","Товар")}</th>
-            <th class="r">${t("analytics.qty","Кол-во")}</th>
-            <th class="r">${t("analytics.avgPrice","Средняя цена")}</th>
-            <th class="r">${t("analytics.revenue","Выручка")}</th>
-            <th class="r">${t("analytics.cogs","Себестоимость")}</th>
-            <th class="r">${t("analytics.profit","Прибыль")}</th>
-            <th class="r">${t("analytics.margin","Маржа")}</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
+  const sum=(k)=>items.reduce((s,x)=>s+(+x[k]||0),0);
+
+  return `<div class="table-wrap"><table>
+    <thead><tr>
+      <th style="width:36px">#</th><th>${t("analytics.tableItem","Товар")}</th>
+      <th class="r">${t("analytics.tableQty","Кол-во")}</th><th class="r">${t("analytics.revenue","Выручка")}</th>
+      <th class="r">${t("analytics.tableCogsShort","Себест.")}</th><th class="r">${t("analytics.grossProfit","Вал. прибыль")}</th>
+      <th style="min-width:120px">${t("analytics.grossMargin","Маржа")}</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr>
+      <td colspan="2">${tf("analytics.topTotal",{count:items.length},`Итого топ-${items.length}`)}</td>
+      <td class="r">${fmt(sum("qty_sold"),0)}</td>
+      <td class="r">${fmtMoney(sum("revenue"))}</td>
+      <td class="r">${fmtMoney(sum("cogs"))}</td>
+      <td class="r">${fmtMoney(sum("gross_profit"))}</td>
+      <td></td>
+    </tr></tfoot>
+  </table></div>`;
 }
 
-function renderDebtsKpi(debts){
-  const totals = debts.totals || {};
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — ДОЛГИ KPI
+   ══════════════════════════════════════════════════════════ */
+function renderDebtsKpi(s){
+  const cr=+(s.collection_rate_pct||0);
   return [
-    {
-      color:"c-red",
-      label:t("analytics.totalDebts","Всего долгов"),
-      value:fmtMoney(totals.total_debt),
-      sub:tf("analytics.debtsCountValue",{value:fmt(totals.debts_count||0)},`${fmt(totals.debts_count||0)} долгов`)
-    },
-    {
-      color:"c-amber",
-      label:t("analytics.overdueDebts","Просрочено"),
-      value:fmtMoney(totals.overdue_amount),
-      sub:tf("analytics.overdueCountValue",{value:fmt(totals.overdue_count||0)},`${fmt(totals.overdue_count||0)} проср.`)
-    },
-    {
-      color:"c-blue",
-      label:t("analytics.realizationAmount","На реализации"),
-      value:fmtMoney(totals.consignment_amount),
-      sub:t("analytics.realizationNow","Текущий объём")
-    },
-    {
-      color:"c-green",
-      label:t("analytics.paidShare","Доля оплаченного"),
-      value:`${fmt(totals.paid_share_pct||0,1)}%`,
-      sub:t("analytics.fromAllDebts","От всех долгов")
-    },
-  ].map(c=>`<div class="kpi-card ${esc(c.color)}"><div class="kpi-label">${esc(c.label)}</div><div class="kpi-value">${c.value}</div><div class="kpi-sub">${esc(c.sub)}</div></div>`).join("");
+    {color:"c-red",    label:t("analytics.outstandingBalance","Непогашенный остаток"),     value:fmtMoney(s.total_balance_amount), sub:tf("analytics.initialAmount",{value:fmtMoney(s.total_initial_amount)},`Начальная сумма: ${fmtMoney(s.total_initial_amount)}`)},
+    {color:"c-orange", label:t("analytics.overdue","Просрочено"),                value:fmt(s.overdue_count),
+     sub:+s.overdue_amount>0?tf("analytics.overdueAmount",{value:fmtMoney(s.overdue_amount)},`На сумму: ${fmtMoney(s.overdue_amount)}`):t("analytics.noOverdue","Без просроченных"),
+     badge:+s.overdue_count>0?{text:t("analytics.attentionRequired","⚠ Требует внимания"),cls:"badge-red"}:{text:t("analytics.ok","✓ OK"),cls:"badge-green"}},
+    {color:"c-amber",  label:t("analytics.openPartial","Открытых / частичных"),     value:`${fmt(s.open_count)} / ${fmt(s.partial_count)}`, sub:tf("analytics.totalDebts",{value:fmt(s.total_count)},`Всего долгов: ${fmt(s.total_count)}`)},
+    {color:"c-green",  label:t("analytics.collected","Собрано"),                  value:fmtMoney(s.total_paid_amount),
+     extra:`<div class="progress-wrap"><div class="progress-fill" style="width:${Math.min(cr,100).toFixed(1)}%;background:var(--success)"></div></div>`,
+     sub:tf("analytics.ofTotalAmount",{value:cr.toFixed(1)},`${cr.toFixed(1)}% от общей суммы`)},
+  ].map(c=>`
+    <div class="kpi-card ${esc(c.color)}">
+      <div class="kpi-label">${esc(c.label)}</div>
+      <div class="kpi-value">${c.value}</div>
+      ${c.extra||""}
+      ${c.badge?`<div class="kpi-badge ${c.badge.cls}">${c.badge.text}</div>`:""}
+      ${c.sub?`<div class="kpi-sub">${esc(c.sub)}</div>`:""}
+    </div>`).join("");
 }
 
-function renderDebtsTable(rows){
-  if (!rows || !rows.length) return `<div class="empty-state"><div class="empty-state-icon">🧾</div><div class="empty-state-title">${t("analytics.noDebtsTitle","Нет открытых долгов")}</div><p class="empty-state-text">${t("analytics.noDebtsText","Сейчас все долги закрыты или отсутствуют.")}</p></div>`;
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — ТАБЛИЦА ДОЛГОВ
+   ══════════════════════════════════════════════════════════ */
+function renderDebtsTable(list){
+  if (!list||!list.length) return `
+    <div class="empty-state" style="border-style:solid;border-color:var(--success-bg);background:linear-gradient(180deg,#f0fdf4 0%,#dcfce7 100%)">
+      <div class="empty-state-icon">✅</div>
+      <div class="empty-state-title" style="color:var(--success)">${t("analytics.noOpenDebtsTitle","Нет открытых долгов")}</div>
+      <p class="empty-state-text">${t("analytics.allConsignmentsPaid","Все реализации оплачены.")}</p>
+    </div>`;
 
-  const body = rows.slice(0,10).map(r=>{
-    const total = +(r.debt_amount || r.total_debt || 0);
-    const paid = +(r.paid_amount || 0);
-    const remain = +(r.remaining_debt || r.balance || total - paid || 0);
-    const pct = total > 0 ? Math.min((paid/total)*100,100) : 0;
-    const overdue = !!r.is_overdue || +(r.days_overdue||0) > 0;
+  const rows=list.map(d=>{
+    const pp=+d.initial_amount>0?Math.min(+d.paid_amount/+d.initial_amount*100,100):0;
     return `<tr>
-      <td><span style="font-weight:600">${esc(r.counterparty_name || r.client_name || "—")}</span>${overdue?`<div style="margin-top:6px"><span class="debt-overdue">${t("analytics.overdue","Просрочено")}</span></div>`:""}</td>
-      <td class="r">${fmtMoney(total)}</td>
-      <td class="r">${fmtMoney(paid)}</td>
-      <td class="r ${remain>0?"cell-danger":"cell-success"}">${fmtMoney(remain)}</td>
       <td>
-        <div class="progress-wrap"><div class="progress-fill" style="width:${pct.toFixed(1)}%;background:${pct>=100?"#16a34a":"#2563eb"}"></div></div>
+        <div style="font-weight:600">${esc(d.counterparty_name||"—")}</div>
+        ${d.comment?`<div style="font-size:12px;color:var(--text-muted)">${esc(d.comment)}</div>`:""}
+      </td>
+      <td class="r">${fmtMoney(d.initial_amount)}</td>
+      <td class="r">${fmtMoney(d.paid_amount)}</td>
+      <td class="r" style="font-weight:700;color:var(--danger)">${fmtMoney(d.balance_amount)}</td>
+      <td>
+        <div class="progress-wrap" style="min-width:70px"><div class="progress-fill" style="width:${pp.toFixed(1)}%;background:var(--success)"></div></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${tf("analytics.paidPercent",{value:pp.toFixed(0)},`${pp.toFixed(0)}% оплачено`)}</div>
+      </td>
+      <td>
+        ${d.is_overdue
+          ? `<span class="debt-overdue">${tf("analytics.overdueDays",{days:d.overdue_days},`⚠ ${d.overdue_days} дн`)}</span>`
+          : d.due_date
+            ? `<span style="font-size:12px;color:var(--text-muted)">${esc(d.due_date)}</span>`
+            : `<span class="cell-muted">—</span>`}
       </td>
     </tr>`;
   }).join("");
 
-  return `<div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>${t("analytics.counterparty","Контрагент")}</th>
-          <th class="r">${t("analytics.total","Всего")}</th>
-          <th class="r">${t("analytics.paid","Оплачено")}</th>
-          <th class="r">${t("analytics.balance","Остаток")}</th>
-          <th>${t("analytics.progress","Прогресс")}</th>
-        </tr>
-      </thead>
-      <tbody>${body}</tbody>
-    </table>
-  </div>`;
+  return `<div class="table-wrap"><table>
+    <thead><tr>
+      <th>${t("analytics.counterparty","Контрагент")}</th><th class="r">${t("analytics.debt","Долг")}</th><th class="r">${t("analytics.paid","Оплачено")}</th>
+      <th class="r">${t("analytics.balance","Остаток")}</th><th style="min-width:110px">${t("analytics.progress","Прогресс")}</th><th>${t("analytics.dueOverdue","Срок / просрочка")}</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
 }
 
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — СКЛАД
+   ══════════════════════════════════════════════════════════ */
 function renderStockKpi(sv){
   const totals = sv.totals || {};
   return [
@@ -957,15 +934,18 @@ function renderStockKpi(sv){
   ].map(c=>`<div class="kpi-card ${esc(c.color)}"><div class="kpi-label">${esc(c.label)}</div><div class="kpi-value">${c.value}</div><div class="kpi-sub">${esc(c.sub)}</div></div>`).join("");
 }
 
+/* ══════════════════════════════════════════════════════════
+   РЕНДЕР — OUT-OF-SYNC
+   ══════════════════════════════════════════════════════════ */
 function renderSyncCheck(sv){
-  const ch = sv.sync_check || { ok:true, out_of_sync:[] };
+  const ch=sv.sync_check||{ok:true,out_of_sync:[]};
   if (ch.ok) return `
     <div class="empty-state" style="border-style:solid;border-color:var(--success-bg);background:linear-gradient(180deg,#f0fdf4 0%,#dcfce7 100%)">
       <div class="empty-state-icon">✅</div>
       <div class="empty-state-title" style="color:var(--success)">${t("analytics.syncOkTitle","Всё синхронизировано")}</div>
       <p class="empty-state-text">${t("analytics.syncOkText","Остатки stock совпадают с партиями item_batches.")}</p>
     </div>`;
-  const rows = ch.out_of_sync.map(r=>{
+  const rows=ch.out_of_sync.map(r=>{
     const diff=+r.diff;
     return `<tr>
       <td><span style="font-weight:600">${esc(r.item_name)}</span></td>
@@ -973,202 +953,100 @@ function renderSyncCheck(sv){
       <td>${fmt(r.qty_in_stock,3)}</td>
       <td>${fmt(r.qty_in_batches,3)}</td>
       <td class="${diff>0?"cell-warning":"cell-danger"}">${diff>0?"+":""}${fmt(diff,3)}</td>
-      <td><span class="kpi-badge ${Math.abs(diff)>1?"badge-red":"badge-amber"}">${Math.abs(diff)>1?t("analytics.needCheck","Проверить"):t("analytics.minorDiff","Небольшое")}</span></td>
+      <td><span class="kpi-badge ${Math.abs(diff)>1?"badge-red":"badge-amber"}">${Math.abs(diff)>1?t("analytics.severitySerious","⚠ Серьёзное"):t("analytics.severitySmall","△ Малое")}</span></td>
     </tr>`;
   }).join("");
-  return `<div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>${t("analytics.item","Товар")}</th>
-          <th>${t("analytics.id","ID")}</th>
-          <th>${t("analytics.stockQty","Stock")}</th>
-          <th>${t("analytics.batchQty","Batches")}</th>
-          <th>${t("analytics.diff","Разница")}</th>
-          <th>${t("analytics.status","Статус")}</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div>`;
-}
-
-function statusLabel(code){
-  switch (code) {
-    case "healthy": return "Healthy";
-    case "warning": return "Warning";
-    case "risk": return "Risk";
-    case "critical": return "Critical";
-    case "stale_no_sales": return "Без продаж";
-    case "out_of_stock": return "Нет остатка";
-    default: return code || "—";
-  }
-}
-function statusColor(code){
-  switch (code) {
-    case "healthy": return "healthy";
-    case "warning": return "warning";
-    case "risk": return "risk";
-    case "critical": return "critical";
-    case "stale_no_sales": return "stale_no_sales";
-    case "out_of_stock": return "out_of_stock";
-    default: return "out_of_stock";
-  }
-}
-function renderTurnoverKpi(turn){
-  const s = turn.summary || {};
-  return [
-    { color:"c-blue", label:"Товаров в выборке", value:fmt(s.items_count||0), sub:`Период: ${fmt(turn.period_days||0)} дн.` },
-    { color:"c-purple", label:"Без продаж", value:fmt(s.stale_no_sales_count||0), sub:"Товары без продаж за период" },
-    { color:"c-orange", label:"Риск + критичные", value:fmt((s.risk_count||0)+(s.critical_count||0)), sub:"Требуют внимания" },
-    { color:"c-red", label:"Стоимость остатка", value:fmtMoney(s.total_stock_cost||0), sub:"Заморожено в остатках" },
-  ].map(c=>`<div class="kpi-card ${esc(c.color)}"><div class="kpi-label">${esc(c.label)}</div><div class="kpi-value">${c.value}</div><div class="kpi-sub">${esc(c.sub)}</div></div>`).join("");
-}
-function renderTurnoverCharts(turn){
-  const rows = turn.items || [];
-  if (!rows.length) {
-    return {
-      chart: `<div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-title">Нет данных</div><p class="empty-state-text">Для выбранного периода нет товаров по оборачиваемости.</p></div>`,
-      top: `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">Нет проблемных товаров</div><p class="empty-state-text">Сейчас нечего показывать.</p></div>`
-    };
-  }
-
-  const statuses = ["healthy","warning","risk","critical","stale_no_sales","out_of_stock"];
-  const counts = Object.fromEntries(statuses.map(s => [s, 0]));
-  rows.forEach(r => { if (counts[r.turnover_status] !== undefined) counts[r.turnover_status] += 1; });
-  const max = Math.max(1, ...statuses.map(s => counts[s]));
-
-  const chart = `<div class="turnover-top-card">
-    <h3 class="turnover-top-title">Распределение по статусам</h3>
-    <div class="turnover-chart-list">
-      ${statuses.map(s => `
-        <div class="turnover-chart-row">
-          <div class="turnover-chart-label">${esc(statusLabel(s))}</div>
-          <div class="turnover-chart-track"><div class="turnover-chart-fill ${statusColor(s)}" style="width:${(counts[s]/max)*100}%"></div></div>
-          <div class="turnover-chart-val">${fmt(counts[s])}</div>
-        </div>`).join("")}
+  return `
+    <div class="alert alert-warning visible" style="margin-bottom:14px">
+      <span class="alert-icon">⚠️</span>
+      ${tf("analytics.syncDifferencesFound",{count:ch.out_of_sync.length},`Обнаружено расхождений: <strong>${ch.out_of_sync.length}</strong>. Требуется инвентаризация.`)}
     </div>
-  </div>`;
-
-  const problemRows = [...rows]
-    .filter(r => ["critical","risk","stale_no_sales"].includes(r.turnover_status))
-    .sort((a,b) => {
-      const rank = { critical:3, risk:2, stale_no_sales:1 };
-      if (rank[b.turnover_status] !== rank[a.turnover_status]) return rank[b.turnover_status] - rank[a.turnover_status];
-      return (b.stock_cost_total||0) - (a.stock_cost_total||0);
-    })
-    .slice(0, 6);
-
-  const top = problemRows.length
-    ? `<div class="turnover-top-card">
-        <h3 class="turnover-top-title">Проблемные товары</h3>
-        <div class="turnover-top-list">
-          ${problemRows.map(r => `
-            <div class="turnover-top-item">
-              <div class="turnover-top-head">
-                <div class="turnover-top-name">${esc(r.name || "—")}</div>
-                <div class="turnover-top-status ${statusColor(r.turnover_status)}">${esc(statusLabel(r.turnover_status))}</div>
-              </div>
-              <div style="font-size:13px;color:var(--text-muted)">
-                Остаток: <strong style="color:var(--text-main)">${fmt(r.qty_on_hand||0)}</strong>
-                · Стоимость: <strong style="color:var(--text-main)">${fmtMoney(r.stock_cost_total||0)}</strong>
-                · Потенц. прибыль: <strong class="${(+r.potential_profit||0)>=0?'cell-success':'cell-danger'}">${fmtMoney(r.potential_profit||0)}</strong>
-              </div>
-            </div>`).join("")}
-        </div>
-      </div>`
-    : `<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-title">Проблемных товаров нет</div><p class="empty-state-text">По текущим фильтрам критичных и зависших товаров не найдено.</p></div>`;
-
-  return { chart, top };
+    <div class="table-wrap"><table>
+      <thead><tr><th>${t("analytics.tableItem","Товар")}</th><th>ID</th><th>${t("analytics.inStock","В stock")}</th><th>${t("analytics.inBatches","В batches")}</th><th>${t("analytics.difference","Разница")}</th><th>${t("analytics.severity","Степень")}</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
 }
 
+/* ══════════════════════════════════════════════════════════
+   ГЛАВНАЯ ЗАГРУЗКА
+   ══════════════════════════════════════════════════════════ */
 async function loadAll(){
-  updateSubtitle();
-  if (!checkTenant()) return;
+  if (!checkTenant()){ hideLoader(); updateSubtitle(); return; }
 
+  showLoader(t("analytics.loadingData","Загрузка данных…"));
   showSkeletons();
-  showLoader();
+  updateSubtitle();
+  document.getElementById("alert-error").classList.remove("visible");
+  document.getElementById("alert-auth").classList.remove("visible");
 
-  const q = buildQuery();
-  const tq = buildTenantOnly();
+  const q    = buildQuery();
+  const qTop = buildQuery({limit:10});
+  const qTid = buildTenantOnly();
 
-  const [pnlR, dailyR, topR, debtsR, svR, turnR] = await Promise.allSettled([
-    apiFetch("/reports/pnl?"+q),
-    apiFetch("/reports/pnl-daily?"+q),
-    apiFetch("/reports/top-items?"+q+"&limit=10"),
-    apiFetch("/debts/analytics?"+q),
-    apiFetch("/stock/valuation?"+tq),
-    apiFetch("/reports/turnover?"+q.replace(/date_from=[^&]*&?|date_to=[^&]*&?/g,"") + (q ? "&" : "") + "period_days=" + inferPeriodDays()),
+  const [pnlR, dailyR, topR, debtsR, svR] = await Promise.allSettled([
+    apiFetch(`/reports/pnl?${q}`),
+    apiFetch(`/reports/pnl-daily?${q}`),
+    apiFetch(`/reports/top-items?${qTop}`),
+    apiFetch(`/reports/debts-summary?${qTid}`),
+    apiFetch(`/reports/stock-value?${qTid}`),
   ]);
 
+  /* P&L */
   if (pnlR.status==="fulfilled"){
-    document.getElementById("pnl-kpi-grid").innerHTML = renderPnlKpi(pnlR.value);
-    document.getElementById("pnl-funnel-wrap").innerHTML = renderPnlFunnel(pnlR.value);
-    document.getElementById("expenses-wrap").innerHTML = renderExpenses(pnlR.value);
-    document.getElementById("pnl-period-note").textContent =
-      $from.value && $to.value ? `${$from.value} — ${$to.value}` : t("analytics.actualForFilter","по фильтру");
+    const pnl=pnlR.value.pnl, per=pnlR.value.period;
+    const from=per?.date_from||$from.value, to=per?.date_to||$to.value;
+    document.getElementById("pnl-period-note").textContent = from&&to?`${from} — ${to}`:from?tf("analytics.fromShort",{date:from},`с ${from}`):"";
+    document.getElementById("pnl-kpi-grid").innerHTML    = renderPnlKpi(pnl);
+    document.getElementById("pnl-funnel-wrap").innerHTML = renderPnlFunnel(pnl);
+    document.getElementById("expenses-wrap").innerHTML   = renderExpenses(pnl);
   } else if (pnlR.reason?.message!=="unauthorized"){
-    blockError("pnl-kpi-grid", t("analytics.errorPnl","Ошибка P&L"), pnlR.reason?.message||"");
-    document.getElementById("pnl-funnel-wrap").innerHTML = "";
-    document.getElementById("expenses-wrap").innerHTML = "";
+    blockError("pnl-kpi-grid",t("analytics.errorPnl","Ошибка P&L"),pnlR.reason?.message||"");
+    document.getElementById("pnl-funnel-wrap").innerHTML="";
   }
 
+  /* Динамика */
   if (dailyR.status==="fulfilled"){
-    document.getElementById("chart-wrap").innerHTML = renderChart(dailyR.value.items || dailyR.value.rows || []);
-    document.getElementById("chart-note").textContent = t("analytics.revenueAndProfit","выручка и чистая прибыль");
+    const d=dailyR.value.daily||[];
+    document.getElementById("chart-note").textContent=tf("analytics.daysShort",{value:d.length},`${d.length} дн.`);
+    document.getElementById("chart-wrap").innerHTML=renderChart(d);
   } else if (dailyR.reason?.message!=="unauthorized"){
-    blockError("chart-wrap", t("analytics.errorDaily","Ошибка динамики"), dailyR.reason?.message||"");
+    document.getElementById("chart-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorDailyTitle","Ошибка динамики")}</div><p class="empty-state-text">${esc(dailyR.reason?.message||"")}</p></div>`;
   }
 
+  /* Топ товаров */
   if (topR.status==="fulfilled"){
-    document.getElementById("top-items-wrap").innerHTML = renderTopItems(topR.value);
+    document.getElementById("top-note").textContent=tf("analytics.topByRevenue",{value:topR.value.limit||10},`топ ${topR.value.limit||10} по выручке`);
+    document.getElementById("top-items-wrap").innerHTML=renderTopItems(topR.value);
   } else if (topR.reason?.message!=="unauthorized"){
-    blockError("top-items-wrap", t("analytics.errorTopItems","Ошибка топ товаров"), topR.reason?.message||"");
+    document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorTopItemsTitle","Ошибка топ товаров")}</div><p class="empty-state-text">${esc(topR.reason?.message||"")}</p></div>`;
   }
 
+  /* Долги */
   if (debtsR.status==="fulfilled"){
-    document.getElementById("debts-kpi-grid").innerHTML = renderDebtsKpi(debtsR.value);
-    document.getElementById("debts-table-wrap").innerHTML = renderDebtsTable(debtsR.value.top_open_debts||[]);
+    const s=debtsR.value.summary||{};
+    document.getElementById("debts-kpi-grid").innerHTML=renderDebtsKpi(s);
+    document.getElementById("debts-table-wrap").innerHTML=
+      `<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">${t("analytics.topOpenDebts","Топ открытых долгов")}</div>`+
+      renderDebtsTable(debtsR.value.top_open_debts||[]);
   } else if (debtsR.reason?.message!=="unauthorized"){
-    blockError("debts-kpi-grid", t("analytics.errorDebts","Ошибка долгов"), debtsR.reason?.message||"");
-    document.getElementById("debts-table-wrap").innerHTML = "";
+    blockError("debts-kpi-grid",t("analytics.errorDebts","Ошибка долгов"),debtsR.reason?.message||"");
+    document.getElementById("debts-table-wrap").innerHTML="";
   }
 
+  /* Склад + sync */
   if (svR.status==="fulfilled"){
-    document.getElementById("stock-kpi-grid").innerHTML = renderStockKpi(svR.value);
-    document.getElementById("sync-body").innerHTML = renderSyncCheck(svR.value);
+    document.getElementById("stock-kpi-grid").innerHTML=renderStockKpi(svR.value);
+    document.getElementById("sync-body").innerHTML=renderSyncCheck(svR.value);
   } else if (svR.reason?.message!=="unauthorized"){
-    blockError("stock-kpi-grid", t("analytics.errorStock","Ошибка склада"), svR.reason?.message||"");
-    document.getElementById("sync-body").innerHTML = "";
+    blockError("stock-kpi-grid",t("analytics.errorStock","Ошибка склада"),svR.reason?.message||"");
+    document.getElementById("sync-body").innerHTML="";
   }
 
-  if (turnR.status==="fulfilled"){
-    document.getElementById("turnover-kpi-grid").innerHTML = renderTurnoverKpi(turnR.value);
-    const charts = renderTurnoverCharts(turnR.value);
-    document.getElementById("turnover-chart-wrap").innerHTML = charts.chart;
-    document.getElementById("turnover-top-wrap").innerHTML = charts.top;
-    document.getElementById("turnover-note").textContent = `Период: ${fmt(turnR.value.period_days||0)} дн.`;
-  } else if (turnR.reason?.message!=="unauthorized"){
-    blockError("turnover-kpi-grid", "Ошибка оборачиваемости", turnR.reason?.message||"");
-    document.getElementById("turnover-chart-wrap").innerHTML = "";
-    document.getElementById("turnover-top-wrap").innerHTML = "";
-  }
-
-  if ([pnlR,dailyR,topR,debtsR,svR,turnR].every(r=>r.status==="rejected") && pnlR.reason?.message!=="unauthorized") {
-    showError(t("analytics.errorLoadPrefix","Не удалось загрузить данные: ") + (pnlR.reason?.message||t("analytics.serverError","Ошибка сервера")));
-  }
+  /* Общая ошибка */
+  if ([pnlR,dailyR,topR,debtsR,svR].every(r=>r.status==="rejected")&&pnlR.reason?.message!=="unauthorized")
+    showError(t("analytics.errorLoadPrefix","Не удалось загрузить данные: ")+(pnlR.reason?.message||t("analytics.serverError","Ошибка сервера")));
 
   hideLoader();
-}
-
-function inferPeriodDays(){
-  if ($from.value && $to.value) {
-    const from = new Date($from.value + "T00:00:00");
-    const to = new Date($to.value + "T00:00:00");
-    const diff = Math.round((to - from) / 86400000) + 1;
-    return Math.max(1, diff);
-  }
-  return 30;
 }
 
 function initI18nPage(){
@@ -1184,6 +1062,7 @@ document.addEventListener("app:language-changed", () => {
   if (checkTenant()) loadAll();
 });
 
+/* Запуск */
 initI18nPage();
 loadAll();
 </script>
