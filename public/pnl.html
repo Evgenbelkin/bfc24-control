@@ -264,6 +264,7 @@
       vertical-align:top;
       font-size:14px;
       background:#fff;
+      white-space:nowrap;
     }
 
     th{
@@ -289,6 +290,21 @@
     .muted{
       color:var(--muted);
       font-size:13px;
+    }
+
+    .value-positive{
+      color:var(--success);
+      font-weight:700;
+    }
+
+    .value-negative{
+      color:var(--danger);
+      font-weight:700;
+    }
+
+    .value-neutral{
+      color:var(--warning);
+      font-weight:700;
     }
 
     #langSwitcher{
@@ -509,6 +525,36 @@
         </div>
       </div>
     </div>
+
+    <div class="card">
+      <h2 class="card-title">Дневная динамика PnL</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Выручка</th>
+              <th>Себестоимость</th>
+              <th>Валовая прибыль</th>
+              <th>Расходы</th>
+              <th>Чистая прибыль</th>
+              <th>Продаж</th>
+              <th>Валовая маржа %</th>
+            </tr>
+          </thead>
+          <tbody id="dailyPnlBody">
+            <tr>
+              <td colspan="8" class="empty">Загрузка...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="muted" style="margin-top:12px;">
+        Источник: /reports/pnl-daily
+      </div>
+    </div>
   </div>
 
   <script src="/js/config.js"></script>
@@ -626,6 +672,7 @@
       periodValue: document.getElementById("periodValue"),
 
       expensesBreakdownBody: document.getElementById("expensesBreakdownBody"),
+      dailyPnlBody: document.getElementById("dailyPnlBody"),
     };
 
     function goBack() {
@@ -641,11 +688,6 @@
     function showStatus(text, type = "info") {
       els.pageStatus.className = "status show " + type;
       els.pageStatus.textContent = text;
-    }
-
-    function hideStatus() {
-      els.pageStatus.className = "status";
-      els.pageStatus.textContent = "";
     }
 
     function formatMoney(value) {
@@ -707,7 +749,7 @@
       }
 
       setActivePeriod(period);
-      loadPnl();
+      loadAll();
     }
 
     function clearActivePeriod() {
@@ -718,7 +760,7 @@
       els.dateFrom.value = "";
       els.dateTo.value = "";
       clearActivePeriod();
-      loadPnl();
+      loadAll();
     }
 
     function applyProfitColor(el, value) {
@@ -731,6 +773,20 @@
       } else {
         el.classList.add("warning");
       }
+    }
+
+    function buildQuery() {
+      const tenantId = ApiBridge.getTenantId(FALLBACK_TENANT_ID);
+      const params = new URLSearchParams();
+      params.set("tenant_id", String(tenantId));
+
+      const dateFrom = String(els.dateFrom.value || "").trim();
+      const dateTo = String(els.dateTo.value || "").trim();
+
+      if (dateFrom) params.set("date_from", dateFrom);
+      if (dateTo) params.set("date_to", dateTo);
+
+      return `?${params.toString()}`;
     }
 
     function renderBreakdown(breakdown) {
@@ -770,18 +826,38 @@
       `).join("");
     }
 
-    function buildQuery() {
-      const tenantId = ApiBridge.getTenantId(FALLBACK_TENANT_ID);
-      const params = new URLSearchParams();
-      params.set("tenant_id", String(tenantId));
+    function renderDailyTable(rows) {
+      if (!Array.isArray(rows) || !rows.length) {
+        els.dailyPnlBody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty">Нет данных по дням</td>
+          </tr>
+        `;
+        return;
+      }
 
-      const dateFrom = String(els.dateFrom.value || "").trim();
-      const dateTo = String(els.dateTo.value || "").trim();
+      els.dailyPnlBody.innerHTML = rows.map((row) => {
+        const net = Number(row.net_profit || 0);
+        const gross = Number(row.gross_profit || 0);
+        const expenses = Number(row.expenses || 0);
 
-      if (dateFrom) params.set("date_from", dateFrom);
-      if (dateTo) params.set("date_to", dateTo);
+        const grossClass = gross > 0 ? "value-positive" : gross < 0 ? "value-negative" : "value-neutral";
+        const netClass = net > 0 ? "value-positive" : net < 0 ? "value-negative" : "value-neutral";
+        const expensesClass = expenses > 0 ? "value-negative" : "value-neutral";
 
-      return `?${params.toString()}`;
+        return `
+          <tr>
+            <td>${escapeHtml(row.date || "")}</td>
+            <td>${escapeHtml(formatMoney(row.revenue))}</td>
+            <td>${escapeHtml(formatMoney(row.cogs))}</td>
+            <td class="${grossClass}">${escapeHtml(formatMoney(row.gross_profit))}</td>
+            <td class="${expensesClass}">${escapeHtml(formatMoney(row.expenses))}</td>
+            <td class="${netClass}">${escapeHtml(formatMoney(row.net_profit))}</td>
+            <td>${escapeHtml(String(Number(row.sales_count || 0)))}</td>
+            <td>${row.gross_margin_pct === null ? "—" : escapeHtml(formatPercent(row.gross_margin_pct))}</td>
+          </tr>
+        `;
+      }).join("");
     }
 
     function renderPnl(data) {
@@ -812,7 +888,7 @@
       els.consignmentPaidValue.textContent = formatMoney(revenueByMethod.consignment_paid);
 
       if (period.date_from || period.date_to) {
-        els.periodValue.textContent = `${period.date_from || "..." } — ${period.date_to || "..."}`;
+        els.periodValue.textContent = `${period.date_from || "..."} — ${period.date_to || "..."}`;
       } else {
         els.periodValue.textContent = "Весь период";
       }
@@ -820,14 +896,19 @@
       renderBreakdown(pnl.expenses_breakdown || {});
     }
 
-    async function loadPnl() {
+    async function loadAll() {
       try {
         showStatus("Загрузка PnL...", "info");
 
         const query = buildQuery();
-        const data = await ApiBridge.get(`/reports/pnl${query}`);
 
-        renderPnl(data);
+        const [pnlData, dailyData] = await Promise.all([
+          ApiBridge.get(`/reports/pnl${query}`),
+          ApiBridge.get(`/reports/pnl-daily${query}`)
+        ]);
+
+        renderPnl(pnlData);
+        renderDailyTable(dailyData.daily || []);
 
         showStatus("PnL успешно загружен", "success");
       } catch (err) {
@@ -848,7 +929,7 @@
         clearActivePeriod();
       });
 
-      els.refreshBtn.addEventListener("click", loadPnl);
+      els.refreshBtn.addEventListener("click", loadAll);
       els.resetBtn.addEventListener("click", resetFilters);
 
       document.addEventListener("app:language-changed", () => {
@@ -865,7 +946,7 @@
         window.i18n.applyTranslations();
         window.i18n.renderLanguageSwitcher("langSwitcher");
       }
-      loadPnl();
+      loadAll();
     }
 
     bootstrap();
