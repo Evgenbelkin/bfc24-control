@@ -276,12 +276,32 @@ function authRequired(req, res, next) {
   })();
 }
 
-function requireRole(allowedRoles = []) {
-  const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+function normalizeAllowedRoles(args) {
+  const flat = args.flatMap((item) => {
+    if (Array.isArray(item)) return item;
+    return [item];
+  });
+
+  return flat
+    .map((role) => String(role || '').trim())
+    .filter(Boolean);
+}
+
+function requireRole(...allowedRoles) {
+  const roles = normalizeAllowedRoles(allowedRoles);
 
   return (req, res, next) => {
     if (!req.user) {
       return buildAuthError(res, 401, 'auth_required', 'Требуется авторизация');
+    }
+
+    if (!roles.length) {
+      return buildAuthError(
+        res,
+        500,
+        'roles_not_configured',
+        'Не настроен список допустимых ролей'
+      );
     }
 
     const legacyRole = req.user.role;
