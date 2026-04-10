@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ru" translate="no" data-page-title-i18n="users.pageTitle">
+<head>
+  <meta charset="UTF-8" />
+  <title>BFC24 CONTROL — Пользователи</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:#dfe3eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --warning:#d97706;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .lang-switcher{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .lang-switcher button{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+      min-width:56px;
+    }
+
+    .lang-switcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .btn-primary:hover{
+      background:var(--primary-hover);
+    }
+
+    .btn-light{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-secondary{
+      background:#f8fafc;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-danger{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+
+    .btn-warning{
+      background:#fffbeb;
+      color:#92400e;
+      border:1px solid #fde68a;
+    }
+
+    .btn-success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid #eef1f5;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:16px;
+    }
+
+    .card-title{
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 14px;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      min-width:0;
+    }
+
+    .field.full{
+      grid-column:1 / -1;
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    input, textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus, textarea:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    textarea{
+      min-height:92px;
+      resize:vertical;
+    }
+
+    .helper{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      align-items:end;
+      margin-top:18px;
+    }
+
+    .toolbar-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+
+    .status.show{display:block}
+    .status.error{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+    .status.success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .status.info{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .stat{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      margin-top:10px;
+    }
+
+    table{
+      width:100%;
+      min-width:1100px;
+      border-collapse:collapse;
+      background:#fff;
+    }
+
+    th, td{
+      border-bottom:1px solid #eef1f5;
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    th{
+      background:#f8fafc;
+      font-weight:700;
+      color:#111827;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    tr:hover td{
+      background:#fbfdff;
+    }
+
+    .row-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:24px 12px;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:3px 8px;
+      border-radius:8px;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .badge-success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+
+    .badge-danger{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+
+    .badge-warning{
+      background:#fffbeb;
+      color:#92400e;
+      border:1px solid #fde68a;
+    }
+
+    .badge-muted{
+      background:#f3f4f6;
+      color:#6b7280;
+      border:1px solid #e5e7eb;
+    }
+
+    @media (max-width: 900px){
+      .form-grid,
+      .stats,
+      .toolbar{
+        grid-template-columns:1fr;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .wrap{
+        padding:16px 12px 32px;
+      }
+
+      .topbar{
+        align-items:flex-start;
+      }
+
+      .topbar-right{
+        width:100%;
+        justify-content:space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title" data-i18n="users.heading">Пользователи</div>
+
+      <div class="topbar-right">
+        <div id="langSwitcher" class="lang-switcher"></div>
+
+        <div class="top-actions">
+          <button class="btn btn-light" onclick="goBack()" data-i18n="users.backButton">Назад</button>
+          <button class="btn btn-light" onclick="logout()" data-i18n="users.logoutButton">Выйти</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title" id="formTitle">Создать пользователя</h2>
+      <div class="muted" data-i18n="users.subtitle">Управление учётными записями для входа в систему.</div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label" data-i18n="users.statsUsers">Пользователей</div>
+          <div class="stat-value" id="usersCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label" data-i18n="users.statsTenant">Tenant ID</div>
+          <div class="stat-value" id="tenantValue">1</div>
+        </div>
+      </div>
+
+      <form id="userForm" autocomplete="off" style="margin-top:18px;">
+        <div class="form-grid">
+          <div class="field">
+            <label for="username" data-i18n="users.usernameLabel">Логин</label>
+            <input id="username" type="text" data-i18n-placeholder="users.usernamePlaceholder" placeholder="Например: ivanov" autocomplete="off" />
+          </div>
+
+          <div class="field">
+            <label for="fullName" data-i18n="users.fullNameLabel">ФИО / имя</label>
+            <input id="fullName" type="text" data-i18n-placeholder="users.fullNamePlaceholder" placeholder="Например: Иван Иванов" />
+          </div>
+
+          <div class="field">
+            <label for="password" data-i18n="users.passwordLabel">Пароль</label>
+            <input id="password" type="password" data-i18n-placeholder="users.passwordPlaceholder" placeholder="Пароль нового пользователя" autocomplete="new-password" />
+            <div class="helper" id="passwordHelper" data-i18n="users.passwordHelper">Обязателен при создании. При редактировании — оставьте пустым, чтобы не менять.</div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="field">
+            <label for="searchInput" data-i18n="users.searchLabel">Поиск</label>
+            <input id="searchInput" type="text" data-i18n-placeholder="users.searchPlaceholder" placeholder="Поиск по логину, имени" />
+          </div>
+
+          <div class="toolbar-actions">
+            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
+            <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="users.refreshButton">Обновить список</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="pageStatus" class="status info"></div>
+      <div id="submitStatus" class="status"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title" data-i18n="users.listTitle">Список пользователей</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="users.tableId">ID</th>
+              <th data-i18n="users.tableUsername">Логин</th>
+              <th data-i18n="users.tableFullName">ФИО / имя</th>
+              <th data-i18n="users.tableRole">Роль</th>
+              <th data-i18n="users.tableActive">Активен</th>
+              <th data-i18n="users.tableBlocked">Заблокирован</th>
+              <th data-i18n="users.tableLastLogin">Последний вход</th>
+              <th data-i18n="users.tableActions">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td colspan="8" class="empty" data-i18n="users.loadingData">Загрузка данных...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+
+  <script>
+    const FALLBACK_TENANT_ID = 1;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/login.html";
+    }
+
+    const Ui = window.AppUI || {
+      escapeHtml: (value) => String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;"),
+      translateError: (value) => String(value || "Ошибка"),
+      displayDateTime: (value) => {
+        if (!value) return "";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleString("ru-RU");
+      }
+    };
+
+    async function requestFallback(method, path, body) {
+      const currentToken = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(currentToken ? { Authorization: "Bearer " + currentToken } : {})
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
+
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+
+      return data;
+    }
+
+    function getTenantIdFromStorage(fallback = 1) {
+      try {
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
+      } catch {}
+      return fallback;
+    }
+
+    const ApiBridge = {
+      getTenantId(fallback = 1) {
+        if (window.API && typeof window.API.getTenantId === "function") {
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
+        }
+        return getTenantIdFromStorage(fallback);
+      },
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      },
+      post(path, body) {
+        if (window.API && typeof window.API.post === "function") {
+          return window.API.post(path, body);
+        }
+        return requestFallback("POST", path, body);
+      },
+      put(path, body) {
+        if (window.API && typeof window.API.put === "function") {
+          return window.API.put(path, body);
+        }
+        return requestFallback("PUT", path, body);
+      },
+      patch(path, body) {
+        if (window.API && typeof window.API.patch === "function") {
+          return window.API.patch(path, body);
+        }
+        return requestFallback("PATCH", path, body);
+      },
+      delete(path) {
+        if (window.API && typeof window.API.delete === "function") {
+          return window.API.delete(path);
+        }
+        return requestFallback("DELETE", path);
+      }
+    };
+
+    let authUser = null;
+    let usersData = [];
+    let editId = null;
+
+    let pageStatusState = null;
+    let submitStatusState = null;
+
+    const els = {
+      formTitle:    document.getElementById("formTitle"),
+      userForm:     document.getElementById("userForm"),
+      username:     document.getElementById("username"),
+      fullName:     document.getElementById("fullName"),
+      password:     document.getElementById("password"),
+      searchInput:  document.getElementById("searchInput"),
+      saveBtn:      document.getElementById("saveBtn"),
+      cancelEditBtn:document.getElementById("cancelEditBtn"),
+      refreshBtn:   document.getElementById("refreshBtn"),
+      tbody:        document.getElementById("tbody"),
+      pageStatus:   document.getElementById("pageStatus"),
+      submitStatus: document.getElementById("submitStatus"),
+      usersCount:   document.getElementById("usersCount"),
+      tenantValue:  document.getElementById("tenantValue")
+    };
+
+    function goBack() {
+      window.location.href = "/index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
+
+    function parseUser() {
+      try {
+        const raw = localStorage.getItem("user");
+        authUser = raw ? JSON.parse(raw) : null;
+      } catch {
+        authUser = null;
+      }
+    }
+
+    function getTenantId() {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
+        return Number(authUser.tenant_id);
+      }
+      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== "undefined" ? FALLBACK_TENANT_ID : 1);
+    }
+
+    function showStatus(el, text, type = "info") {
+      el.className = "status show " + type;
+      el.textContent = text;
+    }
+
+    function hideStatus(el) {
+      el.className = "status";
+      el.textContent = "";
+    }
+
+    function setPageStatus(key, vars, type) {
+      pageStatusState = { key, vars: vars || {}, type };
+      showStatus(els.pageStatus, i18n.format(key, vars || {}), type);
+    }
+
+    function clearPageStatus() {
+      pageStatusState = null;
+      hideStatus(els.pageStatus);
+    }
+
+    function setSubmitStatus(key, vars, type) {
+      submitStatusState = { key, vars: vars || {}, type };
+      showStatus(els.submitStatus, i18n.format(key, vars || {}), type);
+    }
+
+    function clearSubmitStatus() {
+      submitStatusState = null;
+      hideStatus(els.submitStatus);
+    }
+
+    function restoreStatusesAfterLanguageChange() {
+      if (pageStatusState) {
+        showStatus(
+          els.pageStatus,
+          i18n.format(pageStatusState.key, pageStatusState.vars || {}),
+          pageStatusState.type
+        );
+      }
+      if (submitStatusState) {
+        showStatus(
+          els.submitStatus,
+          i18n.format(submitStatusState.key, submitStatusState.vars || {}),
+          submitStatusState.type
+        );
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatDate(value) {
+      return Ui.displayDateTime(value);
+    }
+
+    function extractList(data, keys) {
+      if (Array.isArray(data)) return data;
+      if (!data || typeof data !== "object") return [];
+
+      for (const key of keys) {
+        if (Array.isArray(data[key])) return data[key];
+      }
+
+      for (const value of Object.values(data)) {
+        if (Array.isArray(value)) return value;
+      }
+
+      return [];
+    }
+
+    async function apiGet(path)        { return ApiBridge.get(path); }
+    async function apiPost(path, body) { return ApiBridge.post(path, body); }
+    async function apiPut(path, body)  { return ApiBridge.put(path, body); }
+    async function apiPatch(path, body){ return ApiBridge.patch(path, body); }
+
+    function normalizeUser(row) {
+      return {
+        id:            row.id,
+        username:      row.username || "",
+        full_name:     row.full_name || "",
+        role:          row.role || "",
+        is_active:     row.is_active === false ? false : true,
+        is_blocked:    !!row.is_blocked,
+        last_login_at: row.last_login_at || row.last_login || null
+      };
+    }
+
+    function mapRole(role) {
+      const v = String(role || "").toLowerCase();
+      if (v === "owner")  return i18n.t("users.roleOwner");
+      if (v === "client") return i18n.t("users.roleClient");
+      return role || "—";
+    }
+
+    function getFormTitleText() {
+      if (editId) {
+        return i18n.format("users.formEditTitle", { id: editId });
+      }
+      return i18n.t("users.formCreateTitle");
+    }
+
+    function getSaveButtonText() {
+      return editId ? i18n.t("users.saveChangesButton") : i18n.t("users.saveButton");
+    }
+
+    function syncFormTexts() {
+      els.formTitle.textContent      = getFormTitleText();
+      els.saveBtn.textContent        = getSaveButtonText();
+      els.cancelEditBtn.textContent  = i18n.t("users.cancelEditButton");
+    }
+
+    function resetForm() {
+      editId = null;
+      syncFormTexts();
+      els.cancelEditBtn.style.display = "none";
+      els.username.value  = "";
+      els.fullName.value  = "";
+      els.password.value  = "";
+      els.username.removeAttribute("readonly");
+      clearSubmitStatus();
+    }
+
+    function startEdit(user) {
+      editId = user.id;
+      syncFormTexts();
+      els.cancelEditBtn.style.display = "inline-flex";
+      els.username.value  = user.username || "";
+      els.fullName.value  = user.full_name || "";
+      els.password.value  = "";
+      /* логин менять нельзя при редактировании — только full_name и пароль */
+      els.username.setAttribute("readonly", "readonly");
+      clearSubmitStatus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function getFilteredRows() {
+      const search = (els.searchInput.value || "").trim().toLowerCase();
+
+      return usersData.filter((row) => {
+        if (!search) return true;
+        const text = [
+          row.username,
+          row.full_name
+        ].join(" ").toLowerCase();
+
+        return text.includes(search);
+      });
+    }
+
+    function renderTable() {
+      const rows = getFilteredRows();
+      els.usersCount.textContent = String(usersData.length);
+
+      if (!rows.length) {
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty">${escapeHtml(i18n.t("users.noData"))}</td>
+          </tr>
+        `;
+        return;
+      }
+
+      els.tbody.innerHTML = rows.map((row) => {
+        const activeBadge = row.is_active
+          ? `<span class="badge badge-success">${escapeHtml(i18n.t("users.activeYes"))}</span>`
+          : `<span class="badge badge-muted">${escapeHtml(i18n.t("users.activeNo"))}</span>`;
+
+        const blockedBadge = row.is_blocked
+          ? `<span class="badge badge-danger">${escapeHtml(i18n.t("users.blockedYes"))}</span>`
+          : `<span class="badge badge-success">${escapeHtml(i18n.t("users.blockedNo"))}</span>`;
+
+        const toggleActiveLabel = row.is_active
+          ? escapeHtml(i18n.t("users.btnDeactivate"))
+          : escapeHtml(i18n.t("users.btnActivate"));
+
+        const toggleBlockLabel = row.is_blocked
+          ? escapeHtml(i18n.t("users.btnUnblock"))
+          : escapeHtml(i18n.t("users.btnBlock"));
+
+        const toggleActiveClass = row.is_active ? "btn btn-warning" : "btn btn-success";
+        const toggleBlockClass  = row.is_blocked ? "btn btn-success" : "btn btn-danger";
+
+        return `
+          <tr>
+            <td>${escapeHtml(row.id)}</td>
+            <td>${escapeHtml(row.username)}</td>
+            <td>${escapeHtml(row.full_name)}</td>
+            <td>${escapeHtml(mapRole(row.role))}</td>
+            <td>${activeBadge}</td>
+            <td>${blockedBadge}</td>
+            <td>${escapeHtml(formatDate(row.last_login_at))}</td>
+            <td>
+              <div class="row-actions">
+                <button type="button" class="btn btn-secondary" onclick="editUser('${escapeHtml(String(row.id))}')">${escapeHtml(i18n.t("users.editButton"))}</button>
+                <button type="button" class="${toggleActiveClass}" onclick="toggleActive('${escapeHtml(String(row.id))}')">${toggleActiveLabel}</button>
+                <button type="button" class="${toggleBlockClass}" onclick="toggleBlock('${escapeHtml(String(row.id))}')">${toggleBlockLabel}</button>
+                <button type="button" class="btn btn-light" onclick="resetPassword('${escapeHtml(String(row.id))}')">${escapeHtml(i18n.t("users.btnResetPassword"))}</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderLoadingRow() {
+      els.tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="empty">${escapeHtml(i18n.t("users.loadingData"))}</td>
+        </tr>
+      `;
+    }
+
+    function renderLoadErrorRow() {
+      els.tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="empty">${escapeHtml(i18n.t("users.loadErrorRow"))}</td>
+        </tr>
+      `;
+    }
+
+    async function loadData() {
+      try {
+        const tenantId = getTenantId();
+        els.tenantValue.textContent = String(tenantId);
+
+        renderLoadingRow();
+        setPageStatus("users.loadingStatus", { tenantId }, "info");
+
+        const data = await apiGet(`/owner-admin/users?tenant_id=${tenantId}`);
+        usersData = extractList(data, ["users", "data", "rows"]).map(normalizeUser);
+
+        renderTable();
+
+        setPageStatus("users.loadedStatus", {
+          tenantId,
+          count: usersData.length
+        }, "success");
+      } catch (err) {
+        renderLoadErrorRow();
+        setPageStatus("users.loadErrorStatus", {
+          error: Ui.translateError(err.message)
+        }, "error");
+      }
+    }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      clearSubmitStatus();
+
+      try {
+        const tenantId  = getTenantId();
+        const username  = (els.username.value || "").trim();
+        const fullName  = (els.fullName.value || "").trim();
+        const password  = (els.password.value || "").trim();
+
+        if (!fullName) {
+          throw new Error(i18n.t("users.fullNameRequired"));
+        }
+
+        if (editId) {
+          /* При редактировании: только full_name (и пароль если задан) */
+          if (!fullName) {
+            throw new Error(i18n.t("users.fullNameRequired"));
+          }
+
+          const body = {
+            tenant_id: tenantId,
+            full_name: fullName
+          };
+
+          setSubmitStatus("users.savingUpdate", { id: editId }, "info");
+          await apiPut(`/owner-admin/users/${editId}`, body);
+
+          if (password) {
+            await apiPost(`/owner-admin/users/${editId}/reset-password`, { password });
+          }
+
+          setSubmitStatus("users.updatedSuccess", { id: editId }, "success");
+        } else {
+          /* Создание: требуются логин и пароль */
+          if (!username) {
+            throw new Error(i18n.t("users.usernameRequired"));
+          }
+
+          if (!password) {
+            throw new Error(i18n.t("users.passwordRequired"));
+          }
+
+          const body = {
+            tenant_id: tenantId,
+            username,
+            full_name:  fullName,
+            password,
+            role: "client"
+          };
+
+          setSubmitStatus("users.savingCreate", {}, "info");
+          const result = await apiPost("/owner-admin/users", body);
+
+          /* Проверяем limit_reached от backend */
+          if (result && result.limit_reached) {
+            throw new Error(i18n.t("users.limitReached"));
+          }
+
+          setSubmitStatus("users.createdSuccess", {}, "success");
+        }
+
+        resetForm();
+        await loadData();
+      } catch (err) {
+        const errCode = err.message || "";
+        const isLimitError = errCode === "limit_reached" || errCode.includes("limit_reached");
+        const errorText = isLimitError
+          ? i18n.t("users.limitReached")
+          : Ui.translateError(errCode);
+
+        setSubmitStatus("users.saveErrorStatus", { error: errorText }, "error");
+      }
+    }
+
+    async function toggleActive(id) {
+      try {
+        const user = usersData.find((u) => String(u.id) === String(id));
+        if (!user) return;
+
+        const confirmText = user.is_active
+          ? i18n.format("users.confirmDeactivate", { name: user.username || id })
+          : i18n.format("users.confirmActivate", { name: user.username || id });
+
+        if (!confirm(confirmText)) return;
+
+        await apiPatch(`/owner-admin/users/${id}/toggle-active`, {});
+        await loadData();
+      } catch (err) {
+        setSubmitStatus("users.actionError", { error: Ui.translateError(err.message) }, "error");
+      }
+    }
+
+    async function toggleBlock(id) {
+      try {
+        const user = usersData.find((u) => String(u.id) === String(id));
+        if (!user) return;
+
+        const confirmText = user.is_blocked
+          ? i18n.format("users.confirmUnblock", { name: user.username || id })
+          : i18n.format("users.confirmBlock", { name: user.username || id });
+
+        if (!confirm(confirmText)) return;
+
+        await apiPatch(`/owner-admin/users/${id}/toggle-block`, {});
+        await loadData();
+      } catch (err) {
+        setSubmitStatus("users.actionError", { error: Ui.translateError(err.message) }, "error");
+      }
+    }
+
+    async function resetPassword(id) {
+      try {
+        const user = usersData.find((u) => String(u.id) === String(id));
+        const name = user ? (user.username || id) : id;
+
+        const newPassword = prompt(i18n.format("users.promptNewPassword", { name }));
+        if (newPassword === null) return;
+
+        const trimmed = (newPassword || "").trim();
+        if (!trimmed) {
+          alert(i18n.t("users.passwordRequired"));
+          return;
+        }
+
+        await apiPost(`/owner-admin/users/${id}/reset-password`, { password: trimmed });
+        setSubmitStatus("users.passwordResetSuccess", { name }, "success");
+      } catch (err) {
+        setSubmitStatus("users.actionError", { error: Ui.translateError(err.message) }, "error");
+      }
+    }
+
+    function bindEvents() {
+      els.userForm.addEventListener("submit", handleSubmit);
+      els.searchInput.addEventListener("input", renderTable);
+      els.cancelEditBtn.addEventListener("click", resetForm);
+      els.refreshBtn.addEventListener("click", loadData);
+
+      document.addEventListener("app:language-changed", () => {
+        i18n.applyTranslations();
+        syncFormTexts();
+        renderTable();
+        restoreStatusesAfterLanguageChange();
+      });
+    }
+
+    function bootstrap() {
+      parseUser();
+      i18n.applyTranslations();
+      i18n.renderLanguageSwitcher("langSwitcher");
+      bindEvents();
+      syncFormTexts();
+      loadData();
+    }
+
+    function editUser(id) {
+      const found = usersData.find((x) => String(x.id) === String(id));
+      if (!found) return;
+      startEdit(found);
+    }
+
+    bootstrap();
+    window.editUser       = editUser;
+    window.toggleActive   = toggleActive;
+    window.toggleBlock    = toggleBlock;
+    window.resetPassword  = resetPassword;
+    window.goBack         = goBack;
+    window.logout         = logout;
+  </script>
+</body>
+</html>
