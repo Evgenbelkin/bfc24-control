@@ -146,6 +146,26 @@
       transform: none;
     }
 
+    .btn.quick {
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: none;
+      background: #fff;
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    .btn.quick:hover {
+      background: #f8fafc;
+    }
+
+    .btn.quick.active {
+      background: rgba(37, 99, 235, 0.08);
+      color: var(--brand);
+      border-color: rgba(37, 99, 235, 0.30);
+    }
+
     .panel {
       background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(10px);
@@ -164,7 +184,7 @@
 
     .filters-grid {
       display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-template-columns: repeat(8, minmax(0, 1fr));
       gap: 12px;
       align-items: end;
     }
@@ -227,6 +247,25 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+    }
+
+    .quick-filters-panel {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .quick-filters-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 2px;
     }
 
     .summary {
@@ -345,7 +384,7 @@
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      min-width: 1320px;
+      min-width: 1460px;
     }
 
     thead th {
@@ -363,6 +402,28 @@
       white-space: nowrap;
     }
 
+    thead th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    thead th.sortable:hover {
+      background: #eef2ff;
+    }
+
+    thead th .sort-head {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    thead th .sort-indicator {
+      color: var(--muted);
+      font-size: 11px;
+      min-width: 10px;
+      display: inline-block;
+    }
+
     tbody td {
       padding: 14px 12px;
       border-bottom: 1px solid #edf2f7;
@@ -372,6 +433,22 @@
 
     tbody tr:hover {
       background: rgba(248, 250, 252, 0.85);
+    }
+
+    tbody tr.row-critical {
+      background: rgba(185, 28, 28, 0.04);
+    }
+
+    tbody tr.row-risk {
+      background: rgba(234, 88, 12, 0.04);
+    }
+
+    tbody tr.row-warning {
+      background: rgba(217, 119, 6, 0.04);
+    }
+
+    tbody tr.row-stale {
+      background: rgba(109, 40, 217, 0.04);
     }
 
     .item-name {
@@ -565,6 +642,19 @@
         </div>
 
         <div class="field">
+          <label for="statusFilter">Статус</label>
+          <select id="statusFilter">
+            <option value="all">Все</option>
+            <option value="healthy">Healthy</option>
+            <option value="warning">Warning</option>
+            <option value="risk">Risk</option>
+            <option value="critical">Critical</option>
+            <option value="stale_no_sales">Без продаж</option>
+            <option value="out_of_stock">Нет остатка</option>
+          </select>
+        </div>
+
+        <div class="field">
           <label for="yellowDays">Жёлтый порог</label>
           <input id="yellowDays" type="number" min="1" step="1" value="30" />
         </div>
@@ -595,6 +685,15 @@
             <button id="csvBtn" class="btn ghost" type="button">CSV</button>
           </div>
         </div>
+      </div>
+
+      <div class="quick-filters-panel">
+        <div class="quick-filters-label">Быстрые фильтры</div>
+        <button type="button" class="btn quick active" data-quick-filter="all">Все</button>
+        <button type="button" class="btn quick" data-quick-filter="stale_no_sales">Без продаж</button>
+        <button type="button" class="btn quick" data-quick-filter="critical">Критичные</button>
+        <button type="button" class="btn quick" data-quick-filter="risk">Рисковые</button>
+        <button type="button" class="btn quick" data-quick-filter="with_stock">С остатком</button>
       </div>
     </div>
 
@@ -676,17 +775,39 @@
         <table id="turnoverTable" style="display:none;">
           <thead>
             <tr>
-              <th>Товар</th>
-              <th>Статус</th>
-              <th>Остаток</th>
-              <th>Продано за период</th>
-              <th>Среднее в день</th>
-              <th>Дней остатка</th>
-              <th>Закупка</th>
-              <th>Продажа</th>
-              <th>Стоимость остатка</th>
-              <th>Потенц. выручка</th>
-              <th>Потенц. прибыль</th>
+              <th class="sortable" data-sort-key="name">
+                <span class="sort-head">Товар <span class="sort-indicator" data-sort-indicator="name"></span></span>
+              </th>
+              <th class="sortable" data-sort-key="turnover_status">
+                <span class="sort-head">Статус <span class="sort-indicator" data-sort-indicator="turnover_status"></span></span>
+              </th>
+              <th class="sortable" data-sort-key="qty_on_hand">
+                <span class="sort-head">Остаток <span class="sort-indicator" data-sort-indicator="qty_on_hand"></span></span>
+              </th>
+              <th class="sortable" data-sort-key="sold_qty_period">
+                <span class="sort-head">Продано за период <span class="sort-indicator" data-sort-indicator="sold_qty_period"></span></span>
+              </th>
+              <th class="sortable" data-sort-key="avg_daily_sales">
+                <span class="sort-head">Среднее в день <span class="sort-indicator" data-sort-indicator="avg_daily_sales"></span></span>
+              </th>
+              <th class="sortable" data-sort-key="days_on_hand">
+                <span class="sort-head">Дней остатка <span class="sort-indicator" data-sort-indicator="days_on_hand"></span></span>
+              </th>
+              <th class="sortable" data-sort-key="purchase_price">
+                <span class="sort-head">Закупка <span class="sort-indicator" data-sort-indicator="purchase_price"></span></span>
+              </th>
+              <th class="sortable" data-sort-key="sale_price">
+                <span class="sort-head">Продажа <span class="sort-indicator" data-sort-indicator="sale_price"></span></span>
+              </th>
+              <th class="sortable" data-sort-key="stock_cost_total">
+                <span class="sort-head">Стоимость остатка <span class="sort-indicator" data-sort-indicator="stock_cost_total"></span></span>
+              </th>
+              <th class="sortable" data-sort-key="potential_revenue">
+                <span class="sort-head">Потенц. выручка <span class="sort-indicator" data-sort-indicator="potential_revenue"></span></span>
+              </th>
+              <th class="sortable" data-sort-key="potential_profit">
+                <span class="sort-head">Потенц. прибыль <span class="sort-indicator" data-sort-indicator="potential_profit"></span></span>
+              </th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -705,6 +826,7 @@
     (function () {
       const state = {
         rows: [],
+        filteredRows: [],
         summary: null,
         periodDays: 30,
         thresholds: {
@@ -712,12 +834,19 @@
           orange_days: 60,
           red_days: 90
         },
-        loading: false
+        loading: false,
+        statusFilter: "all",
+        quickFilter: "all",
+        sort: {
+          key: "potential_profit",
+          dir: "desc"
+        }
       };
 
       const els = {
         periodDays: document.getElementById("periodDays"),
         search: document.getElementById("search"),
+        statusFilter: document.getElementById("statusFilter"),
         yellowDays: document.getElementById("yellowDays"),
         orangeDays: document.getElementById("orangeDays"),
         redDays: document.getElementById("redDays"),
@@ -743,7 +872,10 @@
         tableMeta: document.getElementById("tableMeta"),
         stateBox: document.getElementById("stateBox"),
         table: document.getElementById("turnoverTable"),
-        tableBody: document.getElementById("tableBody")
+        tableBody: document.getElementById("tableBody"),
+        sortHeaders: document.querySelectorAll("[data-sort-key]"),
+        sortIndicators: document.querySelectorAll("[data-sort-indicator]"),
+        quickButtons: document.querySelectorAll("[data-quick-filter]")
       };
 
       function getToken() {
@@ -889,6 +1021,21 @@
         return "no_sales";
       }
 
+      function getRowClass(code) {
+        switch (code) {
+          case "critical":
+            return "row-critical";
+          case "risk":
+            return "row-risk";
+          case "warning":
+            return "row-warning";
+          case "stale_no_sales":
+            return "row-stale";
+          default:
+            return "";
+        }
+      }
+
       function readFilters() {
         const periodDays = Number(els.periodDays.value || 30);
         const yellowDays = Number(els.yellowDays.value || 30);
@@ -896,6 +1043,7 @@
         const redDays = Number(els.redDays.value || 90);
         const search = String(els.search.value || "").trim();
         const includeZero = !!els.includeZero.checked;
+        const statusFilter = String(els.statusFilter.value || "all");
 
         return {
           periodDays,
@@ -903,17 +1051,23 @@
           orangeDays,
           redDays,
           search,
-          includeZero
+          includeZero,
+          statusFilter
         };
       }
 
       function resetFilters() {
         els.periodDays.value = "30";
         els.search.value = "";
+        els.statusFilter.value = "all";
         els.yellowDays.value = "30";
         els.orangeDays.value = "60";
         els.redDays.value = "90";
         els.includeZero.checked = false;
+        state.quickFilter = "all";
+        state.sort = { key: "potential_profit", dir: "desc" };
+        syncQuickButtons();
+        syncSortIndicators();
       }
 
       function buildQuery() {
@@ -961,6 +1115,80 @@
         els.outCount.textContent = formatNumber(summary.out_of_stock_count || 0);
       }
 
+      function compareValues(a, b, key) {
+        const av = a[key];
+        const bv = b[key];
+
+        if (key === "name" || key === "turnover_status") {
+          return String(av || "").localeCompare(String(bv || ""), "ru");
+        }
+
+        const aNull = av === null || av === undefined;
+        const bNull = bv === null || bv === undefined;
+
+        if (aNull && bNull) return 0;
+        if (aNull) return 1;
+        if (bNull) return -1;
+
+        return Number(av) - Number(bv);
+      }
+
+      function sortRows(rows) {
+        const { key, dir } = state.sort;
+        const factor = dir === "asc" ? 1 : -1;
+
+        return [...rows].sort((a, b) => {
+          const cmp = compareValues(a, b, key);
+          if (cmp !== 0) return cmp * factor;
+
+          return String(a.name || "").localeCompare(String(b.name || ""), "ru");
+        });
+      }
+
+      function applyClientFilters() {
+        const f = readFilters();
+        state.statusFilter = f.statusFilter;
+
+        let rows = [...state.rows];
+
+        if (f.statusFilter !== "all") {
+          rows = rows.filter((row) => row.turnover_status === f.statusFilter);
+        }
+
+        if (state.quickFilter === "stale_no_sales") {
+          rows = rows.filter((row) => row.turnover_status === "stale_no_sales");
+        } else if (state.quickFilter === "critical") {
+          rows = rows.filter((row) => row.turnover_status === "critical");
+        } else if (state.quickFilter === "risk") {
+          rows = rows.filter((row) => row.turnover_status === "risk");
+        } else if (state.quickFilter === "with_stock") {
+          rows = rows.filter((row) => Number(row.qty_on_hand || 0) > 0);
+        }
+
+        rows = sortRows(rows);
+        state.filteredRows = rows;
+      }
+
+      function syncQuickButtons() {
+        els.quickButtons.forEach((btn) => {
+          btn.classList.toggle(
+            "active",
+            btn.getAttribute("data-quick-filter") === state.quickFilter
+          );
+        });
+      }
+
+      function syncSortIndicators() {
+        els.sortIndicators.forEach((el) => {
+          const key = el.getAttribute("data-sort-indicator");
+          if (key === state.sort.key) {
+            el.textContent = state.sort.dir === "asc" ? "▲" : "▼";
+          } else {
+            el.textContent = "";
+          }
+        });
+      }
+
       function renderRows(rows) {
         if (!rows.length) {
           els.table.style.display = "none";
@@ -973,12 +1201,13 @@
 
         const html = rows.map((row) => {
           const statusCls = getStatusClass(row.turnover_status);
+          const rowCls = getRowClass(row.turnover_status);
           const unit = row.unit ? ` • ${escapeHtml(row.unit)}` : "";
           const sku = row.sku ? `SKU: ${escapeHtml(row.sku)}` : "SKU: —";
           const barcode = row.barcode ? `ШК: ${escapeHtml(row.barcode)}` : "ШК: —";
 
           return `
-            <tr>
+            <tr class="${rowCls}">
               <td>
                 <div class="item-name">${escapeHtml(row.name || "—")}</div>
                 <div class="item-sub">${sku}${unit}</div>
@@ -1005,7 +1234,30 @@
         els.tableBody.innerHTML = html;
         els.stateBox.style.display = "none";
         els.table.style.display = "table";
-        els.tableMeta.textContent = `Строк: ${formatNumber(rows.length)} • Период: ${state.periodDays} дней • Пороги: ${state.thresholds.yellow_days}/${state.thresholds.orange_days}/${state.thresholds.red_days}`;
+        els.tableMeta.textContent =
+          `Строк: ${formatNumber(rows.length)} • ` +
+          `Период: ${state.periodDays} дней • ` +
+          `Пороги: ${state.thresholds.yellow_days}/${state.thresholds.orange_days}/${state.thresholds.red_days} • ` +
+          `Сортировка: ${getSortLabel()}`;
+      }
+
+      function getSortLabel() {
+        const labels = {
+          name: "товар",
+          turnover_status: "статус",
+          qty_on_hand: "остаток",
+          sold_qty_period: "продано",
+          avg_daily_sales: "среднее в день",
+          days_on_hand: "дней остатка",
+          purchase_price: "закупка",
+          sale_price: "продажа",
+          stock_cost_total: "стоимость остатка",
+          potential_revenue: "потенц. выручка",
+          potential_profit: "потенц. прибыль"
+        };
+
+        const dir = state.sort.dir === "asc" ? "↑" : "↓";
+        return `${labels[state.sort.key] || state.sort.key} ${dir}`;
       }
 
       function renderError(message) {
@@ -1031,14 +1283,23 @@
             red_days: readFilters().redDays
           };
 
+          applyClientFilters();
           renderSummary(state.summary);
-          renderRows(state.rows);
+          renderRows(state.filteredRows);
+          syncSortIndicators();
         } catch (error) {
           console.error("[turnover] loadData error:", error);
           renderError(translateError(error));
         } finally {
           setLoading(false);
         }
+      }
+
+      function applyLocalFiltersAndRender() {
+        applyClientFilters();
+        renderRows(state.filteredRows);
+        syncQuickButtons();
+        syncSortIndicators();
       }
 
       function toCsvValue(value) {
@@ -1050,7 +1311,7 @@
       }
 
       function exportCsv() {
-        const rows = state.rows || [];
+        const rows = state.filteredRows || [];
         if (!rows.length) {
           alert("Нет данных для экспорта");
           return;
@@ -1112,6 +1373,17 @@
         URL.revokeObjectURL(url);
       }
 
+      function toggleSort(key) {
+        if (state.sort.key === key) {
+          state.sort.dir = state.sort.dir === "asc" ? "desc" : "asc";
+        } else {
+          state.sort.key = key;
+          state.sort.dir = key === "name" || key === "turnover_status" ? "asc" : "desc";
+        }
+
+        applyLocalFiltersAndRender();
+      }
+
       function bindEvents() {
         els.applyBtn.addEventListener("click", loadData);
 
@@ -1126,6 +1398,16 @@
           if (e.key === "Enter") loadData();
         });
 
+        els.search.addEventListener("input", () => {
+          applyLocalFiltersAndRender();
+        });
+
+        els.statusFilter.addEventListener("change", () => {
+          state.quickFilter = "all";
+          syncQuickButtons();
+          applyLocalFiltersAndRender();
+        });
+
         [
           els.periodDays,
           els.yellowDays,
@@ -1135,6 +1417,21 @@
         ].forEach((el) => {
           el.addEventListener("change", () => {
             loadData();
+          });
+        });
+
+        els.sortHeaders.forEach((th) => {
+          th.addEventListener("click", () => {
+            toggleSort(th.getAttribute("data-sort-key"));
+          });
+        });
+
+        els.quickButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            state.quickFilter = btn.getAttribute("data-quick-filter");
+            els.statusFilter.value = "all";
+            syncQuickButtons();
+            applyLocalFiltersAndRender();
           });
         });
       }
@@ -1150,6 +1447,8 @@
 
       function init() {
         if (redirectToLoginIfNeeded()) return;
+        syncQuickButtons();
+        syncSortIndicators();
         bindEvents();
         loadData();
       }
