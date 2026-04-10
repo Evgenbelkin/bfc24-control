@@ -269,6 +269,7 @@
     .fc.on-success   { background: rgba(25,195,125,.18); border-color: rgba(25,195,125,.48); color: #c0ffe0; }
     .fc.on-warning   { background: rgba(245,185,66,.18); border-color: rgba(245,185,66,.48); color: #ffeea8; }
     .fc.on-danger    { background: rgba(255,95,115,.18); border-color: rgba(255,95,115,.48); color: #ffd4d8; }
+    .fc.on-orange   { background: rgba(255,140,0,.18);   border-color: rgba(255,140,0,.45);   color: #ffe4a8; }
     .fc.on-info      { background: rgba(123,104,255,.18);border-color: rgba(123,104,255,.48);color: #d8d0ff; }
 
     /* chips-summary */
@@ -350,7 +351,8 @@
     }
     .b-ok   { background: rgba(25,195,125,.14); border-color: rgba(25,195,125,.28); color: #c4ffe8; }
     .b-warn { background: rgba(245,185,66,.14);  border-color: rgba(245,185,66,.28);  color: #fff0b8; }
-    .b-red  { background: rgba(255,95,115,.14);  border-color: rgba(255,95,115,.28);  color: #ffd4d9; }
+    .b-red    { background: rgba(255,95,115,.14);  border-color: rgba(255,95,115,.28);  color: #ffd4d9; }
+    .b-orange { background: rgba(255,140,0,.16);   border-color: rgba(255,140,0,.32);   color: #ffe4b0; }
     .b-info { background: rgba(90,168,255,.14);  border-color: rgba(90,168,255,.28);  color: #c4e4ff; }
     .b-muted{ background: rgba(255,255,255,.06); border-color: var(--line-2);          color: var(--muted); }
     .b-vio  { background: rgba(123,104,255,.14); border-color: rgba(123,104,255,.28); color: #d8d0ff; }
@@ -590,7 +592,7 @@
     <div class="panel-header">
       <div>
         <h2 class="panel-title">⚠ Требуют внимания — <span id="attentionBadge">0</span></h2>
-        <div class="panel-subtitle">Просроченные, заблокированные, trial ≤ 7 дней, новые заявки</div>
+        <div class="panel-subtitle">Просроченные, заблокированные, trial ≤ 7 дней, active ≤ 3 дней, новые заявки</div>
       </div>
       <button class="btn btn-ghost" id="btnToggleAttention">Свернуть</button>
     </div>
@@ -621,6 +623,9 @@
         <span class="fc" data-f="expired">🔴 Просроченные</span>
         <span class="fc" data-f="blocked">⛔ Заблокированные</span>
         <span class="fc" data-f="requests">📋 С заявками</span>
+        <span class="fc" data-f="days7">⏰ ≤ 7 дней</span>
+        <span class="fc" data-f="days5">⚠ ≤ 5 дней</span>
+        <span class="fc" data-f="days3">🔴 ≤ 3 дней</span>
       </div>
       <div class="table-wrap">
         <table style="min-width:1380px;">
@@ -1351,6 +1356,21 @@ function renderAttention() {
     }
   });
 
+  // Active ≤ 3 дня
+  tenants.filter(t => String(t.subscription_status||"").toLowerCase() === "active").forEach(t => {
+    const days = daysLeft(t.subscription_end_at);
+    if (days !== null && days <= 3) {
+      cards.push({ cls:"ac-danger",
+        title: `🔴 ${safe(t.name)}`,
+        meta:  `Активная подписка заканчивается · #${safe(t.id)}`,
+        label: `Осталось: ${days} дн. — ${d(t.subscription_end_at)}`,
+        actions: [
+          `<button class="row-btn row-btn-accent" onclick="editTenant('${safe(t.id)}')">✏ Продлить / изменить</button>`
+        ]
+      });
+    }
+  });
+
   // Открытые заявки
   state.subscriptionRequests
     .filter(r => ["new","in_progress"].includes(String(r.status||"").toLowerCase()))
@@ -1499,6 +1519,9 @@ function setFilterActive(val) {
       else if (f === "expired")  chip.classList.add("on-danger");
       else if (f === "blocked")  chip.classList.add("on-danger");
       else if (f === "requests") chip.classList.add("on-info");
+      else if (f === "days7") chip.classList.add("on-warning");
+      else if (f === "days5") chip.classList.add("on-orange");
+      else if (f === "days3") chip.classList.add("on-danger");
     }
   });
 }
@@ -1519,6 +1542,14 @@ function renderTenantsTable() {
     if (filter === "expired"  && sub !== "expired") return false;
     if (filter === "blocked"  && !t.is_blocked && sub !== "blocked") return false;
     if (filter === "requests" && !reqIds.has(String(t.id))) return false;
+    if (filter === "days7" || filter === "days5" || filter === "days3") {
+      const sub2 = String(t.subscription_status||"").toLowerCase();
+      if (sub2 === "expired") return false;
+      const days2 = daysLeft(t.subscription_end_at);
+      if (days2 === null) return false;
+      const limit = filter === "days7" ? 7 : filter === "days5" ? 5 : 3;
+      if (days2 > limit) return false;
+    }
     if (!q) return true;
     return [t.id, t.name, t.slug, t.contact_name, t.contact_phone, t.contact_email,
             t.phone, t.email, t.code, t.tariff_name, t.subscription_status]
@@ -1546,6 +1577,8 @@ function renderTenantsTable() {
 
     const daysLine = days === null ? "" :
       days < 0  ? `<div class="small" style="color:var(--danger);">Истекла ${Math.abs(days)} дн. назад</div>` :
+      days <= 3 ? `<div class="small" style="color:var(--danger);font-weight:800;">⚠ Осталось: ${days} дн.</div>` :
+      days <= 5 ? `<div class="small" style="color:#ff8c00;font-weight:700;">Осталось: ${days} дн.</div>` :
       days <= 7 ? `<div class="small" style="color:var(--warning);">Осталось: ${days} дн.</div>` :
                   `<div class="small muted">Осталось: ${days} дн.</div>`;
 
@@ -1574,6 +1607,10 @@ function renderTenantsTable() {
             ${subBadge(t.subscription_status)}
             ${t.is_active === false ? `<span class="badge b-muted">⏸ выключен</span>` : ""}
             ${t.is_blocked ? `<span class="badge b-red">⛔ блок</span>` : ""}
+            ${sub === "expired" || (days !== null && days < 0) ? `<span class="badge b-red">🔴 Истекла</span>` :
+              days !== null && days <= 3 ? `<span class="badge b-red">🔴 До конца ${days} дн.</span>` :
+              days !== null && days <= 5 ? `<span class="badge b-orange">🟠 До конца ${days} дн.</span>` :
+              days !== null && days <= 7 ? `<span class="badge b-warn">⚠ До конца ${days} дн.</span>` : ""}
           </div>
         </td>
         <td>${contact}</td>
