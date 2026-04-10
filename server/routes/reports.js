@@ -13,7 +13,7 @@
  */
 
 const express = require("express");
-const pool    = require("../db");
+const pool = require("../db");
 const {
   authRequired,
   getEffectiveTenantId,
@@ -24,7 +24,19 @@ const router = express.Router();
 // ─── GET /reports/pnl ─────────────────────────────────────────────────────────
 //
 // Отчёт о прибылях и убытках за период.
-// Требует: sale_items.cost_price и sale_items.gross_profit (из миграции).
+//
+// Источник расходов:
+//   core.expenses
+//
+// Источник продаж:
+//   core.sales + core.sale_items
+//
+// Логика:
+//   revenue        = SUM(si.line_amount)
+//   cogs           = SUM(si.qty * si.cost_price)
+//   gross_profit   = SUM(si.gross_profit)
+//   expenses       = SUM(core.expenses.amount)
+//   net_profit     = gross_profit - expenses
 //
 router.get("/pnl", authRequired, async (req, res) => {
   try {
@@ -34,7 +46,7 @@ router.get("/pnl", authRequired, async (req, res) => {
     }
 
     const dateFrom = String(req.query.date_from || "").trim();
-    const dateTo   = String(req.query.date_to   || "").trim();
+    const dateTo = String(req.query.date_to || "").trim();
 
     // ── Выручка и себестоимость продаж ────────────────────────────────────
     const salesParams = [tenantId];
@@ -52,10 +64,10 @@ router.get("/pnl", authRequired, async (req, res) => {
     const { rows: salesRows } = await pool.query(
       `
       SELECT
-        -- Выручка (за вычетом скидок)
+        -- Выручка (с учётом скидок и фактической суммы строк продаж)
         COALESCE(SUM(si.line_amount), 0)                          AS revenue,
 
-        -- Себестоимость продаж (FIFO)
+        -- Себестоимость продаж (FIFO/зафиксирована в строке продажи)
         COALESCE(SUM(si.qty * si.cost_price), 0)                  AS cogs,
 
         -- Валовая прибыль (зафиксирована в момент продажи)
@@ -70,6 +82,9 @@ router.get("/pnl", authRequired, async (req, res) => {
         -- Количество позиций
         COUNT(si.id)                                              AS line_items_count,
 
+        -- Количество проданных единиц
+        COALESCE(SUM(si.qty), 0)                                  AS sold_qty_total,
+
         -- Выручка наличными / картой / переводом
         COALESCE(SUM(CASE WHEN s.payment_method = 'cash'     AND s.payment_status = 'paid'
                           THEN si.line_amount ELSE 0 END), 0)    AS revenue_cash,
@@ -82,7 +97,7 @@ router.get("/pnl", authRequired, async (req, res) => {
         COALESCE(SUM(CASE WHEN s.sale_type = 'consignment'
                           THEN si.line_amount ELSE 0 END), 0)    AS revenue_consignment,
 
-        -- Оплачено из реализации (через debts)
+        -- Оплачено из реализации
         COALESCE(SUM(CASE WHEN s.sale_type = 'consignment'
                           THEN s.paid_amount ELSE 0 END), 0)     AS consignment_paid
 
@@ -94,50 +109,51 @@ router.get("/pnl", authRequired, async (req, res) => {
       salesParams
     );
 
-    // ── Операционные расходы ───────────────────────────────────────────────
+    // ── Операционные расходы (новая таблица core.expenses) ────────────────
     const expParams = [tenantId];
-    let expWhere = "WHERE tenant_id = $1 AND transaction_type = 'expense'";
+    let expWhere = "WHERE e.tenant_id = $1";
 
     if (dateFrom) {
       expParams.push(dateFrom);
-      expWhere += ` AND created_at >= $${expParams.length}::date`;
+      expWhere += ` AND e.expense_date >= $${expParams.length}::date`;
     }
     if (dateTo) {
       expParams.push(dateTo);
-      expWhere += ` AND created_at < ($${expParams.length}::date + INTERVAL '1 day')`;
+      expWhere += ` AND e.expense_date <= $${expParams.length}::date`;
     }
 
     const { rows: expRows } = await pool.query(
       `
       SELECT
-        COALESCE(SUM(amount), 0)                                                AS total_expenses,
-        COALESCE(SUM(CASE WHEN category = 'rent'      THEN amount ELSE 0 END), 0) AS rent,
-        COALESCE(SUM(CASE WHEN category = 'salary'    THEN amount ELSE 0 END), 0) AS salary,
-        COALESCE(SUM(CASE WHEN category = 'delivery'  THEN amount ELSE 0 END), 0) AS delivery,
-        COALESCE(SUM(CASE WHEN category = 'ads'       THEN amount ELSE 0 END), 0) AS ads,
-        COALESCE(SUM(CASE WHEN category = 'utilities' THEN amount ELSE 0 END), 0) AS utilities,
-        COALESCE(SUM(CASE WHEN category = 'other'     THEN amount ELSE 0 END), 0) AS other,
-        COALESCE(SUM(CASE WHEN category IS NULL OR category = ''
-                          THEN amount ELSE 0 END), 0)                           AS uncategorized
-      FROM core.cash_transactions
+        COALESCE(SUM(e.amount), 0)                                                AS total_expenses,
+        COALESCE(SUM(CASE WHEN e.category = 'rent'      THEN e.amount ELSE 0 END), 0) AS rent,
+        COALESCE(SUM(CASE WHEN e.category = 'salary'    THEN e.amount ELSE 0 END), 0) AS salary,
+        COALESCE(SUM(CASE WHEN e.category = 'purchase'  THEN e.amount ELSE 0 END), 0) AS purchase,
+        COALESCE(SUM(CASE WHEN e.category = 'delivery'  THEN e.amount ELSE 0 END), 0) AS delivery,
+        COALESCE(SUM(CASE WHEN e.category = 'ads'       THEN e.amount ELSE 0 END), 0) AS ads,
+        COALESCE(SUM(CASE WHEN e.category = 'utilities' THEN e.amount ELSE 0 END), 0) AS utilities,
+        COALESCE(SUM(CASE WHEN e.category = 'other'     THEN e.amount ELSE 0 END), 0) AS other,
+        COALESCE(SUM(CASE WHEN e.category IS NULL OR e.category = ''
+                          THEN e.amount ELSE 0 END), 0)                           AS uncategorized
+      FROM core.expenses e
       ${expWhere}
       `,
       expParams
     );
 
     // ── Сборка P&L ─────────────────────────────────────────────────────────
-    const s = salesRows[0];
-    const e = expRows[0];
+    const s = salesRows[0] || {};
+    const e = expRows[0] || {};
 
-    const revenue       = Number(s.revenue);
-    const cogs          = Number(s.cogs);
-    const grossProfit   = Number(s.gross_profit);
-    const totalExpenses = Number(e.total_expenses);
-    const netProfit     = Math.round((grossProfit - totalExpenses) * 100) / 100;
-    const grossMargin   = revenue > 0
+    const revenue = Number(s.revenue || 0);
+    const cogs = Number(s.cogs || 0);
+    const grossProfit = Number(s.gross_profit || 0);
+    const totalExpenses = Number(e.total_expenses || 0);
+    const netProfit = Math.round((grossProfit - totalExpenses) * 100) / 100;
+    const grossMargin = revenue > 0
       ? Math.round((grossProfit / revenue) * 10000) / 100
       : 0;
-    const netMargin     = revenue > 0
+    const netMargin = revenue > 0
       ? Math.round((netProfit / revenue) * 10000) / 100
       : 0;
 
@@ -147,39 +163,46 @@ router.get("/pnl", authRequired, async (req, res) => {
       pnl: {
         // Выручка
         revenue,
-        total_discount:       Number(s.total_discount),
+        total_discount: Number(s.total_discount || 0),
 
         // Себестоимость и валовая прибыль
         cogs,
-        gross_profit:         grossProfit,
-        gross_margin_pct:     grossMargin,
+        gross_profit: grossProfit,
+        gross_margin_pct: grossMargin,
 
         // Операционные расходы
-        operating_expenses:   totalExpenses,
+        operating_expenses: totalExpenses,
         expenses_breakdown: {
-          rent:         Number(e.rent),
-          salary:       Number(e.salary),
-          delivery:     Number(e.delivery),
-          ads:          Number(e.ads),
-          utilities:    Number(e.utilities),
-          other:        Number(e.other),
-          uncategorized: Number(e.uncategorized),
+          rent: Number(e.rent || 0),
+          salary: Number(e.salary || 0),
+          purchase: Number(e.purchase || 0),
+          delivery: Number(e.delivery || 0),
+          ads: Number(e.ads || 0),
+          utilities: Number(e.utilities || 0),
+          other: Number(e.other || 0),
+          uncategorized: Number(e.uncategorized || 0),
         },
 
         // Чистая прибыль
-        net_profit:       netProfit,
-        net_margin_pct:   netMargin,
+        net_profit: netProfit,
+        net_margin_pct: netMargin,
 
         // Дополнительно
-        sales_count:      Number(s.sales_count),
-        line_items_count: Number(s.line_items_count),
+        sales_count: Number(s.sales_count || 0),
+        line_items_count: Number(s.line_items_count || 0),
+        sold_qty_total: Number(s.sold_qty_total || 0),
         revenue_by_method: {
-          cash:         Number(s.revenue_cash),
-          card:         Number(s.revenue_card),
-          transfer:     Number(s.revenue_transfer),
-          consignment:  Number(s.revenue_consignment),
-          consignment_paid: Number(s.consignment_paid),
+          cash: Number(s.revenue_cash || 0),
+          card: Number(s.revenue_card || 0),
+          transfer: Number(s.revenue_transfer || 0),
+          consignment: Number(s.revenue_consignment || 0),
+          consignment_paid: Number(s.consignment_paid || 0),
         },
+      },
+      meta: {
+        expenses_source: "core.expenses",
+        sales_source: "core.sales + core.sale_items",
+        cost_source: "core.sale_items.cost_price",
       },
     });
 
@@ -257,17 +280,16 @@ router.get("/stock-value", authRequired, async (req, res) => {
 
     const totals = rows.reduce(
       (acc, r) => {
-        acc.cost_value   += Number(r.stock_cost_value);
-        acc.sale_value   += Number(r.stock_sale_value);
-        acc.pot_profit   += Number(r.potential_profit);
-        acc.qty_batches  += Number(r.qty_in_batches);
-        acc.qty_stock    += Number(r.qty_in_stock);
+        acc.cost_value += Number(r.stock_cost_value);
+        acc.sale_value += Number(r.stock_sale_value);
+        acc.pot_profit += Number(r.potential_profit);
+        acc.qty_batches += Number(r.qty_in_batches);
+        acc.qty_stock += Number(r.qty_in_stock);
         return acc;
       },
       { cost_value: 0, sale_value: 0, pot_profit: 0, qty_batches: 0, qty_stock: 0 }
     );
 
-    // Проверка синхронизации stock vs batches
     const outOfSync = rows.filter(r =>
       Math.abs(Number(r.qty_in_batches) - Number(r.qty_in_stock)) > 0.001
     );
@@ -276,20 +298,19 @@ router.get("/stock-value", authRequired, async (req, res) => {
       ok: true,
       stock_value: rows,
       totals: {
-        stock_cost_value:   Math.round(totals.cost_value  * 100) / 100,
-        stock_sale_value:   Math.round(totals.sale_value  * 100) / 100,
-        potential_profit:   Math.round(totals.pot_profit  * 100) / 100,
-        total_skus:         rows.length,
+        stock_cost_value: Math.round(totals.cost_value * 100) / 100,
+        stock_sale_value: Math.round(totals.sale_value * 100) / 100,
+        potential_profit: Math.round(totals.pot_profit * 100) / 100,
+        total_skus: rows.length,
       },
-      // Если есть расхождения — сигнализируем
       sync_check: {
-        ok:          outOfSync.length === 0,
+        ok: outOfSync.length === 0,
         out_of_sync: outOfSync.map(r => ({
-          item_id:       r.item_id,
-          item_name:     r.item_name,
-          qty_in_stock:  r.qty_in_stock,
+          item_id: r.item_id,
+          item_name: r.item_name,
+          qty_in_stock: r.qty_in_stock,
           qty_in_batches: r.qty_in_batches,
-          diff:          Number(r.qty_in_batches) - Number(r.qty_in_stock),
+          diff: Number(r.qty_in_batches) - Number(r.qty_in_stock),
         })),
       },
     });
@@ -317,7 +338,6 @@ router.get("/item/:id", authRequired, async (req, res) => {
       return res.status(400).json({ ok: false, error: "invalid_item_id" });
     }
 
-    // Карточка товара
     const { rows: itemRows } = await pool.query(
       `SELECT * FROM core.items WHERE id = $1 AND tenant_id = $2 LIMIT 1`,
       [itemId, tenantId]
@@ -327,7 +347,6 @@ router.get("/item/:id", authRequired, async (req, res) => {
       return res.status(404).json({ ok: false, error: "item_not_found" });
     }
 
-    // Партии: все (включая исчерпанные)
     const { rows: batches } = await pool.query(
       `
       SELECT
@@ -347,7 +366,6 @@ router.get("/item/:id", authRequired, async (req, res) => {
       [tenantId, itemId]
     );
 
-    // Продажи по товару
     const { rows: sales } = await pool.query(
       `
       SELECT
@@ -373,10 +391,9 @@ router.get("/item/:id", authRequired, async (req, res) => {
       [tenantId, itemId]
     );
 
-    // Агрегаты
     const batchAgg = batches.reduce(
       (acc, b) => {
-        acc.qty_received  += Number(b.qty_total);
+        acc.qty_received += Number(b.qty_total);
         acc.qty_remaining += Number(b.qty_remaining);
         acc.total_invested += Number(b.batch_total_cost);
         return acc;
@@ -386,11 +403,11 @@ router.get("/item/:id", authRequired, async (req, res) => {
 
     const salesAgg = sales.reduce(
       (acc, s) => {
-        acc.qty_sold     += Number(s.qty);
-        acc.revenue      += Number(s.line_amount);
-        acc.cogs         += Number(s.qty) * Number(s.cost_price);
+        acc.qty_sold += Number(s.qty);
+        acc.revenue += Number(s.line_amount);
+        acc.cogs += Number(s.qty) * Number(s.cost_price);
         acc.gross_profit += Number(s.gross_profit);
-        acc.discount     += Number(s.discount_amount);
+        acc.discount += Number(s.discount_amount);
         return acc;
       },
       { qty_sold: 0, revenue: 0, cogs: 0, gross_profit: 0, discount: 0 }
@@ -398,22 +415,22 @@ router.get("/item/:id", authRequired, async (req, res) => {
 
     return res.json({
       ok: true,
-      item:    itemRows[0],
+      item: itemRows[0],
       batches,
       sales,
       summary: {
-        qty_received:     batchAgg.qty_received,
-        qty_remaining:    batchAgg.qty_remaining,
-        qty_sold:         salesAgg.qty_sold,
-        total_invested:   Math.round(batchAgg.total_invested * 100) / 100,
-        revenue:          Math.round(salesAgg.revenue       * 100) / 100,
-        cogs:             Math.round(salesAgg.cogs          * 100) / 100,
-        gross_profit:     Math.round(salesAgg.gross_profit  * 100) / 100,
+        qty_received: batchAgg.qty_received,
+        qty_remaining: batchAgg.qty_remaining,
+        qty_sold: salesAgg.qty_sold,
+        total_invested: Math.round(batchAgg.total_invested * 100) / 100,
+        revenue: Math.round(salesAgg.revenue * 100) / 100,
+        cogs: Math.round(salesAgg.cogs * 100) / 100,
+        gross_profit: Math.round(salesAgg.gross_profit * 100) / 100,
         gross_margin_pct: salesAgg.revenue > 0
           ? Math.round((salesAgg.gross_profit / salesAgg.revenue) * 10000) / 100
           : 0,
-        total_discount:   Math.round(salesAgg.discount      * 100) / 100,
-        avg_unit_cost:    batchAgg.qty_remaining > 0
+        total_discount: Math.round(salesAgg.discount * 100) / 100,
+        avg_unit_cost: batchAgg.qty_remaining > 0
           ? Math.round(
               batches
                 .filter(b => Number(b.qty_remaining) > 0)
@@ -434,9 +451,11 @@ router.get("/item/:id", authRequired, async (req, res) => {
 //
 // P&L с разбивкой по календарным дням.
 //
-// Стратегия: два параллельных CTE — продажи по дням и расходы по дням —
-// объединяются через FULL OUTER JOIN по дате. Дни без продаж, но с расходами
-// (и наоборот) тоже попадают в результат с нулями по другой стороне.
+// Продажи по дням:
+//   core.sales + core.sale_items
+//
+// Расходы по дням:
+//   core.expenses.expense_date
 //
 router.get("/pnl-daily", authRequired, async (req, res) => {
   try {
@@ -446,9 +465,8 @@ router.get("/pnl-daily", authRequired, async (req, res) => {
     }
 
     const dateFrom = String(req.query.date_from || "").trim();
-    const dateTo   = String(req.query.date_to   || "").trim();
+    const dateTo = String(req.query.date_to || "").trim();
 
-    // Параметры для CTE продаж
     const salesParams = [tenantId];
     let salesDateFilter = "";
 
@@ -461,22 +479,18 @@ router.get("/pnl-daily", authRequired, async (req, res) => {
       salesDateFilter += ` AND s.created_at < ($${salesParams.length}::date + INTERVAL '1 day')`;
     }
 
-    // Параметры для CTE расходов — тот же порядок: $1=tenantId, $2=dateFrom, $3=dateTo
-    // Переиспользуем salesParams — позиции $2/$3 совпадают.
-    const expDateFilter = salesDateFilter
-      .replace(/s\.created_at/g, "ct.created_at");
+    const expDateFilter = salesDateFilter.replace(/s\.created_at/g, "e.expense_date");
 
     const { rows } = await pool.query(
       `
       WITH
 
-      -- ── Продажи по дням ───────────────────────────────────────────────────
       sales_daily AS (
         SELECT
           s.created_at::date                            AS day,
-          COALESCE(SUM(si.line_amount),    0)           AS revenue,
+          COALESCE(SUM(si.line_amount), 0)              AS revenue,
           COALESCE(SUM(si.qty * si.cost_price), 0)      AS cogs,
-          COALESCE(SUM(si.gross_profit),   0)           AS gross_profit,
+          COALESCE(SUM(si.gross_profit), 0)             AS gross_profit,
           COUNT(DISTINCT s.id)                          AS sales_count
         FROM core.sales s
         JOIN core.sale_items si
@@ -486,30 +500,26 @@ router.get("/pnl-daily", authRequired, async (req, res) => {
         GROUP BY s.created_at::date
       ),
 
-      -- ── Расходы по дням ───────────────────────────────────────────────────
       expenses_daily AS (
         SELECT
-          ct.created_at::date                           AS day,
-          COALESCE(SUM(ct.amount), 0)                   AS expenses
-        FROM core.cash_transactions ct
-        WHERE ct.tenant_id = $1
-          AND ct.transaction_type = 'expense'
+          e.expense_date::date                          AS day,
+          COALESCE(SUM(e.amount), 0)                    AS expenses
+        FROM core.expenses e
+        WHERE e.tenant_id = $1
           ${expDateFilter}
-        GROUP BY ct.created_at::date
+        GROUP BY e.expense_date::date
       )
 
-      -- ── Объединение: FULL OUTER JOIN чтобы не потерять дни ────────────────
       SELECT
         COALESCE(sd.day, ed.day)                        AS date,
-        COALESCE(sd.revenue,      0)                    AS revenue,
-        COALESCE(sd.cogs,         0)                    AS cogs,
+        COALESCE(sd.revenue, 0)                         AS revenue,
+        COALESCE(sd.cogs, 0)                            AS cogs,
         COALESCE(sd.gross_profit, 0)                    AS gross_profit,
-        COALESCE(ed.expenses,     0)                    AS expenses,
+        COALESCE(ed.expenses, 0)                        AS expenses,
         COALESCE(sd.gross_profit, 0)
           - COALESCE(ed.expenses, 0)                    AS net_profit,
-        COALESCE(sd.sales_count,  0)                    AS sales_count,
+        COALESCE(sd.sales_count, 0)                     AS sales_count,
 
-        -- Маржа: NULL если нет выручки (делить на 0 нельзя)
         CASE
           WHEN COALESCE(sd.revenue, 0) > 0
           THEN ROUND(
@@ -529,29 +539,27 @@ router.get("/pnl-daily", authRequired, async (req, res) => {
       salesParams
     );
 
-    // Приводим числа к нужному типу (pg возвращает строки для numeric)
     const daily = rows.map(r => ({
-      date:             r.date instanceof Date
-                          ? r.date.toISOString().split("T")[0]
-                          : String(r.date),
-      revenue:          Math.round(Number(r.revenue)      * 100) / 100,
-      cogs:             Math.round(Number(r.cogs)         * 100) / 100,
-      gross_profit:     Math.round(Number(r.gross_profit) * 100) / 100,
-      expenses:         Math.round(Number(r.expenses)     * 100) / 100,
-      net_profit:       Math.round(Number(r.net_profit)   * 100) / 100,
-      sales_count:      Number(r.sales_count),
+      date: r.date instanceof Date
+        ? r.date.toISOString().split("T")[0]
+        : String(r.date),
+      revenue: Math.round(Number(r.revenue) * 100) / 100,
+      cogs: Math.round(Number(r.cogs) * 100) / 100,
+      gross_profit: Math.round(Number(r.gross_profit) * 100) / 100,
+      expenses: Math.round(Number(r.expenses) * 100) / 100,
+      net_profit: Math.round(Number(r.net_profit) * 100) / 100,
+      sales_count: Number(r.sales_count),
       gross_margin_pct: r.gross_margin_pct !== null ? Number(r.gross_margin_pct) : null,
     }));
 
-    // Итоговые суммы по всему периоду
     const totals = daily.reduce(
       (acc, d) => {
-        acc.revenue      += d.revenue;
-        acc.cogs         += d.cogs;
+        acc.revenue += d.revenue;
+        acc.cogs += d.cogs;
         acc.gross_profit += d.gross_profit;
-        acc.expenses     += d.expenses;
-        acc.net_profit   += d.net_profit;
-        acc.sales_count  += d.sales_count;
+        acc.expenses += d.expenses;
+        acc.net_profit += d.net_profit;
+        acc.sales_count += d.sales_count;
         return acc;
       },
       { revenue: 0, cogs: 0, gross_profit: 0, expenses: 0, net_profit: 0, sales_count: 0 }
@@ -562,13 +570,13 @@ router.get("/pnl-daily", authRequired, async (req, res) => {
       period: { date_from: dateFrom || null, date_to: dateTo || null },
       daily,
       totals: {
-        revenue:      Math.round(totals.revenue      * 100) / 100,
-        cogs:         Math.round(totals.cogs         * 100) / 100,
+        revenue: Math.round(totals.revenue * 100) / 100,
+        cogs: Math.round(totals.cogs * 100) / 100,
         gross_profit: Math.round(totals.gross_profit * 100) / 100,
-        expenses:     Math.round(totals.expenses     * 100) / 100,
-        net_profit:   Math.round(totals.net_profit   * 100) / 100,
-        sales_count:  totals.sales_count,
-        days_count:   daily.length,
+        expenses: Math.round(totals.expenses * 100) / 100,
+        net_profit: Math.round(totals.net_profit * 100) / 100,
+        sales_count: totals.sales_count,
+        days_count: daily.length,
         gross_margin_pct: totals.revenue > 0
           ? Math.round((totals.gross_profit / totals.revenue) * 10000) / 100
           : null,
@@ -594,11 +602,10 @@ router.get("/top-items", authRequired, async (req, res) => {
     }
 
     const dateFrom = String(req.query.date_from || "").trim();
-    const dateTo   = String(req.query.date_to   || "").trim();
+    const dateTo = String(req.query.date_to || "").trim();
 
-    // limit: 1..100, по умолчанию 20
     const rawLimit = Number(req.query.limit || 20);
-    const limit    = Number.isInteger(rawLimit) && rawLimit > 0 && rawLimit <= 100
+    const limit = Number.isInteger(rawLimit) && rawLimit > 0 && rawLimit <= 100
       ? rawLimit
       : 20;
 
@@ -625,39 +632,25 @@ router.get("/top-items", authRequired, async (req, res) => {
         i.sku,
         i.unit,
 
-        -- Количество проданных единиц
         SUM(si.qty)                                         AS qty_sold,
-
-        -- Выручка (с учётом скидок)
         COALESCE(SUM(si.line_amount), 0)                    AS revenue,
-
-        -- Себестоимость по FIFO (зафиксирована в момент продажи)
         COALESCE(SUM(si.qty * si.cost_price), 0)            AS cogs,
-
-        -- Валовая прибыль
         COALESCE(SUM(si.gross_profit), 0)                   AS gross_profit,
-
-        -- Суммарная скидка
         COALESCE(SUM(si.discount_amount), 0)                AS total_discount,
-
-        -- Количество отдельных продаж (строк)
         COUNT(si.id)                                        AS sales_lines,
 
-        -- Средняя цена продажи единицы
         CASE
           WHEN SUM(si.qty) > 0
           THEN ROUND(SUM(si.line_amount) / SUM(si.qty), 4)
           ELSE 0
         END                                                 AS avg_sale_price,
 
-        -- Средняя себестоимость единицы (FIFO-взвешенная)
         CASE
           WHEN SUM(si.qty) > 0
           THEN ROUND(SUM(si.qty * si.cost_price) / SUM(si.qty), 4)
           ELSE 0
         END                                                 AS avg_cost_price,
 
-        -- Маржа, %
         CASE
           WHEN SUM(si.line_amount) > 0
           THEN ROUND(
@@ -681,31 +674,29 @@ router.get("/top-items", authRequired, async (req, res) => {
       params
     );
 
-    // Нормализация чисел из pg-драйвера (numeric → string)
     const items = rows.map((r, idx) => ({
-      rank:           idx + 1,
-      item_id:        Number(r.item_id),
-      item_name:      r.item_name,
-      sku:            r.sku || null,
-      unit:           r.unit || null,
-      qty_sold:       Math.round(Number(r.qty_sold) * 1000) / 1000,
-      revenue:        Math.round(Number(r.revenue)       * 100) / 100,
-      cogs:           Math.round(Number(r.cogs)          * 100) / 100,
-      gross_profit:   Math.round(Number(r.gross_profit)  * 100) / 100,
-      total_discount: Math.round(Number(r.total_discount)* 100) / 100,
-      sales_lines:    Number(r.sales_lines),
-      avg_sale_price: Math.round(Number(r.avg_sale_price)* 10000) / 10000,
-      avg_cost_price: Math.round(Number(r.avg_cost_price)* 10000) / 10000,
-      margin_pct:     Number(r.margin_pct),
+      rank: idx + 1,
+      item_id: Number(r.item_id),
+      item_name: r.item_name,
+      sku: r.sku || null,
+      unit: r.unit || null,
+      qty_sold: Math.round(Number(r.qty_sold) * 1000) / 1000,
+      revenue: Math.round(Number(r.revenue) * 100) / 100,
+      cogs: Math.round(Number(r.cogs) * 100) / 100,
+      gross_profit: Math.round(Number(r.gross_profit) * 100) / 100,
+      total_discount: Math.round(Number(r.total_discount) * 100) / 100,
+      sales_lines: Number(r.sales_lines),
+      avg_sale_price: Math.round(Number(r.avg_sale_price) * 10000) / 10000,
+      avg_cost_price: Math.round(Number(r.avg_cost_price) * 10000) / 10000,
+      margin_pct: Number(r.margin_pct),
     }));
 
-    // Суммы по возвращённым позициям (не по всему каталогу)
     const totals = items.reduce(
       (acc, it) => {
-        acc.revenue      += it.revenue;
-        acc.cogs         += it.cogs;
+        acc.revenue += it.revenue;
+        acc.cogs += it.cogs;
         acc.gross_profit += it.gross_profit;
-        acc.qty_sold     += it.qty_sold;
+        acc.qty_sold += it.qty_sold;
         return acc;
       },
       { revenue: 0, cogs: 0, gross_profit: 0, qty_sold: 0 }
@@ -717,11 +708,11 @@ router.get("/top-items", authRequired, async (req, res) => {
       limit,
       items,
       totals: {
-        revenue:      Math.round(totals.revenue      * 100) / 100,
-        cogs:         Math.round(totals.cogs         * 100) / 100,
+        revenue: Math.round(totals.revenue * 100) / 100,
+        cogs: Math.round(totals.cogs * 100) / 100,
         gross_profit: Math.round(totals.gross_profit * 100) / 100,
-        qty_sold:     Math.round(totals.qty_sold     * 1000) / 1000,
-        margin_pct:   totals.revenue > 0
+        qty_sold: Math.round(totals.qty_sold * 1000) / 1000,
+        margin_pct: totals.revenue > 0
           ? Math.round((totals.gross_profit / totals.revenue) * 10000) / 100
           : 0,
       },
@@ -737,10 +728,6 @@ router.get("/top-items", authRequired, async (req, res) => {
 //
 // Сводка по долгам тенанта.
 //
-// overdue_count — долги со статусом 'open' или 'partial',
-// у которых due_date установлена и уже прошла.
-// Долги без due_date не считаются просроченными.
-//
 router.get("/debts-summary", authRequired, async (req, res) => {
   try {
     const tenantId = getEffectiveTenantId(req);
@@ -751,31 +738,24 @@ router.get("/debts-summary", authRequired, async (req, res) => {
     const { rows } = await pool.query(
       `
       SELECT
-        -- Общая сумма непогашенного остатка (только открытые и частичные)
         COALESCE(
           SUM(balance_amount) FILTER (WHERE status IN ('open', 'partial')),
           0
         )                                                     AS total_balance_amount,
 
-        -- Общая начальная сумма всех долгов (для понимания оборота)
         COALESCE(SUM(initial_amount), 0)                      AS total_initial_amount,
-
-        -- Уже оплачено по всем долгам
         COALESCE(SUM(paid_amount), 0)                         AS total_paid_amount,
 
-        -- Количество по статусам
         COUNT(*) FILTER (WHERE status = 'open')               AS open_count,
         COUNT(*) FILTER (WHERE status = 'partial')            AS partial_count,
         COUNT(*) FILTER (WHERE status = 'paid')               AS paid_count,
 
-        -- Просроченные: открытые/частичные с истёкшим due_date
         COUNT(*) FILTER (
           WHERE status IN ('open', 'partial')
             AND due_date IS NOT NULL
             AND due_date < CURRENT_DATE
         )                                                     AS overdue_count,
 
-        -- Сумма просроченных остатков
         COALESCE(
           SUM(balance_amount) FILTER (
             WHERE status IN ('open', 'partial')
@@ -785,7 +765,6 @@ router.get("/debts-summary", authRequired, async (req, res) => {
           0
         )                                                     AS overdue_amount,
 
-        -- Всего записей
         COUNT(*)                                              AS total_count
 
       FROM core.debts
@@ -796,7 +775,6 @@ router.get("/debts-summary", authRequired, async (req, res) => {
 
     const r = rows[0];
 
-    // Топ-5 крупнейших открытых долгов — полезно для дашборда
     const { rows: topDebts } = await pool.query(
       `
       SELECT
@@ -809,14 +787,12 @@ router.get("/debts-summary", authRequired, async (req, res) => {
         d.comment,
         d.created_at,
         cp.name   AS counterparty_name,
-        -- Просрочен?
         CASE
           WHEN d.due_date IS NOT NULL AND d.due_date < CURRENT_DATE
             AND d.status IN ('open', 'partial')
           THEN TRUE
           ELSE FALSE
         END       AS is_overdue,
-        -- Дней просрочки (0 если не просрочен)
         CASE
           WHEN d.due_date IS NOT NULL AND d.due_date < CURRENT_DATE
             AND d.status IN ('open', 'partial')
@@ -834,49 +810,182 @@ router.get("/debts-summary", authRequired, async (req, res) => {
     );
 
     const topDebtsClean = topDebts.map(d => ({
-      id:                 Number(d.id),
-      counterparty_name:  d.counterparty_name || null,
-      initial_amount:     Math.round(Number(d.initial_amount) * 100) / 100,
-      paid_amount:        Math.round(Number(d.paid_amount)    * 100) / 100,
-      balance_amount:     Math.round(Number(d.balance_amount) * 100) / 100,
-      status:             d.status,
-      due_date:           d.due_date
-                            ? (d.due_date instanceof Date
-                                ? d.due_date.toISOString().split("T")[0]
-                                : String(d.due_date))
-                            : null,
-      is_overdue:         Boolean(d.is_overdue),
-      overdue_days:       Number(d.overdue_days),
-      comment:            d.comment || null,
-      created_at:         d.created_at,
+      id: Number(d.id),
+      counterparty_name: d.counterparty_name || null,
+      initial_amount: Math.round(Number(d.initial_amount) * 100) / 100,
+      paid_amount: Math.round(Number(d.paid_amount) * 100) / 100,
+      balance_amount: Math.round(Number(d.balance_amount) * 100) / 100,
+      status: d.status,
+      due_date: d.due_date
+        ? (d.due_date instanceof Date
+            ? d.due_date.toISOString().split("T")[0]
+            : String(d.due_date))
+        : null,
+      is_overdue: Boolean(d.is_overdue),
+      overdue_days: Number(d.overdue_days),
+      comment: d.comment || null,
+      created_at: d.created_at,
     }));
 
     return res.json({
       ok: true,
       summary: {
-        total_balance_amount:  Math.round(Number(r.total_balance_amount)  * 100) / 100,
-        total_initial_amount:  Math.round(Number(r.total_initial_amount)  * 100) / 100,
-        total_paid_amount:     Math.round(Number(r.total_paid_amount)     * 100) / 100,
-        open_count:            Number(r.open_count),
-        partial_count:         Number(r.partial_count),
-        paid_count:            Number(r.paid_count),
-        overdue_count:         Number(r.overdue_count),
-        overdue_amount:        Math.round(Number(r.overdue_amount)        * 100) / 100,
-        total_count:           Number(r.total_count),
-        // Процент сбора долгов: сколько от начальной суммы уже оплачено
-        collection_rate_pct:   Number(r.total_initial_amount) > 0
+        total_balance_amount: Math.round(Number(r.total_balance_amount) * 100) / 100,
+        total_initial_amount: Math.round(Number(r.total_initial_amount) * 100) / 100,
+        total_paid_amount: Math.round(Number(r.total_paid_amount) * 100) / 100,
+        open_count: Number(r.open_count),
+        partial_count: Number(r.partial_count),
+        paid_count: Number(r.paid_count),
+        overdue_count: Number(r.overdue_count),
+        overdue_amount: Math.round(Number(r.overdue_amount) * 100) / 100,
+        total_count: Number(r.total_count),
+        collection_rate_pct: Number(r.total_initial_amount) > 0
           ? Math.round(
               Number(r.total_paid_amount) / Number(r.total_initial_amount) * 10000
             ) / 100
           : 0,
       },
-      // Топ-5 крупнейших открытых долгов
       top_open_debts: topDebtsClean,
     });
 
   } catch (err) {
     console.error("[GET /reports/debts-summary] error:", err);
     return res.status(500).json({ ok: false, error: "debts_summary_failed" });
+  }
+});
+
+// ─── GET /reports/top-items ───────────────────────────────────────────────────
+//
+// Топ товаров по выручке/прибыли за период.
+// Сортировка: по revenue DESC (самые продаваемые по деньгам).
+//
+router.get("/top-items", authRequired, async (req, res) => {
+  try {
+    const tenantId = getEffectiveTenantId(req);
+    if (!tenantId) {
+      return res.status(400).json({ ok: false, error: "tenant_not_defined" });
+    }
+
+    const dateFrom = String(req.query.date_from || "").trim();
+    const dateTo = String(req.query.date_to || "").trim();
+
+    const rawLimit = Number(req.query.limit || 20);
+    const limit = Number.isInteger(rawLimit) && rawLimit > 0 && rawLimit <= 100
+      ? rawLimit
+      : 20;
+
+    const params = [tenantId];
+    let dateFilter = "";
+
+    if (dateFrom) {
+      params.push(dateFrom);
+      dateFilter += ` AND s.created_at >= $${params.length}::date`;
+    }
+    if (dateTo) {
+      params.push(dateTo);
+      dateFilter += ` AND s.created_at < ($${params.length}::date + INTERVAL '1 day')`;
+    }
+
+    params.push(limit);
+    const limitPlaceholder = `$${params.length}`;
+
+    const { rows } = await pool.query(
+      `
+      SELECT
+        si.item_id,
+        i.name                                              AS item_name,
+        i.sku,
+        i.unit,
+
+        SUM(si.qty)                                         AS qty_sold,
+        COALESCE(SUM(si.line_amount), 0)                    AS revenue,
+        COALESCE(SUM(si.qty * si.cost_price), 0)            AS cogs,
+        COALESCE(SUM(si.gross_profit), 0)                   AS gross_profit,
+        COALESCE(SUM(si.discount_amount), 0)                AS total_discount,
+        COUNT(si.id)                                        AS sales_lines,
+
+        CASE
+          WHEN SUM(si.qty) > 0
+          THEN ROUND(SUM(si.line_amount) / SUM(si.qty), 4)
+          ELSE 0
+        END                                                 AS avg_sale_price,
+
+        CASE
+          WHEN SUM(si.qty) > 0
+          THEN ROUND(SUM(si.qty * si.cost_price) / SUM(si.qty), 4)
+          ELSE 0
+        END                                                 AS avg_cost_price,
+
+        CASE
+          WHEN SUM(si.line_amount) > 0
+          THEN ROUND(
+            SUM(si.gross_profit) / SUM(si.line_amount) * 100,
+            2
+          )
+          ELSE 0
+        END                                                 AS margin_pct
+
+      FROM core.sale_items si
+      JOIN core.sales s
+        ON s.id = si.sale_id AND s.tenant_id = si.tenant_id
+      JOIN core.items i
+        ON i.id = si.item_id
+      WHERE si.tenant_id = $1
+        ${dateFilter}
+      GROUP BY si.item_id, i.name, i.sku, i.unit
+      ORDER BY revenue DESC
+      LIMIT ${limitPlaceholder}
+      `,
+      params
+    );
+
+    const items = rows.map((r, idx) => ({
+      rank: idx + 1,
+      item_id: Number(r.item_id),
+      item_name: r.item_name,
+      sku: r.sku || null,
+      unit: r.unit || null,
+      qty_sold: Math.round(Number(r.qty_sold) * 1000) / 1000,
+      revenue: Math.round(Number(r.revenue) * 100) / 100,
+      cogs: Math.round(Number(r.cogs) * 100) / 100,
+      gross_profit: Math.round(Number(r.gross_profit) * 100) / 100,
+      total_discount: Math.round(Number(r.total_discount) * 100) / 100,
+      sales_lines: Number(r.sales_lines),
+      avg_sale_price: Math.round(Number(r.avg_sale_price) * 10000) / 10000,
+      avg_cost_price: Math.round(Number(r.avg_cost_price) * 10000) / 10000,
+      margin_pct: Number(r.margin_pct),
+    }));
+
+    const totals = items.reduce(
+      (acc, it) => {
+        acc.revenue += it.revenue;
+        acc.cogs += it.cogs;
+        acc.gross_profit += it.gross_profit;
+        acc.qty_sold += it.qty_sold;
+        return acc;
+      },
+      { revenue: 0, cogs: 0, gross_profit: 0, qty_sold: 0 }
+    );
+
+    return res.json({
+      ok: true,
+      period: { date_from: dateFrom || null, date_to: dateTo || null },
+      limit,
+      items,
+      totals: {
+        revenue: Math.round(totals.revenue * 100) / 100,
+        cogs: Math.round(totals.cogs * 100) / 100,
+        gross_profit: Math.round(totals.gross_profit * 100) / 100,
+        qty_sold: Math.round(totals.qty_sold * 1000) / 1000,
+        margin_pct: totals.revenue > 0
+          ? Math.round((totals.gross_profit / totals.revenue) * 10000) / 100
+          : 0,
+      },
+    });
+
+  } catch (err) {
+    console.error("[GET /reports/top-items] error:", err);
+    return res.status(500).json({ ok: false, error: "top_items_failed" });
   }
 });
 

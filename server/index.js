@@ -27,7 +27,6 @@ const ownerAdminRoutes = require("./routes/owner-admin");
 const ownerActivityRoutes = require("./routes/owner-activity");
 const reportsRoutes = require("./routes/reports");
 const usersRoutes = require("./routes/users");
-const reportsPnlRoutes = require("./routes/reports-pnl");
 
 // 🔥 ДОБАВЛЕНО
 const subscriptionRequestsRoutes = require("./routes/subscription-requests");
@@ -100,7 +99,6 @@ app.use("/cash", cashRoutes);
 app.use("/expenses", expensesRoutes);
 app.use("/owner-admin", ownerAdminRoutes);
 app.use("/reports", reportsRoutes);
-app.use("/reports", reportsPnlRoutes);
 
 // 🔥 ДОБАВЛЕНО (ВАЖНО — ДО owner-activity можно, это норм)
 app.use("/", subscriptionRequestsRoutes);
