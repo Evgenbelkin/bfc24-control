@@ -1,4 +1,7 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 const pool = require("../db");
 const {
   authRequired,
@@ -11,6 +14,19 @@ const {
 } = require("../middleware/permissions");
 
 const router = express.Router();
+const UPLOADS_DIR = path.join(__dirname, "..", "..", "uploads");
+
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+const ALLOWED_IMAGE_MIME_TYPES = {
+  "image/jpeg": ".jpg",
+  "image/jpg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/gif": ".gif",
+};
 
 function normalizeOptionalText(value) {
   if (value === null || value === undefined) return null;
@@ -54,6 +70,82 @@ function computeVolumeCm3FromDimensions(lengthCm, widthCm, heightCm) {
   }
 
   return Number(lengthCm) * Number(widthCm) * Number(heightCm);
+}
+
+function sanitizeFilenameBase(filename) {
+  const raw = String(filename || "image").trim();
+  const withoutExt = raw.replace(/\.[^.]+$/, "");
+  const safe = withoutExt
+    .toLowerCase()
+    .replace(/[^a-z0-9-_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return safe || "image";
+}
+
+function getImageExtensionByMimeType(mimeType) {
+  return ALLOWED_IMAGE_MIME_TYPES[String(mimeType || "").toLowerCase()] || null;
+}
+
+function normalizeImageUrl(value) {
+  const text = normalizeOptionalText(value);
+  if (!text) return null;
+  return text.startsWith("/uploads/") ? text : null;
+}
+
+async function deleteUploadedFileByUrl(imageUrl) {
+  if (!imageUrl || !String(imageUrl).startsWith("/uploads/")) return;
+
+  const filename = path.basename(imageUrl);
+  const fullPath = path.join(UPLOADS_DIR, filename);
+
+  try {
+    await fs.promises.unlink(fullPath);
+  } catch (err) {
+    if (err && err.code !== "ENOENT") {
+      console.error("[items] failed to delete uploaded file:", err);
+    }
+  }
+}
+
+async function saveBase64ImageToUploads({ originalName, mimeType, base64Data }) {
+  const extension = getImageExtensionByMimeType(mimeType);
+
+  if (!extension) {
+    throw new Error("unsupported_image_type");
+  }
+
+  const cleanedBase64 = String(base64Data || "")
+    .replace(/^data:[^;]+;base64,/, "")
+    .trim();
+
+  if (!cleanedBase64) {
+    throw new Error("image_data_required");
+  }
+
+  let buffer;
+  try {
+    buffer = Buffer.from(cleanedBase64, "base64");
+  } catch (err) {
+    throw new Error("invalid_image_data");
+  }
+
+  if (!buffer || !buffer.length) {
+    throw new Error("invalid_image_data");
+  }
+
+  const maxSizeBytes = 10 * 1024 * 1024;
+  if (buffer.length > maxSizeBytes) {
+    throw new Error("image_too_large");
+  }
+
+  const filename = `${Date.now()}-${sanitizeFilenameBase(originalName)}-${crypto.randomBytes(6).toString("hex")}${extension}`;
+  const fullPath = path.join(UPLOADS_DIR, filename);
+
+  await fs.promises.writeFile(fullPath, buffer);
+
+  return `/uploads/${filename}`;
 }
 
 async function checkItemDuplicates({ tenantId, sku, barcode, excludeId = null }) {
@@ -126,6 +218,7 @@ function getItemSelectSql(whereSql) {
       i.purchase_price,
       i.sale_price,
       i.description,
+      i.image_url,
       i.weight_grams,
       ROUND((i.weight_grams / 1000.0)::numeric, 3) AS weight_kg,
       i.volume_ml,
@@ -188,6 +281,60 @@ router.get("/", authRequired, async (req, res) => {
     });
   }
 });
+
+router.post(
+  "/upload-image",
+  authRequired,
+  requireActiveWriteSubscription(),
+  requireRole("owner", "admin", "client_owner", "client_manager", "client"),
+  async (req, res) => {
+    try {
+      const tenantId = getEffectiveTenantId(req);
+
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: "tenant_not_defined",
+        });
+      }
+
+      const originalName = normalizeOptionalText(req.body.filename) || "image";
+      const mimeType = normalizeOptionalText(req.body.mime_type);
+      const base64Data = normalizeOptionalText(req.body.file_base64);
+
+      if (!mimeType) {
+        return res.status(400).json({
+          ok: false,
+          error: "image_type_required",
+        });
+      }
+
+      if (!base64Data) {
+        return res.status(400).json({
+          ok: false,
+          error: "image_data_required",
+        });
+      }
+
+      const imageUrl = await saveBase64ImageToUploads({
+        originalName,
+        mimeType,
+        base64Data,
+      });
+
+      return res.status(201).json({
+        ok: true,
+        image_url: imageUrl,
+      });
+    } catch (err) {
+      console.error("[POST /items/upload-image] error:", err);
+      return res.status(500).json({
+        ok: false,
+        error: err.message || "item_image_upload_failed",
+      });
+    }
+  }
+);
 
 router.get("/:id", authRequired, async (req, res) => {
   try {
@@ -266,6 +413,7 @@ router.post(
       const purchasePrice = Number(req.body.purchase_price ?? 0);
       const salePrice = Number(req.body.sale_price ?? 0);
       const description = normalizeOptionalText(req.body.description);
+      const imageUrl = normalizeImageUrl(req.body.image_url);
       const weightKg = normalizeOptionalNumber(req.body.weight_kg);
       const lengthCm = normalizeOptionalNumber(req.body.length_cm);
       const widthCm = normalizeOptionalNumber(req.body.width_cm);
@@ -334,6 +482,7 @@ router.post(
           purchase_price,
           sale_price,
           description,
+          image_url,
           weight_grams,
           volume_ml,
           length_cm,
@@ -341,7 +490,7 @@ router.post(
           height_cm,
           is_active
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
         RETURNING
           id,
           tenant_id,
@@ -354,6 +503,7 @@ router.post(
           purchase_price,
           sale_price,
           description,
+          image_url,
           weight_grams,
           ROUND((weight_grams / 1000.0)::numeric, 3) AS weight_kg,
           volume_ml,
@@ -377,6 +527,7 @@ router.post(
         purchasePrice,
         salePrice,
         description,
+        imageUrl,
         weightGrams,
         volumeCm3,
         lengthCm,
@@ -427,7 +578,7 @@ router.put(
       }
 
       const existsSql = `
-        SELECT id
+        SELECT id, image_url
         FROM core.items
         WHERE id = $1
           AND tenant_id = $2
@@ -442,6 +593,8 @@ router.put(
         });
       }
 
+      const existingImageUrl = existsResult.rows[0].image_url || null;
+
       const name = String(req.body.name || "").trim();
       const brand = normalizeOptionalText(req.body.brand);
       const category = normalizeOptionalText(req.body.category);
@@ -451,6 +604,9 @@ router.put(
       const purchasePrice = Number(req.body.purchase_price ?? 0);
       const salePrice = Number(req.body.sale_price ?? 0);
       const description = normalizeOptionalText(req.body.description);
+      const imageUrl = req.body.image_url === undefined
+        ? existingImageUrl
+        : normalizeImageUrl(req.body.image_url);
       const weightKg = normalizeOptionalNumber(req.body.weight_kg);
       const lengthCm = normalizeOptionalNumber(req.body.length_cm);
       const widthCm = normalizeOptionalNumber(req.body.width_cm);
@@ -520,15 +676,16 @@ router.put(
           purchase_price = $7,
           sale_price = $8,
           description = $9,
-          weight_grams = $10,
-          volume_ml = $11,
-          length_cm = $12,
-          width_cm = $13,
-          height_cm = $14,
-          is_active = $15,
+          image_url = $10,
+          weight_grams = $11,
+          volume_ml = $12,
+          length_cm = $13,
+          width_cm = $14,
+          height_cm = $15,
+          is_active = $16,
           updated_at = NOW()
-        WHERE id = $16
-          AND tenant_id = $17
+        WHERE id = $17
+          AND tenant_id = $18
         RETURNING
           id,
           tenant_id,
@@ -541,6 +698,7 @@ router.put(
           purchase_price,
           sale_price,
           description,
+          image_url,
           weight_grams,
           ROUND((weight_grams / 1000.0)::numeric, 3) AS weight_kg,
           volume_ml,
@@ -563,6 +721,7 @@ router.put(
         purchasePrice,
         salePrice,
         description,
+        imageUrl,
         weightGrams,
         volumeCm3,
         lengthCm,
@@ -574,6 +733,10 @@ router.put(
       ];
 
       const { rows } = await pool.query(sql, params);
+
+      if (existingImageUrl && existingImageUrl !== imageUrl) {
+        await deleteUploadedFileByUrl(existingImageUrl);
+      }
 
       return res.json({
         ok: true,
@@ -618,7 +781,7 @@ router.delete(
         DELETE FROM core.items
         WHERE id = $1
           AND tenant_id = $2
-        RETURNING id
+        RETURNING id, image_url
       `;
 
       const { rows } = await pool.query(sql, [id, tenantId]);
@@ -629,6 +792,8 @@ router.delete(
           error: "item_not_found",
         });
       }
+
+      await deleteUploadedFileByUrl(rows[0].image_url);
 
       return res.json({
         ok: true,

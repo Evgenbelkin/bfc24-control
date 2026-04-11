@@ -262,6 +262,83 @@
       margin-top:2px;
     }
 
+    .photo-upload-box{
+      display:grid;
+      grid-template-columns:220px 1fr;
+      gap:14px;
+      align-items:start;
+      padding:14px;
+      border:1px dashed #cbd5e1;
+      border-radius:14px;
+      background:#f8fafc;
+    }
+
+    .photo-preview{
+      width:220px;
+      height:220px;
+      border-radius:14px;
+      border:1px solid #dbe3ef;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+      padding:10px;
+    }
+
+    .photo-preview img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      background:#fff;
+    }
+
+    .photo-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .photo-help{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+
+    .table-photo{
+      width:72px;
+      min-width:72px;
+    }
+
+    .table-photo-box{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      padding:4px;
+    }
+
+    .table-photo-box img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background:#fff;
+    }
+
     .table-wrap{
       overflow:auto;
       margin-top:10px;
@@ -335,6 +412,13 @@
       }
       .stats{
         grid-template-columns:1fr;
+      }
+      .photo-upload-box{
+        grid-template-columns:1fr;
+      }
+      .photo-preview{
+        width:100%;
+        max-width:220px;
       }
     }
 
@@ -442,6 +526,23 @@
             <textarea id="description" data-i18n-placeholder="items.descriptionPlaceholder" placeholder="Краткое описание товара"></textarea>
           </div>
 
+          <div class="field full">
+            <label for="imageFile">Фото товара</label>
+            <div class="photo-upload-box">
+              <div id="photoPreview" class="photo-preview">Фото не загружено</div>
+
+              <div>
+                <input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" />
+                <div class="photo-actions">
+                  <button type="button" class="btn btn-secondary" id="removeImageBtn">Удалить фото</button>
+                </div>
+                <div class="photo-help">
+                  Поддерживаются JPG, PNG, WEBP, GIF. Файл загружается в папку <b>/uploads</b>, а в базе хранится путь вида <b>/uploads/filename.jpg</b>.
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="field">
             <label for="weightKg" data-i18n="items.weightBox">Вес коробки, кг</label>
             <input id="weightKg" type="number" step="0.001" min="0" data-i18n-placeholder="items.weightBoxPlaceholder" placeholder="Например: 12.5" />
@@ -495,6 +596,7 @@
           <thead>
             <tr>
               <th data-i18n="items.tableId">ID</th>
+              <th>Фото</th>
               <th data-i18n="items.tableName">Название</th>
               <th data-i18n="items.tableSku">Артикул / SKU</th>
               <th data-i18n="items.tableBarcode">Штрихкод</th>
@@ -509,7 +611,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="11" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
+              <td colspan="12" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -616,6 +718,9 @@
     let authUser = null;
     let itemsData = [];
     let editId = null;
+    let currentImageUrl = null;
+    let pendingImageFile = null;
+    let pendingImagePreviewUrl = null;
 
     let pageStatusState = null;
     let submitStatusState = null;
@@ -632,6 +737,9 @@
       salePrice: document.getElementById("salePrice"),
       unit: document.getElementById("unit"),
       description: document.getElementById("description"),
+      imageFile: document.getElementById("imageFile"),
+      removeImageBtn: document.getElementById("removeImageBtn"),
+      photoPreview: document.getElementById("photoPreview"),
       weightKg: document.getElementById("weightKg"),
       lengthCm: document.getElementById("lengthCm"),
       widthCm: document.getElementById("widthCm"),
@@ -748,6 +856,68 @@
       return n.toFixed(digits).replace(/\.?0+$/, "");
     }
 
+    function revokePendingPreviewUrl() {
+      if (pendingImagePreviewUrl) {
+        try {
+          URL.revokeObjectURL(pendingImagePreviewUrl);
+        } catch {}
+        pendingImagePreviewUrl = null;
+      }
+    }
+
+    function setImagePreview(src) {
+      if (!src) {
+        els.photoPreview.innerHTML = "Фото не загружено";
+        return;
+      }
+
+      els.photoPreview.innerHTML = `<img src="${escapeHtml(src)}" alt="Фото товара" />`;
+    }
+
+    function clearImageSelection(options = {}) {
+      revokePendingPreviewUrl();
+      pendingImageFile = null;
+      if (options.clearCurrent !== false) {
+        currentImageUrl = null;
+      }
+      if (els.imageFile) {
+        els.imageFile.value = "";
+      }
+      setImagePreview(currentImageUrl);
+    }
+
+    function getFileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = String(reader.result || "");
+          const base64 = result.includes(",") ? result.split(",").pop() : result;
+          resolve(base64 || "");
+        };
+        reader.onerror = () => reject(new Error("Не удалось прочитать файл"));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadItemImage(file) {
+      if (!file) return currentImageUrl;
+
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+      if (!allowedTypes.includes(String(file.type || "").toLowerCase())) {
+        throw new Error("Поддерживаются только JPG, PNG, WEBP и GIF");
+      }
+
+      const fileBase64 = await getFileToBase64(file);
+
+      const response = await apiPost("/items/upload-image", {
+        filename: file.name,
+        mime_type: file.type,
+        file_base64: fileBase64
+      });
+
+      return response.image_url || null;
+    }
+
     function computeVolumeCm3(lengthCm, widthCm, heightCm) {
       if (
         lengthCm === null || widthCm === null || heightCm === null ||
@@ -816,6 +986,7 @@
         purchase_price: Number(row.purchase_price ?? row.cost_price ?? 0),
         sale_price: Number(row.sale_price ?? row.price ?? 0),
         description: row.description || "",
+        image_url: row.image_url || "",
         weight_kg: row.weight_kg === null || row.weight_kg === undefined ? null : Number(row.weight_kg),
         volume_cm3: computedVolume,
         length_cm,
@@ -865,6 +1036,7 @@
       els.salePrice.value = "0";
       els.unit.value = "pcs";
       els.description.value = "";
+      clearImageSelection({ clearCurrent: true });
       els.weightKg.value = "";
       els.lengthCm.value = "";
       els.widthCm.value = "";
@@ -886,6 +1058,8 @@
       els.salePrice.value = String(item.sale_price ?? 0);
       els.unit.value = item.unit || "pcs";
       els.description.value = item.description || "";
+      currentImageUrl = item.image_url || null;
+      clearImageSelection({ clearCurrent: false });
       els.weightKg.value = item.weight_kg === null ? "" : String(item.weight_kg);
       els.lengthCm.value = item.length_cm === null ? "" : String(item.length_cm);
       els.widthCm.value = item.width_cm === null ? "" : String(item.width_cm);
@@ -943,7 +1117,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="11" class="empty">${escapeHtml(i18n.t("items.noData"))}</td>
+            <td colspan="12" class="empty">${escapeHtml(i18n.t("items.noData"))}</td>
           </tr>
         `;
         return;
@@ -954,6 +1128,11 @@
         return `
           <tr>
             <td>${escapeHtml(row.id)}</td>
+            <td class="table-photo">
+              <div class="table-photo-box">
+                ${row.image_url ? `<img src="${escapeHtml(row.image_url)}" alt="Фото товара" />` : "Нет фото"}
+              </div>
+            </td>
             <td>
               <div class="item-name">${escapeHtml(row.name)}</div>
               <div class="item-sub">${escapeHtml([row.category, row.brand].filter(Boolean).join(" / ") || "Фабрика и артикул фабрики не заполнены")}</div>
@@ -1067,6 +1246,13 @@
           }
         }
 
+        let imageUrl = currentImageUrl;
+
+        if (pendingImageFile) {
+          showStatus(els.submitStatus, "Загружаем фото...", "info");
+          imageUrl = await uploadItemImage(pendingImageFile);
+        }
+
         const body = {
           tenant_id: tenantId,
           name,
@@ -1078,6 +1264,7 @@
           purchase_price,
           sale_price,
           description: description || null,
+          image_url: imageUrl || null,
           weight_kg,
           length_cm,
           width_cm,
@@ -1111,6 +1298,20 @@
       });
       els.cancelEditBtn.addEventListener("click", resetForm);
       els.refreshBtn.addEventListener("click", loadData);
+      els.imageFile.addEventListener("change", (event) => {
+        const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+        revokePendingPreviewUrl();
+        pendingImageFile = file;
+        if (file) {
+          pendingImagePreviewUrl = URL.createObjectURL(file);
+          setImagePreview(pendingImagePreviewUrl);
+        } else {
+          setImagePreview(currentImageUrl);
+        }
+      });
+      els.removeImageBtn.addEventListener("click", () => {
+        clearImageSelection({ clearCurrent: true });
+      });
 
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
@@ -1127,6 +1328,7 @@
       bindEvents();
       syncFormTexts();
       updateVolumeDisplay();
+      setImagePreview(null);
       loadData();
     }
 
