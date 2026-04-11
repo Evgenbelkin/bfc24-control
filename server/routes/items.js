@@ -44,7 +44,7 @@ function validateNonNegativeOptionalNumber(value, errorCode) {
   return { ok: true };
 }
 
-function computeVolumeMlFromDimensions(lengthCm, widthCm, heightCm) {
+function computeVolumeCm3FromDimensions(lengthCm, widthCm, heightCm) {
   if (
     lengthCm === null || widthCm === null || heightCm === null ||
     !Number.isFinite(Number(lengthCm)) || !Number.isFinite(Number(widthCm)) || !Number.isFinite(Number(heightCm)) ||
@@ -125,10 +125,11 @@ function getItemSelectSql(whereSql) {
       i.unit,
       i.purchase_price,
       i.sale_price,
-      i.image_url,
       i.description,
       i.weight_grams,
+      ROUND((i.weight_grams / 1000.0)::numeric, 3) AS weight_kg,
       i.volume_ml,
+      i.volume_ml AS volume_cm3,
       i.length_cm,
       i.width_cm,
       i.height_cm,
@@ -264,13 +265,13 @@ router.post(
       const unit = normalizeOptionalText(req.body.unit) || "pcs";
       const purchasePrice = Number(req.body.purchase_price ?? 0);
       const salePrice = Number(req.body.sale_price ?? 0);
-      const imageUrl = normalizeOptionalText(req.body.image_url);
       const description = normalizeOptionalText(req.body.description);
-      const weightGrams = normalizeOptionalNumber(req.body.weight_grams);
+      const weightKg = normalizeOptionalNumber(req.body.weight_kg);
       const lengthCm = normalizeOptionalNumber(req.body.length_cm);
       const widthCm = normalizeOptionalNumber(req.body.width_cm);
       const heightCm = normalizeOptionalNumber(req.body.height_cm);
-      const volumeMl = computeVolumeMlFromDimensions(lengthCm, widthCm, heightCm);
+      const volumeCm3 = computeVolumeCm3FromDimensions(lengthCm, widthCm, heightCm);
+      const weightGrams = weightKg === null ? null : Number(weightKg) * 1000;
       const isActive = normalizeBoolean(req.body.is_active, true);
 
       if (!name) {
@@ -295,7 +296,7 @@ router.post(
       }
 
       for (const check of [
-        validateNonNegativeOptionalNumber(weightGrams, "invalid_weight_grams"),
+        validateNonNegativeOptionalNumber(weightKg, "invalid_weight_kg"),
         validateNonNegativeOptionalNumber(lengthCm, "invalid_length_cm"),
         validateNonNegativeOptionalNumber(widthCm, "invalid_width_cm"),
         validateNonNegativeOptionalNumber(heightCm, "invalid_height_cm"),
@@ -332,7 +333,6 @@ router.post(
           unit,
           purchase_price,
           sale_price,
-          image_url,
           description,
           weight_grams,
           volume_ml,
@@ -341,7 +341,7 @@ router.post(
           height_cm,
           is_active
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
         RETURNING
           id,
           tenant_id,
@@ -353,10 +353,11 @@ router.post(
           unit,
           purchase_price,
           sale_price,
-          image_url,
           description,
           weight_grams,
+          ROUND((weight_grams / 1000.0)::numeric, 3) AS weight_kg,
           volume_ml,
+          volume_ml AS volume_cm3,
           length_cm,
           width_cm,
           height_cm,
@@ -375,10 +376,9 @@ router.post(
         unit,
         purchasePrice,
         salePrice,
-        imageUrl,
         description,
         weightGrams,
-        volumeMl,
+        volumeCm3,
         lengthCm,
         widthCm,
         heightCm,
@@ -450,13 +450,13 @@ router.put(
       const unit = normalizeOptionalText(req.body.unit) || "pcs";
       const purchasePrice = Number(req.body.purchase_price ?? 0);
       const salePrice = Number(req.body.sale_price ?? 0);
-      const imageUrl = normalizeOptionalText(req.body.image_url);
       const description = normalizeOptionalText(req.body.description);
-      const weightGrams = normalizeOptionalNumber(req.body.weight_grams);
+      const weightKg = normalizeOptionalNumber(req.body.weight_kg);
       const lengthCm = normalizeOptionalNumber(req.body.length_cm);
       const widthCm = normalizeOptionalNumber(req.body.width_cm);
       const heightCm = normalizeOptionalNumber(req.body.height_cm);
-      const volumeMl = computeVolumeMlFromDimensions(lengthCm, widthCm, heightCm);
+      const volumeCm3 = computeVolumeCm3FromDimensions(lengthCm, widthCm, heightCm);
+      const weightGrams = weightKg === null ? null : Number(weightKg) * 1000;
       const isActive = normalizeBoolean(req.body.is_active, true);
 
       if (!name) {
@@ -481,7 +481,7 @@ router.put(
       }
 
       for (const check of [
-        validateNonNegativeOptionalNumber(weightGrams, "invalid_weight_grams"),
+        validateNonNegativeOptionalNumber(weightKg, "invalid_weight_kg"),
         validateNonNegativeOptionalNumber(lengthCm, "invalid_length_cm"),
         validateNonNegativeOptionalNumber(widthCm, "invalid_width_cm"),
         validateNonNegativeOptionalNumber(heightCm, "invalid_height_cm"),
@@ -519,17 +519,16 @@ router.put(
           unit = $6,
           purchase_price = $7,
           sale_price = $8,
-          image_url = $9,
-          description = $10,
-          weight_grams = $11,
-          volume_ml = $12,
-          length_cm = $13,
-          width_cm = $14,
-          height_cm = $15,
-          is_active = $16,
+          description = $9,
+          weight_grams = $10,
+          volume_ml = $11,
+          length_cm = $12,
+          width_cm = $13,
+          height_cm = $14,
+          is_active = $15,
           updated_at = NOW()
-        WHERE id = $17
-          AND tenant_id = $18
+        WHERE id = $16
+          AND tenant_id = $17
         RETURNING
           id,
           tenant_id,
@@ -541,10 +540,11 @@ router.put(
           unit,
           purchase_price,
           sale_price,
-          image_url,
           description,
           weight_grams,
+          ROUND((weight_grams / 1000.0)::numeric, 3) AS weight_kg,
           volume_ml,
+          volume_ml AS volume_cm3,
           length_cm,
           width_cm,
           height_cm,
@@ -562,10 +562,9 @@ router.put(
         unit,
         purchasePrice,
         salePrice,
-        imageUrl,
         description,
         weightGrams,
-        volumeMl,
+        volumeCm3,
         lengthCm,
         widthCm,
         heightCm,

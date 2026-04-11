@@ -19,7 +19,6 @@
       --danger:#dc2626;
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:16px;
-      --soft:#f8fafc;
     }
 
     *{box-sizing:border-box}
@@ -32,7 +31,7 @@
     }
 
     .wrap{
-      max-width:1560px;
+      max-width:1480px;
       margin:0 auto;
       padding:24px 16px 48px;
     }
@@ -164,18 +163,11 @@
       font-weight:800;
     }
 
-    .editor-grid{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) 300px;
-      gap:16px;
-      margin-top:18px;
-      align-items:start;
-    }
-
     .form-grid{
       display:grid;
       grid-template-columns:repeat(4,minmax(0,1fr));
       gap:14px;
+      margin-top:18px;
     }
 
     .field{
@@ -187,6 +179,10 @@
 
     .field.full{
       grid-column:1 / -1;
+    }
+
+    .field.span-2{
+      grid-column:span 2;
     }
 
     label{
@@ -210,71 +206,14 @@
       box-shadow:0 0 0 4px rgba(37,99,235,.10);
     }
 
+    input[readonly]{
+      background:#f8fafc;
+      color:#374151;
+    }
+
     textarea{
       min-height:92px;
       resize:vertical;
-    }
-
-    .preview-card{
-      border:1px solid #e8edf4;
-      border-radius:14px;
-      background:var(--soft);
-      padding:14px;
-      position:sticky;
-      top:12px;
-    }
-
-    .preview-title{
-      font-size:14px;
-      font-weight:700;
-      margin-bottom:10px;
-    }
-
-    .preview-image{
-      width:100%;
-      aspect-ratio:1/1;
-      border-radius:14px;
-      border:1px solid #e5e7eb;
-      background:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-      margin-bottom:12px;
-    }
-
-    .preview-empty{
-      color:var(--muted);
-      font-size:13px;
-      text-align:center;
-      padding:18px;
-      line-height:1.45;
-    }
-
-    .preview-meta{
-      display:grid;
-      gap:8px;
-    }
-
-    .preview-meta-item{
-      background:#fff;
-      border:1px solid #e8edf4;
-      border-radius:12px;
-      padding:10px 12px;
-    }
-
-    .preview-meta-label{
-      color:var(--muted);
-      font-size:11px;
-      margin-bottom:4px;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-    }
-
-    .preview-meta-value{
-      font-size:14px;
-      font-weight:700;
-      word-break:break-word;
     }
 
     .toolbar{
@@ -317,6 +256,12 @@
       border:1px solid #bfdbfe;
     }
 
+    .calc-note{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
     .table-wrap{
       overflow:auto;
       margin-top:10px;
@@ -324,7 +269,7 @@
 
     table{
       width:100%;
-      min-width:1650px;
+      min-width:1300px;
       border-collapse:collapse;
       background:#fff;
     }
@@ -344,56 +289,10 @@
       position:sticky;
       top:0;
       z-index:1;
-      white-space:nowrap;
     }
 
     tr:hover td{
       background:#fbfdff;
-    }
-
-    .item-main{ display:block; }
-
-    .cell-name{
-      min-width:220px;
-    }
-
-    .thumb{
-      width:56px;
-      height:56px;
-      border-radius:12px;
-      border:1px solid #e5e7eb;
-      background:#fff;
-      overflow:hidden;
-      flex-shrink:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .thumb img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
-
-    .thumb-empty{
-      color:#94a3b8;
-      font-size:11px;
-      text-align:center;
-      line-height:1.2;
-      padding:6px;
-    }
-
-    .item-name{
-      font-weight:700;
-      margin-bottom:3px;
-    }
-
-    .item-sub{
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.4;
     }
 
     .row-actions{
@@ -402,54 +301,59 @@
       flex-wrap:wrap;
     }
 
+    .item-name{
+      font-weight:700;
+      margin-bottom:4px;
+    }
+
+    .item-sub{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
+    }
+
+    .dim-lines{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      color:#374151;
+      font-size:13px;
+    }
+
     .empty{
       text-align:center;
       color:var(--muted);
       padding:24px 12px;
     }
 
-    .dim-lines{
-      display:grid;
-      gap:4px;
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    @media (max-width: 1180px){
-      .editor-grid{
-        grid-template-columns:1fr;
+    @media (max-width: 1100px){
+      .form-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
       }
-
-      .preview-card{
-        position:static;
-      }
-
-      .form-grid,
-      .stats,
-      .toolbar{
-        grid-template-columns:1fr 1fr;
-      }
-    }
-
-    @media (max-width: 980px){
-      .form-grid,
-      .stats,
       .toolbar{
         grid-template-columns:1fr;
       }
+      .stats{
+        grid-template-columns:1fr;
+      }
+    }
 
+    @media (max-width: 780px){
+      .form-grid{
+        grid-template-columns:1fr;
+      }
+      .field.span-2{
+        grid-column:span 1;
+      }
       .title{
         font-size:24px;
       }
-
       .wrap{
         padding:16px 12px 32px;
       }
-
       .topbar{
         align-items:flex-start;
       }
-
       .topbar-right{
         width:100%;
         justify-content:space-between;
@@ -482,7 +386,7 @@
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label" data-i18n="items.statsActive">Активных</div>
+          <div class="stat-label">Активных</div>
           <div class="stat-value" id="activeItemsCount">0</div>
         </div>
         <div class="stat">
@@ -492,122 +396,89 @@
       </div>
 
       <form id="itemForm" autocomplete="off">
-        <div class="editor-grid">
-          <div>
-            <div class="form-grid">
-              <div class="field">
-                <label for="name" data-i18n="items.nameLabel">Название</label>
-                <input id="name" type="text" data-i18n-placeholder="items.namePlaceholder" placeholder="Например: Тест товар SaaS" />
-              </div>
-
-              <div class="field">
-                <label for="brand">Артикул фабрики</label>
-                <input id="brand" type="text" placeholder="Например: A-4587" />
-              </div>
-
-              <div class="field">
-                <label for="category">Фабрика</label>
-                <input id="category" type="text" placeholder="Например: Shenzhen Factory 12" />
-              </div>
-
-              <div class="field">
-                <label for="unit" data-i18n="items.unitLabel">Единица</label>
-                <input id="unit" type="text" data-i18n-placeholder="items.unitPlaceholder" placeholder="Например: pcs" value="pcs" />
-              </div>
-
-              <div class="field">
-                <label for="sku" data-i18n="items.skuLabel">Артикул / SKU</label>
-                <input id="sku" type="text" data-i18n-placeholder="items.skuPlaceholder" placeholder="Например: SKU-001" />
-              </div>
-
-              <div class="field">
-                <label for="barcode" data-i18n="items.barcodeLabel">Штрихкод</label>
-                <input id="barcode" type="text" data-i18n-placeholder="items.barcodePlaceholder" placeholder="Например: 1234567890123" />
-              </div>
-
-              <div class="field">
-                <label for="purchasePrice" data-i18n="items.purchasePriceLabel">Закупочная цена</label>
-                <input id="purchasePrice" type="number" step="0.01" min="0" value="0" />
-              </div>
-
-              <div class="field">
-                <label for="salePrice" data-i18n="items.salePriceLabel">Цена продажи</label>
-                <input id="salePrice" type="number" step="0.01" min="0" value="0" />
-              </div>
-
-              <div class="field full">
-                <label>Фото товара</label>
-                <input type="text" value="Загрузка фото будет добавлена следующим шагом отдельным модулем" readonly style="background:var(--soft); color:var(--muted); cursor:not-allowed;" />
-              </div>
-
-              <div class="field full">
-                <label for="description" data-i18n="items.descriptionLabel">Описание</label>
-                <textarea id="description" data-i18n-placeholder="items.descriptionPlaceholder" placeholder="Краткое описание товара"></textarea>
-              </div>
-
-              <div class="field">
-                <label for="weightGrams">Вес коробки, г</label>
-                <input id="weightGrams" type="number" step="0.001" min="0" value="" />
-              </div>
-
-              <div class="field">
-                <label for="lengthCm">Длина коробки, см</label>
-                <input id="lengthCm" type="number" step="0.01" min="0" value="" />
-              </div>
-
-              <div class="field">
-                <label for="widthCm">Ширина коробки, см</label>
-                <input id="widthCm" type="number" step="0.01" min="0" value="" />
-              </div>
-
-              <div class="field">
-                <label for="heightCm">Высота коробки, см</label>
-                <input id="heightCm" type="number" step="0.01" min="0" value="" />
-              </div>
-
-              <div class="field">
-                <label for="volumeDisplay">Объём коробки, м³ (авто)</label>
-                <input id="volumeDisplay" type="text" value="" readonly style="background:var(--soft);" />
-              </div>
-            </div>
-
-            <div class="toolbar">
-              <div class="field">
-                <label for="searchInput" data-i18n="items.searchLabel">Поиск</label>
-                <input id="searchInput" type="text" data-i18n-placeholder="items.searchPlaceholder" placeholder="Поиск по названию, артикулу, штрихкоду" />
-              </div>
-
-              <div class="toolbar-actions">
-                <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
-                <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
-                <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="items.refreshButton">Обновить список</button>
-              </div>
-            </div>
+        <div class="form-grid">
+          <div class="field span-2">
+            <label for="name" data-i18n="items.nameLabel">Название</label>
+            <input id="name" type="text" data-i18n-placeholder="items.namePlaceholder" placeholder="Например: Тест товар SaaS" />
           </div>
 
-          <div class="preview-card">
-            <div class="preview-title" >Краткий предпросмотр карточки</div>
-            <div class="preview-image" id="previewImageBox">
-              <div class="preview-empty" id="previewImageEmpty">Фото товара пока не подключено. Сначала доводим карточку и характеристики, потом отдельно делаем удобную загрузку фото.</div>
-            </div>
-            <div class="preview-meta">
-              <div class="preview-meta-item">
-                <div class="preview-meta-label" data-i18n="items.previewName">Название</div>
-                <div class="preview-meta-value" id="previewName">—</div>
-              </div>
-              <div class="preview-meta-item">
-                <div class="preview-meta-label" >Фабрика / артикул фабрики</div>
-                <div class="preview-meta-value" id="previewBrandCategory">—</div>
-              </div>
-              <div class="preview-meta-item">
-                <div class="preview-meta-label" data-i18n="items.previewPricing">Цена / закупка</div>
-                <div class="preview-meta-value" id="previewPricing">0 / 0</div>
-              </div>
-              <div class="preview-meta-item">
-                <div class="preview-meta-label" >Коробка / вес</div>
-                <div class="preview-meta-value" id="previewSize">—</div>
-              </div>
-            </div>
+          <div class="field">
+            <label for="brand">Артикул фабрики</label>
+            <input id="brand" type="text" placeholder="Например: XJ-2048" />
+          </div>
+
+          <div class="field">
+            <label for="category">Фабрика</label>
+            <input id="category" type="text" placeholder="Например: Shenzhen Factory" />
+          </div>
+
+          <div class="field">
+            <label for="sku" data-i18n="items.skuLabel">Артикул / SKU</label>
+            <input id="sku" type="text" data-i18n-placeholder="items.skuPlaceholder" placeholder="Например: SKU-001" />
+          </div>
+
+          <div class="field">
+            <label for="barcode" data-i18n="items.barcodeLabel">Штрихкод</label>
+            <input id="barcode" type="text" data-i18n-placeholder="items.barcodePlaceholder" placeholder="Например: 1234567890123" />
+          </div>
+
+          <div class="field">
+            <label for="purchasePrice" data-i18n="items.purchasePriceLabel">Закупочная цена</label>
+            <input id="purchasePrice" type="number" step="0.01" min="0" value="0" />
+          </div>
+
+          <div class="field">
+            <label for="salePrice" data-i18n="items.salePriceLabel">Цена продажи</label>
+            <input id="salePrice" type="number" step="0.01" min="0" value="0" />
+          </div>
+
+          <div class="field">
+            <label for="unit" data-i18n="items.unitLabel">Единица</label>
+            <input id="unit" type="text" data-i18n-placeholder="items.unitPlaceholder" placeholder="Например: pcs" value="pcs" />
+          </div>
+
+          <div class="field full">
+            <label for="description">Описание</label>
+            <textarea id="description" placeholder="Краткое описание товара"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="weightKg">Вес коробки, кг</label>
+            <input id="weightKg" type="number" step="0.001" min="0" placeholder="Например: 12.5" />
+          </div>
+
+          <div class="field">
+            <label for="lengthCm">Длина коробки, см</label>
+            <input id="lengthCm" type="number" step="0.01" min="0" placeholder="Например: 60" />
+          </div>
+
+          <div class="field">
+            <label for="widthCm">Ширина коробки, см</label>
+            <input id="widthCm" type="number" step="0.01" min="0" placeholder="Например: 40" />
+          </div>
+
+          <div class="field">
+            <label for="heightCm">Высота коробки, см</label>
+            <input id="heightCm" type="number" step="0.01" min="0" placeholder="Например: 35" />
+          </div>
+
+          <div class="field">
+            <label for="volumeM3">Объём коробки, м³</label>
+            <input id="volumeM3" type="text" readonly placeholder="Рассчитывается автоматически" />
+            <div class="calc-note">Объём считается автоматически по размерам коробки.</div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="field">
+            <label for="searchInput" data-i18n="items.searchLabel">Поиск</label>
+            <input id="searchInput" type="text" data-i18n-placeholder="items.searchPlaceholder" placeholder="Поиск по названию, артикулу, штрихкоду" />
+          </div>
+
+          <div class="toolbar-actions">
+            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
+            <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="items.refreshButton">Обновить список</button>
           </div>
         </div>
       </form>
@@ -624,13 +495,13 @@
           <thead>
             <tr>
               <th data-i18n="items.tableId">ID</th>
-              <th data-i18n="items.tableItemCard">Товар</th>
+              <th data-i18n="items.tableName">Название</th>
               <th data-i18n="items.tableSku">Артикул / SKU</th>
               <th data-i18n="items.tableBarcode">Штрихкод</th>
               <th data-i18n="items.tableUnit">Ед.</th>
               <th data-i18n="items.tablePurchase">Закупка</th>
               <th data-i18n="items.tableSale">Продажа</th>
-              <th data-i18n="items.tableMetrics">Характеристики</th>
+              <th>Характеристики</th>
               <th data-i18n="items.tableActive">Активно</th>
               <th data-i18n="items.tableDate">Дата</th>
               <th data-i18n="items.tableActions">Действия</th>
@@ -761,11 +632,11 @@
       salePrice: document.getElementById("salePrice"),
       unit: document.getElementById("unit"),
       description: document.getElementById("description"),
-      weightGrams: document.getElementById("weightGrams"),
+      weightKg: document.getElementById("weightKg"),
       lengthCm: document.getElementById("lengthCm"),
       widthCm: document.getElementById("widthCm"),
       heightCm: document.getElementById("heightCm"),
-      volumeDisplay: document.getElementById("volumeDisplay"),
+      volumeM3: document.getElementById("volumeM3"),
       searchInput: document.getElementById("searchInput"),
       saveBtn: document.getElementById("saveBtn"),
       cancelEditBtn: document.getElementById("cancelEditBtn"),
@@ -775,12 +646,7 @@
       submitStatus: document.getElementById("submitStatus"),
       itemsCount: document.getElementById("itemsCount"),
       activeItemsCount: document.getElementById("activeItemsCount"),
-      tenantValue: document.getElementById("tenantValue"),
-      previewImageEmpty: document.getElementById("previewImageEmpty"),
-      previewName: document.getElementById("previewName"),
-      previewBrandCategory: document.getElementById("previewBrandCategory"),
-      previewPricing: document.getElementById("previewPricing"),
-      previewSize: document.getElementById("previewSize")
+      tenantValue: document.getElementById("tenantValue")
     };
 
     function goBack() {
@@ -803,10 +669,10 @@
     }
 
     function getTenantId() {
-      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== '') {
         return Number(authUser.tenant_id);
       }
-      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== "undefined" ? FALLBACK_TENANT_ID : 1);
+      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== 'undefined' ? FALLBACK_TENANT_ID : 1);
     }
 
     function showStatus(el, text, type = "info") {
@@ -872,20 +738,38 @@
     function formatMoney(value) {
       const n = Number(value || 0);
       if (!Number.isFinite(n)) return "0";
-      return new Intl.NumberFormat("ru-RU", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      }).format(n);
+      return n % 1 === 0 ? String(n) : n.toFixed(2);
     }
 
     function formatMetric(value, digits = 2) {
       if (value === null || value === undefined || value === "") return "—";
       const n = Number(value);
       if (!Number.isFinite(n)) return "—";
-      return new Intl.NumberFormat("ru-RU", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: digits
-      }).format(n);
+      return n.toFixed(digits).replace(/\.?0+$/, "");
+    }
+
+    function computeVolumeCm3(lengthCm, widthCm, heightCm) {
+      if (
+        lengthCm === null || widthCm === null || heightCm === null ||
+        !Number.isFinite(lengthCm) || !Number.isFinite(widthCm) || !Number.isFinite(heightCm) ||
+        lengthCm <= 0 || widthCm <= 0 || heightCm <= 0
+      ) {
+        return null;
+      }
+      return lengthCm * widthCm * heightCm;
+    }
+
+    function formatVolumeM3(volumeCm3) {
+      if (volumeCm3 === null || volumeCm3 === undefined || volumeCm3 === "") return "";
+      const m3 = Number(volumeCm3) / 1000000;
+      if (!Number.isFinite(m3)) return "";
+      return m3.toFixed(4).replace(/\.?0+$/, "");
+    }
+
+    function readOptionalNumber(value) {
+      if (value === null || value === undefined || value === "") return null;
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
     }
 
     function extractList(data, keys) {
@@ -927,8 +811,8 @@
         purchase_price: Number(row.purchase_price ?? row.cost_price ?? 0),
         sale_price: Number(row.sale_price ?? row.price ?? 0),
         description: row.description || "",
-        weight_grams: row.weight_grams === null || row.weight_grams === undefined ? null : Number(row.weight_grams),
-        volume_ml: row.volume_ml === null || row.volume_ml === undefined ? null : Number(row.volume_ml),
+        weight_kg: row.weight_kg === null || row.weight_kg === undefined ? null : Number(row.weight_kg),
+        volume_cm3: row.volume_cm3 === null || row.volume_cm3 === undefined ? Number(row.volume_ml ?? 0) || null : Number(row.volume_cm3),
         length_cm: row.length_cm === null || row.length_cm === undefined ? null : Number(row.length_cm),
         width_cm: row.width_cm === null || row.width_cm === undefined ? null : Number(row.width_cm),
         height_cm: row.height_cm === null || row.height_cm === undefined ? null : Number(row.height_cm),
@@ -954,74 +838,13 @@
       els.cancelEditBtn.textContent = i18n.t("items.cancelEditButton");
     }
 
-    function getImagePlaceholderText() {
-      return i18n.t("items.previewImageEmpty");
-    }
-
-    function readOptionalNumber(value) {
-      const raw = String(value ?? "").trim();
-      if (!raw) return null;
-      const n = Number(raw);
-      return Number.isFinite(n) ? n : null;
-    }
-
-    function computeVolumeMl(length, width, height) {
-      if (
-        length === null || width === null || height === null ||
-        !Number.isFinite(length) || !Number.isFinite(width) || !Number.isFinite(height) ||
-        length <= 0 || width <= 0 || height <= 0
-      ) {
-        return null;
-      }
-      return length * width * height;
-    }
-
-    function formatVolumeM3(volumeMl) {
-      if (volumeMl === null || volumeMl === undefined || !Number.isFinite(Number(volumeMl))) return "—";
-      const m3 = Number(volumeMl) / 1000000;
-      return m3.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 4 });
-    }
-
     function updateVolumeDisplay() {
       const length = readOptionalNumber(els.lengthCm.value);
       const width = readOptionalNumber(els.widthCm.value);
       const height = readOptionalNumber(els.heightCm.value);
-      const volumeMl = computeVolumeMl(length, width, height);
-      els.volumeDisplay.value = volumeMl === null ? "" : `${formatVolumeM3(volumeMl)} м³`;
-      return volumeMl;
-    }
-
-    function renderPreview() {
-      const name = (els.name.value || "").trim() || "—";
-      const factoryArticle = (els.brand.value || "").trim();
-      const factory = (els.category.value || "").trim();
-      const purchasePrice = formatMoney(els.purchasePrice.value || 0);
-      const salePrice = formatMoney(els.salePrice.value || 0);
-
-      const length = readOptionalNumber(els.lengthCm.value);
-      const width = readOptionalNumber(els.widthCm.value);
-      const height = readOptionalNumber(els.heightCm.value);
-      const weight = readOptionalNumber(els.weightGrams.value);
-      const volumeMl = updateVolumeDisplay();
-
-      const dims = [];
-      if (length !== null || width !== null || height !== null) {
-        dims.push(
-          [
-            length !== null ? formatMetric(length, 2) : "—",
-            width !== null ? formatMetric(width, 2) : "—",
-            height !== null ? formatMetric(height, 2) : "—"
-          ].join(" × ") + " см"
-        );
-      }
-      if (weight !== null) dims.push(`Вес: ${formatMetric(weight, 3)} г`);
-      if (volumeMl !== null) dims.push(`Объём: ${formatVolumeM3(volumeMl)} м³`);
-
-      els.previewName.textContent = name;
-      els.previewBrandCategory.textContent = [factory, factoryArticle].filter(Boolean).join(" / ") || "—";
-      els.previewPricing.textContent = `${salePrice} / ${purchasePrice}`;
-      els.previewSize.textContent = dims.join(" • ") || "—";
-      els.previewImageEmpty.textContent = "Фото товара пока не подключено. Следующим шагом сделаем удобную загрузку файла.";
+      const volumeCm3 = computeVolumeCm3(length, width, height);
+      els.volumeM3.value = volumeCm3 === null ? "" : `${formatVolumeM3(volumeCm3)} м³`;
+      return volumeCm3;
     }
 
     function resetForm() {
@@ -1037,13 +860,12 @@
       els.salePrice.value = "0";
       els.unit.value = "pcs";
       els.description.value = "";
-      els.weightGrams.value = "";
+      els.weightKg.value = "";
       els.lengthCm.value = "";
       els.widthCm.value = "";
       els.heightCm.value = "";
-      clearSubmitStatus();
       updateVolumeDisplay();
-      renderPreview();
+      clearSubmitStatus();
     }
 
     function startEdit(item) {
@@ -1059,13 +881,12 @@
       els.salePrice.value = String(item.sale_price ?? 0);
       els.unit.value = item.unit || "pcs";
       els.description.value = item.description || "";
-      els.weightGrams.value = item.weight_grams ?? "";
-      els.lengthCm.value = item.length_cm ?? "";
-      els.widthCm.value = item.width_cm ?? "";
-      els.heightCm.value = item.height_cm ?? "";
-      clearSubmitStatus();
+      els.weightKg.value = item.weight_kg === null ? "" : String(item.weight_kg);
+      els.lengthCm.value = item.length_cm === null ? "" : String(item.length_cm);
+      els.widthCm.value = item.width_cm === null ? "" : String(item.width_cm);
+      els.heightCm.value = item.height_cm === null ? "" : String(item.height_cm);
       updateVolumeDisplay();
-      renderPreview();
+      clearSubmitStatus();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -1080,8 +901,8 @@
           row.category,
           row.sku,
           row.barcode,
-          row.unit,
-          row.description
+          row.description,
+          row.unit
         ].join(" ").toLowerCase();
 
         return text.includes(search);
@@ -1097,12 +918,13 @@
         );
       }
 
-      if (row.weight_grams !== null) {
-        parts.push(`Вес: ${formatMetric(row.weight_grams, 3)} г`);
+      if (row.weight_kg !== null) {
+        parts.push(`Вес: ${formatMetric(row.weight_kg, 3)} кг`);
       }
 
-      if (row.volume_ml !== null) {
-        parts.push(`Объём: ${formatVolumeM3(row.volume_ml)} м³`);
+      const volumeCm3 = row.volume_cm3;
+      if (volumeCm3 !== null) {
+        parts.push(`Объём: ${formatVolumeM3(volumeCm3)} м³`);
       }
 
       return parts.length ? parts : ["—"];
@@ -1127,14 +949,10 @@
         return `
           <tr>
             <td>${escapeHtml(row.id)}</td>
-            <td class="cell-name">
-              <div class="item-main">
-                <div>
-                  <div class="item-name">${escapeHtml(row.name)}</div>
-                  <div class="item-sub">${escapeHtml([row.category, row.brand].filter(Boolean).join(" / ") || "Фабрика и артикул фабрики не заполнены")}</div>
-                  <div class="item-sub">${escapeHtml(row.description || "")}</div>
-                </div>
-              </div>
+            <td>
+              <div class="item-name">${escapeHtml(row.name)}</div>
+              <div class="item-sub">${escapeHtml([row.category, row.brand].filter(Boolean).join(" / ") || "Фабрика и артикул фабрики не заполнены")}</div>
+              <div class="item-sub">${escapeHtml(row.description || "")}</div>
             </td>
             <td>${escapeHtml(row.sku)}</td>
             <td>${escapeHtml(row.barcode)}</td>
@@ -1216,11 +1034,10 @@
         const unit = (els.unit.value || "").trim() || "pcs";
         const description = (els.description.value || "").trim();
 
-        const weight_grams = readOptionalNumber(els.weightGrams.value);
+        const weight_kg = readOptionalNumber(els.weightKg.value);
         const length_cm = readOptionalNumber(els.lengthCm.value);
         const width_cm = readOptionalNumber(els.widthCm.value);
         const height_cm = readOptionalNumber(els.heightCm.value);
-        const volume_ml = computeVolumeMl(length_cm, width_cm, height_cm);
 
         if (!name) {
           throw new Error(i18n.t("items.nameRequired"));
@@ -1234,14 +1051,14 @@
           throw new Error(i18n.t("items.salePriceInvalid"));
         }
 
-        for (const [value, key] of [
-          [weight_grams, "items.weightInvalid"],
-          [length_cm, "items.lengthInvalid"],
-          [width_cm, "items.widthInvalid"],
-          [height_cm, "items.heightInvalid"]
+        for (const [value, message] of [
+          [weight_kg, "Вес коробки должен быть 0 или больше"],
+          [length_cm, "Длина коробки должна быть 0 или больше"],
+          [width_cm, "Ширина коробки должна быть 0 или больше"],
+          [height_cm, "Высота коробки должна быть 0 или больше"]
         ]) {
           if (value !== null && value < 0) {
-            throw new Error(i18n.t(key));
+            throw new Error(message);
           }
         }
 
@@ -1256,8 +1073,7 @@
           purchase_price,
           sale_price,
           description: description || null,
-          weight_grams,
-          volume_ml,
+          weight_kg,
           length_cm,
           width_cm,
           height_cm
@@ -1285,11 +1101,8 @@
     function bindEvents() {
       els.itemForm.addEventListener("submit", handleSubmit);
       els.searchInput.addEventListener("input", renderTable);
-      [els.name, els.brand, els.category, els.purchasePrice, els.salePrice, els.weightGrams, els.lengthCm, els.widthCm, els.heightCm].forEach((node) => {
-        node.addEventListener("input", () => {
-          updateVolumeDisplay();
-          renderPreview();
-        });
+      [els.weightKg, els.lengthCm, els.widthCm, els.heightCm].forEach((node) => {
+        node.addEventListener("input", updateVolumeDisplay);
       });
       els.cancelEditBtn.addEventListener("click", resetForm);
       els.refreshBtn.addEventListener("click", loadData);
@@ -1298,7 +1111,6 @@
         i18n.applyTranslations();
         syncFormTexts();
         renderTable();
-        renderPreview();
         restoreStatusesAfterLanguageChange();
       });
     }
@@ -1310,7 +1122,6 @@
       bindEvents();
       syncFormTexts();
       updateVolumeDisplay();
-      renderPreview();
       loadData();
     }
 
