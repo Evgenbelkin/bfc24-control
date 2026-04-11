@@ -522,9 +522,13 @@
           </div>
 
           <div class="field full">
-            <label for="description" data-i18n="items.descriptionLabel">Описание</label>
-            <textarea id="description" data-i18n-placeholder="items.descriptionPlaceholder" placeholder="Краткое описание товара"></textarea>
-          </div>
+  <label>Фото товара</label>
+  <input id="imageInput" type="file" accept="image/*" />
+
+  <div id="imagePreviewWrap" style="margin-top:10px; display:none;">
+    <img id="imagePreview" style="max-width:150px; border-radius:8px; border:1px solid #ddd;" />
+  </div>
+</div>
 
           <div class="field full">
             <label for="imageFile">Фото товара</label>
