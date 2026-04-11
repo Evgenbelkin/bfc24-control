@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="turnover.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <meta
@@ -11,6 +11,7 @@
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
 
   <style>
     :root {
@@ -97,7 +98,41 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      align-items: center;
     }
+
+    #langSwitcher {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    #langSwitcher .btn-light {
+      min-height: 42px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.18s ease;
+      box-shadow: none;
+    }
+
+    #langSwitcher .btn-light:hover {
+      background: #f8fafc;
+      color: var(--text);
+    }
+
+    #langSwitcher .btn-light.active {
+      background: rgba(37, 99, 235, 0.08);
+      color: var(--brand);
+      border-color: rgba(37, 99, 235, 0.30);
+    }
+
 
     .btn {
       appearance: none;
@@ -738,68 +773,70 @@
   <div class="page">
     <div class="topbar">
       <div class="topbar-left">
-        <h1 class="title">Оборачиваемость</h1>
-        <p class="subtitle">
+        <h1 class="title" data-i18n="turnover.title">Оборачиваемость</h1>
+        <p class="subtitle" data-i18n="turnover.subtitle">
           Контроль залеживания, скорости продаж и замороженных денег в остатках
         </p>
       </div>
 
       <div class="topbar-actions">
-        <a class="btn secondary" href="/analytics.html">Назад в аналитику</a>
-        <a class="btn ghost" href="/index.html">На главную</a>
+        <div id="langSwitcher"></div>
+        <a class="btn secondary" href="/analytics.html" data-i18n="turnover.backToAnalytics">Назад в аналитику</a>
+        <a class="btn ghost" href="/index.html" data-i18n="turnover.backHome">На главную</a>
       </div>
     </div>
 
     <div class="panel filters">
       <div class="filters-grid">
         <div class="field">
-          <label for="periodDays">Период, дней</label>
+          <label for="periodDays" data-i18n="turnover.periodDaysLabel">Период, дней</label>
           <select id="periodDays">
-            <option value="7">7 дней</option>
-            <option value="14">14 дней</option>
-            <option value="30" selected>30 дней</option>
-            <option value="60">60 дней</option>
-            <option value="90">90 дней</option>
-            <option value="180">180 дней</option>
-            <option value="365">365 дней</option>
+            <option value="7" data-i18n="turnover.period7">7 дней</option>
+            <option value="14" data-i18n="turnover.period14">14 дней</option>
+            <option value="30" selected data-i18n="turnover.period30">30 дней</option>
+            <option value="60" data-i18n="turnover.period60">60 дней</option>
+            <option value="90" data-i18n="turnover.period90">90 дней</option>
+            <option value="180" data-i18n="turnover.period180">180 дней</option>
+            <option value="365" data-i18n="turnover.period365">365 дней</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="search">Поиск</label>
+          <label for="search" data-i18n="turnover.searchLabel">Поиск</label>
           <input
             id="search"
             type="text"
+            data-i18n-placeholder="turnover.searchPlaceholder"
             placeholder="Название, SKU, штрихкод"
             autocomplete="off"
           />
         </div>
 
         <div class="field">
-          <label for="statusFilter">Статус</label>
+          <label for="statusFilter" data-i18n="turnover.statusFilterLabel">Статус</label>
           <select id="statusFilter">
-            <option value="all">Все</option>
-            <option value="healthy">Healthy</option>
-            <option value="warning">Warning</option>
-            <option value="risk">Risk</option>
-            <option value="critical">Critical</option>
-            <option value="stale_no_sales">Без продаж</option>
-            <option value="out_of_stock">Нет остатка</option>
+            <option value="all" data-i18n="turnover.statusAll">Все</option>
+            <option value="healthy" data-i18n="turnover.statusHealthy">Healthy</option>
+            <option value="warning" data-i18n="turnover.statusWarning">Warning</option>
+            <option value="risk" data-i18n="turnover.statusRisk">Risk</option>
+            <option value="critical" data-i18n="turnover.statusCritical">Critical</option>
+            <option value="stale_no_sales" data-i18n="turnover.statusStaleNoSales">Без продаж</option>
+            <option value="out_of_stock" data-i18n="turnover.statusOutOfStock">Нет остатка</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="yellowDays">Жёлтый порог</label>
+          <label for="yellowDays" data-i18n="turnover.yellowThresholdLabel">Жёлтый порог</label>
           <input id="yellowDays" type="number" min="1" step="1" value="30" />
         </div>
 
         <div class="field">
-          <label for="orangeDays">Оранжевый порог</label>
+          <label for="orangeDays" data-i18n="turnover.orangeThresholdLabel">Оранжевый порог</label>
           <input id="orangeDays" type="number" min="1" step="1" value="60" />
         </div>
 
         <div class="field">
-          <label for="redDays">Красный порог</label>
+          <label for="redDays" data-i18n="turnover.redThresholdLabel">Красный порог</label>
           <input id="redDays" type="number" min="1" step="1" value="90" />
         </div>
 
@@ -807,110 +844,110 @@
           <label>&nbsp;</label>
           <div class="checkbox-wrap">
             <input id="includeZero" type="checkbox" />
-            <span>Показывать нулевые остатки</span>
+            <span data-i18n="turnover.includeZeroLabel">Показывать нулевые остатки</span>
           </div>
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
           <div class="filters-actions">
-            <button id="applyBtn" class="btn">Обновить</button>
-            <button id="resetBtn" class="btn secondary" type="button">Сбросить</button>
-            <button id="csvBtn" class="btn ghost" type="button">CSV</button>
+            <button id="applyBtn" class="btn" data-i18n="turnover.refreshButton">Обновить</button>
+            <button id="resetBtn" class="btn secondary" type="button" data-i18n="turnover.resetButton">Сбросить</button>
+            <button id="csvBtn" class="btn ghost" type="button" data-i18n="turnover.csvButton">CSV</button>
           </div>
         </div>
       </div>
 
       <div class="quick-filters-panel">
-        <div class="quick-filters-label">Быстрые фильтры</div>
-        <button type="button" class="btn quick active" data-quick-filter="all">Все</button>
-        <button type="button" class="btn quick" data-quick-filter="stale_no_sales">Без продаж</button>
-        <button type="button" class="btn quick" data-quick-filter="critical">Критичные</button>
-        <button type="button" class="btn quick" data-quick-filter="risk">Рисковые</button>
-        <button type="button" class="btn quick" data-quick-filter="with_stock">С остатком</button>
+        <div class="quick-filters-label" data-i18n="turnover.quickFiltersLabel">Быстрые фильтры</div>
+        <button type="button" class="btn quick active" data-quick-filter="all" data-i18n="turnover.quickAll">Все</button>
+        <button type="button" class="btn quick" data-quick-filter="stale_no_sales" data-i18n="turnover.quickNoSales">Без продаж</button>
+        <button type="button" class="btn quick" data-quick-filter="critical" data-i18n="turnover.quickCritical">Критичные</button>
+        <button type="button" class="btn quick" data-quick-filter="risk" data-i18n="turnover.quickRisk">Рисковые</button>
+        <button type="button" class="btn quick" data-quick-filter="with_stock" data-i18n="turnover.quickWithStock">С остатком</button>
       </div>
     </div>
 
     <div class="summary">
       <div class="card stock">
-        <div class="label">Товаров в выборке</div>
+        <div class="label" data-i18n="turnover.summaryItemsLabel">Товаров в выборке</div>
         <div class="value" id="sumItems">0</div>
-        <div class="hint" id="sumPeriodHint">Период: 30 дней</div>
+        <div class="hint" id="sumPeriodHint" data-i18n="turnover.summaryPeriodHintStatic">Период: 30 дней</div>
       </div>
 
       <div class="card stock">
-        <div class="label">Остаток, шт</div>
+        <div class="label" data-i18n="turnover.summaryQtyLabel">Остаток, шт</div>
         <div class="value" id="sumQty">0</div>
-        <div class="hint">Суммарный остаток по товарам</div>
+        <div class="hint" data-i18n="turnover.summaryQtyHint">Суммарный остаток по товарам</div>
       </div>
 
       <div class="card stock">
-        <div class="label">Стоимость остатка</div>
+        <div class="label" data-i18n="turnover.summaryCostLabel">Стоимость остатка</div>
         <div class="value" id="sumCost">0 ₽</div>
-        <div class="hint">По партиям FIFO / fallback на закупку</div>
+        <div class="hint" data-i18n="turnover.summaryCostHint">По партиям FIFO / fallback на закупку</div>
       </div>
 
       <div class="card stock">
-        <div class="label">Потенциальная выручка</div>
+        <div class="label" data-i18n="turnover.summaryRevenueLabel">Потенциальная выручка</div>
         <div class="value" id="sumRevenue">0 ₽</div>
-        <div class="hint">Если продать весь текущий остаток</div>
+        <div class="hint" data-i18n="turnover.summaryRevenueHint">Если продать весь текущий остаток</div>
       </div>
 
       <div class="card stock">
-        <div class="label">Потенциальная прибыль</div>
+        <div class="label" data-i18n="turnover.summaryProfitLabel">Потенциальная прибыль</div>
         <div class="value" id="sumProfit">0 ₽</div>
-        <div class="hint">Выручка минус стоимость остатка</div>
+        <div class="hint" data-i18n="turnover.summaryProfitHint">Выручка минус стоимость остатка</div>
       </div>
     </div>
 
     <div class="status-row">
       <div class="mini-card ok">
-        <div class="mini-title">Healthy</div>
+        <div class="mini-title" data-i18n="turnover.statusHealthy">Healthy</div>
         <div class="mini-value" id="healthyCount">0</div>
       </div>
 
       <div class="mini-card warning">
-        <div class="mini-title">Warning</div>
+        <div class="mini-title" data-i18n="turnover.statusWarning">Warning</div>
         <div class="mini-value" id="warningCount">0</div>
       </div>
 
       <div class="mini-card risk">
-        <div class="mini-title">Risk</div>
+        <div class="mini-title" data-i18n="turnover.statusRisk">Risk</div>
         <div class="mini-value" id="riskCount">0</div>
       </div>
 
       <div class="mini-card critical">
-        <div class="mini-title">Critical</div>
+        <div class="mini-title" data-i18n="turnover.statusCritical">Critical</div>
         <div class="mini-value" id="criticalCount">0</div>
       </div>
 
       <div class="mini-card stale">
-        <div class="mini-title">Без продаж</div>
+        <div class="mini-title" data-i18n="turnover.statusStaleNoSales">Без продаж</div>
         <div class="mini-value" id="staleCount">0</div>
       </div>
 
       <div class="mini-card out">
-        <div class="mini-title">Нет остатка</div>
+        <div class="mini-title" data-i18n="turnover.statusOutOfStock">Нет остатка</div>
         <div class="mini-value" id="outCount">0</div>
       </div>
     </div>
 
     <div class="charts-grid">
       <div class="panel chart-panel">
-        <div class="chart-title">Распределение по статусам</div>
-        <div class="chart-subtitle">Статусы считаются по текущей отфильтрованной выборке</div>
+        <div class="chart-title" data-i18n="turnover.chartStatusTitle">Распределение по статусам</div>
+        <div class="chart-subtitle" data-i18n="turnover.chartStatusSubtitle">Статусы считаются по текущей отфильтрованной выборке</div>
         <div id="statusChart" class="status-chart"></div>
       </div>
 
       <div class="panel chart-panel">
-        <div class="chart-title">Топ по стоимости остатка</div>
-        <div class="chart-subtitle">Где сейчас заморожено больше всего денег</div>
+        <div class="chart-title" data-i18n="turnover.chartStockCostTitle">Топ по стоимости остатка</div>
+        <div class="chart-subtitle" data-i18n="turnover.chartStockCostSubtitle">Где сейчас заморожено больше всего денег</div>
         <div id="stockCostChart" class="bar-list"></div>
       </div>
 
       <div class="panel chart-panel">
-        <div class="chart-title">Топ по потенциальной прибыли</div>
-        <div class="chart-subtitle">Какие товары дают наибольший потенциал прибыли</div>
+        <div class="chart-title" data-i18n="turnover.chartProfitTitle">Топ по потенциальной прибыли</div>
+        <div class="chart-subtitle" data-i18n="turnover.chartProfitSubtitle">Какие товары дают наибольший потенциал прибыли</div>
         <div id="profitChart" class="bar-list"></div>
       </div>
     </div>
@@ -918,49 +955,49 @@
     <div class="panel table-panel">
       <div class="table-head">
         <div>
-          <div class="table-title">Таблица оборачиваемости</div>
-          <div class="table-meta" id="tableMeta">Загрузка данных…</div>
+          <div class="table-title" data-i18n="turnover.tableTitle">Таблица оборачиваемости</div>
+          <div class="table-meta" id="tableMeta" data-i18n="turnover.tableMetaLoading">Загрузка данных…</div>
         </div>
       </div>
 
       <div class="table-wrap">
-        <div id="stateBox" class="loading">Загрузка…</div>
+        <div id="stateBox" class="loading" data-i18n="turnover.tableLoading">Загрузка…</div>
 
         <table id="turnoverTable" style="display:none;">
           <thead>
             <tr>
               <th class="sortable" data-sort-key="name">
-                <span class="sort-head">Товар <span class="sort-indicator" data-sort-indicator="name"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tableItem">Товар</span> <span class="sort-indicator" data-sort-indicator="name"></span></span>
               </th>
               <th class="sortable" data-sort-key="turnover_status">
-                <span class="sort-head">Статус <span class="sort-indicator" data-sort-indicator="turnover_status"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tableStatus">Статус</span> <span class="sort-indicator" data-sort-indicator="turnover_status"></span></span>
               </th>
               <th class="sortable" data-sort-key="qty_on_hand">
-                <span class="sort-head">Остаток <span class="sort-indicator" data-sort-indicator="qty_on_hand"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tableQty">Остаток</span> <span class="sort-indicator" data-sort-indicator="qty_on_hand"></span></span>
               </th>
               <th class="sortable" data-sort-key="sold_qty_period">
-                <span class="sort-head">Продано за период <span class="sort-indicator" data-sort-indicator="sold_qty_period"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tableSoldPeriod">Продано за период</span> <span class="sort-indicator" data-sort-indicator="sold_qty_period"></span></span>
               </th>
               <th class="sortable" data-sort-key="avg_daily_sales">
-                <span class="sort-head">Среднее в день <span class="sort-indicator" data-sort-indicator="avg_daily_sales"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tableAvgDaily">Среднее в день</span> <span class="sort-indicator" data-sort-indicator="avg_daily_sales"></span></span>
               </th>
               <th class="sortable" data-sort-key="days_on_hand">
-                <span class="sort-head">Дней остатка <span class="sort-indicator" data-sort-indicator="days_on_hand"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tableDaysOnHand">Дней остатка</span> <span class="sort-indicator" data-sort-indicator="days_on_hand"></span></span>
               </th>
               <th class="sortable" data-sort-key="purchase_price">
-                <span class="sort-head">Закупка <span class="sort-indicator" data-sort-indicator="purchase_price"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tablePurchase">Закупка</span> <span class="sort-indicator" data-sort-indicator="purchase_price"></span></span>
               </th>
               <th class="sortable" data-sort-key="sale_price">
-                <span class="sort-head">Продажа <span class="sort-indicator" data-sort-indicator="sale_price"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tableSale">Продажа</span> <span class="sort-indicator" data-sort-indicator="sale_price"></span></span>
               </th>
               <th class="sortable" data-sort-key="stock_cost_total">
-                <span class="sort-head">Стоимость остатка <span class="sort-indicator" data-sort-indicator="stock_cost_total"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tableStockCost">Стоимость остатка</span> <span class="sort-indicator" data-sort-indicator="stock_cost_total"></span></span>
               </th>
               <th class="sortable" data-sort-key="potential_revenue">
-                <span class="sort-head">Потенц. выручка <span class="sort-indicator" data-sort-indicator="potential_revenue"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tablePotentialRevenue">Потенц. выручка</span> <span class="sort-indicator" data-sort-indicator="potential_revenue"></span></span>
               </th>
               <th class="sortable" data-sort-key="potential_profit">
-                <span class="sort-head">Потенц. прибыль <span class="sort-indicator" data-sort-indicator="potential_profit"></span></span>
+                <span class="sort-head"><span data-i18n="turnover.tablePotentialProfit">Потенц. прибыль</span> <span class="sort-indicator" data-sort-indicator="potential_profit"></span></span>
               </th>
             </tr>
           </thead>
@@ -969,7 +1006,7 @@
       </div>
     </div>
 
-    <div class="footer-note">
+    <div class="footer-note" data-i18n="turnover.footerNote">
       Логика статусов: healthy / warning / risk / critical рассчитываются по количеству дней остатка.
       Если продаж за выбранный период не было, товар уходит в статус «Без продаж».
       Если остаток равен 0 — в статус «Нет остатка».
@@ -1035,6 +1072,27 @@
         stockCostChart: document.getElementById("stockCostChart"),
         profitChart: document.getElementById("profitChart")
       };
+
+
+      function t(path, fallback) {
+        return window.i18n ? window.i18n.t(path, fallback) : (fallback || path);
+      }
+
+      function tf(path, params, fallback) {
+        return window.i18n ? window.i18n.format(path, params, fallback) : (fallback || path);
+      }
+
+      function getCurrentLang() {
+        return window.i18n ? window.i18n.getLang() : "ru";
+      }
+
+      function getIntlLocale() {
+        return getCurrentLang() === "en"
+          ? "en-US"
+          : getCurrentLang() === "zh"
+            ? "zh-CN"
+            : "ru-RU";
+      }
 
       function getToken() {
         try {
@@ -1105,12 +1163,12 @@
         if (window.translateError) return window.translateError(raw);
 
         const map = {
-          unauthorized: "Сессия истекла или нет доступа",
-          forbidden: "Недостаточно прав",
-          tenant_id_required: "Не найден tenant_id",
-          internal_error: "Внутренняя ошибка сервера",
-          request_failed: "Ошибка запроса",
-          unknown_error: "Неизвестная ошибка"
+          unauthorized: t("turnover.errorUnauthorized", "Сессия истекла или нет доступа"),
+          forbidden: t("turnover.errorForbidden", "Недостаточно прав"),
+          tenant_id_required: t("turnover.errorTenantRequired", "Не найден tenant_id"),
+          internal_error: t("turnover.errorInternal", "Внутренняя ошибка сервера"),
+          request_failed: t("turnover.errorRequestFailed", "Ошибка запроса"),
+          unknown_error: t("turnover.errorUnknown", "Неизвестная ошибка")
         };
 
         return map[raw] || raw;
@@ -1118,7 +1176,7 @@
 
       function formatNumber(value, fractionDigits = 0) {
         const num = Number(value || 0);
-        return new Intl.NumberFormat("ru-RU", {
+        return new Intl.NumberFormat(getIntlLocale(), {
           minimumFractionDigits: fractionDigits,
           maximumFractionDigits: fractionDigits
         }).format(num);
@@ -1126,7 +1184,7 @@
 
       function formatMoney(value) {
         const num = Number(value || 0);
-        return new Intl.NumberFormat("ru-RU", {
+        return new Intl.NumberFormat(getIntlLocale(), {
           style: "currency",
           currency: "RUB",
           maximumFractionDigits: 0
@@ -1137,7 +1195,7 @@
         if (value === null || value === undefined || value === "") return "—";
         const num = Number(value);
         if (!Number.isFinite(num)) return "—";
-        return new Intl.NumberFormat("ru-RU", {
+        return new Intl.NumberFormat(getIntlLocale(), {
           minimumFractionDigits: 0,
           maximumFractionDigits: digits
         }).format(num);
@@ -1146,19 +1204,19 @@
       function statusLabel(code) {
         switch (code) {
           case "healthy":
-            return "Healthy";
+            return t("turnover.statusHealthy", "Healthy");
           case "warning":
-            return "Warning";
+            return t("turnover.statusWarning", "Warning");
           case "risk":
-            return "Risk";
+            return t("turnover.statusRisk", "Risk");
           case "critical":
-            return "Critical";
+            return t("turnover.statusCritical", "Critical");
           case "stale_no_sales":
-            return "Без продаж";
+            return t("turnover.statusStaleNoSales", "Без продаж");
           case "out_of_stock":
-            return "Нет остатка";
+            return t("turnover.statusOutOfStock", "Нет остатка");
           case "no_sales":
-            return "Нет продаж";
+            return t("turnover.statusNoSales", "Нет продаж");
           default:
             return code || "—";
         }
@@ -1263,7 +1321,7 @@
         els.sumCost.textContent = formatMoney(summary.total_stock_cost || 0);
         els.sumRevenue.textContent = formatMoney(summary.total_potential_revenue || 0);
         els.sumProfit.textContent = formatMoney(summary.total_potential_profit || 0);
-        els.sumPeriodHint.textContent = `Период: ${state.periodDays} дней`;
+        els.sumPeriodHint.textContent = tf("turnover.summaryPeriodHint", { days: state.periodDays }, `Период: ${state.periodDays} дней`);
 
         els.healthyCount.textContent = formatNumber(summary.healthy_count || 0);
         els.warningCount.textContent = formatNumber(summary.warning_count || 0);
@@ -1381,7 +1439,7 @@
 
         els.statusChart.innerHTML = rows.length
           ? html
-          : `<div class="chart-empty">Нет данных для графика</div>`;
+          : `<div class="chart-empty">${escapeHtml(t("turnover.chartEmpty", "Нет данных для графика"))}</div>`;
       }
 
       function renderBarChart(container, rows, valueKey, fillClass, emptyText) {
@@ -1426,14 +1484,14 @@
           rows,
           "stock_cost_total",
           "",
-          "Нет данных по стоимости остатка"
+          t("turnover.chartEmptyStockCost", "Нет данных по стоимости остатка")
         );
         renderBarChart(
           els.profitChart,
           rows,
           "potential_profit",
           "profit",
-          "Нет данных по потенциальной прибыли"
+          t("turnover.chartEmptyProfit", "Нет данных по потенциальной прибыли")
         );
       }
 
@@ -1442,8 +1500,8 @@
           els.table.style.display = "none";
           els.stateBox.style.display = "block";
           els.stateBox.className = "empty";
-          els.stateBox.textContent = "Нет данных по выбранным фильтрам";
-          els.tableMeta.textContent = "0 строк";
+          els.stateBox.textContent = t("turnover.noDataFilters", "Нет данных по выбранным фильтрам");
+          els.tableMeta.textContent = t("turnover.tableMetaZero", "0 строк");
           renderCharts([]);
           return;
         }
@@ -1452,8 +1510,8 @@
           const statusCls = getStatusClass(row.turnover_status);
           const rowCls = getRowClass(row.turnover_status);
           const unit = row.unit ? ` • ${escapeHtml(row.unit)}` : "";
-          const sku = row.sku ? `SKU: ${escapeHtml(row.sku)}` : "SKU: —";
-          const barcode = row.barcode ? `ШК: ${escapeHtml(row.barcode)}` : "ШК: —";
+          const sku = row.sku ? `${t("turnover.skuPrefix", "SKU")}: ${escapeHtml(row.sku)}` : `${t("turnover.skuPrefix", "SKU")}: —`;
+          const barcode = row.barcode ? `${t("turnover.barcodePrefix", "ШК")}: ${escapeHtml(row.barcode)}` : `${t("turnover.barcodePrefix", "ШК")}: —`;
 
           return `
             <tr class="${rowCls}">
@@ -1484,27 +1542,31 @@
         els.stateBox.style.display = "none";
         els.table.style.display = "table";
         els.tableMeta.textContent =
-          `Строк: ${formatNumber(rows.length)} • ` +
-          `Период: ${state.periodDays} дней • ` +
-          `Пороги: ${state.thresholds.yellow_days}/${state.thresholds.orange_days}/${state.thresholds.red_days} • ` +
-          `Сортировка: ${getSortLabel()}`;
+          tf("turnover.tableMetaValue", {
+            rows: formatNumber(rows.length),
+            days: state.periodDays,
+            yellow: state.thresholds.yellow_days,
+            orange: state.thresholds.orange_days,
+            red: state.thresholds.red_days,
+            sort: getSortLabel()
+          }, `Строк: ${formatNumber(rows.length)} • Период: ${state.periodDays} дней • Пороги: ${state.thresholds.yellow_days}/${state.thresholds.orange_days}/${state.thresholds.red_days} • Сортировка: ${getSortLabel()}`);
 
         renderCharts(rows);
       }
 
       function getSortLabel() {
         const labels = {
-          name: "товар",
-          turnover_status: "статус",
-          qty_on_hand: "остаток",
-          sold_qty_period: "продано",
-          avg_daily_sales: "среднее в день",
-          days_on_hand: "дней остатка",
-          purchase_price: "закупка",
-          sale_price: "продажа",
-          stock_cost_total: "стоимость остатка",
-          potential_revenue: "потенц. выручка",
-          potential_profit: "потенц. прибыль"
+          name: t("turnover.sortItem", "товар"),
+          turnover_status: t("turnover.sortStatus", "статус"),
+          qty_on_hand: t("turnover.sortQty", "остаток"),
+          sold_qty_period: t("turnover.sortSold", "продано"),
+          avg_daily_sales: t("turnover.sortAvgDaily", "среднее в день"),
+          days_on_hand: t("turnover.sortDays", "дней остатка"),
+          purchase_price: t("turnover.sortPurchase", "закупка"),
+          sale_price: t("turnover.sortSale", "продажа"),
+          stock_cost_total: t("turnover.sortStockCost", "стоимость остатка"),
+          potential_revenue: t("turnover.sortPotentialRevenue", "потенц. выручка"),
+          potential_profit: t("turnover.sortPotentialProfit", "потенц. прибыль")
         };
 
         const dir = state.sort.dir === "asc" ? "↑" : "↓";
@@ -1516,13 +1578,13 @@
         els.stateBox.style.display = "block";
         els.stateBox.className = "error";
         els.stateBox.textContent = message;
-        els.tableMeta.textContent = "Ошибка загрузки";
+        els.tableMeta.textContent = t("turnover.errorLoading", "Ошибка загрузки");
         renderCharts([]);
       }
 
       async function loadData() {
         try {
-          setLoading(true, "Загрузка оборачиваемости…");
+          setLoading(true, t("turnover.loadingTurnover", "Загрузка оборачиваемости…"));
 
           const data = await apiGet(buildQuery());
 
@@ -1565,26 +1627,26 @@
       function exportCsv() {
         const rows = state.filteredRows || [];
         if (!rows.length) {
-          alert("Нет данных для экспорта");
+          alert(t("turnover.noDataExport", "Нет данных для экспорта"));
           return;
         }
 
         const headers = [
-          "ID",
-          "Товар",
-          "SKU",
-          "Штрихкод",
-          "Ед.",
-          "Статус",
-          "Остаток",
-          "Продано за период",
-          "Среднее в день",
-          "Дней остатка",
-          "Закупка",
-          "Продажа",
-          "Стоимость остатка",
-          "Потенциальная выручка",
-          "Потенциальная прибыль"
+          t("turnover.csvId", "ID"),
+          t("turnover.csvItem", "Товар"),
+          t("turnover.csvSku", "SKU"),
+          t("turnover.csvBarcode", "Штрихкод"),
+          t("turnover.csvUnit", "Ед."),
+          t("turnover.csvStatus", "Статус"),
+          t("turnover.csvQty", "Остаток"),
+          t("turnover.csvSoldPeriod", "Продано за период"),
+          t("turnover.csvAvgDaily", "Среднее в день"),
+          t("turnover.csvDaysOnHand", "Дней остатка"),
+          t("turnover.csvPurchase", "Закупка"),
+          t("turnover.csvSale", "Продажа"),
+          t("turnover.csvStockCost", "Стоимость остатка"),
+          t("turnover.csvPotentialRevenue", "Потенциальная выручка"),
+          t("turnover.csvPotentialProfit", "Потенциальная прибыль")
         ];
 
         const lines = rows.map((row) => [
@@ -1618,7 +1680,7 @@
         const m = String(now.getMonth() + 1).padStart(2, "0");
         const d = String(now.getDate()).padStart(2, "0");
         a.href = url;
-        a.download = `turnover_${y}-${m}-${d}.csv`;
+        a.download = `${t("turnover.csvFilePrefix", "turnover")}_${y}-${m}-${d}.csv`;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -1688,6 +1750,30 @@
         });
       }
 
+
+      function applyI18n() {
+        if (window.i18n) {
+          window.i18n.applyTranslations();
+          window.i18n.renderLanguageSwitcher("langSwitcher");
+        }
+      }
+
+      function rerenderAfterLanguageChange() {
+        applyI18n();
+        if (state.summary) renderSummary(state.summary);
+        if (state.rows && state.rows.length) {
+          applyClientFilters();
+          renderRows(state.filteredRows);
+          syncSortIndicators();
+        } else if (state.loading) {
+          els.stateBox.textContent = t("turnover.tableLoading", "Загрузка…");
+          els.tableMeta.textContent = t("turnover.tableMetaLoading", "Загрузка данных…");
+        } else {
+          renderRows([]);
+          syncSortIndicators();
+        }
+      }
+
       function redirectToLoginIfNeeded() {
         const token = getToken();
         if (!token) {
@@ -1699,6 +1785,8 @@
 
       function init() {
         if (redirectToLoginIfNeeded()) return;
+        applyI18n();
+        document.addEventListener("app:language-changed", rerenderAfterLanguageChange);
         syncQuickButtons();
         syncSortIndicators();
         bindEvents();
