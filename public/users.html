@@ -349,6 +349,50 @@
       border:1px solid #e5e7eb;
     }
 
+    .modules-box{
+      margin-top: 4px;
+      border:1px solid #e8edf4;
+      background:#f8fafc;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .modules-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px 14px;
+      margin-top:10px;
+    }
+
+    .module-option{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:10px 12px;
+      background:#fff;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+    }
+
+    .module-option input{
+      width:18px;
+      height:18px;
+      margin-top:1px;
+      flex-shrink:0;
+    }
+
+    .module-option span{
+      font-size:14px;
+      line-height:1.35;
+      color:var(--text);
+    }
+
+    .modules-badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+
     @media (max-width: 900px){
       .form-grid,
       .stats,
@@ -421,6 +465,12 @@
             <label for="password" data-i18n="users.passwordLabel">Пароль</label>
             <input id="password" type="password" data-i18n-placeholder="users.passwordPlaceholder" placeholder="Пароль нового пользователя" autocomplete="new-password" />
             <div class="helper" id="passwordHelper" data-i18n="users.passwordHelper">Обязателен при создании. При редактировании — оставьте пустым, чтобы не менять.</div>
+            <div class="field full">
+            <label>Доступные модули</label>
+            <div class="modules-box">
+              <div class="helper">Отметь только те модули, которые должен видеть и использовать сотрудник.</div>
+              <div class="modules-grid" id="modulesGrid"></div>
+            </div>
           </div>
         </div>
 
@@ -455,13 +505,14 @@
               <th data-i18n="users.tableRole">Роль</th>
               <th data-i18n="users.tableActive">Активен</th>
               <th data-i18n="users.tableBlocked">Заблокирован</th>
+              <th>Модули</th>
               <th data-i18n="users.tableLastLogin">Последний вход</th>
               <th data-i18n="users.tableActions">Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="8" class="empty" data-i18n="users.loadingData">Загрузка данных...</td>
+              <td colspan="9" class="empty" data-i18n="users.loadingData">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -590,6 +641,7 @@
       username:     document.getElementById("username"),
       fullName:     document.getElementById("fullName"),
       password:     document.getElementById("password"),
+      modulesGrid:  document.getElementById("modulesGrid"),
       searchInput:  document.getElementById("searchInput"),
       saveBtn:      document.getElementById("saveBtn"),
       cancelEditBtn:document.getElementById("cancelEditBtn"),
@@ -707,12 +759,90 @@
     async function apiPut(path, body)  { return ApiBridge.put(path, body); }
     async function apiPatch(path, body){ return ApiBridge.patch(path, body); }
 
+
+    const AVAILABLE_MODULES = [
+      { code: "items",     label: "Товары" },
+      { code: "locations", label: "Места хранения" },
+      { code: "clients",   label: "Клиенты" },
+      { code: "stock",     label: "Остатки" },
+      { code: "movements", label: "Движения" },
+      { code: "incoming",  label: "Приёмка" },
+      { code: "sales",     label: "Продажи" },
+      { code: "writeoff",  label: "Списание" },
+      { code: "cash",      label: "Деньги" },
+      { code: "expenses",  label: "Расходы" },
+      { code: "analytics", label: "Аналитика" },
+      { code: "turnover",  label: "Оборачиваемость" },
+      { code: "debts",     label: "Долги клиентов" },
+      { code: "users",     label: "Пользователи" }
+    ];
+
+    function normalizeModules(value) {
+      let source = value;
+
+      if (typeof source === "string") {
+        try {
+          source = JSON.parse(source);
+        } catch (_) {
+          source = [];
+        }
+      }
+
+      if (!Array.isArray(source)) return [];
+
+      const allowed = new Set(AVAILABLE_MODULES.map((item) => item.code));
+
+      return Array.from(new Set(
+        source
+          .map((item) => String(item || "").trim())
+          .filter((item) => allowed.has(item))
+      ));
+    }
+
+    function getSelectedModules() {
+      return Array.from(document.querySelectorAll('input[name="userModule"]:checked'))
+        .map((node) => node.value);
+    }
+
+    function setSelectedModules(modules) {
+      const selected = new Set(normalizeModules(modules));
+      document.querySelectorAll('input[name="userModule"]').forEach((node) => {
+        node.checked = selected.has(node.value);
+      });
+    }
+
+    function renderModulesGrid() {
+      if (!els.modulesGrid) return;
+      els.modulesGrid.innerHTML = AVAILABLE_MODULES.map((item) => `
+        <label class="module-option">
+          <input type="checkbox" name="userModule" value="${escapeHtml(item.code)}" />
+          <span>${escapeHtml(item.label)}</span>
+        </label>
+      `).join("");
+    }
+
+    function renderModulesBadges(modules) {
+      const normalized = normalizeModules(modules);
+      if (!normalized.length) {
+        return `<span class="badge badge-muted">Нет модулей</span>`;
+      }
+
+      return `<div class="modules-badges">${
+        normalized.map((code) => {
+          const found = AVAILABLE_MODULES.find((item) => item.code === code);
+          const text = found ? found.label : code;
+          return `<span class="badge badge-success">${escapeHtml(text)}</span>`;
+        }).join("")
+      }</div>`;
+    }
+
     function normalizeUser(row) {
       return {
         id:            row.id,
         username:      row.username || "",
         full_name:     row.full_name || "",
         role:          row.role || "",
+        modules:       normalizeModules(row.modules),
         is_active:     row.is_active === false ? false : true,
         is_blocked:    !!row.is_blocked,
         last_login_at: row.last_login_at || row.last_login || null
@@ -750,6 +880,7 @@
       els.username.value  = "";
       els.fullName.value  = "";
       els.password.value  = "";
+      setSelectedModules([]);
       els.username.removeAttribute("readonly");
       clearSubmitStatus();
     }
@@ -761,6 +892,7 @@
       els.username.value  = user.username || "";
       els.fullName.value  = user.full_name || "";
       els.password.value  = "";
+      setSelectedModules(user.modules || []);
       els.username.setAttribute("readonly", "readonly");
       clearSubmitStatus();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -787,7 +919,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="8" class="empty">${escapeHtml(i18n.t("users.noData"))}</td>
+            <td colspan="9" class="empty">${escapeHtml(i18n.t("users.noData"))}</td>
           </tr>
         `;
         return;
@@ -821,6 +953,7 @@
             <td>${escapeHtml(mapRole(row.role))}</td>
             <td>${activeBadge}</td>
             <td>${blockedBadge}</td>
+            <td>${renderModulesBadges(row.modules)}</td>
             <td>${escapeHtml(formatDate(row.last_login_at))}</td>
             <td>
               <div class="row-actions">
@@ -846,7 +979,7 @@
     function renderLoadErrorRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="8" class="empty">${escapeHtml(i18n.t("users.loadErrorRow"))}</td>
+          <td colspan="9" class="empty">${escapeHtml(i18n.t("users.loadErrorRow"))}</td>
         </tr>
       `;
     }
@@ -885,6 +1018,7 @@
         const username  = (els.username.value || "").trim();
         const fullName  = (els.fullName.value || "").trim();
         const password  = (els.password.value || "").trim();
+        const modules   = getSelectedModules();
 
         if (!fullName) {
           throw new Error(i18n.t("users.fullNameRequired"));
@@ -893,7 +1027,8 @@
         if (editId) {
           const body = {
             tenant_id: tenantId,
-            full_name: fullName
+            full_name: fullName,
+            modules
           };
 
           setSubmitStatus("users.savingUpdate", { id: editId }, "info");
@@ -918,7 +1053,8 @@
             username,
             full_name:  fullName,
             password,
-            role: "client"
+            role: "client",
+            modules
           };
 
           setSubmitStatus("users.savingCreate", {}, "info");
@@ -1011,6 +1147,7 @@
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
         syncFormTexts();
+        renderModulesGrid();
         renderTable();
         restoreStatusesAfterLanguageChange();
       });
@@ -1021,6 +1158,7 @@
       i18n.applyTranslations();
       i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
+      renderModulesGrid();
       syncFormTexts();
       loadData();
     }

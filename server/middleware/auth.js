@@ -58,6 +58,124 @@ async function loadUserAccess(userId) {
   };
 }
 
+const ALL_MODULE_CODES = [
+  "items",
+  "locations",
+  "clients",
+  "stock",
+  "movements",
+  "incoming",
+  "sales",
+  "writeoff",
+  "cash",
+  "expenses",
+  "analytics",
+  "turnover",
+  "debts",
+  "users"
+];
+
+const MODULE_PERMISSION_MAP = {
+  items: ["items.read", "items.create", "items.update", "items.delete"],
+  locations: ["locations.read", "locations.create", "locations.update", "locations.delete"],
+  clients: [],
+  stock: ["stock.read"],
+  movements: ["stock.read", "sales.read", "writeoff.read"],
+  incoming: ["items.read", "locations.read", "stock.read", "stock.incoming"],
+  sales: ["items.read", "locations.read", "stock.read", "sales.read", "sales.create"],
+  writeoff: ["items.read", "locations.read", "stock.read", "writeoff.read", "writeoff.create"],
+  cash: ["cash.read", "cash.create"],
+  expenses: ["cash.read"],
+  analytics: ["dashboard.read"],
+  turnover: ["dashboard.read"],
+  debts: ["debts.read", "debts.pay"],
+  users: ["users.read", "users.create", "users.update", "users.block"]
+};
+
+function normalizeModules(value) {
+  if (Array.isArray(value)) {
+    return Array.from(new Set(
+      value
+        .map((item) => String(item || "").trim())
+        .filter(Boolean)
+    ));
+  }
+
+  if (!value) return [];
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return normalizeModules(parsed);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+function deriveModulesFromAccess(user, access) {
+  const directModules = normalizeModules(user?.modules);
+  if (directModules.length) return directModules;
+
+  const rbacRoles = Array.isArray(access?.roles) ? access.roles : [];
+  if (user?.role === "owner" || rbacRoles.includes("tenant_owner") || rbacRoles.includes("tenant_admin")) {
+    return ALL_MODULE_CODES.slice();
+  }
+
+  const permissions = Array.isArray(access?.permissions) ? access.permissions : [];
+  const modules = new Set();
+
+  for (const code of permissions) {
+    const value = String(code || "").trim();
+
+    if (value.startsWith("items.")) modules.add("items");
+    if (value.startsWith("locations.")) modules.add("locations");
+    if (value.startsWith("stock.")) {
+      modules.add("stock");
+      if (value === "stock.incoming") modules.add("incoming");
+    }
+    if (value.startsWith("sales.")) modules.add("sales");
+    if (value.startsWith("writeoff.")) modules.add("writeoff");
+    if (value.startsWith("cash.")) modules.add("cash");
+    if (value.startsWith("debts.")) modules.add("debts");
+    if (value.startsWith("users.")) modules.add("users");
+    if (value === "dashboard.read") {
+      modules.add("analytics");
+      modules.add("turnover");
+      modules.add("movements");
+      modules.add("clients");
+      modules.add("expenses");
+    }
+  }
+
+  return Array.from(modules);
+}
+
+
+
+
+function resolveEffectivePermissions(user, access) {
+  const rbacRoles = Array.isArray(access?.roles) ? access.roles : [];
+  const basePermissions = Array.isArray(access?.permissions) ? access.permissions : [];
+  const directModules = normalizeModules(user?.modules);
+
+  if (!directModules.length || user?.role === "owner" || rbacRoles.includes("tenant_owner") || rbacRoles.includes("tenant_admin")) {
+    return basePermissions;
+  }
+
+  const merged = new Set();
+  for (const moduleCode of directModules) {
+    const permissions = MODULE_PERMISSION_MAP[moduleCode] || [];
+    for (const code of permissions) {
+      merged.add(code);
+    }
+  }
+
+  return Array.from(merged);
+}
+
 async function loadUserForAuth(userId) {
   const { rows } = await pool.query(
     `
@@ -72,6 +190,7 @@ async function loadUserForAuth(userId) {
         u.last_login_at,
         u.email,
         u.phone,
+        u.modules,
         t.name AS tenant_name,
         t.is_active AS tenant_is_active,
         t.is_blocked AS tenant_is_blocked,
@@ -244,11 +363,12 @@ function authRequired(req, res, next) {
         last_login_at: user.last_login_at,
         email: user.email || null,
         phone: user.phone || null,
+        modules: deriveModulesFromAccess(user, access),
         subscription_status: user.subscription_status || null,
         subscription_start_at: user.subscription_start_at || null,
         subscription_end_at: user.subscription_end_at || null,
         rbac_roles: access.roles,
-        permissions: access.permissions,
+        permissions: resolveEffectivePermissions(user, access),
         token_payload: payload,
       };
 
@@ -329,8 +449,43 @@ function requireRole(...allowedRoles) {
   };
 }
 
+
+function requireModuleAccess(...allowedModules) {
+  const modules = allowedModules
+    .flatMap((item) => Array.isArray(item) ? item : [item])
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+
+  return (req, res, next) => {
+    if (!req.user) {
+      return buildAuthError(res, 401, 'auth_required', 'Требуется авторизация');
+    }
+
+    if (!modules.length) {
+      return buildAuthError(res, 500, 'modules_not_configured', 'Не настроен список модулей');
+    }
+
+    if (req.user.role === 'owner' || req.user.hasRoleCode?.('tenant_owner') || req.user.hasRoleCode?.('tenant_admin')) {
+      return next();
+    }
+
+    const currentModules = Array.isArray(req.user.modules) ? req.user.modules : [];
+    const allowed = modules.some((code) => currentModules.includes(code));
+
+    if (!allowed) {
+      return buildAuthError(res, 403, 'module_denied', 'Нет доступа к модулю', {
+        required_modules: modules,
+        current_modules: currentModules,
+      });
+    }
+
+    return next();
+  };
+}
+
 module.exports = {
   authRequired,
   requireRole,
+  requireModuleAccess,
   getEffectiveTenantId,
 };

@@ -46,6 +46,45 @@ function parseIntOrNull(value) {
   return Number.isInteger(n) && n > 0 ? n : null;
 }
 
+const ALLOWED_MODULE_CODES = [
+  "items",
+  "locations",
+  "clients",
+  "stock",
+  "movements",
+  "incoming",
+  "sales",
+  "writeoff",
+  "cash",
+  "expenses",
+  "analytics",
+  "turnover",
+  "debts",
+  "users",
+];
+
+function normalizeModulesInput(value) {
+  let raw = value;
+
+  if (typeof raw === "string") {
+    try {
+      raw = JSON.parse(raw);
+    } catch (_) {
+      raw = [];
+    }
+  }
+
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+
+  return Array.from(new Set(
+    raw
+      .map((item) => String(item || "").trim())
+      .filter((item) => ALLOWED_MODULE_CODES.includes(item))
+  ));
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
    QUERY HELPER: загружает пользователя только внутри tenant
 ────────────────────────────────────────────────────────────────────────── */
@@ -61,6 +100,7 @@ async function getUserInTenant(userId, tenantId) {
         u.tenant_id,
         u.email,
         u.phone,
+        u.modules,
         u.is_active,
         u.is_blocked,
         u.last_login_at,
@@ -160,6 +200,7 @@ router.get(
           u.tenant_id,
           u.email,
           u.phone,
+          u.modules,
           u.is_active,
           u.is_blocked,
           u.last_login_at,
@@ -223,6 +264,7 @@ router.post(
       const username  = normalizeText(req.body.username);
       const password  = normalizeText(req.body.password);
       const fullName  = normalizeText(req.body.full_name);
+      const modules   = normalizeModulesInput(req.body.modules);
 
       /* Обязательные поля */
       if (!username) {
@@ -295,10 +337,11 @@ router.post(
             tenant_id,
             email,
             phone,
+            modules,
             is_active,
             is_blocked
           )
-          VALUES ($1,$2,$3,'client',$4,NULL,NULL,TRUE,FALSE)
+          VALUES ($1,$2,$3,'client',$4,NULL,NULL,$5::jsonb,TRUE,FALSE)
           RETURNING
             id,
             username,
@@ -307,13 +350,14 @@ router.post(
             tenant_id,
             email,
             phone,
+            modules,
             is_active,
             is_blocked,
             last_login_at,
             created_at,
             updated_at
         `,
-        [username, passwordHash, fullName, tenantId]
+        [username, passwordHash, fullName, tenantId, JSON.stringify(modules)]
       );
 
       const user = insertResult.rows[0];
@@ -342,7 +386,7 @@ router.post(
         entityId: user.id,
         entityLabel: user.username,
         tenantId,
-        details: { role: user.role },
+        details: { role: user.role, modules: user.modules || [] },
       });
 
       return res.status(201).json({
@@ -419,6 +463,7 @@ router.put(
       }
 
       const fullName = normalizeText(req.body.full_name, current.full_name);
+      const modules = req.body.modules === undefined ? normalizeModulesInput(current.modules) : normalizeModulesInput(req.body.modules);
 
       if (!fullName) {
         return res.status(400).json({
@@ -433,9 +478,10 @@ router.put(
           UPDATE saas.users
           SET
             full_name = $1,
+            modules = $2::jsonb,
             updated_at = NOW()
-          WHERE id = $2
-            AND tenant_id = $3
+          WHERE id = $3
+            AND tenant_id = $4
           RETURNING
             id,
             username,
@@ -444,13 +490,14 @@ router.put(
             tenant_id,
             email,
             phone,
+            modules,
             is_active,
             is_blocked,
             last_login_at,
             created_at,
             updated_at
         `,
-        [fullName, userId, tenantId]
+        [fullName, JSON.stringify(modules), userId, tenantId]
       );
 
       const user = rows[0];
@@ -464,6 +511,8 @@ router.put(
         details: {
           before_full_name: current.full_name,
           after_full_name: user.full_name,
+          before_modules: current.modules || [],
+          after_modules: user.modules || [],
         },
       });
 
@@ -561,6 +610,7 @@ router.patch(
             tenant_id,
             email,
             phone,
+            modules,
             is_active,
             is_blocked,
             last_login_at,
@@ -678,6 +728,7 @@ router.patch(
             tenant_id,
             email,
             phone,
+            modules,
             is_active,
             is_blocked,
             last_login_at,
