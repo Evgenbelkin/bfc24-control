@@ -339,6 +339,44 @@
       background:#fff;
     }
 
+
+    .table-photo-box.is-clickable{
+      cursor:zoom-in;
+    }
+
+    .image-modal{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:9999;
+      cursor:zoom-out;
+    }
+
+    .image-modal.show{
+      display:flex;
+    }
+
+    .image-modal-content{
+      max-width:min(92vw, 980px);
+      max-height:88vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .image-modal-content img{
+      max-width:100%;
+      max-height:88vh;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+      display:block;
+    }
+
     .table-wrap{
       overflow:auto;
       margin-top:10px;
@@ -621,6 +659,13 @@
     </div>
   </div>
 
+
+  <div id="imageModal" class="image-modal" aria-hidden="true">
+    <div class="image-modal-content">
+      <img id="imageModalImg" alt="Фото товара" />
+    </div>
+  </div>
+
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
@@ -756,7 +801,9 @@
       submitStatus: document.getElementById("submitStatus"),
       itemsCount: document.getElementById("itemsCount"),
       activeItemsCount: document.getElementById("activeItemsCount"),
-      tenantValue: document.getElementById("tenantValue")
+      tenantValue: document.getElementById("tenantValue"),
+      imageModal: document.getElementById("imageModal"),
+      imageModalImg: document.getElementById("imageModalImg")
     };
 
     function goBack() {
@@ -874,6 +921,22 @@
       }
 
       els.photoPreview.innerHTML = `<img src="${escapeHtml(src)}" alt="Фото товара" />`;
+    }
+
+    function openImageModal(src) {
+      if (!src || !els.imageModal || !els.imageModalImg) return;
+      els.imageModalImg.src = src;
+      els.imageModal.classList.add("show");
+      els.imageModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeImageModal() {
+      if (!els.imageModal || !els.imageModalImg) return;
+      els.imageModal.classList.remove("show");
+      els.imageModal.setAttribute("aria-hidden", "true");
+      els.imageModalImg.removeAttribute("src");
+      document.body.style.overflow = "";
     }
 
     function clearImageSelection(options = {}) {
@@ -1131,7 +1194,10 @@
           <tr>
             <td>${escapeHtml(row.id)}</td>
             <td class="table-photo">
-              <div class="table-photo-box">
+              <div
+                class="table-photo-box ${row.image_url ? "is-clickable" : ""}"
+                ${row.image_url ? `onclick="openItemImageModal('${escapeHtml(row.image_url)}')"` : ""}
+              >
                 ${row.image_url ? `<img src="${escapeHtml(row.image_url)}" alt="Фото товара" />` : "Нет фото"}
               </div>
             </td>
@@ -1314,6 +1380,21 @@
       els.removeImageBtn.addEventListener("click", () => {
         clearImageSelection({ clearCurrent: true });
       });
+      els.photoPreview.addEventListener("click", () => {
+        const previewSrc = pendingImagePreviewUrl || currentImageUrl;
+        if (previewSrc) openImageModal(previewSrc);
+      });
+      if (els.photoPreview) {
+        els.photoPreview.style.cursor = "zoom-in";
+      }
+      if (els.imageModal) {
+        els.imageModal.addEventListener("click", closeImageModal);
+      }
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && els.imageModal && els.imageModal.classList.contains("show")) {
+          closeImageModal();
+        }
+      });
 
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
@@ -1340,10 +1421,15 @@
       startEdit(found);
     }
 
+    function openItemImageModal(src) {
+      openImageModal(src);
+    }
+
     bootstrap();
     window.editItem = editItem;
     window.goBack = goBack;
     window.logout = logout;
+    window.openItemImageModal = openItemImageModal;
   </script>
 </body>
 </html>
