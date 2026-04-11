@@ -368,6 +368,57 @@
 
     .stack   { display: flex; flex-direction: column; gap: 3px; }
     .row-act { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    .tenant-name-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      color: var(--text);
+      font: inherit;
+      font-weight: 800;
+      text-align: left;
+      cursor: pointer;
+    }
+    .tenant-name-btn:hover { color: #bfe0ff; text-decoration: underline; }
+
+    .tenant-row-expired td {
+      background: linear-gradient(90deg, rgba(255,95,115,0.10) 0%, rgba(255,95,115,0.03) 42%, transparent 100%);
+    }
+    .tenant-row-blocked td {
+      background: linear-gradient(90deg, rgba(255,95,115,0.08) 0%, rgba(255,95,115,0.02) 42%, transparent 100%);
+    }
+    .tenant-row-warning td {
+      background: linear-gradient(90deg, rgba(245,185,66,0.10) 0%, rgba(245,185,66,0.03) 42%, transparent 100%);
+    }
+    .tenant-row-request td {
+      background: linear-gradient(90deg, rgba(90,168,255,0.08) 0%, rgba(90,168,255,0.02) 42%, transparent 100%);
+    }
+    .tenant-row-expired:hover td,
+    .tenant-row-blocked:hover td,
+    .tenant-row-warning:hover td,
+    .tenant-row-request:hover td {
+      background: linear-gradient(90deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 45%, rgba(255,255,255,0.01) 100%);
+    }
+
+    .module-chip-more {
+      background: rgba(123,104,255,.12);
+      border-color: rgba(123,104,255,.28);
+      color: #d8d0ff;
+    }
+
+    .tenant-main-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      white-space: nowrap;
+    }
     .inline-badges { display: flex; flex-wrap: wrap; gap: 4px; }
 
     .empty {
@@ -1526,6 +1577,26 @@ function setFilterActive(val) {
   });
 }
 
+
+function getTenantRowClass(t, hasReq) {
+  const sub  = String(t.subscription_status || "").toLowerCase();
+  const days = daysLeft(t.subscription_end_at);
+  if (t.is_blocked || sub === "blocked") return "tenant-row-blocked";
+  if (sub === "expired" || (days !== null && days < 0)) return "tenant-row-expired";
+  if (days !== null && days <= 7) return "tenant-row-warning";
+  if (hasReq) return "tenant-row-request";
+  return "";
+}
+
+function renderCompactModules(mods) {
+  if (!mods.length) return `<span class="muted small">нет</span>`;
+  const visible = mods.slice(0, 4);
+  const rest = mods.length - visible.length;
+  return visible
+    .map(m => `<span class="badge b-muted" style="padding:2px 7px;font-size:10px;">${safe(m)}</span>`)
+    .join("") + (rest > 0 ? `<span class="badge module-chip-more" style="padding:2px 7px;font-size:10px;">+${rest}</span>` : "");
+}
+
 /* ══════════════════════════════════════════════════════════
    TENANTS TABLE
    ══════════════════════════════════════════════════════════ */
@@ -1588,15 +1659,14 @@ function renderTenantsTable() {
       t.contact_email ? `<div class="muted small">${safe(t.contact_email)}</div>` : ""
     ].filter(Boolean).join("") || `<span class="muted">—</span>`;
 
-    const modsHtml = mods.length
-      ? mods.map(m => `<span class="badge b-muted" style="padding:2px 7px;font-size:10px;">${safe(m)}</span>`).join("")
-      : `<span class="muted small">нет</span>`;
+    const modsHtml = renderCompactModules(mods);
+    const rowClass = getTenantRowClass(t, hasReq);
 
     return `
-      <tr>
+      <tr class="${rowClass}">
         <td>
           <div class="stack">
-            <div class="strong">#${safe(t.id)} — ${safe(t.name)}</div>
+            <button class="tenant-name-btn" type="button" onclick="editTenant('${safe(t.id)}')">#${safe(t.id)} — ${safe(t.name)}</button>
             <div class="muted small mono">slug: ${safe(t.slug||"—")}</div>
             ${t.code ? `<div class="muted small mono">code: ${safe(t.code)}</div>` : ""}
             ${hasReq ? `<span class="badge b-info" style="margin-top:3px;font-size:10px;">📋 есть заявка</span>` : ""}
@@ -1620,14 +1690,14 @@ function renderTenantsTable() {
             <div><span class="muted">Начало:</span> ${d(t.subscription_start_at)}</div>
             <div><span class="muted">Конец:</span>  ${d(t.subscription_end_at)}</div>
             ${daysLine}
-            <div class="muted">SKU: ${safe(t.max_sku??"—")} · МХ: ${safe(t.max_locations??"—")}</div>
+            <div class="muted">SKU: ${safe(t.max_sku??"—")} · МХ: ${safe(t.max_locations??"—")} · Польз.: ${safe(t.max_users??"—")}</div>
           </div>
         </td>
         <td>
           <div class="stack">
             ${actBadge(a.activity_status||"inactive")}
             <div class="muted small">Вход: ${safe(dt(a.last_login_at))}</div>
-            <div class="muted small">7/30: ${safe(a.activity_7d??0)}/${safe(a.activity_30d??0)}</div>
+            <div class="tenant-main-stat">7/30: ${safe(a.activity_7d??0)}/${safe(a.activity_30d??0)}</div>
           </div>
         </td>
         <td>
@@ -1638,9 +1708,10 @@ function renderTenantsTable() {
         </td>
         <td>
           <div class="row-act">
-            <button class="row-btn row-btn-accent" onclick="editTenant('${safe(t.id)}')">✏ Ред.</button>
+            <button class="row-btn row-btn-success" onclick="quickRenewTenant('${safe(t.id)}')">💳 +30д</button>
             <button class="row-btn row-btn-warning" onclick="toggleTenantActive('${safe(t.id)}')">${t.is_active===false ? "✅ Вкл" : "⏸ Выкл"}</button>
             <button class="row-btn ${t.is_blocked ? "row-btn-success" : "row-btn-danger"}" onclick="toggleTenantBlock('${safe(t.id)}')">${t.is_blocked ? "🔓 Разблок." : "🔒 Блок."}</button>
+            <button class="row-btn row-btn-accent" onclick="editTenant('${safe(t.id)}')">✏ Ред.</button>
             <button class="row-btn" onclick="openTenantEvents('${safe(t.id)}','${safe(t.name)}')">📋 События</button>
           </div>
         </td>
@@ -2032,6 +2103,33 @@ window.editUser = function(id) {
   el.userFullName.value          = u.full_name ?? "";
   el.userPassword.value          = "";
   el.formsSection.scrollIntoView({ behavior:"smooth", block:"start" });
+};
+
+
+window.quickRenewTenant = async function(id) {
+  const t = state.tenants.find(x => String(x.id) === String(id));
+  if (!t) return;
+  const base = t.subscription_end_at ? new Date(t.subscription_end_at) : new Date();
+  if (Number.isNaN(base.getTime())) {
+    alert("Не удалось определить текущую дату окончания подписки");
+    return;
+  }
+  const next = new Date(base.getTime());
+  next.setDate(next.getDate() + 30);
+
+  if (!confirm(`Продлить подписку клиента "${t.name}" на 30 дней?`)) return;
+  try {
+    const payload = {
+      subscription_status: "active",
+      status: "active",
+      is_active: true,
+      is_blocked: false,
+      subscription_end_at: next.toISOString()
+    };
+    const r = await apiPut(`/owner-admin/tenants/${id}`, payload);
+    if (!r?.ok) throw r;
+    await refreshAll();
+  } catch(err) { console.error(err); showError(err); }
 };
 
 window.toggleTenantActive = async function(id) {
