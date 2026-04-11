@@ -546,6 +546,27 @@ document.querySelectorAll(".preset-btn").forEach(btn=>{
 });
 function clearFilter(){ $from.value=""; $to.value=""; document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active")); loadAll(); }
 
+function inferPeriodDays(){
+  if ($from.value && $to.value){
+    const from = new Date($from.value + "T00:00:00");
+    const to   = new Date($to.value + "T00:00:00");
+    const diff = Math.round((to - from) / 86400000) + 1;
+    if (Number.isFinite(diff) && diff > 0) return diff;
+  }
+  const activePreset = document.querySelector(".preset-btn.active")?.dataset?.preset;
+  if (activePreset === "7" || activePreset === "30" || activePreset === "90") return Number(activePreset);
+  if (activePreset === "month"){
+    const now = new Date();
+    return now.getDate();
+  }
+  if (activePreset === "year"){
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    return Math.max(1, Math.round((now - start) / 86400000) + 1);
+  }
+  return 30;
+}
+
 /* ══════════════════════════════════════════════════════════
    API
    ══════════════════════════════════════════════════════════ */
@@ -931,50 +952,44 @@ function problemPriority(status) {
 }
 
 function renderProblemProducts(data) {
-  const items = Array.isArray(data.items) ? data.items : [];
-
-  console.log("TURNOVER RAW:", items);
+  const items = Array.isArray(data?.items) ? data.items : [];
+  const acceptedStatuses = new Set(["critical", "risk", "warning", "stale_no_sales", "no_sales", "out_of_stock"]);
 
   const problems = items
-    .filter((row) => {
-      const s = row.turnover_status;
-      return s === 'critical' || s === 'risk' || s === 'warning' || s === 'stale_no_sales' || s === 'no_sales';
-    })
+    .filter((row) => row && acceptedStatuses.has(String(row.turnover_status || "")))
     .sort((a, b) => {
-      const byPriority = problemPriority(b.turnover_status) - problemPriority(a.turnover_status);
+      const byPriority = problemPriority(String(b.turnover_status || "")) - problemPriority(String(a.turnover_status || ""));
       if (byPriority !== 0) return byPriority;
-      return (+b.stock_cost_total || 0) - (+a.stock_cost_total || 0);
+      return (+b?.stock_cost_total || 0) - (+a?.stock_cost_total || 0);
     });
-
-  console.log("TURNOVER PROBLEMS:", problems);
 
   if (!problems.length) {
     return `
       <div class="empty-state">
         <div class="empty-state-icon">✅</div>
-        <div class="empty-state-title">Проблемных товаров нет</div>
-        <p class="empty-state-text">По выбранному периоду проблем не найдено</p>
+        <div class="empty-state-title">${t("analytics.noProblemProductsTitle","Проблемных товаров нет")}</div>
+        <p class="empty-state-text">${t("analytics.noProblemProductsText","По выбранному периоду проблем не найдено")}</p>
       </div>
     `;
   }
 
   const chartItems = problems.slice(0, 8);
-  const maxCost = Math.max(1, ...chartItems.map(i => +i.stock_cost_total || 0));
+  const maxCost = Math.max(1, ...chartItems.map((i) => +i?.stock_cost_total || 0));
 
   const chartHtml = `
     <div class="mini-card-surface">
-      <h3 class="mini-card-title">Проблемные товары</h3>
-      <p class="mini-card-note">Где заморожены деньги</p>
+      <h3 class="mini-card-title">${t("analytics.problemProductsTitle","Проблемные товары")}</h3>
+      <p class="mini-card-note">${t("analytics.frozenMoneyTitle","Где заморожены деньги")}</p>
 
       <div class="top-bars">
         ${chartItems.map((i, idx) => `
           <div class="top-bar-item">
             <div class="top-bar-head">
-              <div class="top-bar-name">${idx + 1}. ${esc(i.name || '—')}</div>
-              <div class="top-bar-value">${fmtMoney(i.stock_cost_total)}</div>
+              <div class="top-bar-name">${idx + 1}. ${esc(i?.name || i?.item_name || "—")}</div>
+              <div class="top-bar-value">${fmtMoney(i?.stock_cost_total)}</div>
             </div>
             <div class="top-bar-track">
-              <div class="top-bar-fill" style="width:${Math.max(3, ((+i.stock_cost_total || 0) / maxCost) * 100)}%"></div>
+              <div class="top-bar-fill" style="width:${Math.max(3, ((+i?.stock_cost_total || 0) / maxCost) * 100)}%"></div>
             </div>
           </div>
         `).join("")}
@@ -985,36 +1000,36 @@ function renderProblemProducts(data) {
   const rowsHtml = problems.map((row) => `
     <tr>
       <td>
-        <div style="font-weight:600">${esc(row.name || '—')}</div>
-        <div class="cell-muted" style="font-size:12px">${esc(row.sku || row.barcode || '')}</div>
+        <div style="font-weight:600">${esc(row?.name || row?.item_name || "—")}</div>
+        <div class="cell-muted" style="font-size:12px">${esc(row?.sku || row?.barcode || row?.vendor_code || "")}</div>
       </td>
       <td>
-        <span class="problem-status-pill ${statusClass(row.turnover_status)}">
-          ${statusLabel(row.turnover_status)}
+        <span class="problem-status-pill ${statusClass(String(row?.turnover_status || ""))}">
+          ${statusLabel(String(row?.turnover_status || ""))}
         </span>
       </td>
-      <td class="r">${fmt(row.qty_on_hand,0)}</td>
-      <td class="r">${fmtMoney(row.stock_cost_total)}</td>
-      <td class="r ${+row.potential_profit >= 0 ? 'cell-success' : 'cell-danger'}">
-        ${fmtMoney(row.potential_profit)}
+      <td class="r">${fmt(row?.qty_on_hand,0)}</td>
+      <td class="r">${fmtMoney(row?.stock_cost_total)}</td>
+      <td class="r ${+row?.potential_profit >= 0 ? 'cell-success' : 'cell-danger'}">
+        ${fmtMoney(row?.potential_profit)}
       </td>
-      <td class="r">${row.days_on_hand == null ? '—' : fmt(row.days_on_hand,1)}</td>
-      <td class="r">${fmt(row.sold_qty_period,0)}</td>
+      <td class="r">${row?.days_on_hand == null ? '—' : fmt(row.days_on_hand,1)}</td>
+      <td class="r">${fmt(row?.sold_qty_period,0)}</td>
     </tr>
-  `).join('');
+  `).join("");
 
   const tableHtml = `
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Товар</th>
-            <th>Статус</th>
-            <th class="r">Остаток</th>
-            <th class="r">Стоимость</th>
-            <th class="r">Прибыль</th>
-            <th class="r">Дней</th>
-            <th class="r">Продано</th>
+            <th>${t("analytics.tableItem","Товар")}</th>
+            <th>${t("analytics.status","Статус")}</th>
+            <th class="r">${t("analytics.stockShort","Остаток")}</th>
+            <th class="r">${t("analytics.cost","Стоимость")}</th>
+            <th class="r">${t("analytics.profit","Прибыль")}</th>
+            <th class="r">${t("analytics.days","Дней")}</th>
+            <th class="r">${t("analytics.sold","Продано")}</th>
           </tr>
         </thead>
         <tbody>${rowsHtml}</tbody>
@@ -1170,84 +1185,119 @@ async function loadAll(){
   document.getElementById("alert-error").classList.remove("visible");
   document.getElementById("alert-auth").classList.remove("visible");
 
-  const q    = buildQuery();
-  const qTop = buildQuery({limit:10});
-  const qTid = buildTenantOnly();
+  try {
+    const q    = buildQuery();
+    const qTop = buildQuery({limit:10});
+    const qTid = buildTenantOnly();
+    const periodDays = inferPeriodDays();
 
-  const periodDays = inferPeriodDays();
-  const [pnlR, dailyR, topR, turnR, debtsR, svR] = await Promise.allSettled([
-    apiFetch(`/reports/pnl?${q}`),
-    apiFetch(`/reports/pnl-daily?${q}`),
-    apiFetch(`/reports/top-items?${qTop}`),
-    apiFetch(`/reports/turnover?tenant_id=${getEffectiveTenantId()}&period_days=${periodDays}`),
-    apiFetch(`/reports/debts-summary?${qTid}`),
-    apiFetch(`/reports/stock-value?${qTid}`),
-  ]);
+    const [pnlR, dailyR, topR, turnR, debtsR, svR] = await Promise.allSettled([
+      apiFetch(`/reports/pnl?${q}`),
+      apiFetch(`/reports/pnl-daily?${q}`),
+      apiFetch(`/reports/top-items?${qTop}`),
+      apiFetch(`/reports/turnover?tenant_id=${getEffectiveTenantId()}&period_days=${periodDays}`),
+      apiFetch(`/reports/debts-summary?${qTid}`),
+      apiFetch(`/reports/stock-value?${qTid}`),
+    ]);
 
-  /* P&L */
-  if (pnlR.status==="fulfilled"){
-    const pnl=pnlR.value.pnl, per=pnlR.value.period;
-    const from=per?.date_from||$from.value, to=per?.date_to||$to.value;
-    document.getElementById("pnl-period-note").textContent = from&&to?`${from} — ${to}`:from?tf("analytics.fromShort",{date:from},`с ${from}`):"";
-    document.getElementById("pnl-kpi-grid").innerHTML    = renderPnlKpi(pnl);
-    document.getElementById("pnl-funnel-wrap").innerHTML = renderPnlFunnel(pnl);
-    document.getElementById("expenses-wrap").innerHTML   = renderExpenses(pnl);
-  } else if (pnlR.reason?.message!=="unauthorized"){
-    blockError("pnl-kpi-grid",t("analytics.errorPnl","Ошибка P&L"),pnlR.reason?.message||"");
-    document.getElementById("pnl-funnel-wrap").innerHTML="";
+    /* P&L */
+    try {
+      if (pnlR.status==="fulfilled"){
+        const pnl=pnlR.value.pnl, per=pnlR.value.period;
+        const from=per?.date_from||$from.value, to=per?.date_to||$to.value;
+        document.getElementById("pnl-period-note").textContent = from&&to?`${from} — ${to}`:from?tf("analytics.fromShort",{date:from},`с ${from}`):"";
+        document.getElementById("pnl-kpi-grid").innerHTML    = renderPnlKpi(pnl);
+        document.getElementById("pnl-funnel-wrap").innerHTML = renderPnlFunnel(pnl);
+        document.getElementById("expenses-wrap").innerHTML   = renderExpenses(pnl);
+      } else if (pnlR.reason?.message!=="unauthorized"){
+        blockError("pnl-kpi-grid",t("analytics.errorPnl","Ошибка P&L"),pnlR.reason?.message||"");
+        document.getElementById("pnl-funnel-wrap").innerHTML="";
+      }
+    } catch (err) {
+      blockError("pnl-kpi-grid",t("analytics.errorPnl","Ошибка P&L"),err?.message||"render error");
+      document.getElementById("pnl-funnel-wrap").innerHTML="";
+      document.getElementById("expenses-wrap").innerHTML="";
+    }
+
+    /* Динамика */
+    try {
+      if (dailyR.status==="fulfilled"){
+        const d=dailyR.value.daily||[];
+        document.getElementById("chart-note").textContent=tf("analytics.daysShort",{value:d.length},`${d.length} дн.`);
+        document.getElementById("chart-wrap").innerHTML=renderChart(d);
+      } else if (dailyR.reason?.message!=="unauthorized"){
+        document.getElementById("chart-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorDailyTitle","Ошибка динамики")}</div><p class="empty-state-text">${esc(dailyR.reason?.message||"")}</p></div>`;
+      }
+    } catch (err) {
+      document.getElementById("chart-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorDailyTitle","Ошибка динамики")}</div><p class="empty-state-text">${esc(err?.message||"render error")}</p></div>`;
+    }
+
+    /* Топ товаров */
+    try {
+      if (topR.status==="fulfilled"){
+        document.getElementById("top-note").textContent=tf("analytics.topByRevenue",{value:topR.value.limit||10},`топ ${topR.value.limit||10} по выручке`);
+        document.getElementById("top-items-wrap").innerHTML=renderTopItems(topR.value);
+      } else if (topR.reason?.message!=="unauthorized"){
+        document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorTopItemsTitle","Ошибка топ товаров")}</div><p class="empty-state-text">${esc(topR.reason?.message||"")}</p></div>`;
+      }
+    } catch (err) {
+      document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorTopItemsTitle","Ошибка топ товаров")}</div><p class="empty-state-text">${esc(err?.message||"render error")}</p></div>`;
+    }
+
+    /* Проблемные товары */
+    try {
+      if (turnR.status==="fulfilled"){
+        document.getElementById("problem-note").textContent = tf("analytics.problemPeriodDays",{value:fmt(periodDays,0)},`период ${fmt(periodDays,0)} дн.`);
+        document.getElementById("problem-products-wrap").innerHTML = renderProblemProducts(turnR.value);
+      } else if (turnR.reason?.message!=="unauthorized"){
+        document.getElementById("problem-products-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.problemProductsErrorTitle","Ошибка проблемных товаров")}</div><p class="empty-state-text">${esc(turnR.reason?.message||"")}</p></div>`;
+      }
+    } catch (err) {
+      document.getElementById("problem-products-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.problemProductsErrorTitle","Ошибка проблемных товаров")}</div><p class="empty-state-text">${esc(err?.message||"render error")}</p></div>`;
+    }
+
+    /* Долги */
+    try {
+      if (debtsR.status==="fulfilled"){
+        const s=debtsR.value.summary||{};
+        document.getElementById("debts-kpi-grid").innerHTML=renderDebtsKpi(s);
+        document.getElementById("debts-table-wrap").innerHTML=
+          `<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">${t("analytics.topOpenDebts","Топ открытых долгов")}</div>`+
+          renderDebtsTable(debtsR.value.top_open_debts||[]);
+      } else if (debtsR.reason?.message!=="unauthorized"){
+        blockError("debts-kpi-grid",t("analytics.errorDebts","Ошибка долгов"),debtsR.reason?.message||"");
+        document.getElementById("debts-table-wrap").innerHTML="";
+      }
+    } catch (err) {
+      blockError("debts-kpi-grid",t("analytics.errorDebts","Ошибка долгов"),err?.message||"render error");
+      document.getElementById("debts-table-wrap").innerHTML="";
+    }
+
+    /* Склад + sync */
+    try {
+      if (svR.status==="fulfilled"){
+        document.getElementById("stock-kpi-grid").innerHTML=renderStockKpi(svR.value);
+        document.getElementById("sync-body").innerHTML=renderSyncCheck(svR.value);
+      } else if (svR.reason?.message!=="unauthorized"){
+        blockError("stock-kpi-grid",t("analytics.errorStock","Ошибка склада"),svR.reason?.message||"");
+        document.getElementById("sync-body").innerHTML="";
+      }
+    } catch (err) {
+      blockError("stock-kpi-grid",t("analytics.errorStock","Ошибка склада"),err?.message||"render error");
+      document.getElementById("sync-body").innerHTML="";
+    }
+
+    /* Общая ошибка */
+    if ([pnlR,dailyR,topR,turnR,debtsR,svR].every(r=>r.status==="rejected")&&pnlR.reason?.message!=="unauthorized") {
+      showError(t("analytics.errorLoadPrefix","Не удалось загрузить данные: ")+(pnlR.reason?.message||t("analytics.serverError","Ошибка сервера")));
+    }
+  } catch (err) {
+    if (err?.message !== "unauthorized") {
+      showError(t("analytics.errorLoadPrefix","Не удалось загрузить данные: ")+(err?.message || t("analytics.serverError","Ошибка сервера")));
+    }
+  } finally {
+    hideLoader();
   }
-
-  /* Динамика */
-  if (dailyR.status==="fulfilled"){
-    const d=dailyR.value.daily||[];
-    document.getElementById("chart-note").textContent=tf("analytics.daysShort",{value:d.length},`${d.length} дн.`);
-    document.getElementById("chart-wrap").innerHTML=renderChart(d);
-  } else if (dailyR.reason?.message!=="unauthorized"){
-    document.getElementById("chart-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorDailyTitle","Ошибка динамики")}</div><p class="empty-state-text">${esc(dailyR.reason?.message||"")}</p></div>`;
-  }
-
-  /* Топ товаров */
-  if (topR.status==="fulfilled"){
-    document.getElementById("top-note").textContent=tf("analytics.topByRevenue",{value:topR.value.limit||10},`топ ${topR.value.limit||10} по выручке`);
-    document.getElementById("top-items-wrap").innerHTML=renderTopItems(topR.value);
-  } else if (topR.reason?.message!=="unauthorized"){
-    document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorTopItemsTitle","Ошибка топ товаров")}</div><p class="empty-state-text">${esc(topR.reason?.message||"")}</p></div>`;
-  }
-
-  /* Проблемные товары */
-  if (turnR.status==="fulfilled"){
-    document.getElementById("problem-note").textContent = `период ${fmt(periodDays,0)} дн.`;
-    document.getElementById("problem-products-wrap").innerHTML = renderProblemProducts(turnR.value);
-  } else if (turnR.reason?.message!=="unauthorized"){
-    document.getElementById("problem-products-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">Ошибка проблемных товаров</div><p class="empty-state-text">${esc(turnR.reason?.message||"")}</p></div>`;
-  }
-
-  /* Долги */
-  if (debtsR.status==="fulfilled"){
-    const s=debtsR.value.summary||{};
-    document.getElementById("debts-kpi-grid").innerHTML=renderDebtsKpi(s);
-    document.getElementById("debts-table-wrap").innerHTML=
-      `<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">${t("analytics.topOpenDebts","Топ открытых долгов")}</div>`+
-      renderDebtsTable(debtsR.value.top_open_debts||[]);
-  } else if (debtsR.reason?.message!=="unauthorized"){
-    blockError("debts-kpi-grid",t("analytics.errorDebts","Ошибка долгов"),debtsR.reason?.message||"");
-    document.getElementById("debts-table-wrap").innerHTML="";
-  }
-
-  /* Склад + sync */
-  if (svR.status==="fulfilled"){
-    document.getElementById("stock-kpi-grid").innerHTML=renderStockKpi(svR.value);
-    document.getElementById("sync-body").innerHTML=renderSyncCheck(svR.value);
-  } else if (svR.reason?.message!=="unauthorized"){
-    blockError("stock-kpi-grid",t("analytics.errorStock","Ошибка склада"),svR.reason?.message||"");
-    document.getElementById("sync-body").innerHTML="";
-  }
-
-  /* Общая ошибка */
-  if ([pnlR,dailyR,topR,turnR,debtsR,svR].every(r=>r.status==="rejected")&&pnlR.reason?.message!=="unauthorized")
-    showError(t("analytics.errorLoadPrefix","Не удалось загрузить данные: ")+(pnlR.reason?.message||t("analytics.serverError","Ошибка сервера")));
-
-  hideLoader();
 }
 
 function initI18nPage(){
