@@ -932,39 +932,55 @@ function problemPriority(status) {
 
 function renderProblemProducts(data) {
   const items = Array.isArray(data.items) ? data.items : [];
+
+  console.log("TURNOVER RAW:", items);
+
   const problems = items
-    .filter((row) => ['critical', 'risk', 'warning', 'stale_no_sales'].includes(row.turnover_status))
+    .filter((row) => {
+      const s = row.turnover_status;
+      return s === 'critical' || s === 'risk' || s === 'warning' || s === 'stale_no_sales' || s === 'no_sales';
+    })
     .sort((a, b) => {
       const byPriority = problemPriority(b.turnover_status) - problemPriority(a.turnover_status);
       if (byPriority !== 0) return byPriority;
       return (+b.stock_cost_total || 0) - (+a.stock_cost_total || 0);
     });
 
+  console.log("TURNOVER PROBLEMS:", problems);
+
   if (!problems.length) {
-    return `<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-title">Проблемных товаров нет</div><p class="empty-state-text">По выбранному периоду и текущим правилам проблемные товары не найдены.</p></div>`;
+    return `
+      <div class="empty-state">
+        <div class="empty-state-icon">✅</div>
+        <div class="empty-state-title">Проблемных товаров нет</div>
+        <p class="empty-state-text">По выбранному периоду проблем не найдено</p>
+      </div>
+    `;
   }
 
   const chartItems = problems.slice(0, 8);
-  const maxCost = Math.max(1, ...chartItems.map((it) => +it.stock_cost_total || 0));
+  const maxCost = Math.max(1, ...chartItems.map(i => +i.stock_cost_total || 0));
 
   const chartHtml = `
     <div class="mini-card-surface">
-      <h3 class="mini-card-title">График проблемных товаров</h3>
-      <p class="mini-card-note">Сортировка по уровню риска и стоимости остатка</p>
+      <h3 class="mini-card-title">Проблемные товары</h3>
+      <p class="mini-card-note">Где заморожены деньги</p>
+
       <div class="top-bars">
-        ${chartItems.map((it, idx) => {
-          const width = Math.max(3, ((+it.stock_cost_total || 0) / maxCost) * 100);
-          return `
-            <div class="top-bar-item">
-              <div class="top-bar-head">
-                <div class="top-bar-name">${idx + 1}. ${esc(it.name || '—')}</div>
-                <div class="top-bar-value">${fmtMoney(it.stock_cost_total)}</div>
-              </div>
-              <div class="top-bar-track"><div class="top-bar-fill" style="width:${width}%"></div></div>
-            </div>`;
-        }).join('')}
+        ${chartItems.map((i, idx) => `
+          <div class="top-bar-item">
+            <div class="top-bar-head">
+              <div class="top-bar-name">${idx + 1}. ${esc(i.name || '—')}</div>
+              <div class="top-bar-value">${fmtMoney(i.stock_cost_total)}</div>
+            </div>
+            <div class="top-bar-track">
+              <div class="top-bar-fill" style="width:${Math.max(3, ((+i.stock_cost_total || 0) / maxCost) * 100)}%"></div>
+            </div>
+          </div>
+        `).join("")}
       </div>
-    </div>`;
+    </div>
+  `;
 
   const rowsHtml = problems.map((row) => `
     <tr>
@@ -972,28 +988,46 @@ function renderProblemProducts(data) {
         <div style="font-weight:600">${esc(row.name || '—')}</div>
         <div class="cell-muted" style="font-size:12px">${esc(row.sku || row.barcode || '')}</div>
       </td>
-      <td><span class="problem-status-pill ${statusClass(row.turnover_status)}">${statusLabel(row.turnover_status)}</span></td>
+      <td>
+        <span class="problem-status-pill ${statusClass(row.turnover_status)}">
+          ${statusLabel(row.turnover_status)}
+        </span>
+      </td>
       <td class="r">${fmt(row.qty_on_hand,0)}</td>
       <td class="r">${fmtMoney(row.stock_cost_total)}</td>
-      <td class="r ${+row.potential_profit >= 0 ? 'cell-success' : 'cell-danger'}">${fmtMoney(row.potential_profit)}</td>
+      <td class="r ${+row.potential_profit >= 0 ? 'cell-success' : 'cell-danger'}">
+        ${fmtMoney(row.potential_profit)}
+      </td>
       <td class="r">${row.days_on_hand == null ? '—' : fmt(row.days_on_hand,1)}</td>
       <td class="r">${fmt(row.sold_qty_period,0)}</td>
-    </tr>`).join('');
+    </tr>
+  `).join('');
 
-  const tableHtml = `<div class="table-wrap"><table>
-    <thead><tr>
-      <th>Товар</th>
-      <th>Статус</th>
-      <th class="r">Остаток</th>
-      <th class="r">Стоимость остатка</th>
-      <th class="r">Потенц. прибыль</th>
-      <th class="r">Дней остатка</th>
-      <th class="r">Продано</th>
-    </tr></thead>
-    <tbody>${rowsHtml}</tbody>
-  </table></div>`;
+  const tableHtml = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Товар</th>
+            <th>Статус</th>
+            <th class="r">Остаток</th>
+            <th class="r">Стоимость</th>
+            <th class="r">Прибыль</th>
+            <th class="r">Дней</th>
+            <th class="r">Продано</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>
+  `;
 
-  return `<div class="analytics-split">${chartHtml}<div>${tableHtml}</div></div>`;
+  return `
+    <div class="analytics-split">
+      ${chartHtml}
+      <div>${tableHtml}</div>
+    </div>
+  `;
 }
 
 /* ══════════════════════════════════════════════════════════
