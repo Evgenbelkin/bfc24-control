@@ -1189,10 +1189,18 @@
         let visibleCount = 0;
 
         cards.forEach((card) => {
-          if (card.id === "logoutCard" || card.id === "subscriptionCard") {
-            card.style.display = "";
-            return;
-          }
+          if (card.id === "logoutCard") {
+  card.style.display = "";
+  return;
+}
+
+if (card.id === "subscriptionCard") {
+  const modules = normalizeModules(user);
+  const hasLimitedModules = Array.isArray(modules) && modules.length > 0 && modules.length < 14;
+
+  card.style.display = hasLimitedModules ? "none" : "";
+  return;
+}
 
           const onclickValue = card.getAttribute("onclick") || "";
           const match = onclickValue.match(/window\.location\.href='([^']+)'/);
