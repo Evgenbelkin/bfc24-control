@@ -243,13 +243,6 @@
       margin-bottom:12px;
     }
 
-    .preview-image img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
-
     .preview-empty{
       color:var(--muted);
       font-size:13px;
@@ -358,14 +351,10 @@
       background:#fbfdff;
     }
 
+    .item-main{ display:block; }
+
     .cell-name{
       min-width:220px;
-    }
-
-    .item-main{
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
     }
 
     .thumb{
@@ -512,13 +501,13 @@
               </div>
 
               <div class="field">
-                <label for="brand" data-i18n="items.brandLabel">Бренд</label>
-                <input id="brand" type="text" data-i18n-placeholder="items.brandPlaceholder" placeholder="Например: Xiaomi" />
+                <label for="brand">Артикул фабрики</label>
+                <input id="brand" type="text" placeholder="Например: A-4587" />
               </div>
 
               <div class="field">
-                <label for="category" data-i18n="items.categoryLabel">Категория</label>
-                <input id="category" type="text" data-i18n-placeholder="items.categoryPlaceholder" placeholder="Например: Электроника" />
+                <label for="category">Фабрика</label>
+                <input id="category" type="text" placeholder="Например: Shenzhen Factory 12" />
               </div>
 
               <div class="field">
@@ -547,8 +536,8 @@
               </div>
 
               <div class="field full">
-                <label for="imageUrl" data-i18n="items.imageUrlLabel">Ссылка на изображение</label>
-                <input id="imageUrl" type="text" data-i18n-placeholder="items.imageUrlPlaceholder" placeholder="https://..." />
+                <label>Фото товара</label>
+                <input type="text" value="Загрузка фото будет добавлена следующим шагом отдельным модулем" readonly style="background:var(--soft); color:var(--muted); cursor:not-allowed;" />
               </div>
 
               <div class="field full">
@@ -557,28 +546,28 @@
               </div>
 
               <div class="field">
-                <label for="weightGrams" data-i18n="items.weightLabel">Вес, г</label>
+                <label for="weightGrams">Вес коробки, г</label>
                 <input id="weightGrams" type="number" step="0.001" min="0" value="" />
               </div>
 
               <div class="field">
-                <label for="volumeMl" data-i18n="items.volumeLabel">Объём, мл</label>
-                <input id="volumeMl" type="number" step="0.001" min="0" value="" />
-              </div>
-
-              <div class="field">
-                <label for="lengthCm" data-i18n="items.lengthLabel">Длина, см</label>
+                <label for="lengthCm">Длина коробки, см</label>
                 <input id="lengthCm" type="number" step="0.01" min="0" value="" />
               </div>
 
               <div class="field">
-                <label for="widthCm" data-i18n="items.widthLabel">Ширина, см</label>
+                <label for="widthCm">Ширина коробки, см</label>
                 <input id="widthCm" type="number" step="0.01" min="0" value="" />
               </div>
 
               <div class="field">
-                <label for="heightCm" data-i18n="items.heightLabel">Высота, см</label>
+                <label for="heightCm">Высота коробки, см</label>
                 <input id="heightCm" type="number" step="0.01" min="0" value="" />
+              </div>
+
+              <div class="field">
+                <label for="volumeDisplay">Объём коробки, м³ (авто)</label>
+                <input id="volumeDisplay" type="text" value="" readonly style="background:var(--soft);" />
               </div>
             </div>
 
@@ -597,10 +586,9 @@
           </div>
 
           <div class="preview-card">
-            <div class="preview-title" data-i18n="items.previewTitle">Предпросмотр карточки</div>
+            <div class="preview-title" >Краткий предпросмотр карточки</div>
             <div class="preview-image" id="previewImageBox">
-              <div class="preview-empty" id="previewImageEmpty" data-i18n="items.previewImageEmpty">Укажи ссылку на изображение, и здесь появится превью</div>
-              <img id="previewImage" alt="" style="display:none;" />
+              <div class="preview-empty" id="previewImageEmpty">Фото товара пока не подключено. Сначала доводим карточку и характеристики, потом отдельно делаем удобную загрузку фото.</div>
             </div>
             <div class="preview-meta">
               <div class="preview-meta-item">
@@ -608,7 +596,7 @@
                 <div class="preview-meta-value" id="previewName">—</div>
               </div>
               <div class="preview-meta-item">
-                <div class="preview-meta-label" data-i18n="items.previewBrandCategory">Бренд / категория</div>
+                <div class="preview-meta-label" >Фабрика / артикул фабрики</div>
                 <div class="preview-meta-value" id="previewBrandCategory">—</div>
               </div>
               <div class="preview-meta-item">
@@ -616,7 +604,7 @@
                 <div class="preview-meta-value" id="previewPricing">0 / 0</div>
               </div>
               <div class="preview-meta-item">
-                <div class="preview-meta-label" data-i18n="items.previewSize">Габариты / вес</div>
+                <div class="preview-meta-label" >Коробка / вес</div>
                 <div class="preview-meta-value" id="previewSize">—</div>
               </div>
             </div>
@@ -772,13 +760,12 @@
       purchasePrice: document.getElementById("purchasePrice"),
       salePrice: document.getElementById("salePrice"),
       unit: document.getElementById("unit"),
-      imageUrl: document.getElementById("imageUrl"),
       description: document.getElementById("description"),
       weightGrams: document.getElementById("weightGrams"),
-      volumeMl: document.getElementById("volumeMl"),
       lengthCm: document.getElementById("lengthCm"),
       widthCm: document.getElementById("widthCm"),
       heightCm: document.getElementById("heightCm"),
+      volumeDisplay: document.getElementById("volumeDisplay"),
       searchInput: document.getElementById("searchInput"),
       saveBtn: document.getElementById("saveBtn"),
       cancelEditBtn: document.getElementById("cancelEditBtn"),
@@ -789,7 +776,6 @@
       itemsCount: document.getElementById("itemsCount"),
       activeItemsCount: document.getElementById("activeItemsCount"),
       tenantValue: document.getElementById("tenantValue"),
-      previewImage: document.getElementById("previewImage"),
       previewImageEmpty: document.getElementById("previewImageEmpty"),
       previewName: document.getElementById("previewName"),
       previewBrandCategory: document.getElementById("previewBrandCategory"),
@@ -940,7 +926,6 @@
         unit: row.unit || "pcs",
         purchase_price: Number(row.purchase_price ?? row.cost_price ?? 0),
         sale_price: Number(row.sale_price ?? row.price ?? 0),
-        image_url: row.image_url || "",
         description: row.description || "",
         weight_grams: row.weight_grams === null || row.weight_grams === undefined ? null : Number(row.weight_grams),
         volume_ml: row.volume_ml === null || row.volume_ml === undefined ? null : Number(row.volume_ml),
@@ -980,21 +965,46 @@
       return Number.isFinite(n) ? n : null;
     }
 
+    function computeVolumeMl(length, width, height) {
+      if (
+        length === null || width === null || height === null ||
+        !Number.isFinite(length) || !Number.isFinite(width) || !Number.isFinite(height) ||
+        length <= 0 || width <= 0 || height <= 0
+      ) {
+        return null;
+      }
+      return length * width * height;
+    }
+
+    function formatVolumeM3(volumeMl) {
+      if (volumeMl === null || volumeMl === undefined || !Number.isFinite(Number(volumeMl))) return "—";
+      const m3 = Number(volumeMl) / 1000000;
+      return m3.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 4 });
+    }
+
+    function updateVolumeDisplay() {
+      const length = readOptionalNumber(els.lengthCm.value);
+      const width = readOptionalNumber(els.widthCm.value);
+      const height = readOptionalNumber(els.heightCm.value);
+      const volumeMl = computeVolumeMl(length, width, height);
+      els.volumeDisplay.value = volumeMl === null ? "" : `${formatVolumeM3(volumeMl)} м³`;
+      return volumeMl;
+    }
+
     function renderPreview() {
       const name = (els.name.value || "").trim() || "—";
-      const brand = (els.brand.value || "").trim();
-      const category = (els.category.value || "").trim();
-      const imageUrl = (els.imageUrl.value || "").trim();
+      const factoryArticle = (els.brand.value || "").trim();
+      const factory = (els.category.value || "").trim();
       const purchasePrice = formatMoney(els.purchasePrice.value || 0);
       const salePrice = formatMoney(els.salePrice.value || 0);
 
-      const dims = [];
       const length = readOptionalNumber(els.lengthCm.value);
       const width = readOptionalNumber(els.widthCm.value);
       const height = readOptionalNumber(els.heightCm.value);
       const weight = readOptionalNumber(els.weightGrams.value);
-      const volume = readOptionalNumber(els.volumeMl.value);
+      const volumeMl = updateVolumeDisplay();
 
+      const dims = [];
       if (length !== null || width !== null || height !== null) {
         dims.push(
           [
@@ -1004,25 +1014,14 @@
           ].join(" × ") + " см"
         );
       }
-      if (weight !== null) dims.push(i18n.format("items.previewWeightValue", { value: formatMetric(weight, 3) }));
-      if (volume !== null) dims.push(i18n.format("items.previewVolumeValue", { value: formatMetric(volume, 3) }));
+      if (weight !== null) dims.push(`Вес: ${formatMetric(weight, 3)} г`);
+      if (volumeMl !== null) dims.push(`Объём: ${formatVolumeM3(volumeMl)} м³`);
 
       els.previewName.textContent = name;
-      els.previewBrandCategory.textContent = [brand, category].filter(Boolean).join(" / ") || "—";
+      els.previewBrandCategory.textContent = [factory, factoryArticle].filter(Boolean).join(" / ") || "—";
       els.previewPricing.textContent = `${salePrice} / ${purchasePrice}`;
       els.previewSize.textContent = dims.join(" • ") || "—";
-
-      if (imageUrl) {
-        els.previewImage.style.display = "block";
-        els.previewImage.src = imageUrl;
-        els.previewImage.alt = name;
-        els.previewImageEmpty.style.display = "none";
-      } else {
-        els.previewImage.removeAttribute("src");
-        els.previewImage.style.display = "none";
-        els.previewImageEmpty.textContent = getImagePlaceholderText();
-        els.previewImageEmpty.style.display = "block";
-      }
+      els.previewImageEmpty.textContent = "Фото товара пока не подключено. Следующим шагом сделаем удобную загрузку файла.";
     }
 
     function resetForm() {
@@ -1037,14 +1036,13 @@
       els.purchasePrice.value = "0";
       els.salePrice.value = "0";
       els.unit.value = "pcs";
-      els.imageUrl.value = "";
       els.description.value = "";
       els.weightGrams.value = "";
-      els.volumeMl.value = "";
       els.lengthCm.value = "";
       els.widthCm.value = "";
       els.heightCm.value = "";
       clearSubmitStatus();
+      updateVolumeDisplay();
       renderPreview();
     }
 
@@ -1060,14 +1058,13 @@
       els.purchasePrice.value = String(item.purchase_price ?? 0);
       els.salePrice.value = String(item.sale_price ?? 0);
       els.unit.value = item.unit || "pcs";
-      els.imageUrl.value = item.image_url || "";
       els.description.value = item.description || "";
       els.weightGrams.value = item.weight_grams ?? "";
-      els.volumeMl.value = item.volume_ml ?? "";
       els.lengthCm.value = item.length_cm ?? "";
       els.widthCm.value = item.width_cm ?? "";
       els.heightCm.value = item.height_cm ?? "";
       clearSubmitStatus();
+      updateVolumeDisplay();
       renderPreview();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -1096,16 +1093,16 @@
 
       if (row.length_cm !== null || row.width_cm !== null || row.height_cm !== null) {
         parts.push(
-          `${formatMetric(row.length_cm, 2)} × ${formatMetric(row.width_cm, 2)} × ${formatMetric(row.height_cm, 2)} см`
+          `Коробка: ${formatMetric(row.length_cm, 2)} × ${formatMetric(row.width_cm, 2)} × ${formatMetric(row.height_cm, 2)} см`
         );
       }
 
       if (row.weight_grams !== null) {
-        parts.push(i18n.format("items.tableWeightValue", { value: formatMetric(row.weight_grams, 3) }));
+        parts.push(`Вес: ${formatMetric(row.weight_grams, 3)} г`);
       }
 
       if (row.volume_ml !== null) {
-        parts.push(i18n.format("items.tableVolumeValue", { value: formatMetric(row.volume_ml, 3) }));
+        parts.push(`Объём: ${formatVolumeM3(row.volume_ml)} м³`);
       }
 
       return parts.length ? parts : ["—"];
@@ -1132,15 +1129,9 @@
             <td>${escapeHtml(row.id)}</td>
             <td class="cell-name">
               <div class="item-main">
-                <div class="thumb">
-                  ${row.image_url
-                    ? `<img src="${escapeHtml(row.image_url)}" alt="${escapeHtml(row.name)}" loading="lazy" />`
-                    : `<div class="thumb-empty">${escapeHtml(i18n.t("items.noImageShort"))}</div>`
-                  }
-                </div>
                 <div>
                   <div class="item-name">${escapeHtml(row.name)}</div>
-                  <div class="item-sub">${escapeHtml([row.brand, row.category].filter(Boolean).join(" / ") || i18n.t("items.noBrandCategory"))}</div>
+                  <div class="item-sub">${escapeHtml([row.category, row.brand].filter(Boolean).join(" / ") || "Фабрика и артикул фабрики не заполнены")}</div>
                   <div class="item-sub">${escapeHtml(row.description || "")}</div>
                 </div>
               </div>
@@ -1223,14 +1214,13 @@
         const purchase_price = Number(els.purchasePrice.value || 0);
         const sale_price = Number(els.salePrice.value || 0);
         const unit = (els.unit.value || "").trim() || "pcs";
-        const image_url = (els.imageUrl.value || "").trim();
         const description = (els.description.value || "").trim();
 
         const weight_grams = readOptionalNumber(els.weightGrams.value);
-        const volume_ml = readOptionalNumber(els.volumeMl.value);
         const length_cm = readOptionalNumber(els.lengthCm.value);
         const width_cm = readOptionalNumber(els.widthCm.value);
         const height_cm = readOptionalNumber(els.heightCm.value);
+        const volume_ml = computeVolumeMl(length_cm, width_cm, height_cm);
 
         if (!name) {
           throw new Error(i18n.t("items.nameRequired"));
@@ -1246,7 +1236,6 @@
 
         for (const [value, key] of [
           [weight_grams, "items.weightInvalid"],
-          [volume_ml, "items.volumeInvalid"],
           [length_cm, "items.lengthInvalid"],
           [width_cm, "items.widthInvalid"],
           [height_cm, "items.heightInvalid"]
@@ -1266,7 +1255,6 @@
           unit,
           purchase_price,
           sale_price,
-          image_url: image_url || null,
           description: description || null,
           weight_grams,
           volume_ml,
@@ -1297,34 +1285,14 @@
     function bindEvents() {
       els.itemForm.addEventListener("submit", handleSubmit);
       els.searchInput.addEventListener("input", renderTable);
+      [els.name, els.brand, els.category, els.purchasePrice, els.salePrice, els.weightGrams, els.lengthCm, els.widthCm, els.heightCm].forEach((node) => {
+        node.addEventListener("input", () => {
+          updateVolumeDisplay();
+          renderPreview();
+        });
+      });
       els.cancelEditBtn.addEventListener("click", resetForm);
       els.refreshBtn.addEventListener("click", loadData);
-
-      [
-        els.name,
-        els.brand,
-        els.category,
-        els.purchasePrice,
-        els.salePrice,
-        els.imageUrl,
-        els.weightGrams,
-        els.volumeMl,
-        els.lengthCm,
-        els.widthCm,
-        els.heightCm
-      ].forEach((input) => input.addEventListener("input", renderPreview));
-
-      els.previewImage.addEventListener("error", () => {
-        els.previewImage.removeAttribute("src");
-        els.previewImage.style.display = "none";
-        els.previewImageEmpty.textContent = i18n.t("items.previewImageLoadError");
-        els.previewImageEmpty.style.display = "block";
-      });
-
-      els.previewImage.addEventListener("load", () => {
-        els.previewImageEmpty.style.display = "none";
-        els.previewImage.style.display = "block";
-      });
 
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
@@ -1341,6 +1309,7 @@
       i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
       syncFormTexts();
+      updateVolumeDisplay();
       renderPreview();
       loadData();
     }

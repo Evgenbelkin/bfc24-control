@@ -44,6 +44,18 @@ function validateNonNegativeOptionalNumber(value, errorCode) {
   return { ok: true };
 }
 
+function computeVolumeMlFromDimensions(lengthCm, widthCm, heightCm) {
+  if (
+    lengthCm === null || widthCm === null || heightCm === null ||
+    !Number.isFinite(Number(lengthCm)) || !Number.isFinite(Number(widthCm)) || !Number.isFinite(Number(heightCm)) ||
+    Number(lengthCm) <= 0 || Number(widthCm) <= 0 || Number(heightCm) <= 0
+  ) {
+    return null;
+  }
+
+  return Number(lengthCm) * Number(widthCm) * Number(heightCm);
+}
+
 async function checkItemDuplicates({ tenantId, sku, barcode, excludeId = null }) {
   if (sku) {
     const skuParams = [tenantId, sku];
@@ -255,10 +267,10 @@ router.post(
       const imageUrl = normalizeOptionalText(req.body.image_url);
       const description = normalizeOptionalText(req.body.description);
       const weightGrams = normalizeOptionalNumber(req.body.weight_grams);
-      const volumeMl = normalizeOptionalNumber(req.body.volume_ml);
       const lengthCm = normalizeOptionalNumber(req.body.length_cm);
       const widthCm = normalizeOptionalNumber(req.body.width_cm);
       const heightCm = normalizeOptionalNumber(req.body.height_cm);
+      const volumeMl = computeVolumeMlFromDimensions(lengthCm, widthCm, heightCm);
       const isActive = normalizeBoolean(req.body.is_active, true);
 
       if (!name) {
@@ -284,7 +296,6 @@ router.post(
 
       for (const check of [
         validateNonNegativeOptionalNumber(weightGrams, "invalid_weight_grams"),
-        validateNonNegativeOptionalNumber(volumeMl, "invalid_volume_ml"),
         validateNonNegativeOptionalNumber(lengthCm, "invalid_length_cm"),
         validateNonNegativeOptionalNumber(widthCm, "invalid_width_cm"),
         validateNonNegativeOptionalNumber(heightCm, "invalid_height_cm"),
@@ -442,10 +453,10 @@ router.put(
       const imageUrl = normalizeOptionalText(req.body.image_url);
       const description = normalizeOptionalText(req.body.description);
       const weightGrams = normalizeOptionalNumber(req.body.weight_grams);
-      const volumeMl = normalizeOptionalNumber(req.body.volume_ml);
       const lengthCm = normalizeOptionalNumber(req.body.length_cm);
       const widthCm = normalizeOptionalNumber(req.body.width_cm);
       const heightCm = normalizeOptionalNumber(req.body.height_cm);
+      const volumeMl = computeVolumeMlFromDimensions(lengthCm, widthCm, heightCm);
       const isActive = normalizeBoolean(req.body.is_active, true);
 
       if (!name) {
@@ -471,7 +482,6 @@ router.put(
 
       for (const check of [
         validateNonNegativeOptionalNumber(weightGrams, "invalid_weight_grams"),
-        validateNonNegativeOptionalNumber(volumeMl, "invalid_volume_ml"),
         validateNonNegativeOptionalNumber(lengthCm, "invalid_length_cm"),
         validateNonNegativeOptionalNumber(widthCm, "invalid_width_cm"),
         validateNonNegativeOptionalNumber(heightCm, "invalid_height_cm"),
