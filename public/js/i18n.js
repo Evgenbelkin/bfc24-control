@@ -843,7 +843,24 @@
         serverError: "Ошибка сервера",
         grossProfitShort: "Вал. прибыль",
         expensesShort: "Расходы",
-        netProfitShort: "Чист. прибыль"
+        netProfitShort: "Чист. прибыль",
+
+        topItemsChartTitle: "График топ товаров",
+        topItemsChartNote: "Визуализация выручки по лидерам продаж",
+        salesValue: "{value} продаж",
+        noSalesForPeriodTitle: "За период не было продаж",
+        problemProductsTitle: "Проблемные товары",
+        frozenMoneyTitle: "Где заморожены деньги",
+        problemPeriodDays: "за {value} дн. · оборачиваемость и риск",
+        status: "Статус",
+        stockShort: "Остаток",
+        cost: "Стоимость",
+        profit: "Прибыль",
+        days: "Дней",
+        sold: "Продано",
+        noProblemProductsTitle: "Проблемных товаров нет",
+        noProblemProductsText: "По выбранному периоду проблем не найдено.",
+        problemProductsErrorTitle: "Ошибка проблемных товаров",
       }
     },
 
@@ -1690,7 +1707,24 @@
         serverError: "Server error",
         grossProfitShort: "Gross profit",
         expensesShort: "Expenses",
-        netProfitShort: "Net profit"
+        netProfitShort: "Net profit",
+
+        topItemsChartTitle: "Top items chart",
+        topItemsChartNote: "Revenue visualization for best-selling items",
+        salesValue: "{value} sales",
+        noSalesForPeriodTitle: "No sales for the selected period",
+        problemProductsTitle: "Problem products",
+        frozenMoneyTitle: "Where money is frozen",
+        problemPeriodDays: "for {value} days · turnover and risk",
+        status: "Status",
+        stockShort: "Stock",
+        cost: "Cost",
+        profit: "Profit",
+        days: "Days",
+        sold: "Sold",
+        noProblemProductsTitle: "No problem products",
+        noProblemProductsText: "No issues found for the selected period.",
+        problemProductsErrorTitle: "Problem products error",
       }
     },
 
@@ -2467,7 +2501,24 @@
         serverError: "服务器错误",
         grossProfitShort: "毛利润",
         expensesShort: "支出",
-        netProfitShort: "净利润"
+        netProfitShort: "净利润",
+
+        topItemsChartTitle: "热销商品图表",
+        topItemsChartNote: "按销售收入展示领先商品",
+        salesValue: "{value} 笔销售",
+        noSalesForPeriodTitle: "该时间段没有销售数据",
+        problemProductsTitle: "问题商品",
+        frozenMoneyTitle: "资金被占用的位置",
+        problemPeriodDays: "最近 {value} 天 · 周转与风险",
+        status: "状态",
+        stockShort: "库存",
+        cost: "成本",
+        profit: "利润",
+        days: "天数",
+        sold: "已售",
+        noProblemProductsTitle: "没有问题商品",
+        noProblemProductsText: "在所选时间段内未发现问题。",
+        problemProductsErrorTitle: "问题商品错误",
       }
     }
   };
