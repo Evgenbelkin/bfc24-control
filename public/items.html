@@ -403,13 +403,13 @@
           </div>
 
           <div class="field">
-            <label for="brand">Артикул фабрики</label>
-            <input id="brand" type="text" placeholder="Например: XJ-2048" />
+            <label for="brand" data-i18n="items.factoryArticle">Артикул фабрики</label>
+            <input id="brand" type="text" data-i18n-placeholder="items.factoryArticlePlaceholder" placeholder="Например: XJ-2048" />
           </div>
 
           <div class="field">
-            <label for="category">Фабрика</label>
-            <input id="category" type="text" placeholder="Например: Shenzhen Factory" />
+            <label for="category" data-i18n="items.factory">Фабрика</label>
+            <input id="category" type="text" data-i18n-placeholder="items.factoryPlaceholder" placeholder="Например: Shenzhen Factory" />
           </div>
 
           <div class="field">
@@ -438,34 +438,34 @@
           </div>
 
           <div class="field full">
-            <label for="description">Описание</label>
-            <textarea id="description" placeholder="Краткое описание товара"></textarea>
+            <label for="description" data-i18n="items.descriptionLabel">Описание</label>
+            <textarea id="description" data-i18n-placeholder="items.descriptionPlaceholder" placeholder="Краткое описание товара"></textarea>
           </div>
 
           <div class="field">
-            <label for="weightKg">Вес коробки, кг</label>
-            <input id="weightKg" type="number" step="0.001" min="0" placeholder="Например: 12.5" />
+            <label for="weightKg" data-i18n="items.weightBox">Вес коробки, кг</label>
+            <input id="weightKg" type="number" step="0.001" min="0" data-i18n-placeholder="items.weightBoxPlaceholder" placeholder="Например: 12.5" />
           </div>
 
           <div class="field">
-            <label for="lengthCm">Длина коробки, см</label>
-            <input id="lengthCm" type="number" step="0.01" min="0" placeholder="Например: 60" />
+            <label for="lengthCm" data-i18n="items.lengthBox">Длина коробки, см</label>
+            <input id="lengthCm" type="number" step="0.01" min="0" data-i18n-placeholder="items.lengthBoxPlaceholder" placeholder="Например: 60" />
           </div>
 
           <div class="field">
-            <label for="widthCm">Ширина коробки, см</label>
-            <input id="widthCm" type="number" step="0.01" min="0" placeholder="Например: 40" />
+            <label for="widthCm" data-i18n="items.widthBox">Ширина коробки, см</label>
+            <input id="widthCm" type="number" step="0.01" min="0" data-i18n-placeholder="items.widthBoxPlaceholder" placeholder="Например: 40" />
           </div>
 
           <div class="field">
-            <label for="heightCm">Высота коробки, см</label>
-            <input id="heightCm" type="number" step="0.01" min="0" placeholder="Например: 35" />
+            <label for="heightCm" data-i18n="items.heightBox">Высота коробки, см</label>
+            <input id="heightCm" type="number" step="0.01" min="0" data-i18n-placeholder="items.heightBoxPlaceholder" placeholder="Например: 35" />
           </div>
 
           <div class="field">
-            <label for="volumeM3">Объём коробки, м³</label>
-            <input id="volumeM3" type="text" readonly placeholder="Рассчитывается автоматически" />
-            <div class="calc-note">Объём считается автоматически по размерам коробки.</div>
+            <label for="volumeM3" data-i18n="items.volumeBox">Объём коробки, м³</label>
+            <input id="volumeM3" type="text" readonly data-i18n-placeholder="items.volumeAuto" placeholder="Рассчитывается автоматически" />
+            <div class="calc-note" data-i18n="items.volumeAutoHint">Объём считается автоматически по размерам коробки.</div>
           </div>
         </div>
 
@@ -501,7 +501,7 @@
               <th data-i18n="items.tableUnit">Ед.</th>
               <th data-i18n="items.tablePurchase">Закупка</th>
               <th data-i18n="items.tableSale">Продажа</th>
-              <th>Характеристики</th>
+              <th data-i18n="items.tableMetrics">Характеристики</th>
               <th data-i18n="items.tableActive">Активно</th>
               <th data-i18n="items.tableDate">Дата</th>
               <th data-i18n="items.tableActions">Действия</th>
@@ -800,32 +800,31 @@
     }
 
     function normalizeItem(row) {
-  const length_cm = row.length_cm === null || row.length_cm === undefined ? null : Number(row.length_cm);
-  const width_cm = row.width_cm === null || row.width_cm === undefined ? null : Number(row.width_cm);
-  const height_cm = row.height_cm === null || row.height_cm === undefined ? null : Number(row.height_cm);
+      const length_cm = row.length_cm === null || row.length_cm === undefined ? null : Number(row.length_cm);
+      const width_cm = row.width_cm === null || row.width_cm === undefined ? null : Number(row.width_cm);
+      const height_cm = row.height_cm === null || row.height_cm === undefined ? null : Number(row.height_cm);
+      const computedVolume = computeVolumeCm3(length_cm, width_cm, height_cm);
 
-  const computedVolume = computeVolumeCm3(length_cm, width_cm, height_cm);
-
-  return {
-    id: row.id,
-    name: row.name || row.item_name || "",
-    brand: row.brand || "",
-    category: row.category || "",
-    sku: row.sku || row.vendor_code || row.article || "",
-    barcode: row.barcode || "",
-    unit: row.unit || "pcs",
-    purchase_price: Number(row.purchase_price ?? row.cost_price ?? 0),
-    sale_price: Number(row.sale_price ?? row.price ?? 0),
-    description: row.description || "",
-    weight_kg: row.weight_kg === null || row.weight_kg === undefined ? null : Number(row.weight_kg),
-    length_cm,
-    width_cm,
-    height_cm,
-    volume_cm3: computedVolume,
-    is_active: row.is_active === false ? false : true,
-    created_at: row.created_at || row.date || null
-  };
-}
+      return {
+        id: row.id,
+        name: row.name || row.item_name || "",
+        brand: row.brand || "",
+        category: row.category || "",
+        sku: row.sku || row.vendor_code || row.article || "",
+        barcode: row.barcode || "",
+        unit: row.unit || "pcs",
+        purchase_price: Number(row.purchase_price ?? row.cost_price ?? 0),
+        sale_price: Number(row.sale_price ?? row.price ?? 0),
+        description: row.description || "",
+        weight_kg: row.weight_kg === null || row.weight_kg === undefined ? null : Number(row.weight_kg),
+        volume_cm3: computedVolume,
+        length_cm,
+        width_cm,
+        height_cm,
+        is_active: row.is_active === false ? false : true,
+        created_at: row.created_at || row.date || null
+      };
+    }
 
     function getFormTitleText() {
       if (editId) {
