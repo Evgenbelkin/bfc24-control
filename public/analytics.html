@@ -951,6 +951,20 @@ function problemPriority(status) {
   }
 }
 
+function formatProblemDays(row) {
+  const rawDays = Number(row?.days_on_hand);
+  const soldQty = Number(row?.sold_qty_period || 0);
+  const status = String(row?.turnover_status || "");
+
+  if (!Number.isFinite(rawDays) || rawDays <= 0) return "—";
+  if (soldQty <= 0 || status === "stale_no_sales" || status === "no_sales") return "—";
+
+  if (rawDays >= 1000) return "999+";
+  if (rawDays >= 180) return fmt(rawDays, 0);
+
+  return fmt(rawDays, 1);
+}
+
 function renderProblemProducts(data) {
   const items = Array.isArray(data?.items) ? data.items : [];
   const acceptedStatuses = new Set(["critical", "risk", "warning", "stale_no_sales", "no_sales", "out_of_stock"]);
@@ -1013,7 +1027,7 @@ function renderProblemProducts(data) {
       <td class="r ${+row?.potential_profit >= 0 ? 'cell-success' : 'cell-danger'}">
         ${fmtMoney(row?.potential_profit)}
       </td>
-      <td class="r">${row?.days_on_hand == null ? '—' : fmt(row.days_on_hand,1)}</td>
+      <td class="r">${formatProblemDays(row)}</td>
       <td class="r">${fmt(row?.sold_qty_period,0)}</td>
     </tr>
   `).join("");
