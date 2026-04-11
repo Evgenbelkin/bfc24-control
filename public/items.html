@@ -800,26 +800,32 @@
     }
 
     function normalizeItem(row) {
-      return {
-        id: row.id,
-        name: row.name || row.item_name || "",
-        brand: row.brand || "",
-        category: row.category || "",
-        sku: row.sku || row.vendor_code || row.article || "",
-        barcode: row.barcode || "",
-        unit: row.unit || "pcs",
-        purchase_price: Number(row.purchase_price ?? row.cost_price ?? 0),
-        sale_price: Number(row.sale_price ?? row.price ?? 0),
-        description: row.description || "",
-        weight_kg: row.weight_kg === null || row.weight_kg === undefined ? null : Number(row.weight_kg),
-        volume_cm3: row.volume_cm3 === null || row.volume_cm3 === undefined ? Number(row.volume_ml ?? 0) || null : Number(row.volume_cm3),
-        length_cm: row.length_cm === null || row.length_cm === undefined ? null : Number(row.length_cm),
-        width_cm: row.width_cm === null || row.width_cm === undefined ? null : Number(row.width_cm),
-        height_cm: row.height_cm === null || row.height_cm === undefined ? null : Number(row.height_cm),
-        is_active: row.is_active === false ? false : true,
-        created_at: row.created_at || row.date || null
-      };
-    }
+  const length_cm = row.length_cm === null || row.length_cm === undefined ? null : Number(row.length_cm);
+  const width_cm = row.width_cm === null || row.width_cm === undefined ? null : Number(row.width_cm);
+  const height_cm = row.height_cm === null || row.height_cm === undefined ? null : Number(row.height_cm);
+
+  const computedVolume = computeVolumeCm3(length_cm, width_cm, height_cm);
+
+  return {
+    id: row.id,
+    name: row.name || row.item_name || "",
+    brand: row.brand || "",
+    category: row.category || "",
+    sku: row.sku || row.vendor_code || row.article || "",
+    barcode: row.barcode || "",
+    unit: row.unit || "pcs",
+    purchase_price: Number(row.purchase_price ?? row.cost_price ?? 0),
+    sale_price: Number(row.sale_price ?? row.price ?? 0),
+    description: row.description || "",
+    weight_kg: row.weight_kg === null || row.weight_kg === undefined ? null : Number(row.weight_kg),
+    length_cm,
+    width_cm,
+    height_cm,
+    volume_cm3: computedVolume,
+    is_active: row.is_active === false ? false : true,
+    created_at: row.created_at || row.date || null
+  };
+}
 
     function getFormTitleText() {
       if (editId) {
