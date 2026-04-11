@@ -860,9 +860,10 @@
         noProblemProductsTitle: "Нет проблемных товаров",
         noProblemProductsText: "По текущему периоду не найдено товаров с риском или замедлением.",
         problemProductsErrorTitle: "Ошибка проблемных товаров"
-,
+      },
 
       turnover: {
+        pageTitle: "BFC24 CONTROL — Оборачиваемость",
         title: "Оборачиваемость",
         subtitle: "Контроль залеживания, скорости продаж и замороженных денег в остатках",
         backToAnalytics: "Назад в аналитику",
@@ -975,7 +976,7 @@
         csvPotentialRevenue: "Потенциальная выручка",
         csvPotentialProfit: "Потенциальная прибыль",
         footerNote: "Логика статусов: healthy / warning / risk / critical рассчитываются по количеству дней остатка. Если продаж за выбранный период не было, товар уходит в статус «Без продаж». Если остаток равен 0 — в статус «Нет остатка»."
-      }      }
+      }
     },
 
     en: {
@@ -1838,9 +1839,10 @@
         noProblemProductsTitle: "No problem items",
         noProblemProductsText: "No items with risk or slowdown were found for the current period.",
         problemProductsErrorTitle: "Problem items error"
-,
+      },
 
       turnover: {
+        pageTitle: "BFC24 CONTROL — Turnover",
         title: "Turnover",
         subtitle: "Control of slow-moving items, sales speed and money frozen in stock",
         backToAnalytics: "Back to analytics",
@@ -1953,7 +1955,7 @@
         csvPotentialRevenue: "Potential revenue",
         csvPotentialProfit: "Potential profit",
         footerNote: "Status logic: healthy / warning / risk / critical are calculated by the number of days on hand. If there were no sales during the selected period, the item moves to the “No sales” status. If stock equals 0, the item moves to “Out of stock”."
-      }      }
+      }
     },
 
     zh: {
@@ -2746,9 +2748,10 @@
         noProblemProductsTitle: "没有问题商品",
         noProblemProductsText: "当前周期内未发现存在风险或滞销的商品。",
         problemProductsErrorTitle: "问题商品加载错误"
-,
+      },
 
       turnover: {
+        pageTitle: "BFC24 CONTROL — 周转分析",
         title: "周转分析",
         subtitle: "控制滞销、销售速度以及库存中被冻结的资金",
         backToAnalytics: "返回分析页",
@@ -2861,7 +2864,7 @@
         csvPotentialRevenue: "潜在营收",
         csvPotentialProfit: "潜在利润",
         footerNote: "状态逻辑：healthy / warning / risk / critical 按库存可售天数计算。如果所选周期内没有销售，商品进入“无销售”状态。如果库存为 0，则进入“无库存”状态。"
-      }      }
+      }
     }
   };
 
