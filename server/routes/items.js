@@ -18,6 +18,12 @@ function normalizeOptionalText(value) {
   return text === "" ? null : text;
 }
 
+function normalizeOptionalNumber(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : NaN;
+}
+
 function normalizeBoolean(value, defaultValue = true) {
   if (value === undefined) return defaultValue;
   if (typeof value === "boolean") return value;
@@ -28,6 +34,14 @@ function normalizeBoolean(value, defaultValue = true) {
   if (["false", "0", "no", "off"].includes(raw)) return false;
 
   return defaultValue;
+}
+
+function validateNonNegativeOptionalNumber(value, errorCode) {
+  if (value === null) return { ok: true };
+  if (!Number.isFinite(value) || value < 0) {
+    return { ok: false, error: errorCode };
+  }
+  return { ok: true };
 }
 
 async function checkItemDuplicates({ tenantId, sku, barcode, excludeId = null }) {
@@ -86,6 +100,34 @@ async function checkItemDuplicates({ tenantId, sku, barcode, excludeId = null })
   return { ok: true };
 }
 
+function getItemSelectSql(whereSql) {
+  return `
+    SELECT
+      i.id,
+      i.tenant_id,
+      i.name,
+      i.brand,
+      i.category,
+      i.sku,
+      i.barcode,
+      i.unit,
+      i.purchase_price,
+      i.sale_price,
+      i.image_url,
+      i.description,
+      i.weight_grams,
+      i.volume_ml,
+      i.length_cm,
+      i.width_cm,
+      i.height_cm,
+      i.is_active,
+      i.created_at,
+      i.updated_at
+    FROM core.items i
+    ${whereSql}
+  `;
+}
+
 router.get("/", authRequired, async (req, res) => {
   try {
     const tenantId = getEffectiveTenantId(req);
@@ -105,26 +147,16 @@ router.get("/", authRequired, async (req, res) => {
       params.push(`%${search}%`);
       whereSql += ` AND (
         i.name ILIKE $${params.length}
+        OR COALESCE(i.brand, '') ILIKE $${params.length}
+        OR COALESCE(i.category, '') ILIKE $${params.length}
         OR COALESCE(i.sku, '') ILIKE $${params.length}
         OR COALESCE(i.barcode, '') ILIKE $${params.length}
+        OR COALESCE(i.description, '') ILIKE $${params.length}
       )`;
     }
 
     const sql = `
-      SELECT
-        i.id,
-        i.tenant_id,
-        i.name,
-        i.sku,
-        i.barcode,
-        i.unit,
-        i.purchase_price,
-        i.sale_price,
-        i.is_active,
-        i.created_at,
-        i.updated_at
-      FROM core.items i
-      ${whereSql}
+      ${getItemSelectSql(whereSql)}
       ORDER BY i.id DESC
     `;
 
@@ -164,21 +196,7 @@ router.get("/:id", authRequired, async (req, res) => {
     }
 
     const sql = `
-      SELECT
-        i.id,
-        i.tenant_id,
-        i.name,
-        i.sku,
-        i.barcode,
-        i.unit,
-        i.purchase_price,
-        i.sale_price,
-        i.is_active,
-        i.created_at,
-        i.updated_at
-      FROM core.items i
-      WHERE i.id = $1
-        AND i.tenant_id = $2
+      ${getItemSelectSql("WHERE i.id = $1 AND i.tenant_id = $2")}
       LIMIT 1
     `;
 
@@ -227,11 +245,20 @@ router.post(
       }
 
       const name = String(req.body.name || "").trim();
+      const brand = normalizeOptionalText(req.body.brand);
+      const category = normalizeOptionalText(req.body.category);
       const sku = normalizeOptionalText(req.body.sku);
       const barcode = normalizeOptionalText(req.body.barcode);
       const unit = normalizeOptionalText(req.body.unit) || "pcs";
       const purchasePrice = Number(req.body.purchase_price ?? 0);
       const salePrice = Number(req.body.sale_price ?? 0);
+      const imageUrl = normalizeOptionalText(req.body.image_url);
+      const description = normalizeOptionalText(req.body.description);
+      const weightGrams = normalizeOptionalNumber(req.body.weight_grams);
+      const volumeMl = normalizeOptionalNumber(req.body.volume_ml);
+      const lengthCm = normalizeOptionalNumber(req.body.length_cm);
+      const widthCm = normalizeOptionalNumber(req.body.width_cm);
+      const heightCm = normalizeOptionalNumber(req.body.height_cm);
       const isActive = normalizeBoolean(req.body.is_active, true);
 
       if (!name) {
@@ -255,6 +282,21 @@ router.post(
         });
       }
 
+      for (const check of [
+        validateNonNegativeOptionalNumber(weightGrams, "invalid_weight_grams"),
+        validateNonNegativeOptionalNumber(volumeMl, "invalid_volume_ml"),
+        validateNonNegativeOptionalNumber(lengthCm, "invalid_length_cm"),
+        validateNonNegativeOptionalNumber(widthCm, "invalid_width_cm"),
+        validateNonNegativeOptionalNumber(heightCm, "invalid_height_cm"),
+      ]) {
+        if (!check.ok) {
+          return res.status(400).json({
+            ok: false,
+            error: check.error,
+          });
+        }
+      }
+
       const duplicateCheck = await checkItemDuplicates({
         tenantId,
         sku,
@@ -272,23 +314,41 @@ router.post(
         INSERT INTO core.items (
           tenant_id,
           name,
+          brand,
+          category,
           sku,
           barcode,
           unit,
           purchase_price,
           sale_price,
+          image_url,
+          description,
+          weight_grams,
+          volume_ml,
+          length_cm,
+          width_cm,
+          height_cm,
           is_active
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
         RETURNING
           id,
           tenant_id,
           name,
+          brand,
+          category,
           sku,
           barcode,
           unit,
           purchase_price,
           sale_price,
+          image_url,
+          description,
+          weight_grams,
+          volume_ml,
+          length_cm,
+          width_cm,
+          height_cm,
           is_active,
           created_at,
           updated_at
@@ -297,11 +357,20 @@ router.post(
       const params = [
         tenantId,
         name,
+        brand,
+        category,
         sku,
         barcode,
         unit,
         purchasePrice,
         salePrice,
+        imageUrl,
+        description,
+        weightGrams,
+        volumeMl,
+        lengthCm,
+        widthCm,
+        heightCm,
         isActive,
       ];
 
@@ -363,11 +432,20 @@ router.put(
       }
 
       const name = String(req.body.name || "").trim();
+      const brand = normalizeOptionalText(req.body.brand);
+      const category = normalizeOptionalText(req.body.category);
       const sku = normalizeOptionalText(req.body.sku);
       const barcode = normalizeOptionalText(req.body.barcode);
       const unit = normalizeOptionalText(req.body.unit) || "pcs";
       const purchasePrice = Number(req.body.purchase_price ?? 0);
       const salePrice = Number(req.body.sale_price ?? 0);
+      const imageUrl = normalizeOptionalText(req.body.image_url);
+      const description = normalizeOptionalText(req.body.description);
+      const weightGrams = normalizeOptionalNumber(req.body.weight_grams);
+      const volumeMl = normalizeOptionalNumber(req.body.volume_ml);
+      const lengthCm = normalizeOptionalNumber(req.body.length_cm);
+      const widthCm = normalizeOptionalNumber(req.body.width_cm);
+      const heightCm = normalizeOptionalNumber(req.body.height_cm);
       const isActive = normalizeBoolean(req.body.is_active, true);
 
       if (!name) {
@@ -391,6 +469,21 @@ router.put(
         });
       }
 
+      for (const check of [
+        validateNonNegativeOptionalNumber(weightGrams, "invalid_weight_grams"),
+        validateNonNegativeOptionalNumber(volumeMl, "invalid_volume_ml"),
+        validateNonNegativeOptionalNumber(lengthCm, "invalid_length_cm"),
+        validateNonNegativeOptionalNumber(widthCm, "invalid_width_cm"),
+        validateNonNegativeOptionalNumber(heightCm, "invalid_height_cm"),
+      ]) {
+        if (!check.ok) {
+          return res.status(400).json({
+            ok: false,
+            error: check.error,
+          });
+        }
+      }
+
       const duplicateCheck = await checkItemDuplicates({
         tenantId,
         sku,
@@ -409,24 +502,42 @@ router.put(
         UPDATE core.items
         SET
           name = $1,
-          sku = $2,
-          barcode = $3,
-          unit = $4,
-          purchase_price = $5,
-          sale_price = $6,
-          is_active = $7,
+          brand = $2,
+          category = $3,
+          sku = $4,
+          barcode = $5,
+          unit = $6,
+          purchase_price = $7,
+          sale_price = $8,
+          image_url = $9,
+          description = $10,
+          weight_grams = $11,
+          volume_ml = $12,
+          length_cm = $13,
+          width_cm = $14,
+          height_cm = $15,
+          is_active = $16,
           updated_at = NOW()
-        WHERE id = $8
-          AND tenant_id = $9
+        WHERE id = $17
+          AND tenant_id = $18
         RETURNING
           id,
           tenant_id,
           name,
+          brand,
+          category,
           sku,
           barcode,
           unit,
           purchase_price,
           sale_price,
+          image_url,
+          description,
+          weight_grams,
+          volume_ml,
+          length_cm,
+          width_cm,
+          height_cm,
           is_active,
           created_at,
           updated_at
@@ -434,11 +545,20 @@ router.put(
 
       const params = [
         name,
+        brand,
+        category,
         sku,
         barcode,
         unit,
         purchasePrice,
         salePrice,
+        imageUrl,
+        description,
+        weightGrams,
+        volumeMl,
+        lengthCm,
+        widthCm,
+        heightCm,
         isActive,
         id,
         tenantId,

@@ -19,6 +19,7 @@
       --danger:#dc2626;
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:16px;
+      --soft:#f8fafc;
     }
 
     *{box-sizing:border-box}
@@ -31,7 +32,7 @@
     }
 
     .wrap{
-      max-width:1320px;
+      max-width:1560px;
       margin:0 auto;
       padding:24px 16px 48px;
     }
@@ -138,9 +139,42 @@
       font-size:13px;
     }
 
-    .form-grid{
+    .stats{
       display:grid;
       grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .stat{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .editor-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 300px;
+      gap:16px;
+      margin-top:18px;
+      align-items:start;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:14px;
     }
 
@@ -179,6 +213,75 @@
     textarea{
       min-height:92px;
       resize:vertical;
+    }
+
+    .preview-card{
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      background:var(--soft);
+      padding:14px;
+      position:sticky;
+      top:12px;
+    }
+
+    .preview-title{
+      font-size:14px;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+
+    .preview-image{
+      width:100%;
+      aspect-ratio:1/1;
+      border-radius:14px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      margin-bottom:12px;
+    }
+
+    .preview-image img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .preview-empty{
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+      padding:18px;
+      line-height:1.45;
+    }
+
+    .preview-meta{
+      display:grid;
+      gap:8px;
+    }
+
+    .preview-meta-item{
+      background:#fff;
+      border:1px solid #e8edf4;
+      border-radius:12px;
+      padding:10px 12px;
+    }
+
+    .preview-meta-label{
+      color:var(--muted);
+      font-size:11px;
+      margin-bottom:4px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .preview-meta-value{
+      font-size:14px;
+      font-weight:700;
+      word-break:break-word;
     }
 
     .toolbar{
@@ -221,31 +324,6 @@
       border:1px solid #bfdbfe;
     }
 
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .stat{
-      background:#f8fafc;
-      border:1px solid #e8edf4;
-      border-radius:14px;
-      padding:14px;
-    }
-
-    .stat-label{
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:6px;
-    }
-
-    .stat-value{
-      font-size:22px;
-      font-weight:800;
-    }
-
     .table-wrap{
       overflow:auto;
       margin-top:10px;
@@ -253,7 +331,7 @@
 
     table{
       width:100%;
-      min-width:1200px;
+      min-width:1650px;
       border-collapse:collapse;
       background:#fff;
     }
@@ -273,10 +351,60 @@
       position:sticky;
       top:0;
       z-index:1;
+      white-space:nowrap;
     }
 
     tr:hover td{
       background:#fbfdff;
+    }
+
+    .cell-name{
+      min-width:220px;
+    }
+
+    .item-main{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+
+    .thumb{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+      overflow:hidden;
+      flex-shrink:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .thumb-empty{
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      line-height:1.2;
+      padding:6px;
+    }
+
+    .item-name{
+      font-weight:700;
+      margin-bottom:3px;
+    }
+
+    .item-sub{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
     }
 
     .row-actions{
@@ -289,6 +417,29 @@
       text-align:center;
       color:var(--muted);
       padding:24px 12px;
+    }
+
+    .dim-lines{
+      display:grid;
+      gap:4px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    @media (max-width: 1180px){
+      .editor-grid{
+        grid-template-columns:1fr;
+      }
+
+      .preview-card{
+        position:static;
+      }
+
+      .form-grid,
+      .stats,
+      .toolbar{
+        grid-template-columns:1fr 1fr;
+      }
     }
 
     @media (max-width: 980px){
@@ -342,54 +493,133 @@
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
+          <div class="stat-label" data-i18n="items.statsActive">Активных</div>
+          <div class="stat-value" id="activeItemsCount">0</div>
+        </div>
+        <div class="stat">
           <div class="stat-label" data-i18n="items.statsTenant">Tenant ID</div>
           <div class="stat-value" id="tenantValue">1</div>
         </div>
       </div>
 
-      <form id="itemForm" autocomplete="off" style="margin-top:18px;">
-        <div class="form-grid">
-          <div class="field">
-            <label for="name" data-i18n="items.nameLabel">Название</label>
-            <input id="name" type="text" data-i18n-placeholder="items.namePlaceholder" placeholder="Например: Тест товар SaaS" />
+      <form id="itemForm" autocomplete="off">
+        <div class="editor-grid">
+          <div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="name" data-i18n="items.nameLabel">Название</label>
+                <input id="name" type="text" data-i18n-placeholder="items.namePlaceholder" placeholder="Например: Тест товар SaaS" />
+              </div>
+
+              <div class="field">
+                <label for="brand" data-i18n="items.brandLabel">Бренд</label>
+                <input id="brand" type="text" data-i18n-placeholder="items.brandPlaceholder" placeholder="Например: Xiaomi" />
+              </div>
+
+              <div class="field">
+                <label for="category" data-i18n="items.categoryLabel">Категория</label>
+                <input id="category" type="text" data-i18n-placeholder="items.categoryPlaceholder" placeholder="Например: Электроника" />
+              </div>
+
+              <div class="field">
+                <label for="unit" data-i18n="items.unitLabel">Единица</label>
+                <input id="unit" type="text" data-i18n-placeholder="items.unitPlaceholder" placeholder="Например: pcs" value="pcs" />
+              </div>
+
+              <div class="field">
+                <label for="sku" data-i18n="items.skuLabel">Артикул / SKU</label>
+                <input id="sku" type="text" data-i18n-placeholder="items.skuPlaceholder" placeholder="Например: SKU-001" />
+              </div>
+
+              <div class="field">
+                <label for="barcode" data-i18n="items.barcodeLabel">Штрихкод</label>
+                <input id="barcode" type="text" data-i18n-placeholder="items.barcodePlaceholder" placeholder="Например: 1234567890123" />
+              </div>
+
+              <div class="field">
+                <label for="purchasePrice" data-i18n="items.purchasePriceLabel">Закупочная цена</label>
+                <input id="purchasePrice" type="number" step="0.01" min="0" value="0" />
+              </div>
+
+              <div class="field">
+                <label for="salePrice" data-i18n="items.salePriceLabel">Цена продажи</label>
+                <input id="salePrice" type="number" step="0.01" min="0" value="0" />
+              </div>
+
+              <div class="field full">
+                <label for="imageUrl" data-i18n="items.imageUrlLabel">Ссылка на изображение</label>
+                <input id="imageUrl" type="text" data-i18n-placeholder="items.imageUrlPlaceholder" placeholder="https://..." />
+              </div>
+
+              <div class="field full">
+                <label for="description" data-i18n="items.descriptionLabel">Описание</label>
+                <textarea id="description" data-i18n-placeholder="items.descriptionPlaceholder" placeholder="Краткое описание товара"></textarea>
+              </div>
+
+              <div class="field">
+                <label for="weightGrams" data-i18n="items.weightLabel">Вес, г</label>
+                <input id="weightGrams" type="number" step="0.001" min="0" value="" />
+              </div>
+
+              <div class="field">
+                <label for="volumeMl" data-i18n="items.volumeLabel">Объём, мл</label>
+                <input id="volumeMl" type="number" step="0.001" min="0" value="" />
+              </div>
+
+              <div class="field">
+                <label for="lengthCm" data-i18n="items.lengthLabel">Длина, см</label>
+                <input id="lengthCm" type="number" step="0.01" min="0" value="" />
+              </div>
+
+              <div class="field">
+                <label for="widthCm" data-i18n="items.widthLabel">Ширина, см</label>
+                <input id="widthCm" type="number" step="0.01" min="0" value="" />
+              </div>
+
+              <div class="field">
+                <label for="heightCm" data-i18n="items.heightLabel">Высота, см</label>
+                <input id="heightCm" type="number" step="0.01" min="0" value="" />
+              </div>
+            </div>
+
+            <div class="toolbar">
+              <div class="field">
+                <label for="searchInput" data-i18n="items.searchLabel">Поиск</label>
+                <input id="searchInput" type="text" data-i18n-placeholder="items.searchPlaceholder" placeholder="Поиск по названию, артикулу, штрихкоду" />
+              </div>
+
+              <div class="toolbar-actions">
+                <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
+                <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
+                <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="items.refreshButton">Обновить список</button>
+              </div>
+            </div>
           </div>
 
-          <div class="field">
-            <label for="sku" data-i18n="items.skuLabel">Артикул / SKU</label>
-            <input id="sku" type="text" data-i18n-placeholder="items.skuPlaceholder" placeholder="Например: SKU-001" />
-          </div>
-
-          <div class="field">
-            <label for="barcode" data-i18n="items.barcodeLabel">Штрихкод</label>
-            <input id="barcode" type="text" data-i18n-placeholder="items.barcodePlaceholder" placeholder="Например: 1234567890123" />
-          </div>
-
-          <div class="field">
-            <label for="purchasePrice" data-i18n="items.purchasePriceLabel">Закупочная цена</label>
-            <input id="purchasePrice" type="number" step="0.01" min="0" value="0" />
-          </div>
-
-          <div class="field">
-            <label for="salePrice" data-i18n="items.salePriceLabel">Цена продажи</label>
-            <input id="salePrice" type="number" step="0.01" min="0" value="0" />
-          </div>
-
-          <div class="field">
-            <label for="unit" data-i18n="items.unitLabel">Единица</label>
-            <input id="unit" type="text" data-i18n-placeholder="items.unitPlaceholder" placeholder="Например: pcs" value="pcs" />
-          </div>
-        </div>
-
-        <div class="toolbar">
-          <div class="field">
-            <label for="searchInput" data-i18n="items.searchLabel">Поиск</label>
-            <input id="searchInput" type="text" data-i18n-placeholder="items.searchPlaceholder" placeholder="Поиск по названию, артикулу, штрихкоду" />
-          </div>
-
-          <div class="toolbar-actions">
-            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
-            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
-            <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="items.refreshButton">Обновить список</button>
+          <div class="preview-card">
+            <div class="preview-title" data-i18n="items.previewTitle">Предпросмотр карточки</div>
+            <div class="preview-image" id="previewImageBox">
+              <div class="preview-empty" id="previewImageEmpty" data-i18n="items.previewImageEmpty">Укажи ссылку на изображение, и здесь появится превью</div>
+              <img id="previewImage" alt="" style="display:none;" />
+            </div>
+            <div class="preview-meta">
+              <div class="preview-meta-item">
+                <div class="preview-meta-label" data-i18n="items.previewName">Название</div>
+                <div class="preview-meta-value" id="previewName">—</div>
+              </div>
+              <div class="preview-meta-item">
+                <div class="preview-meta-label" data-i18n="items.previewBrandCategory">Бренд / категория</div>
+                <div class="preview-meta-value" id="previewBrandCategory">—</div>
+              </div>
+              <div class="preview-meta-item">
+                <div class="preview-meta-label" data-i18n="items.previewPricing">Цена / закупка</div>
+                <div class="preview-meta-value" id="previewPricing">0 / 0</div>
+              </div>
+              <div class="preview-meta-item">
+                <div class="preview-meta-label" data-i18n="items.previewSize">Габариты / вес</div>
+                <div class="preview-meta-value" id="previewSize">—</div>
+              </div>
+            </div>
           </div>
         </div>
       </form>
@@ -406,12 +636,13 @@
           <thead>
             <tr>
               <th data-i18n="items.tableId">ID</th>
-              <th data-i18n="items.tableName">Название</th>
+              <th data-i18n="items.tableItemCard">Товар</th>
               <th data-i18n="items.tableSku">Артикул / SKU</th>
               <th data-i18n="items.tableBarcode">Штрихкод</th>
               <th data-i18n="items.tableUnit">Ед.</th>
               <th data-i18n="items.tablePurchase">Закупка</th>
               <th data-i18n="items.tableSale">Продажа</th>
+              <th data-i18n="items.tableMetrics">Характеристики</th>
               <th data-i18n="items.tableActive">Активно</th>
               <th data-i18n="items.tableDate">Дата</th>
               <th data-i18n="items.tableActions">Действия</th>
@@ -419,7 +650,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="10" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
+              <td colspan="11" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -520,18 +751,6 @@
           return window.API.put(path, body);
         }
         return requestFallback("PUT", path, body);
-      },
-      patch(path, body) {
-        if (window.API && typeof window.API.patch === "function") {
-          return window.API.patch(path, body);
-        }
-        return requestFallback("PATCH", path, body);
-      },
-      delete(path) {
-        if (window.API && typeof window.API.delete === "function") {
-          return window.API.delete(path);
-        }
-        return requestFallback("DELETE", path);
       }
     };
 
@@ -546,11 +765,20 @@
       formTitle: document.getElementById("formTitle"),
       itemForm: document.getElementById("itemForm"),
       name: document.getElementById("name"),
+      brand: document.getElementById("brand"),
+      category: document.getElementById("category"),
       sku: document.getElementById("sku"),
       barcode: document.getElementById("barcode"),
       purchasePrice: document.getElementById("purchasePrice"),
       salePrice: document.getElementById("salePrice"),
       unit: document.getElementById("unit"),
+      imageUrl: document.getElementById("imageUrl"),
+      description: document.getElementById("description"),
+      weightGrams: document.getElementById("weightGrams"),
+      volumeMl: document.getElementById("volumeMl"),
+      lengthCm: document.getElementById("lengthCm"),
+      widthCm: document.getElementById("widthCm"),
+      heightCm: document.getElementById("heightCm"),
       searchInput: document.getElementById("searchInput"),
       saveBtn: document.getElementById("saveBtn"),
       cancelEditBtn: document.getElementById("cancelEditBtn"),
@@ -559,7 +787,14 @@
       pageStatus: document.getElementById("pageStatus"),
       submitStatus: document.getElementById("submitStatus"),
       itemsCount: document.getElementById("itemsCount"),
-      tenantValue: document.getElementById("tenantValue")
+      activeItemsCount: document.getElementById("activeItemsCount"),
+      tenantValue: document.getElementById("tenantValue"),
+      previewImage: document.getElementById("previewImage"),
+      previewImageEmpty: document.getElementById("previewImageEmpty"),
+      previewName: document.getElementById("previewName"),
+      previewBrandCategory: document.getElementById("previewBrandCategory"),
+      previewPricing: document.getElementById("previewPricing"),
+      previewSize: document.getElementById("previewSize")
     };
 
     function goBack() {
@@ -582,10 +817,10 @@
     }
 
     function getTenantId() {
-      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== '') {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
         return Number(authUser.tenant_id);
       }
-      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== 'undefined' ? FALLBACK_TENANT_ID : 1);
+      return ApiBridge.getTenantId(typeof FALLBACK_TENANT_ID !== "undefined" ? FALLBACK_TENANT_ID : 1);
     }
 
     function showStatus(el, text, type = "info") {
@@ -651,7 +886,20 @@
     function formatMoney(value) {
       const n = Number(value || 0);
       if (!Number.isFinite(n)) return "0";
-      return n % 1 === 0 ? String(n) : n.toFixed(2);
+      return new Intl.NumberFormat("ru-RU", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      }).format(n);
+    }
+
+    function formatMetric(value, digits = 2) {
+      if (value === null || value === undefined || value === "") return "—";
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "—";
+      return new Intl.NumberFormat("ru-RU", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: digits
+      }).format(n);
     }
 
     function extractList(data, keys) {
@@ -685,11 +933,20 @@
       return {
         id: row.id,
         name: row.name || row.item_name || "",
+        brand: row.brand || "",
+        category: row.category || "",
         sku: row.sku || row.vendor_code || row.article || "",
         barcode: row.barcode || "",
         unit: row.unit || "pcs",
         purchase_price: Number(row.purchase_price ?? row.cost_price ?? 0),
         sale_price: Number(row.sale_price ?? row.price ?? 0),
+        image_url: row.image_url || "",
+        description: row.description || "",
+        weight_grams: row.weight_grams === null || row.weight_grams === undefined ? null : Number(row.weight_grams),
+        volume_ml: row.volume_ml === null || row.volume_ml === undefined ? null : Number(row.volume_ml),
+        length_cm: row.length_cm === null || row.length_cm === undefined ? null : Number(row.length_cm),
+        width_cm: row.width_cm === null || row.width_cm === undefined ? null : Number(row.width_cm),
+        height_cm: row.height_cm === null || row.height_cm === undefined ? null : Number(row.height_cm),
         is_active: row.is_active === false ? false : true,
         created_at: row.created_at || row.date || null
       };
@@ -712,17 +969,83 @@
       els.cancelEditBtn.textContent = i18n.t("items.cancelEditButton");
     }
 
+    function getImagePlaceholderText() {
+      return i18n.t("items.previewImageEmpty");
+    }
+
+    function readOptionalNumber(value) {
+      const raw = String(value ?? "").trim();
+      if (!raw) return null;
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function renderPreview() {
+      const name = (els.name.value || "").trim() || "—";
+      const brand = (els.brand.value || "").trim();
+      const category = (els.category.value || "").trim();
+      const imageUrl = (els.imageUrl.value || "").trim();
+      const purchasePrice = formatMoney(els.purchasePrice.value || 0);
+      const salePrice = formatMoney(els.salePrice.value || 0);
+
+      const dims = [];
+      const length = readOptionalNumber(els.lengthCm.value);
+      const width = readOptionalNumber(els.widthCm.value);
+      const height = readOptionalNumber(els.heightCm.value);
+      const weight = readOptionalNumber(els.weightGrams.value);
+      const volume = readOptionalNumber(els.volumeMl.value);
+
+      if (length !== null || width !== null || height !== null) {
+        dims.push(
+          [
+            length !== null ? formatMetric(length, 2) : "—",
+            width !== null ? formatMetric(width, 2) : "—",
+            height !== null ? formatMetric(height, 2) : "—"
+          ].join(" × ") + " см"
+        );
+      }
+      if (weight !== null) dims.push(i18n.format("items.previewWeightValue", { value: formatMetric(weight, 3) }));
+      if (volume !== null) dims.push(i18n.format("items.previewVolumeValue", { value: formatMetric(volume, 3) }));
+
+      els.previewName.textContent = name;
+      els.previewBrandCategory.textContent = [brand, category].filter(Boolean).join(" / ") || "—";
+      els.previewPricing.textContent = `${salePrice} / ${purchasePrice}`;
+      els.previewSize.textContent = dims.join(" • ") || "—";
+
+      if (imageUrl) {
+        els.previewImage.style.display = "block";
+        els.previewImage.src = imageUrl;
+        els.previewImage.alt = name;
+        els.previewImageEmpty.style.display = "none";
+      } else {
+        els.previewImage.removeAttribute("src");
+        els.previewImage.style.display = "none";
+        els.previewImageEmpty.textContent = getImagePlaceholderText();
+        els.previewImageEmpty.style.display = "block";
+      }
+    }
+
     function resetForm() {
       editId = null;
       syncFormTexts();
       els.cancelEditBtn.style.display = "none";
       els.name.value = "";
+      els.brand.value = "";
+      els.category.value = "";
       els.sku.value = "";
       els.barcode.value = "";
       els.purchasePrice.value = "0";
       els.salePrice.value = "0";
       els.unit.value = "pcs";
+      els.imageUrl.value = "";
+      els.description.value = "";
+      els.weightGrams.value = "";
+      els.volumeMl.value = "";
+      els.lengthCm.value = "";
+      els.widthCm.value = "";
+      els.heightCm.value = "";
       clearSubmitStatus();
+      renderPreview();
     }
 
     function startEdit(item) {
@@ -730,12 +1053,22 @@
       syncFormTexts();
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = item.name || "";
+      els.brand.value = item.brand || "";
+      els.category.value = item.category || "";
       els.sku.value = item.sku || "";
       els.barcode.value = item.barcode || "";
       els.purchasePrice.value = String(item.purchase_price ?? 0);
       els.salePrice.value = String(item.sale_price ?? 0);
       els.unit.value = item.unit || "pcs";
+      els.imageUrl.value = item.image_url || "";
+      els.description.value = item.description || "";
+      els.weightGrams.value = item.weight_grams ?? "";
+      els.volumeMl.value = item.volume_ml ?? "";
+      els.lengthCm.value = item.length_cm ?? "";
+      els.widthCm.value = item.width_cm ?? "";
+      els.heightCm.value = item.height_cm ?? "";
       clearSubmitStatus();
+      renderPreview();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -746,52 +1079,98 @@
         if (!search) return true;
         const text = [
           row.name,
+          row.brand,
+          row.category,
           row.sku,
           row.barcode,
-          row.unit
+          row.unit,
+          row.description
         ].join(" ").toLowerCase();
 
         return text.includes(search);
       });
     }
 
+    function getDimensionsText(row) {
+      const parts = [];
+
+      if (row.length_cm !== null || row.width_cm !== null || row.height_cm !== null) {
+        parts.push(
+          `${formatMetric(row.length_cm, 2)} × ${formatMetric(row.width_cm, 2)} × ${formatMetric(row.height_cm, 2)} см`
+        );
+      }
+
+      if (row.weight_grams !== null) {
+        parts.push(i18n.format("items.tableWeightValue", { value: formatMetric(row.weight_grams, 3) }));
+      }
+
+      if (row.volume_ml !== null) {
+        parts.push(i18n.format("items.tableVolumeValue", { value: formatMetric(row.volume_ml, 3) }));
+      }
+
+      return parts.length ? parts : ["—"];
+    }
+
     function renderTable() {
       const rows = getFilteredRows();
       els.itemsCount.textContent = String(itemsData.length);
+      els.activeItemsCount.textContent = String(itemsData.filter((row) => row.is_active).length);
 
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="10" class="empty">${escapeHtml(i18n.t("items.noData"))}</td>
+            <td colspan="11" class="empty">${escapeHtml(i18n.t("items.noData"))}</td>
           </tr>
         `;
         return;
       }
 
-      els.tbody.innerHTML = rows.map((row) => `
-        <tr>
-          <td>${escapeHtml(row.id)}</td>
-          <td>${escapeHtml(row.name)}</td>
-          <td>${escapeHtml(row.sku)}</td>
-          <td>${escapeHtml(row.barcode)}</td>
-          <td>${escapeHtml(row.unit)}</td>
-          <td>${escapeHtml(formatMoney(row.purchase_price))}</td>
-          <td>${escapeHtml(formatMoney(row.sale_price))}</td>
-          <td>${row.is_active ? escapeHtml(i18n.t("items.activeYes")) : escapeHtml(i18n.t("items.activeNo"))}</td>
-          <td>${escapeHtml(formatDate(row.created_at))}</td>
-          <td>
-            <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("items.editButton"))}</button>
-            </div>
-          </td>
-        </tr>
-      `).join("");
+      els.tbody.innerHTML = rows.map((row) => {
+        const dimensions = getDimensionsText(row);
+        return `
+          <tr>
+            <td>${escapeHtml(row.id)}</td>
+            <td class="cell-name">
+              <div class="item-main">
+                <div class="thumb">
+                  ${row.image_url
+                    ? `<img src="${escapeHtml(row.image_url)}" alt="${escapeHtml(row.name)}" loading="lazy" />`
+                    : `<div class="thumb-empty">${escapeHtml(i18n.t("items.noImageShort"))}</div>`
+                  }
+                </div>
+                <div>
+                  <div class="item-name">${escapeHtml(row.name)}</div>
+                  <div class="item-sub">${escapeHtml([row.brand, row.category].filter(Boolean).join(" / ") || i18n.t("items.noBrandCategory"))}</div>
+                  <div class="item-sub">${escapeHtml(row.description || "")}</div>
+                </div>
+              </div>
+            </td>
+            <td>${escapeHtml(row.sku)}</td>
+            <td>${escapeHtml(row.barcode)}</td>
+            <td>${escapeHtml(row.unit)}</td>
+            <td>${escapeHtml(formatMoney(row.purchase_price))}</td>
+            <td>${escapeHtml(formatMoney(row.sale_price))}</td>
+            <td>
+              <div class="dim-lines">
+                ${dimensions.map((line) => `<div>${escapeHtml(line)}</div>`).join("")}
+              </div>
+            </td>
+            <td>${row.is_active ? escapeHtml(i18n.t("items.activeYes")) : escapeHtml(i18n.t("items.activeNo"))}</td>
+            <td>${escapeHtml(formatDate(row.created_at))}</td>
+            <td>
+              <div class="row-actions">
+                <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("items.editButton"))}</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
     }
 
     function renderLoadingRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="10" class="empty">${escapeHtml(i18n.t("items.loadingData"))}</td>
+          <td colspan="11" class="empty">${escapeHtml(i18n.t("items.loadingData"))}</td>
         </tr>
       `;
     }
@@ -799,7 +1178,7 @@
     function renderLoadErrorRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="10" class="empty">${escapeHtml(i18n.t("items.loadErrorRow"))}</td>
+          <td colspan="11" class="empty">${escapeHtml(i18n.t("items.loadErrorRow"))}</td>
         </tr>
       `;
     }
@@ -837,11 +1216,21 @@
         const tenantId = getTenantId();
 
         const name = (els.name.value || "").trim();
+        const brand = (els.brand.value || "").trim();
+        const category = (els.category.value || "").trim();
         const sku = (els.sku.value || "").trim();
         const barcode = (els.barcode.value || "").trim();
         const purchase_price = Number(els.purchasePrice.value || 0);
         const sale_price = Number(els.salePrice.value || 0);
         const unit = (els.unit.value || "").trim() || "pcs";
+        const image_url = (els.imageUrl.value || "").trim();
+        const description = (els.description.value || "").trim();
+
+        const weight_grams = readOptionalNumber(els.weightGrams.value);
+        const volume_ml = readOptionalNumber(els.volumeMl.value);
+        const length_cm = readOptionalNumber(els.lengthCm.value);
+        const width_cm = readOptionalNumber(els.widthCm.value);
+        const height_cm = readOptionalNumber(els.heightCm.value);
 
         if (!name) {
           throw new Error(i18n.t("items.nameRequired"));
@@ -855,14 +1244,35 @@
           throw new Error(i18n.t("items.salePriceInvalid"));
         }
 
+        for (const [value, key] of [
+          [weight_grams, "items.weightInvalid"],
+          [volume_ml, "items.volumeInvalid"],
+          [length_cm, "items.lengthInvalid"],
+          [width_cm, "items.widthInvalid"],
+          [height_cm, "items.heightInvalid"]
+        ]) {
+          if (value !== null && value < 0) {
+            throw new Error(i18n.t(key));
+          }
+        }
+
         const body = {
           tenant_id: tenantId,
           name,
+          brand: brand || null,
+          category: category || null,
           sku: sku || null,
           barcode: barcode || null,
           unit,
           purchase_price,
-          sale_price
+          sale_price,
+          image_url: image_url || null,
+          description: description || null,
+          weight_grams,
+          volume_ml,
+          length_cm,
+          width_cm,
+          height_cm
         };
 
         if (editId) {
@@ -890,10 +1300,37 @@
       els.cancelEditBtn.addEventListener("click", resetForm);
       els.refreshBtn.addEventListener("click", loadData);
 
+      [
+        els.name,
+        els.brand,
+        els.category,
+        els.purchasePrice,
+        els.salePrice,
+        els.imageUrl,
+        els.weightGrams,
+        els.volumeMl,
+        els.lengthCm,
+        els.widthCm,
+        els.heightCm
+      ].forEach((input) => input.addEventListener("input", renderPreview));
+
+      els.previewImage.addEventListener("error", () => {
+        els.previewImage.removeAttribute("src");
+        els.previewImage.style.display = "none";
+        els.previewImageEmpty.textContent = i18n.t("items.previewImageLoadError");
+        els.previewImageEmpty.style.display = "block";
+      });
+
+      els.previewImage.addEventListener("load", () => {
+        els.previewImageEmpty.style.display = "none";
+        els.previewImage.style.display = "block";
+      });
+
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
         syncFormTexts();
         renderTable();
+        renderPreview();
         restoreStatusesAfterLanguageChange();
       });
     }
@@ -904,6 +1341,7 @@
       i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
       syncFormTexts();
+      renderPreview();
       loadData();
     }
 
