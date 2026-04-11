@@ -490,6 +490,25 @@
       border: 1px solid #fecaca;
     }
 
+
+    .menu-access-empty {
+      grid-column: 1 / -1;
+      background: var(--card-bg);
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      color: var(--text-muted);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .menu-access-empty strong {
+      display: block;
+      color: var(--text-main);
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
     @media (max-width: 768px) {
       .toolbar {
         justify-content: flex-start;
@@ -1130,6 +1149,87 @@
       bindLanguageButtons();
     }
 
+
+    function normalizeModules(user) {
+      if (!user || typeof user !== "object") return [];
+      if (!Array.isArray(user.modules)) return [];
+      return user.modules
+        .map((x) => String(x || "").trim())
+        .filter(Boolean);
+    }
+
+    function getModuleCodeByPath(pathname) {
+      const map = {
+        "/items.html": "items",
+        "/locations.html": "locations",
+        "/clients.html": "clients",
+        "/stock.html": "stock",
+        "/movements.html": "movements",
+        "/incoming.html": "incoming",
+        "/sales.html": "sales",
+        "/writeoff.html": "writeoff",
+        "/cash.html": "cash",
+        "/expenses.html": "expenses",
+        "/analytics.html": "analytics",
+        "/turnover.html": "turnover",
+        "/debts.html": "debts",
+        "/users.html": "users"
+      };
+      return map[pathname] || null;
+    }
+
+    function applyModuleAccess(user) {
+      try {
+        const menu = document.getElementById("menu");
+        if (!menu) return;
+
+        const modules = new Set(normalizeModules(user));
+
+        const cards = Array.from(menu.querySelectorAll(".card"));
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          if (card.id === "logoutCard" || card.id === "subscriptionCard") {
+            card.style.display = "";
+            return;
+          }
+
+          const onclickValue = card.getAttribute("onclick") || "";
+          const match = onclickValue.match(/window\.location\.href='([^']+)'/);
+          const path = match ? match[1] : "";
+          const moduleCode = getModuleCodeByPath(path);
+
+          if (!moduleCode) {
+            card.style.display = "";
+            visibleCount += 1;
+            return;
+          }
+
+          if (modules.has(moduleCode)) {
+            card.style.display = "";
+            visibleCount += 1;
+          } else {
+            card.style.display = "none";
+          }
+        });
+
+        let emptyBox = document.getElementById("menuAccessEmpty");
+        if (!visibleCount) {
+          if (!emptyBox) {
+            emptyBox = document.createElement("div");
+            emptyBox.id = "menuAccessEmpty";
+            emptyBox.className = "menu-access-empty";
+            menu.appendChild(emptyBox);
+          }
+          emptyBox.innerHTML = "<strong>Нет доступных модулей</strong><div>Обратитесь к администратору клиента для выдачи прав доступа.</div>";
+        } else if (emptyBox) {
+          emptyBox.remove();
+        }
+      } catch (_) {
+        // Не ломаем вход из-за проблем с фильтрацией меню
+      }
+    }
+
     function renderUserBox(user) {
       const userBox = document.getElementById("userBox");
       if (!userBox) return;
@@ -1163,6 +1263,7 @@
             }
             if (savedUser) {
               renderUserBox(savedUser);
+              applyModuleAccess(savedUser);
             }
           } catch (_) {}
         }
@@ -1187,6 +1288,7 @@
         }
 
         renderUserBox(user);
+        applyModuleAccess(user);
       } catch (e) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
