@@ -353,7 +353,7 @@
         createdSuccess: "Товар успешно создан",
         updatedSuccess: "Товар #{id} успешно обновлён",
         saveErrorStatus: "Ошибка сохранения: {error}"
-      }
+      },
 
       sales: {
         pageTitle: "BFC24 CONTROL — Продажа",
@@ -1010,7 +1010,7 @@
         csvPotentialRevenue: "Потенциальная выручка",
         csvPotentialProfit: "Потенциальная прибыль",
         footerNote: "Логика статусов: healthy / warning / risk / critical рассчитываются по количеству дней остатка. Если продаж за выбранный период не было, товар уходит в статус «Без продаж». Если остаток равен 0 — в статус «Нет остатка»."
-      }      }
+      }
     },
 
     en: {
@@ -1366,7 +1366,7 @@
         createdSuccess: "Item created successfully",
         updatedSuccess: "Item #{id} updated successfully",
         saveErrorStatus: "Save error: {error}"
-      }
+      },
 
       sales: {
         pageTitle: "BFC24 CONTROL — Sales",
@@ -2023,7 +2023,7 @@
         csvPotentialRevenue: "Potential revenue",
         csvPotentialProfit: "Potential profit",
         footerNote: "Status logic: healthy / warning / risk / critical are calculated by the number of days on hand. If there were no sales during the selected period, the item moves to the “No sales” status. If stock equals 0, the item moves to “Out of stock”."
-      }      }
+      }
     },
 
     zh: {
@@ -2309,7 +2309,7 @@
         createdSuccess: "商品创建成功",
         updatedSuccess: "商品 #{id} 更新成功",
         saveErrorStatus: "保存错误：{error}"
-      }
+      },
 
       sales: {
         pageTitle: "BFC24 CONTROL — 销售",
@@ -2966,7 +2966,7 @@
         csvPotentialRevenue: "潜在营收",
         csvPotentialProfit: "潜在利润",
         footerNote: "状态逻辑：healthy / warning / risk / critical 按库存可售天数计算。如果所选周期内没有销售，商品进入“无销售”状态。如果库存为 0，则进入“无库存”状态。"
-      }      }
+      }
     }
   };
 
