@@ -689,6 +689,28 @@
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
 
+      <div class="card" onclick="window.location.href='/batches.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="12" y="16" width="40" height="32" rx="6" stroke-width="2.4"/>
+                <path class="stroke-main" d="M20 24H44" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M20 32H32" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M37 39H46" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M41.5 34.5V43.5" stroke-width="2.8" stroke-linecap="round"/>
+                <circle class="stroke-accent" cx="41.5" cy="39" r="8" stroke-width="2.4"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3>Партии / Себестоимость</h3>
+          <div class="muted">Финансы партий, курсы, доставка и автоматический расчёт себестоимости.</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+
       <div class="card" onclick="window.location.href='/movements.html'">
         <div class="card__content">
           <div class="card__top">
@@ -1164,6 +1186,7 @@
         "/locations.html": "locations",
         "/clients.html": "clients",
         "/stock.html": "stock",
+        "/batches.html": "batches",
         "/movements.html": "movements",
         "/incoming.html": "incoming",
         "/sales.html": "sales",
@@ -1196,7 +1219,7 @@
 
 if (card.id === "subscriptionCard") {
   const modules = normalizeModules(user);
-  const hasLimitedModules = Array.isArray(modules) && modules.length > 0 && modules.length < 14;
+  const hasLimitedModules = Array.isArray(modules) && modules.length > 0 && modules.length < 15;
 
   card.style.display = hasLimitedModules ? "none" : "";
   return;

@@ -3,6 +3,7 @@ const pool = require("../db");
 const {
   authRequired,
   requireRole,
+  requireModuleAccess,
   getEffectiveTenantId,
 } = require("../middleware/auth");
 
@@ -26,7 +27,7 @@ function calcFinanceFilled(batch) {
   const cnyRate = Number(batch.cny_rate || 0);
   const deliveryCost = Number(batch.delivery_cost || 0);
 
-  return unitCost > 0 && (usdRate > 0 || cnyRate > 0 || deliveryCost > 0);
+  return unitCost > 0 && usdRate > 0 && cnyRate > 0 && deliveryCost > 0;
 }
 
 router.get("/", authRequired, async (req, res) => {
@@ -74,64 +75,69 @@ router.get("/", authRequired, async (req, res) => {
   }
 });
 
-router.get("/batches", authRequired, async (req, res) => {
-  try {
-    const tenantId = getEffectiveTenantId(req);
+router.get(
+  "/batches",
+  authRequired,
+  requireModuleAccess("batches"),
+  async (req, res) => {
+    try {
+      const tenantId = getEffectiveTenantId(req);
 
-    if (!tenantId) {
-      return res.status(400).json({
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: "tenant_not_defined",
+        });
+      }
+
+      const sql = `
+        SELECT
+          b.id,
+          b.tenant_id,
+          b.item_id,
+          b.receipt_id,
+          b.batch_date,
+          b.qty_total,
+          b.qty_remaining,
+          b.unit_cost,
+          b.usd_rate,
+          b.cny_rate,
+          b.delivery_cost,
+          b.is_finance_filled,
+          (b.qty_remaining * b.unit_cost) AS total_sum,
+          b.created_at,
+          b.updated_at,
+          i.name AS item_name,
+          i.sku,
+          i.barcode
+        FROM core.item_batches b
+        JOIN core.items i
+          ON i.id = b.item_id
+         AND i.tenant_id = b.tenant_id
+        WHERE b.tenant_id = $1
+        ORDER BY b.batch_date ASC, b.id ASC
+      `;
+
+      const { rows } = await pool.query(sql, [tenantId]);
+
+      return res.json({
+        ok: true,
+        batches: rows,
+      });
+    } catch (e) {
+      console.error("[GET /stock/batches] error:", e);
+      return res.status(500).json({
         ok: false,
-        error: "tenant_not_defined",
+        error: "batches_failed",
       });
     }
-
-    const sql = `
-      SELECT
-        b.id,
-        b.tenant_id,
-        b.item_id,
-        b.receipt_id,
-        b.batch_date,
-        b.qty_total,
-        b.qty_remaining,
-        b.unit_cost,
-        b.usd_rate,
-        b.cny_rate,
-        b.delivery_cost,
-        b.is_finance_filled,
-        (b.qty_remaining * b.unit_cost) AS total_sum,
-        b.created_at,
-        b.updated_at,
-        i.name AS item_name,
-        i.sku,
-        i.barcode
-      FROM core.item_batches b
-      JOIN core.items i
-        ON i.id = b.item_id
-       AND i.tenant_id = b.tenant_id
-      WHERE b.tenant_id = $1
-      ORDER BY b.batch_date ASC, b.id ASC
-    `;
-
-    const { rows } = await pool.query(sql, [tenantId]);
-
-    return res.json({
-      ok: true,
-      batches: rows,
-    });
-  } catch (e) {
-    console.error("[GET /stock/batches] error:", e);
-    return res.status(500).json({
-      ok: false,
-      error: "batches_failed",
-    });
   }
-});
+);
 
 router.patch(
   "/batches/:id",
   authRequired,
-  requireRole("owner", "client"),
+  requireModuleAccess("batches"),
   async (req, res) => {
     const client = await pool.connect();
 
@@ -215,7 +221,6 @@ router.patch(
         });
       }
 
-      const currentBatch = currentRows[0];
       const isFinanceFilled = calcFinanceFilled({
         unit_cost: unitCost,
         usd_rate: usdRate,

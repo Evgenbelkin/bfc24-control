@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru" translate="no" data-page-title-i18n="stock.pageTitle">
+<html lang="ru" translate="no" data-page-title-i18n="common.appName">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL — Остатки</title>
+  <title>BFC24 CONTROL — Партии / Себестоимость</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="google" content="notranslate" />
 
@@ -17,6 +17,12 @@
       --primary-hover:#1d4ed8;
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:16px;
+      --danger-bg:#fef2f2;
+      --danger-line:#fecaca;
+      --danger-text:#991b1b;
+      --ok-bg:#f0fdf4;
+      --ok-line:#bbf7d0;
+      --ok-text:#166534;
     }
 
     *{box-sizing:border-box}
@@ -29,7 +35,7 @@
     }
 
     .wrap{
-      max-width:1200px;
+      max-width:1600px;
       margin:0 auto;
       padding:24px 16px 48px;
     }
@@ -106,6 +112,27 @@
       border:1px solid var(--line);
     }
 
+    .btn-small{
+      padding:9px 12px;
+      font-size:13px;
+      border-radius:10px;
+    }
+
+    .btn-save{
+      background:var(--primary);
+      color:#fff;
+      border:none;
+    }
+
+    .btn-save:hover{
+      background:var(--primary-hover);
+    }
+
+    .btn-save:disabled{
+      background:#93c5fd;
+      cursor:not-allowed;
+    }
+
     .card{
       background:var(--card);
       border:1px solid #eef1f5;
@@ -159,6 +186,13 @@
     input:focus, select:focus{
       border-color:#9db8ff;
       box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    .input-mini{
+      min-width:110px;
+      padding:9px 10px;
+      font-size:13px;
+      border-radius:10px;
     }
 
     .status{
@@ -239,6 +273,7 @@
       position:sticky;
       top:0;
       z-index:1;
+      white-space:nowrap;
     }
 
     tr:hover td{
@@ -253,6 +288,81 @@
       text-align:center;
       color:var(--muted);
       padding:24px 12px;
+    }
+
+    .batch-row-finance-missing td{
+      background:var(--danger-bg);
+    }
+
+    .batch-row-finance-ok td{
+      background:#fcfffd;
+    }
+
+    .batch-status{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .batch-status.missing{
+      background:var(--danger-bg);
+      color:var(--danger-text);
+      border:1px solid var(--danger-line);
+    }
+
+    .batch-status.ok{
+      background:var(--ok-bg);
+      color:var(--ok-text);
+      border:1px solid var(--ok-line);
+    }
+
+    .batch-save-status{
+      margin-top:6px;
+      font-size:12px;
+      line-height:1.35;
+      min-height:16px;
+    }
+
+    .batch-save-status.error{
+      color:var(--danger-text);
+    }
+
+    .batch-save-status.success{
+      color:var(--ok-text);
+    }
+
+    .batch-save-status.info{
+      color:#1d4ed8;
+    }
+
+    .cell-stack{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:110px;
+    }
+
+    .calc-cell{
+      white-space:nowrap;
+      font-weight:700;
+    }
+
+    .subtext{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .batch-row-actions{
+      min-width:160px;
+    }
+
+    .mono{
+      font-variant-numeric: tabular-nums;
     }
 
     @media (max-width: 900px){
@@ -283,7 +393,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title" data-i18n="stock.heading">Остатки</div>
+      <div class="title" >Партии / Себестоимость</div>
 
       <div class="topbar-right">
         <div id="langSwitcher" class="lang-switcher"></div>
@@ -361,6 +471,41 @@
           <tbody id="tbody">
             <tr>
               <td colspan="5" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Партии товаров</h2>
+      <div class="muted">Редактирование финансов партии: закупка в юанях, курс юаня, доставка в долларах и курс доллара. Себестоимость и сумма остатка считаются автоматически.</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Товар</th>
+              <th>Артикул / SKU</th>
+              <th>Штрихкод</th>
+              <th>Дата партии</th>
+              <th>Кол-во в партии</th>
+              <th>Остаток партии</th>
+              <th>Закупка, ¥/шт</th>
+              <th>Курс ¥</th>
+              <th>Доставка, $/партия</th>
+              <th>Курс $</th>
+              <th>Закупка, ₽/шт</th>
+              <th>Доставка, ₽/шт</th>
+              <th>Себестоимость 1 шт, ₽</th>
+              <th>Сумма остатка, ₽</th>
+              <th>Статус</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody id="batchesTbody">
+            <tr>
+              <td colspan="16" class="empty">Загрузка партий...</td>
             </tr>
           </tbody>
         </table>
@@ -447,13 +592,36 @@
           return window.API.get(path);
         }
         return requestFallback("GET", path);
+      },
+      patch(path, body) {
+        if (window.API && typeof window.API.patch === "function") {
+          return window.API.patch(path, body);
+        }
+        return requestFallback("PATCH", path, body);
       }
     };
+
+
+    function normalizeModules(user) {
+      if (!user || !Array.isArray(user.modules)) return [];
+      return user.modules.map((x) => String(x || "").trim()).filter(Boolean);
+    }
+
+    function hasBatchesAccess(user) {
+      if (!user) return false;
+      const role = String(user.role || "");
+      if (role === "owner") return true;
+      const rbacRoles = Array.isArray(user.rbac_roles) ? user.rbac_roles : [];
+      if (rbacRoles.includes("tenant_owner") || rbacRoles.includes("tenant_admin")) return true;
+      return normalizeModules(user).includes("batches");
+    }
 
     let authUser = null;
     let stockData = [];
     let itemsData = [];
     let locationsData = [];
+    let batchesData = [];
+
     let pageStatusState = null;
 
     const els = {
@@ -461,6 +629,7 @@
       locationFilter: document.getElementById("locationFilter"),
       refreshBtn: document.getElementById("refreshBtn"),
       tbody: document.getElementById("tbody"),
+      batchesTbody: document.getElementById("batchesTbody"),
       pageStatus: document.getElementById("pageStatus"),
       rowsCount: document.getElementById("rowsCount"),
       itemsCount: document.getElementById("itemsCount"),
@@ -536,6 +705,13 @@
         return [];
       }
 
+      if (type === "batches") {
+        if (Array.isArray(data.batches)) return data.batches;
+        if (Array.isArray(data.data)) return data.data;
+        if (Array.isArray(data.rows)) return data.rows;
+        return [];
+      }
+
       if (Array.isArray(data.data)) return data.data;
       if (Array.isArray(data.rows)) return data.rows;
       return [];
@@ -552,9 +728,49 @@
 
     function formatNumber(value, digits = 0) {
       const num = Number(value || 0);
-      if (digits > 0) return num.toFixed(digits);
-      if (Number.isInteger(num)) return String(num);
+      if (digits > 0) {
+        return num.toFixed(digits);
+      }
+      if (Number.isInteger(num)) {
+        return String(num);
+      }
       return num.toFixed(3);
+    }
+
+    function toNumber(value) {
+      if (value === null || value === undefined || value === "") return 0;
+      const num = Number(String(value).replace(",", "."));
+      return Number.isFinite(num) ? num : 0;
+    }
+
+    function calcBatchFinance(row) {
+      const unitCostCny = toNumber(row.unit_cost);
+      const cnyRate = toNumber(row.cny_rate);
+      const deliveryUsd = toNumber(row.delivery_cost);
+      const usdRate = toNumber(row.usd_rate);
+      const qtyTotal = toNumber(row.qty_total);
+      const qtyRemaining = toNumber(row.qty_remaining);
+
+      const purchaseRubPerUnit = unitCostCny * cnyRate;
+      const deliveryRubTotal = deliveryUsd * usdRate;
+      const deliveryRubPerUnit = qtyTotal > 0 ? deliveryRubTotal / qtyTotal : 0;
+      const unitCostRub = purchaseRubPerUnit + deliveryRubPerUnit;
+      const stockSumRub = unitCostRub * qtyRemaining;
+
+      const isFinanceFilled = (
+        unitCostCny > 0 &&
+        cnyRate > 0 &&
+        deliveryUsd > 0 &&
+        usdRate > 0
+      );
+
+      return {
+        purchaseRubPerUnit,
+        deliveryRubPerUnit,
+        unitCostRub,
+        stockSumRub,
+        isFinanceFilled
+      };
     }
 
     async function apiGet(path) {
@@ -563,6 +779,7 @@
 
     function renderLocationFilter() {
       const currentValue = els.locationFilter.value;
+
       const options = locationsData
         .slice()
         .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"))
@@ -582,21 +799,54 @@
     function buildRows() {
       return stockData
         .map(stockRow => {
-          const itemId = stockRow.item_id ?? stockRow.itemId ?? stockRow.product_id ?? stockRow.productId ?? null;
-          const locationId = stockRow.location_id ?? stockRow.locationId ?? null;
-          const qty = Number(stockRow.qty ?? stockRow.quantity ?? stockRow.stock_qty ?? 0);
+          const itemId =
+            stockRow.item_id ??
+            stockRow.itemId ??
+            stockRow.product_id ??
+            stockRow.productId ??
+            null;
 
-          const item = itemsData.find(i => String(i.id) === String(itemId)) || {};
-          const location = locationsData.find(l => String(l.id) === String(locationId)) || {};
+          const locationId =
+            stockRow.location_id ??
+            stockRow.locationId ??
+            null;
+
+          const qty =
+            Number(
+              stockRow.qty ??
+              stockRow.quantity ??
+              stockRow.stock_qty ??
+              0
+            );
+
+          const item =
+            itemsData.find(i => String(i.id) === String(itemId)) || {};
+
+          const location =
+            locationsData.find(l => String(l.id) === String(locationId)) || {};
 
           const locationName = location.name || stockRow.location_name || "";
           const locationCode = location.code || stockRow.location_code || "";
 
           return {
             item_id: itemId,
-            item_name: item.name || item.item_name || stockRow.item_name || stockRow.name || "",
-            sku: item.sku || item.vendor_code || item.article || item.code || stockRow.sku || "",
-            barcode: item.barcode || stockRow.barcode || "",
+            item_name:
+              item.name ||
+              item.item_name ||
+              stockRow.item_name ||
+              stockRow.name ||
+              "",
+            sku:
+              item.sku ||
+              item.vendor_code ||
+              item.article ||
+              item.code ||
+              stockRow.sku ||
+              "",
+            barcode:
+              item.barcode ||
+              stockRow.barcode ||
+              "",
             location_id: locationId,
             location_name: locationName,
             location_code: locationCode,
@@ -627,13 +877,16 @@
             row.location_name,
             row.location_code
           ].join(" ").toLowerCase();
+
           return text.includes(search);
         })
         .sort((a, b) => {
           const byItem = String(a.item_name || "").localeCompare(String(b.item_name || ""), "ru");
           if (byItem !== 0) return byItem;
+
           const byLocation = String(a.location_display || "").localeCompare(String(b.location_display || ""), "ru");
           if (byLocation !== 0) return byLocation;
+
           return Number(b.qty || 0) - Number(a.qty || 0);
         });
 
@@ -644,7 +897,11 @@
       els.qtyGrandTotal.textContent = formatNumber(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
 
       if (!rows.length) {
-        els.tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td>
+          </tr>
+        `;
         return;
       }
 
@@ -659,33 +916,241 @@
       `).join("");
     }
 
+    function renderBatches() {
+      const search = (els.searchInput.value || "").trim().toLowerCase();
+
+      const rows = batchesData
+        .filter(row => {
+          if (!search) return true;
+          const text = [
+            row.item_name,
+            row.sku,
+            row.barcode,
+            row.batch_date
+          ].join(" ").toLowerCase();
+
+          return text.includes(search);
+        })
+        .sort((a, b) => {
+          const byItem = String(a.item_name || "").localeCompare(String(b.item_name || ""), "ru");
+          if (byItem !== 0) return byItem;
+
+          const byDate = String(a.batch_date || "").localeCompare(String(b.batch_date || ""), "ru");
+          if (byDate !== 0) return byDate;
+
+          return Number(a.id || 0) - Number(b.id || 0);
+        });
+
+      if (!rows.length) {
+        els.batchesTbody.innerHTML = `
+          <tr>
+            <td colspan="16" class="empty">Партий пока нет</td>
+          </tr>
+        `;
+        return;
+      }
+
+      els.batchesTbody.innerHTML = rows.map(row => {
+        const calc = calcBatchFinance(row);
+        const statusClass = calc.isFinanceFilled ? "ok" : "missing";
+        const statusText = calc.isFinanceFilled ? "Заполнено" : "Не заполнено";
+        const trClass = calc.isFinanceFilled ? "batch-row-finance-ok" : "batch-row-finance-missing";
+
+        const saveStatusHtml = row._saveStatusText
+          ? `<div class="batch-save-status ${escapeHtml(row._saveStatusType || "")}">${escapeHtml(row._saveStatusText)}</div>`
+          : `<div class="batch-save-status"></div>`;
+
+        return `
+          <tr class="${trClass}" data-batch-id="${escapeHtml(String(row.id))}">
+            <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
+            <td>${escapeHtml(row.sku || "")}</td>
+            <td>${escapeHtml(row.barcode || "")}</td>
+            <td>${escapeHtml(row.batch_date || "")}</td>
+            <td class="qty mono">${escapeHtml(formatNumber(row.qty_total))}</td>
+            <td class="qty mono">${escapeHtml(formatNumber(row.qty_remaining))}</td>
+
+            <td>
+              <div class="cell-stack">
+                <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="unit_cost" value="${escapeHtml(formatNumber(row.unit_cost, 4))}" />
+                <div class="subtext">Юань за 1 шт</div>
+              </div>
+            </td>
+
+            <td>
+              <div class="cell-stack">
+                <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="cny_rate" value="${escapeHtml(formatNumber(row.cny_rate, 4))}" />
+                <div class="subtext">Курс юаня</div>
+              </div>
+            </td>
+
+            <td>
+              <div class="cell-stack">
+                <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="delivery_cost" value="${escapeHtml(formatNumber(row.delivery_cost, 4))}" />
+                <div class="subtext">Доллар за партию</div>
+              </div>
+            </td>
+
+            <td>
+              <div class="cell-stack">
+                <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="usd_rate" value="${escapeHtml(formatNumber(row.usd_rate, 4))}" />
+                <div class="subtext">Курс доллара</div>
+              </div>
+            </td>
+
+            <td class="calc-cell mono js-purchase-rub-per-unit">${escapeHtml(formatNumber(calc.purchaseRubPerUnit, 2))}</td>
+            <td class="calc-cell mono js-delivery-rub-per-unit">${escapeHtml(formatNumber(calc.deliveryRubPerUnit, 2))}</td>
+            <td class="calc-cell mono js-unit-cost-rub">${escapeHtml(formatNumber(calc.unitCostRub, 2))}</td>
+            <td class="calc-cell mono js-stock-sum-rub">${escapeHtml(formatNumber(calc.stockSumRub, 2))}</td>
+
+            <td>
+              <span class="batch-status ${statusClass} js-batch-status">${escapeHtml(statusText)}</span>
+            </td>
+
+            <td class="batch-row-actions">
+              <button type="button" class="btn btn-small btn-save js-save-batch">Сохранить</button>
+              ${saveStatusHtml}
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      bindBatchRowEvents();
+    }
+
+    function updateBatchRowCalculatedValues(tr) {
+      const qtyTotal = toNumber(tr.children[4].textContent);
+      const qtyRemaining = toNumber(tr.children[5].textContent);
+      const unitCost = toNumber(tr.querySelector('[data-field="unit_cost"]').value);
+      const cnyRate = toNumber(tr.querySelector('[data-field="cny_rate"]').value);
+      const deliveryCost = toNumber(tr.querySelector('[data-field="delivery_cost"]').value);
+      const usdRate = toNumber(tr.querySelector('[data-field="usd_rate"]').value);
+
+      const purchaseRubPerUnit = unitCost * cnyRate;
+      const deliveryRubTotal = deliveryCost * usdRate;
+      const deliveryRubPerUnit = qtyTotal > 0 ? deliveryRubTotal / qtyTotal : 0;
+      const unitCostRub = purchaseRubPerUnit + deliveryRubPerUnit;
+      const stockSumRub = unitCostRub * qtyRemaining;
+
+      tr.querySelector('.js-purchase-rub-per-unit').textContent = formatNumber(purchaseRubPerUnit, 2);
+      tr.querySelector('.js-delivery-rub-per-unit').textContent = formatNumber(deliveryRubPerUnit, 2);
+      tr.querySelector('.js-unit-cost-rub').textContent = formatNumber(unitCostRub, 2);
+      tr.querySelector('.js-stock-sum-rub').textContent = formatNumber(stockSumRub, 2);
+
+      const isFinanceFilled = unitCost > 0 && cnyRate > 0 && deliveryCost > 0 && usdRate > 0;
+      const statusEl = tr.querySelector('.js-batch-status');
+      statusEl.textContent = isFinanceFilled ? 'Заполнено' : 'Не заполнено';
+      statusEl.className = 'batch-status js-batch-status ' + (isFinanceFilled ? 'ok' : 'missing');
+
+      tr.classList.toggle('batch-row-finance-ok', isFinanceFilled);
+      tr.classList.toggle('batch-row-finance-missing', !isFinanceFilled);
+
+      const saveStatus = tr.querySelector('.batch-save-status');
+      if (saveStatus) {
+        saveStatus.textContent = '';
+        saveStatus.className = 'batch-save-status';
+      }
+    }
+
+    function bindBatchRowEvents() {
+      els.batchesTbody.querySelectorAll('tr[data-batch-id]').forEach(tr => {
+        tr.querySelectorAll('.js-batch-input').forEach(input => {
+          input.addEventListener('input', () => updateBatchRowCalculatedValues(tr));
+        });
+
+        const saveBtn = tr.querySelector('.js-save-batch');
+        saveBtn.addEventListener('click', async () => {
+          const batchId = tr.dataset.batchId;
+          const unitCost = toNumber(tr.querySelector('[data-field="unit_cost"]').value);
+          const cnyRate = toNumber(tr.querySelector('[data-field="cny_rate"]').value);
+          const deliveryCost = toNumber(tr.querySelector('[data-field="delivery_cost"]').value);
+          const usdRate = toNumber(tr.querySelector('[data-field="usd_rate"]').value);
+          const statusEl = tr.querySelector('.batch-save-status');
+
+          try {
+            saveBtn.disabled = true;
+            if (statusEl) {
+              statusEl.textContent = 'Сохраняем...';
+              statusEl.className = 'batch-save-status info';
+            }
+
+            const result = await ApiBridge.patch(`/stock/batches/${batchId}`, {
+              unit_cost: unitCost,
+              cny_rate: cnyRate,
+              delivery_cost: deliveryCost,
+              usd_rate: usdRate
+            });
+
+            const updated = result && result.batch ? result.batch : null;
+            if (!updated) {
+              throw new Error('empty_batch_response');
+            }
+
+            const index = batchesData.findIndex(row => String(row.id) === String(batchId));
+            if (index >= 0) {
+              batchesData[index] = {
+                ...batchesData[index],
+                ...updated,
+                _saveStatusType: 'success',
+                _saveStatusText: 'Сохранено'
+              };
+            }
+
+            renderBatches();
+          } catch (err) {
+            if (statusEl) {
+              statusEl.textContent = Ui.translateError(err.message);
+              statusEl.className = 'batch-save-status error';
+            }
+          } finally {
+            saveBtn.disabled = false;
+          }
+        });
+      });
+    }
+
     async function loadData() {
       try {
         setPageStatus("stock.loadingStatus", {}, "info");
 
         const tenantId = getTenantId();
 
-        const [stockRes, itemsRes, locationsRes] = await Promise.all([
+        const [stockRes, itemsRes, locationsRes, batchesRes] = await Promise.all([
           apiGet(`/stock?tenant_id=${tenantId}`),
           apiGet(`/items?tenant_id=${tenantId}`),
-          apiGet(`/locations?tenant_id=${tenantId}`)
+          apiGet(`/locations?tenant_id=${tenantId}`),
+          apiGet(`/stock/batches?tenant_id=${tenantId}`)
         ]);
 
         stockData = normalize(stockRes, "stock");
         itemsData = normalize(itemsRes, "items");
         locationsData = normalize(locationsRes, "locations");
+        batchesData = normalize(batchesRes, "batches").map(row => ({
+          ...row,
+          _saveStatusType: '',
+          _saveStatusText: ''
+        }));
 
         renderLocationFilter();
         renderTable();
+        renderBatches();
 
         setPageStatus("stock.loadedStatus", {
           stock: buildRows().length,
           items: itemsData.length,
           locations: locationsData.length,
-          batches: 0
+          batches: batchesData.length
         }, "success");
       } catch (err) {
-        els.tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
+        els.tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td>
+          </tr>
+        `;
+        els.batchesTbody.innerHTML = `
+          <tr>
+            <td colspan="16" class="empty">Ошибка загрузки партий</td>
+          </tr>
+        `;
         setPageStatus("stock.loadErrorStatus", {
           error: Ui.translateError(err.message)
         }, "error");
@@ -693,7 +1158,10 @@
     }
 
     function bindEvents() {
-      els.searchInput.addEventListener("input", renderTable);
+      els.searchInput.addEventListener("input", () => {
+        renderTable();
+        renderBatches();
+      });
       els.locationFilter.addEventListener("change", renderTable);
       els.refreshBtn.addEventListener("click", loadData);
 
@@ -701,12 +1169,19 @@
         i18n.applyTranslations();
         renderLocationFilter();
         renderTable();
+        renderBatches();
         restoreStatusesAfterLanguageChange();
       });
     }
 
     function bootstrap() {
       parseUser();
+
+      if (!hasBatchesAccess(authUser)) {
+        window.location.href = "/index.html";
+        return;
+      }
+
       i18n.applyTranslations();
       i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
