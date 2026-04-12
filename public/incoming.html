@@ -331,7 +331,7 @@
 
     <div class="card">
       <h2 class="card-title" data-i18n="incoming.cardTitle">Новая приёмка</h2>
-      <div class="muted" data-i18n="incoming.subtitle">Выбери товар, место хранения, количество и цену закупки для прихода на склад.</div>
+      <div class="muted" data-i18n="incoming.subtitle">Выбери товар, место хранения и количество для прихода на склад.</div>
 
       <div class="stats">
         <div class="stat">
@@ -377,12 +377,6 @@
           <div class="field">
             <label for="qty" data-i18n="incoming.qtyLabel">Количество</label>
             <input id="qty" type="number" min="1" step="1" value="1" />
-          </div>
-
-          <div class="field">
-            <label for="purchasePrice" data-i18n="incoming.purchasePriceLabel">Цена закупки</label>
-            <input id="purchasePrice" type="number" min="0" step="0.01" value="0" />
-            <div class="hint" data-i18n="incoming.purchasePriceHint">Укажи закупочную цену за 1 единицу товара.</div>
           </div>
 
           <div class="field full">
@@ -521,7 +515,6 @@
       selectedItemBox: document.getElementById("selectedItemBox"),
       locationId: document.getElementById("locationId"),
       qty: document.getElementById("qty"),
-      purchasePrice: document.getElementById("purchasePrice"),
       comment: document.getElementById("comment"),
       itemsCount: document.getElementById("itemsCount"),
       locationsCount: document.getElementById("locationsCount"),
@@ -768,17 +761,11 @@
           throw new Error(i18n.t("incoming.qtyInvalid"));
         }
 
-        const purchasePrice = Number(els.purchasePrice.value);
-        if (Number.isNaN(purchasePrice) || purchasePrice < 0) {
-          throw new Error(i18n.t("incoming.purchasePriceInvalid"));
-        }
-
         const body = {
           tenant_id: tenantId,
           item_id: Number(selectedItem.id),
           location_id: Number(els.locationId.value),
           qty,
-          purchase_price: purchasePrice,
           comment: (els.comment.value || "").trim() || null
         };
 
@@ -791,7 +778,6 @@
         }, "success");
 
         els.qty.value = 1;
-        els.purchasePrice.value = 0;
         els.comment.value = "";
         els.locationId.value = "";
         els.itemSearch.value = "";

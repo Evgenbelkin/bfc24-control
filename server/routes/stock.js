@@ -20,6 +20,15 @@ function normalizeText(value) {
   return s.length ? s : null;
 }
 
+function calcFinanceFilled(batch) {
+  const unitCost = Number(batch.unit_cost || 0);
+  const usdRate = Number(batch.usd_rate || 0);
+  const cnyRate = Number(batch.cny_rate || 0);
+  const deliveryCost = Number(batch.delivery_cost || 0);
+
+  return unitCost > 0 && (usdRate > 0 || cnyRate > 0 || deliveryCost > 0);
+}
+
 router.get("/", authRequired, async (req, res) => {
   try {
     const tenantId = getEffectiveTenantId(req);
@@ -86,6 +95,10 @@ router.get("/batches", authRequired, async (req, res) => {
         b.qty_total,
         b.qty_remaining,
         b.unit_cost,
+        b.usd_rate,
+        b.cny_rate,
+        b.delivery_cost,
+        b.is_finance_filled,
         (b.qty_remaining * b.unit_cost) AS total_sum,
         b.created_at,
         b.updated_at,
@@ -115,6 +128,165 @@ router.get("/batches", authRequired, async (req, res) => {
   }
 });
 
+router.patch(
+  "/batches/:id",
+  authRequired,
+  requireRole("owner", "client"),
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      const tenantId = getEffectiveTenantId(req);
+      const batchId = toNumber(req.params.id);
+
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: "tenant_not_defined",
+        });
+      }
+
+      if (!batchId || batchId <= 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_batch_id",
+        });
+      }
+
+      const unitCost = toNumber(req.body.unit_cost);
+      const usdRate = toNumber(req.body.usd_rate);
+      const cnyRate = toNumber(req.body.cny_rate);
+      const deliveryCost = toNumber(req.body.delivery_cost);
+      const batchDate = normalizeText(req.body.batch_date);
+
+      if (unitCost === null || unitCost < 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_unit_cost",
+        });
+      }
+
+      if (usdRate === null || usdRate < 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_usd_rate",
+        });
+      }
+
+      if (cnyRate === null || cnyRate < 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_cny_rate",
+        });
+      }
+
+      if (deliveryCost === null || deliveryCost < 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_delivery_cost",
+        });
+      }
+
+      if (batchDate && !/^\d{4}-\d{2}-\d{2}$/.test(batchDate)) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_batch_date",
+        });
+      }
+
+      await client.query("BEGIN");
+
+      const { rows: currentRows } = await client.query(
+        `
+          SELECT *
+          FROM core.item_batches
+          WHERE tenant_id = $1
+            AND id = $2
+          LIMIT 1
+        `,
+        [tenantId, batchId]
+      );
+
+      if (!currentRows.length) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({
+          ok: false,
+          error: "batch_not_found",
+        });
+      }
+
+      const currentBatch = currentRows[0];
+      const isFinanceFilled = calcFinanceFilled({
+        unit_cost: unitCost,
+        usd_rate: usdRate,
+        cny_rate: cnyRate,
+        delivery_cost: deliveryCost,
+      });
+
+      const { rows: updatedRows } = await client.query(
+        `
+          UPDATE core.item_batches
+          SET
+            batch_date = COALESCE($3::date, batch_date),
+            unit_cost = $4,
+            usd_rate = $5,
+            cny_rate = $6,
+            delivery_cost = $7,
+            is_finance_filled = $8,
+            updated_at = NOW()
+          WHERE tenant_id = $1
+            AND id = $2
+          RETURNING *
+        `,
+        [
+          tenantId,
+          batchId,
+          batchDate,
+          unitCost,
+          usdRate,
+          cnyRate,
+          deliveryCost,
+          isFinanceFilled,
+        ]
+      );
+
+      const updatedBatch = updatedRows[0];
+
+      await client.query(
+        `
+          UPDATE core.receipt_items
+          SET purchase_price = $4
+          WHERE tenant_id = $1
+            AND receipt_id = $2
+            AND item_id = $3
+        `,
+        [
+          tenantId,
+          updatedBatch.receipt_id,
+          updatedBatch.item_id,
+          unitCost,
+        ]
+      );
+
+      await client.query("COMMIT");
+
+      return res.json({
+        ok: true,
+        batch: updatedBatch,
+      });
+    } catch (e) {
+      await client.query("ROLLBACK");
+      console.error("[PATCH /stock/batches/:id] error:", e);
+      return res.status(500).json({
+        ok: false,
+        error: "batch_update_failed",
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
 router.post(
   "/incoming",
   authRequired,
@@ -136,9 +308,14 @@ router.post(
       const itemId = toNumber(req.body.item_id);
       const locationId = toNumber(req.body.location_id);
       const qty = toNumber(req.body.qty);
-      const purchasePrice = toNumber(req.body.purchase_price);
       const batchDate = normalizeText(req.body.batch_date);
       const comment = normalizeText(req.body.comment);
+
+      const purchasePrice = 0;
+      const usdRate = 0;
+      const cnyRate = 0;
+      const deliveryCost = 0;
+      const isFinanceFilled = false;
 
       if (!itemId || itemId <= 0) {
         return res.status(400).json({
@@ -158,13 +335,6 @@ router.post(
         return res.status(400).json({
           ok: false,
           error: "invalid_qty",
-        });
-      }
-
-      if (purchasePrice === null || purchasePrice < 0) {
-        return res.status(400).json({
-          ok: false,
-          error: "invalid_purchase_price",
         });
       }
 
@@ -278,12 +448,27 @@ router.post(
             batch_date,
             qty_total,
             qty_remaining,
-            unit_cost
+            unit_cost,
+            usd_rate,
+            cny_rate,
+            delivery_cost,
+            is_finance_filled
           )
-          VALUES ($1, $2, $3, $4::date, $5, $5, $6)
+          VALUES ($1, $2, $3, $4::date, $5, $5, $6, $7, $8, $9, $10)
           RETURNING *
         `,
-        [tenantId, itemId, receipt.id, effectiveBatchDate, qty, purchasePrice]
+        [
+          tenantId,
+          itemId,
+          receipt.id,
+          effectiveBatchDate,
+          qty,
+          purchasePrice,
+          usdRate,
+          cnyRate,
+          deliveryCost,
+          isFinanceFilled,
+        ]
       );
 
       const batch = batchRows[0];
