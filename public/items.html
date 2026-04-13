@@ -789,6 +789,7 @@
       purchasePrice: document.getElementById("purchasePrice"),
       salePrice: document.getElementById("salePrice"),
       unit: document.getElementById("unit"),
+      boxQty: document.getElementById("boxQty"),
       description: document.getElementById("description"),
       imageFile: document.getElementById("imageFile"),
       removeImageBtn: document.getElementById("removeImageBtn"),
@@ -1107,6 +1108,7 @@
       els.purchasePrice.value = "0";
       els.salePrice.value = "0";
       els.unit.value = "pcs";
+      els.boxQty.value = "1";
       els.description.value = "";
       clearImageSelection({ clearCurrent: true });
       els.weightKg.value = "";
@@ -1129,6 +1131,7 @@
       els.purchasePrice.value = String(item.purchase_price ?? 0);
       els.salePrice.value = String(item.sale_price ?? 0);
       els.unit.value = item.unit || "pcs";
+      els.boxQty.value = String(item.box_qty ?? 1);
       els.description.value = item.description || "";
       currentImageUrl = item.image_url || null;
       clearImageSelection({ clearCurrent: false });
@@ -1291,6 +1294,7 @@
         const barcode = (els.barcode.value || "").trim();
         const purchase_price = Number(els.purchasePrice.value || 0);
         const sale_price = Number(els.salePrice.value || 0);
+        const box_qty = Number(els.boxQty.value || 1);
         const unit = (els.unit.value || "").trim() || "pcs";
         const description = (els.description.value || "").trim();
 
@@ -1309,6 +1313,10 @@
 
         if (!Number.isFinite(sale_price) || sale_price < 0) {
           throw new Error(i18n.t("items.salePriceInvalid"));
+        }
+
+        if (!Number.isFinite(box_qty) || box_qty <= 0) {
+          throw new Error("Штук в коробке должно быть больше 0");
         }
 
         for (const [value, message] of [
@@ -1337,6 +1345,7 @@
           sku: sku || null,
           barcode: barcode || null,
           unit,
+          box_qty,
           purchase_price,
           sale_price,
           description: description || null,
