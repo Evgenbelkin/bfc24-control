@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" translate="no" data-page-title-i18n="common.appName">
+<html lang="ru" translate="no" data-page-title-i18n="stock.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Партии / Себестоимость</title>
@@ -155,7 +155,7 @@
 
     .filters{
       display:grid;
-      grid-template-columns:1.5fr 1fr auto;
+      grid-template-columns:1.5fr auto;
       gap:12px;
       align-items:end;
     }
@@ -172,7 +172,7 @@
       font-weight:700;
     }
 
-    input, select{
+    input{
       width:100%;
       border:1px solid var(--line);
       border-radius:12px;
@@ -183,7 +183,7 @@
       outline:none;
     }
 
-    input:focus, select:focus{
+    input:focus{
       border-color:#9db8ff;
       box-shadow:0 0 0 4px rgba(37,99,235,.10);
     }
@@ -221,31 +221,6 @@
       border:1px solid #bfdbfe;
     }
 
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .stat{
-      background:#f8fafc;
-      border:1px solid #e8edf4;
-      border-radius:14px;
-      padding:14px;
-    }
-
-    .stat-label{
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:6px;
-    }
-
-    .stat-value{
-      font-size:22px;
-      font-weight:800;
-    }
-
     .table-wrap{
       overflow:auto;
     }
@@ -255,7 +230,7 @@
       border-collapse:collapse;
       margin-top:10px;
       background:#fff;
-      min-width:900px;
+      min-width:1400px;
     }
 
     th, td{
@@ -278,10 +253,6 @@
 
     tr:hover td{
       background:#fbfdff;
-    }
-
-    .qty{
-      font-weight:700;
     }
 
     .empty{
@@ -328,17 +299,9 @@
       min-height:16px;
     }
 
-    .batch-save-status.error{
-      color:var(--danger-text);
-    }
-
-    .batch-save-status.success{
-      color:var(--ok-text);
-    }
-
-    .batch-save-status.info{
-      color:#1d4ed8;
-    }
+    .batch-save-status.error{ color:var(--danger-text); }
+    .batch-save-status.success{ color:var(--ok-text); }
+    .batch-save-status.info{ color:#1d4ed8; }
 
     .cell-stack{
       display:flex;
@@ -366,8 +329,7 @@
     }
 
     @media (max-width: 900px){
-      .filters,
-      .stats{
+      .filters{
         grid-template-columns:1fr;
       }
 
@@ -393,88 +355,34 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title" >Партии / Себестоимость</div>
+      <div class="title">Партии / Себестоимость</div>
 
       <div class="topbar-right">
         <div id="langSwitcher" class="lang-switcher"></div>
 
         <div class="top-actions">
-          <button class="btn btn-light" onclick="goBack()" data-i18n="stock.backButton">Назад</button>
-          <button class="btn btn-light" onclick="logout()" data-i18n="stock.logoutButton">Выйти</button>
+          <button class="btn btn-light" onclick="goBack()">Назад</button>
+          <button class="btn btn-light" onclick="logout()">Выйти</button>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title" data-i18n="stock.filtersTitle">Фильтры</h2>
+      <h2 class="card-title">Фильтр</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput" data-i18n="stock.searchLabel">Поиск по товару / артикулу / штрихкоду</label>
-          <input id="searchInput" type="text" data-i18n-placeholder="stock.searchPlaceholder" placeholder="Например: Тест, SaaS, SKU, barcode" />
+          <label for="searchInput">Поиск по товару / артикулу / штрихкоду</label>
+          <input id="searchInput" type="text" placeholder="Например: Самолет, SKU, barcode" />
         </div>
 
         <div class="field">
-          <label for="locationFilter" data-i18n="stock.locationFilterLabel">Место хранения</label>
-          <select id="locationFilter">
-            <option value="" data-i18n="stock.locationFilterAll">Все МХ</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label data-i18n="stock.actionsLabel">&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="stock.refreshButton">Обновить</button>
-        </div>
-      </div>
-
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label" data-i18n="stock.statsRows">Строк остатков</div>
-          <div class="stat-value" id="rowsCount">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label" data-i18n="stock.statsItems">Товаров</div>
-          <div class="stat-value" id="itemsCount">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label" data-i18n="stock.statsLocations">Мест хранения</div>
-          <div class="stat-value" id="locationsCount">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label" data-i18n="stock.statsQtyTotal">Сумма по фильтру</div>
-          <div class="stat-value" id="qtyTotal">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label" data-i18n="stock.statsQtyGrandTotal">Общая сумма</div>
-          <div class="stat-value" id="qtyGrandTotal">0</div>
+          <label>&nbsp;</label>
+          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
         </div>
       </div>
 
       <div id="pageStatus" class="status info"></div>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title" data-i18n="stock.currentStockTitle">Текущие остатки</h2>
-      <div class="muted" data-i18n="stock.currentStockSubtitle">Показываются фактические остатки по товарам и местам хранения.</div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th data-i18n="stock.tableItem">Товар</th>
-              <th data-i18n="stock.tableSku">Артикул / SKU</th>
-              <th data-i18n="stock.tableBarcode">Штрихкод</th>
-              <th data-i18n="stock.tableLocation">Место хранения</th>
-              <th data-i18n="stock.tableQty">Количество</th>
-            </tr>
-          </thead>
-          <tbody id="tbody">
-            <tr>
-              <td colspan="5" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
     <div class="card">
@@ -525,19 +433,7 @@
     }
 
     const Ui = window.AppUI || {
-      escapeHtml: (value) => String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;"),
       translateError: (value) => String(value || "Ошибка"),
-      displayDateTime: (value) => {
-        if (!value) return "";
-        const d = new Date(value);
-        if (Number.isNaN(d.getTime())) return String(value);
-        return d.toLocaleString();
-      }
     };
 
     async function requestFallback(method, path, body) {
@@ -601,41 +497,15 @@
       }
     };
 
-
-    function normalizeModules(user) {
-      if (!user || !Array.isArray(user.modules)) return [];
-      return user.modules.map((x) => String(x || "").trim()).filter(Boolean);
-    }
-
-    function hasBatchesAccess(user) {
-      if (!user) return false;
-      const role = String(user.role || "");
-      if (role === "owner") return true;
-      const rbacRoles = Array.isArray(user.rbac_roles) ? user.rbac_roles : [];
-      if (rbacRoles.includes("tenant_owner") || rbacRoles.includes("tenant_admin")) return true;
-      return normalizeModules(user).includes("batches");
-    }
-
     let authUser = null;
-    let stockData = [];
-    let itemsData = [];
-    let locationsData = [];
     let batchesData = [];
-
     let pageStatusState = null;
 
     const els = {
       searchInput: document.getElementById("searchInput"),
-      locationFilter: document.getElementById("locationFilter"),
       refreshBtn: document.getElementById("refreshBtn"),
-      tbody: document.getElementById("tbody"),
       batchesTbody: document.getElementById("batchesTbody"),
-      pageStatus: document.getElementById("pageStatus"),
-      rowsCount: document.getElementById("rowsCount"),
-      itemsCount: document.getElementById("itemsCount"),
-      locationsCount: document.getElementById("locationsCount"),
-      qtyTotal: document.getElementById("qtyTotal"),
-      qtyGrandTotal: document.getElementById("qtyGrandTotal")
+      pageStatus: document.getElementById("pageStatus")
     };
 
     function goBack() {
@@ -671,49 +541,21 @@
 
     function setPageStatus(key, vars, type) {
       pageStatusState = { key, vars: vars || {}, type };
-      showStatus(i18n.format(key, vars || {}), type);
-    }
-
-    function restoreStatusesAfterLanguageChange() {
-      if (pageStatusState) {
-        showStatus(i18n.format(pageStatusState.key, pageStatusState.vars || {}), pageStatusState.type);
+      if (window.i18n && typeof i18n.format === "function") {
+        showStatus(i18n.format(key, vars || {}), type);
+      } else {
+        showStatus(String(key), type);
       }
     }
 
     function normalize(data, type = "") {
       if (Array.isArray(data)) return data;
       if (!data || typeof data !== "object") return [];
-
-      if (type === "stock") {
-        if (Array.isArray(data.stock)) return data.stock;
-        if (Array.isArray(data.data)) return data.data;
-        if (Array.isArray(data.rows)) return data.rows;
-        return [];
-      }
-
-      if (type === "items") {
-        if (Array.isArray(data.items)) return data.items;
-        if (Array.isArray(data.data)) return data.data;
-        if (Array.isArray(data.rows)) return data.rows;
-        return [];
-      }
-
-      if (type === "locations") {
-        if (Array.isArray(data.locations)) return data.locations;
-        if (Array.isArray(data.data)) return data.data;
-        if (Array.isArray(data.rows)) return data.rows;
-        return [];
-      }
-
       if (type === "batches") {
         if (Array.isArray(data.batches)) return data.batches;
         if (Array.isArray(data.data)) return data.data;
         if (Array.isArray(data.rows)) return data.rows;
-        return [];
       }
-
-      if (Array.isArray(data.data)) return data.data;
-      if (Array.isArray(data.rows)) return data.rows;
       return [];
     }
 
@@ -728,12 +570,8 @@
 
     function formatNumber(value, digits = 0) {
       const num = Number(value || 0);
-      if (digits > 0) {
-        return num.toFixed(digits);
-      }
-      if (Number.isInteger(num)) {
-        return String(num);
-      }
+      if (digits > 0) return num.toFixed(digits);
+      if (Number.isInteger(num)) return String(num);
       return num.toFixed(3);
     }
 
@@ -741,6 +579,13 @@
       if (value === null || value === undefined || value === "") return 0;
       const num = Number(String(value).replace(",", "."));
       return Number.isFinite(num) ? num : 0;
+    }
+
+    function formatBatchDate(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value);
+      return d.toLocaleDateString("ru-RU");
     }
 
     function calcBatchFinance(row) {
@@ -773,149 +618,6 @@
       };
     }
 
-    async function apiGet(path) {
-      return ApiBridge.get(path);
-    }
-
-    function renderLocationFilter() {
-      const currentValue = els.locationFilter.value;
-
-      const options = locationsData
-        .slice()
-        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"))
-        .map(loc => {
-          const locationTitle = `${loc.name || ""}${loc.code ? " (" + loc.code + ")" : ""}`;
-          return `<option value="${escapeHtml(String(loc.id))}">${escapeHtml(locationTitle)}</option>`;
-        })
-        .join("");
-
-      els.locationFilter.innerHTML = `<option value="">${escapeHtml(i18n.t("stock.locationFilterAll"))}</option>` + options;
-
-      if ([...els.locationFilter.options].some(opt => String(opt.value) === String(currentValue))) {
-        els.locationFilter.value = currentValue;
-      }
-    }
-
-    function buildRows() {
-      return stockData
-        .map(stockRow => {
-          const itemId =
-            stockRow.item_id ??
-            stockRow.itemId ??
-            stockRow.product_id ??
-            stockRow.productId ??
-            null;
-
-          const locationId =
-            stockRow.location_id ??
-            stockRow.locationId ??
-            null;
-
-          const qty =
-            Number(
-              stockRow.qty ??
-              stockRow.quantity ??
-              stockRow.stock_qty ??
-              0
-            );
-
-          const item =
-            itemsData.find(i => String(i.id) === String(itemId)) || {};
-
-          const location =
-            locationsData.find(l => String(l.id) === String(locationId)) || {};
-
-          const locationName = location.name || stockRow.location_name || "";
-          const locationCode = location.code || stockRow.location_code || "";
-
-          return {
-            item_id: itemId,
-            item_name:
-              item.name ||
-              item.item_name ||
-              stockRow.item_name ||
-              stockRow.name ||
-              "",
-            sku:
-              item.sku ||
-              item.vendor_code ||
-              item.article ||
-              item.code ||
-              stockRow.sku ||
-              "",
-            barcode:
-              item.barcode ||
-              stockRow.barcode ||
-              "",
-            location_id: locationId,
-            location_name: locationName,
-            location_code: locationCode,
-            location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
-            qty
-          };
-        })
-        .filter(row => Number(row.qty || 0) > 0);
-    }
-
-    function renderTable() {
-      const search = (els.searchInput.value || "").trim().toLowerCase();
-      const selectedLocationId = els.locationFilter.value;
-
-      const allRows = buildRows();
-
-      const rows = allRows
-        .filter(row => {
-          if (!selectedLocationId) return true;
-          return String(row.location_id) === String(selectedLocationId);
-        })
-        .filter(row => {
-          if (!search) return true;
-          const text = [
-            row.item_name,
-            row.sku,
-            row.barcode,
-            row.location_name,
-            row.location_code
-          ].join(" ").toLowerCase();
-
-          return text.includes(search);
-        })
-        .sort((a, b) => {
-          const byItem = String(a.item_name || "").localeCompare(String(b.item_name || ""), "ru");
-          if (byItem !== 0) return byItem;
-
-          const byLocation = String(a.location_display || "").localeCompare(String(b.location_display || ""), "ru");
-          if (byLocation !== 0) return byLocation;
-
-          return Number(b.qty || 0) - Number(a.qty || 0);
-        });
-
-      els.rowsCount.textContent = String(rows.length);
-      els.itemsCount.textContent = String(new Set(allRows.map(row => String(row.item_id || ""))).size);
-      els.locationsCount.textContent = String(new Set(allRows.map(row => String(row.location_id || ""))).size);
-      els.qtyTotal.textContent = formatNumber(rows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
-      els.qtyGrandTotal.textContent = formatNumber(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
-
-      if (!rows.length) {
-        els.tbody.innerHTML = `
-          <tr>
-            <td colspan="5" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td>
-          </tr>
-        `;
-        return;
-      }
-
-      els.tbody.innerHTML = rows.map(row => `
-        <tr>
-          <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
-          <td>${escapeHtml(row.sku)}</td>
-          <td>${escapeHtml(row.barcode)}</td>
-          <td>${escapeHtml(row.location_display)}</td>
-          <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
-        </tr>
-      `).join("");
-    }
-
     function renderBatches() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
 
@@ -928,16 +630,13 @@
             row.barcode,
             row.batch_date
           ].join(" ").toLowerCase();
-
           return text.includes(search);
         })
         .sort((a, b) => {
           const byItem = String(a.item_name || "").localeCompare(String(b.item_name || ""), "ru");
           if (byItem !== 0) return byItem;
-
           const byDate = String(a.batch_date || "").localeCompare(String(b.batch_date || ""), "ru");
           if (byDate !== 0) return byDate;
-
           return Number(a.id || 0) - Number(b.id || 0);
         });
 
@@ -962,12 +661,12 @@
 
         return `
           <tr class="${trClass}" data-batch-id="${escapeHtml(String(row.id))}">
-            <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
+            <td>${escapeHtml(row.item_name || "")}</td>
             <td>${escapeHtml(row.sku || "")}</td>
             <td>${escapeHtml(row.barcode || "")}</td>
-            <td>${escapeHtml(row.batch_date || "")}</td>
-            <td class="qty mono">${escapeHtml(formatNumber(row.qty_total))}</td>
-            <td class="qty mono">${escapeHtml(formatNumber(row.qty_remaining))}</td>
+            <td>${escapeHtml(formatBatchDate(row.batch_date))}</td>
+            <td class="mono">${escapeHtml(formatNumber(row.qty_total))}</td>
+            <td class="mono">${escapeHtml(formatNumber(row.qty_remaining))}</td>
 
             <td>
               <div class="cell-stack">
@@ -1113,39 +812,17 @@
         setPageStatus("stock.loadingStatus", {}, "info");
 
         const tenantId = getTenantId();
+        const batchesRes = await ApiBridge.get(`/stock/batches?tenant_id=${tenantId}`);
 
-        const [stockRes, itemsRes, locationsRes, batchesRes] = await Promise.all([
-          apiGet(`/stock?tenant_id=${tenantId}`),
-          apiGet(`/items?tenant_id=${tenantId}`),
-          apiGet(`/locations?tenant_id=${tenantId}`),
-          apiGet(`/stock/batches?tenant_id=${tenantId}`)
-        ]);
-
-        stockData = normalize(stockRes, "stock");
-        itemsData = normalize(itemsRes, "items");
-        locationsData = normalize(locationsRes, "locations");
         batchesData = normalize(batchesRes, "batches").map(row => ({
           ...row,
           _saveStatusType: '',
           _saveStatusText: ''
         }));
 
-        renderLocationFilter();
-        renderTable();
         renderBatches();
-
-        setPageStatus("stock.loadedStatus", {
-          stock: buildRows().length,
-          items: itemsData.length,
-          locations: locationsData.length,
-          batches: batchesData.length
-        }, "success");
+        setPageStatus("stock.loadedStatus", { batches: batchesData.length }, "success");
       } catch (err) {
-        els.tbody.innerHTML = `
-          <tr>
-            <td colspan="5" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td>
-          </tr>
-        `;
         els.batchesTbody.innerHTML = `
           <tr>
             <td colspan="16" class="empty">Ошибка загрузки партий</td>
@@ -1158,32 +835,28 @@
     }
 
     function bindEvents() {
-      els.searchInput.addEventListener("input", () => {
-        renderTable();
-        renderBatches();
-      });
-      els.locationFilter.addEventListener("change", renderTable);
+      els.searchInput.addEventListener("input", renderBatches);
       els.refreshBtn.addEventListener("click", loadData);
 
       document.addEventListener("app:language-changed", () => {
-        i18n.applyTranslations();
-        renderLocationFilter();
-        renderTable();
+        if (window.i18n && typeof i18n.applyTranslations === "function") {
+          i18n.applyTranslations();
+          if (typeof i18n.renderLanguageSwitcher === "function") {
+            i18n.renderLanguageSwitcher("langSwitcher");
+          }
+        }
         renderBatches();
-        restoreStatusesAfterLanguageChange();
       });
     }
 
     function bootstrap() {
       parseUser();
-
-      if (!hasBatchesAccess(authUser)) {
-        window.location.href = "/index.html";
-        return;
+      if (window.i18n && typeof i18n.applyTranslations === "function") {
+        i18n.applyTranslations();
+        if (typeof i18n.renderLanguageSwitcher === "function") {
+          i18n.renderLanguageSwitcher("langSwitcher");
+        }
       }
-
-      i18n.applyTranslations();
-      i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
       loadData();
     }
