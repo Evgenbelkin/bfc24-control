@@ -421,8 +421,18 @@
             </div>
 
             <div class="field">
+              <label for="saleMode">Режим продажи</label>
+              <select id="saleMode">
+                <option value="pcs">Штуки</option>
+                <option value="boxes" selected>Коробки</option>
+              </select>
+              <div class="hint" id="saleModeHint">По умолчанию продажа идёт коробками, если у товара заполнено "Штук в коробке".</div>
+            </div>
+
+            <div class="field">
               <label for="qty" data-i18n="sales.qtyLabel">Количество</label>
               <input id="qty" type="number" min="1" step="1" value="1" />
+              <div class="hint" id="qtyModeHint"></div>
             </div>
 
             <div class="field">
@@ -568,7 +578,10 @@
       selectedItemBox: document.getElementById("selectedItemBox"),
       locationId: document.getElementById("locationId"),
       counterpartyId: document.getElementById("counterpartyId"),
+      saleMode: document.getElementById("saleMode"),
       qty: document.getElementById("qty"),
+      qtyModeHint: document.getElementById("qtyModeHint"),
+      saleModeHint: document.getElementById("saleModeHint"),
       price: document.getElementById("price"),
       comment: document.getElementById("comment"),
       itemsCount: document.getElementById("itemsCount"),
@@ -686,6 +699,7 @@
         sku: item.sku || "",
         barcode: item.barcode || "",
         vendor_code: item.vendor_code || item.article || "",
+        box_qty: Number(item.box_qty ?? item.raw?.box_qty ?? 1),
         price: Number(item.price || item.sale_price || 0),
         raw: item
       };
@@ -717,6 +731,31 @@
       return Number(stockMap[key] || 0);
     }
 
+    function getSelectedBoxQty() {
+      if (!selectedItem) return 0;
+      const boxQty = Number(selectedItem.box_qty || 0);
+      return Number.isFinite(boxQty) ? boxQty : 0;
+    }
+
+    function updateSaleModeUi() {
+      const mode = els.saleMode ? String(els.saleMode.value || "pcs") : "pcs";
+      const boxQty = getSelectedBoxQty();
+
+      if (mode === "boxes") {
+        if (els.qtyModeHint) {
+          if (boxQty > 0) {
+            els.qtyModeHint.textContent = `1 коробка = ${boxQty} шт`;
+          } else {
+            els.qtyModeHint.textContent = "У товара не заполнено поле 'Штук в коробке'. Продажа коробками недоступна.";
+          }
+        }
+      } else {
+        if (els.qtyModeHint) {
+          els.qtyModeHint.textContent = "Количество вводится в штуках.";
+        }
+      }
+    }
+
     function renderSelectedItem() {
       if (!selectedItem) {
         els.selectedItemBox.classList.remove("active");
@@ -725,7 +764,28 @@
       }
 
       const stockQty = getCurrentStockQty();
+      const boxQty = getSelectedBoxQty();
+      const mode = els.saleMode ? String(els.saleMode.value || "pcs") : "pcs";
       let stockInfo = "";
+      let boxInfo = "";
+
+      if (boxQty > 0) {
+        const fullBoxes = stockQty !== null ? Math.floor(Number(stockQty || 0) / boxQty) : null;
+        const boxStockText = fullBoxes !== null
+          ? ` | Коробок доступно: ${fullBoxes}`
+          : "";
+        boxInfo = `
+          <div class="selected-stock ${boxQty <= 0 ? "zero" : ""}">
+            ${escapeHtml(`Штук в коробке: ${boxQty}${boxStockText}`)}
+          </div>
+        `;
+      } else if (mode === "boxes") {
+        boxInfo = `
+          <div class="selected-stock zero">
+            ${escapeHtml("У товара не заполнено поле 'Штук в коробке'.")}
+          </div>
+        `;
+      }
 
       if (stockQty !== null) {
         stockInfo = `
@@ -751,7 +811,9 @@
           ${selectedItem.vendor_code ? " | " + escapeHtml(i18n.t("sales.shortArticle")) + ": " + escapeHtml(selectedItem.vendor_code) : ""}
         </div>
         ${stockInfo}
+        ${boxInfo}
       `;
+      updateSaleModeUi();
     }
 
     function renderItemResults(items) {
@@ -928,8 +990,17 @@
         if (!selectedItem || !selectedItem.id) throw new Error(i18n.t("sales.itemRequired"));
         if (!els.locationId.value) throw new Error(i18n.t("sales.locationRequired"));
 
-        const qty = Number(els.qty.value);
-        if (!Number.isFinite(qty) || qty <= 0) throw new Error(i18n.t("sales.qtyInvalid"));
+        const enteredQty = Number(els.qty.value);
+        if (!Number.isFinite(enteredQty) || enteredQty <= 0) throw new Error(i18n.t("sales.qtyInvalid"));
+
+        const saleMode = els.saleMode ? String(els.saleMode.value || "pcs") : "pcs";
+        const boxQty = getSelectedBoxQty();
+
+        if (saleMode === "boxes" && (!Number.isFinite(boxQty) || boxQty <= 0)) {
+          throw new Error("У выбранного товара не заполнено поле 'Штук в коробке'");
+        }
+
+        const qty = saleMode === "boxes" ? (enteredQty * boxQty) : enteredQty;
 
         const price = Number(els.price.value || 0);
         if (!Number.isFinite(price) || price < 0) throw new Error(i18n.t("sales.priceInvalid"));
@@ -957,6 +1028,12 @@
           comment: (els.comment.value || "").trim() || null
         };
 
+        if (saleMode === "boxes") {
+          const saleComment = `Продано коробками: ${enteredQty} кор. × ${boxQty} шт = ${qty} шт`;
+          body.comment = body.comment ? `${body.comment}
+${saleComment}` : saleComment;
+        }
+
         if (els.counterpartyId.value) {
           body.counterparty_id = Number(els.counterpartyId.value);
         }
@@ -976,6 +1053,10 @@
         els.price.value = 0;
         els.comment.value = "";
         els.paymentMethod.value = "cash";
+        if (els.saleMode) {
+          els.saleMode.value = "boxes";
+        }
+        updateSaleModeUi();
         els.counterpartyId.value = "";
         els.locationId.value = "";
         els.itemSearch.value = "";
@@ -1001,6 +1082,13 @@
       els.locationId.addEventListener("change", () => {
         renderSelectedItem();
       });
+
+      if (els.saleMode) {
+        els.saleMode.addEventListener("change", () => {
+          renderSelectedItem();
+          updateSaleModeUi();
+        });
+      }
 
       document.addEventListener("click", (e) => {
         const inAutocomplete = e.target.closest(".autocomplete");
@@ -1042,6 +1130,10 @@
 
       i18n.applyTranslations();
       i18n.renderLanguageSwitcher("langSwitcher");
+      if (els.saleMode) {
+        els.saleMode.value = "boxes";
+      }
+      updateSaleModeUi();
       bindEvents();
       loadInitialData();
     }
