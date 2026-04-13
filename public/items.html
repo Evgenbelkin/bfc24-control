@@ -560,9 +560,9 @@
           </div>
 
           <div class="field">
-  <label for="boxQty">Штук в коробке</label>
-  <input id="boxQty" type="number" step="1" min="1" value="1" placeholder="Например: 24" />
-</div>
+            <label for="boxQty">Штук в коробке</label>
+            <input id="boxQty" type="number" step="1" min="1" value="1" placeholder="Например: 24" />
+          </div>
 
           
 
@@ -789,7 +789,6 @@
       purchasePrice: document.getElementById("purchasePrice"),
       salePrice: document.getElementById("salePrice"),
       unit: document.getElementById("unit"),
-      boxQty: document.getElementById("boxQty"),
       description: document.getElementById("description"),
       imageFile: document.getElementById("imageFile"),
       removeImageBtn: document.getElementById("removeImageBtn"),
@@ -1108,7 +1107,6 @@
       els.purchasePrice.value = "0";
       els.salePrice.value = "0";
       els.unit.value = "pcs";
-      els.boxQty.value = "1";
       els.description.value = "";
       clearImageSelection({ clearCurrent: true });
       els.weightKg.value = "";
@@ -1131,7 +1129,6 @@
       els.purchasePrice.value = String(item.purchase_price ?? 0);
       els.salePrice.value = String(item.sale_price ?? 0);
       els.unit.value = item.unit || "pcs";
-      els.boxQty.value = item.box_qty || 1;
       els.description.value = item.description || "";
       currentImageUrl = item.image_url || null;
       clearImageSelection({ clearCurrent: false });
@@ -1219,6 +1216,7 @@
             <td>${escapeHtml(row.sku)}</td>
             <td>${escapeHtml(row.barcode)}</td>
             <td>${escapeHtml(row.unit)}</td>
+            <td>${escapeHtml(formatMoney(row.box_qty || 1))}</td>
             <td>${escapeHtml(formatMoney(row.purchase_price))}</td>
             <td>${escapeHtml(formatMoney(row.sale_price))}</td>
             <td>
@@ -1241,7 +1239,7 @@
     function renderLoadingRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="11" class="empty">${escapeHtml(i18n.t("items.loadingData"))}</td>
+          <td colspan="13" class="empty">${escapeHtml(i18n.t("items.loadingData"))}</td>
         </tr>
       `;
     }
@@ -1249,7 +1247,7 @@
     function renderLoadErrorRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="11" class="empty">${escapeHtml(i18n.t("items.loadErrorRow"))}</td>
+          <td colspan="13" class="empty">${escapeHtml(i18n.t("items.loadErrorRow"))}</td>
         </tr>
       `;
     }
@@ -1294,7 +1292,6 @@
         const purchase_price = Number(els.purchasePrice.value || 0);
         const sale_price = Number(els.salePrice.value || 0);
         const unit = (els.unit.value || "").trim() || "pcs";
-        const box_qty = Number(els.boxQty.value || 1);
         const description = (els.description.value || "").trim();
 
         const weight_kg = readOptionalNumber(els.weightKg.value);
@@ -1312,10 +1309,6 @@
 
         if (!Number.isFinite(sale_price) || sale_price < 0) {
           throw new Error(i18n.t("items.salePriceInvalid"));
-        }
-
-        if (!Number.isFinite(box_qty) || box_qty <= 0) {
-          throw new Error("Количество в коробке должно быть больше 0");
         }
 
         for (const [value, message] of [
@@ -1344,7 +1337,6 @@
           sku: sku || null,
           barcode: barcode || null,
           unit,
-          box_qty,
           purchase_price,
           sale_price,
           description: description || null,
