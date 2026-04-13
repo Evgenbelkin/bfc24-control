@@ -375,8 +375,18 @@
           </div>
 
           <div class="field">
-            <label for="qty" data-i18n="incoming.qtyLabel">Количество</label>
+            <label for="receiveMode">Режим приёмки</label>
+            <select id="receiveMode">
+              <option value="pieces">Штуки</option>
+              <option value="boxes">Коробки</option>
+            </select>
+            <div id="receiveModeHint" class="hint">Складской учёт ведётся в штуках. Коробки — только режим ввода.</div>
+          </div>
+
+          <div class="field">
+            <label for="qty" id="qtyLabel" data-i18n="incoming.qtyLabel">Количество</label>
             <input id="qty" type="number" min="1" step="1" value="1" />
+            <div id="qtyModeHint" class="hint" style="display:none;"></div>
           </div>
 
           <div class="field full">
@@ -514,7 +524,11 @@
       itemResults: document.getElementById("itemResults"),
       selectedItemBox: document.getElementById("selectedItemBox"),
       locationId: document.getElementById("locationId"),
+      receiveMode: document.getElementById("receiveMode"),
       qty: document.getElementById("qty"),
+      qtyLabel: document.getElementById("qtyLabel"),
+      qtyModeHint: document.getElementById("qtyModeHint"),
+      receiveModeHint: document.getElementById("receiveModeHint"),
       comment: document.getElementById("comment"),
       itemsCount: document.getElementById("itemsCount"),
       locationsCount: document.getElementById("locationsCount"),
@@ -599,6 +613,7 @@
         sku: item.sku || "",
         barcode: item.barcode || "",
         vendor_code: item.vendor_code || item.article || "",
+        box_qty: Number(item.box_qty ?? 0),
         raw: item
       };
     }
@@ -614,13 +629,51 @@
       .join(" ")
       .toLowerCase();
     }
+    function getReceiveMode() {
+      return els.receiveMode && els.receiveMode.value === "boxes" ? "boxes" : "pieces";
+    }
+
+    function updateQtyModeUi() {
+      const mode = getReceiveMode();
+      const boxQty = Number(selectedItem?.box_qty || 0);
+
+      if (els.qtyLabel) {
+        els.qtyLabel.textContent = mode === "boxes" ? "Количество коробок" : i18n.t("incoming.qtyLabel");
+      }
+
+      if (!els.qtyModeHint) return;
+
+      if (mode !== "boxes") {
+        els.qtyModeHint.style.display = "none";
+        els.qtyModeHint.textContent = "";
+        return;
+      }
+
+      els.qtyModeHint.style.display = "block";
+
+      if (selectedItem && boxQty > 0) {
+        els.qtyModeHint.textContent = `1 коробка = ${boxQty} шт. В остатки уйдёт количество в штуках автоматически.`;
+        return;
+      }
+
+      if (selectedItem) {
+        els.qtyModeHint.textContent = "У этого товара не заполнено поле «Штук в коробке». Приёмка коробками недоступна.";
+        return;
+      }
+
+      els.qtyModeHint.textContent = "Выбери товар, чтобы система показала, сколько штук в одной коробке.";
+    }
+
 
     function renderSelectedItem() {
       if (!selectedItem) {
         els.selectedItemBox.classList.remove("active");
         els.selectedItemBox.innerHTML = "";
+        updateQtyModeUi();
         return;
       }
+
+      const boxQty = Number(selectedItem.box_qty || 0);
 
       els.selectedItemBox.classList.add("active");
       els.selectedItemBox.innerHTML = `
@@ -630,8 +683,11 @@
           ${selectedItem.sku ? " | SKU: " + Ui.escapeHtml(selectedItem.sku) : ""}
           ${selectedItem.barcode ? " | " + Ui.escapeHtml(i18n.t("incoming.shortBarcode")) + ": " + Ui.escapeHtml(selectedItem.barcode) : ""}
           ${selectedItem.vendor_code ? " | " + Ui.escapeHtml(i18n.t("incoming.shortArticle")) + ": " + Ui.escapeHtml(selectedItem.vendor_code) : ""}
+          | Штук в коробке: ${Ui.escapeHtml(String(boxQty > 0 ? boxQty : "не задано"))}
         </div>
       `;
+
+      updateQtyModeUi();
     }
 
     function renderItemResults(items) {
@@ -756,17 +812,37 @@
           throw new Error(i18n.t("incoming.locationRequired"));
         }
 
-        const qty = Number(els.qty.value);
-        if (!qty || qty <= 0) {
+        const inputQty = Number(els.qty.value);
+        if (!inputQty || inputQty <= 0) {
           throw new Error(i18n.t("incoming.qtyInvalid"));
+        }
+
+        const mode = getReceiveMode();
+        const boxQty = Number(selectedItem.box_qty || 0);
+        let finalQty = inputQty;
+
+        if (mode === "boxes") {
+          if (!boxQty || boxQty <= 0) {
+            throw new Error("У выбранного товара не заполнено поле «Штук в коробке». Приёмка коробками невозможна.");
+          }
+          finalQty = inputQty * boxQty;
+        }
+
+        const commentParts = [];
+        const originalComment = (els.comment.value || "").trim();
+        if (originalComment) {
+          commentParts.push(originalComment);
+        }
+        if (mode === "boxes") {
+          commentParts.push(`Принято коробками: ${inputQty} кор. × ${boxQty} шт = ${finalQty} шт`);
         }
 
         const body = {
           tenant_id: tenantId,
           item_id: Number(selectedItem.id),
           location_id: Number(els.locationId.value),
-          qty,
-          comment: (els.comment.value || "").trim() || null
+          qty: finalQty,
+          comment: commentParts.join(" | ") || null
         };
 
         setSubmitStatus("incoming.submittingStatus", {}, "info");
@@ -781,6 +857,9 @@
         els.comment.value = "";
         els.locationId.value = "";
         els.itemSearch.value = "";
+        if (els.receiveMode) {
+          els.receiveMode.value = "pieces";
+        }
         selectedItem = null;
         renderSelectedItem();
         els.itemResults.style.display = "none";
@@ -806,6 +885,12 @@
           els.itemResults.style.display = "none";
         }
       });
+
+      if (els.receiveMode) {
+        els.receiveMode.addEventListener("change", () => {
+          updateQtyModeUi();
+        });
+      }
 
       els.refreshBtn.addEventListener("click", loadInitialData);
       els.incomingForm.addEventListener("submit", handleSubmit);
