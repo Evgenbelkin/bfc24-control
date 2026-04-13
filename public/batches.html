@@ -618,6 +618,11 @@
       };
     }
 
+    function formatInputValue(value) {
+  const num = Number(value || 0);
+  return num === 0 ? '' : num.toFixed(4);
+}
+
     function renderBatches() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
 
@@ -670,7 +675,7 @@
 
             <td>
               <div class="cell-stack">
-                <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="unit_cost" value="${escapeHtml(formatNumber(row.unit_cost, 4))}" />
+                <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="unit_cost" value="${escapeHtml(formatNumber(row.unit_cost))}" />
                 <div class="subtext">Юань за 1 шт</div>
               </div>
             </td>
