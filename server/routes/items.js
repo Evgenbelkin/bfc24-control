@@ -215,6 +215,7 @@ function getItemSelectSql(whereSql) {
       i.sku,
       i.barcode,
       i.unit,
+      i.box_qty,
       i.purchase_price,
       i.sale_price,
       i.description,
@@ -410,6 +411,8 @@ router.post(
       const sku = normalizeOptionalText(req.body.sku);
       const barcode = normalizeOptionalText(req.body.barcode);
       const unit = normalizeOptionalText(req.body.unit) || "pcs";
+      const boxQtyRaw = normalizeOptionalNumber(req.body.box_qty);
+      const boxQty = boxQtyRaw === null ? 1 : boxQtyRaw;
       const purchasePrice = Number(req.body.purchase_price ?? 0);
       const salePrice = Number(req.body.sale_price ?? 0);
       const description = normalizeOptionalText(req.body.description);
@@ -440,6 +443,13 @@ router.post(
         return res.status(400).json({
           ok: false,
           error: "invalid_sale_price",
+        });
+      }
+
+      if (!Number.isFinite(boxQty) || boxQty <= 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_box_qty",
         });
       }
 
@@ -479,6 +489,7 @@ router.post(
           sku,
           barcode,
           unit,
+          box_qty,
           purchase_price,
           sale_price,
           description,
@@ -500,6 +511,7 @@ router.post(
           sku,
           barcode,
           unit,
+          box_qty,
           purchase_price,
           sale_price,
           description,
@@ -524,6 +536,7 @@ router.post(
         sku,
         barcode,
         unit,
+        boxQty,
         purchasePrice,
         salePrice,
         description,
@@ -601,6 +614,8 @@ router.put(
       const sku = normalizeOptionalText(req.body.sku);
       const barcode = normalizeOptionalText(req.body.barcode);
       const unit = normalizeOptionalText(req.body.unit) || "pcs";
+      const boxQtyRaw = normalizeOptionalNumber(req.body.box_qty);
+      const boxQty = boxQtyRaw === null ? 1 : boxQtyRaw;
       const purchasePrice = Number(req.body.purchase_price ?? 0);
       const salePrice = Number(req.body.sale_price ?? 0);
       const description = normalizeOptionalText(req.body.description);
@@ -633,6 +648,13 @@ router.put(
         return res.status(400).json({
           ok: false,
           error: "invalid_sale_price",
+        });
+      }
+
+      if (!Number.isFinite(boxQty) || boxQty <= 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_box_qty",
         });
       }
 
@@ -673,7 +695,8 @@ router.put(
           sku = $4,
           barcode = $5,
           unit = $6,
-          purchase_price = $7,
+          box_qty = $7,
+          purchase_price = $8,
           sale_price = $8,
           description = $9,
           image_url = $10,
@@ -695,6 +718,7 @@ router.put(
           sku,
           barcode,
           unit,
+          box_qty,
           purchase_price,
           sale_price,
           description,
@@ -718,6 +742,7 @@ router.put(
         sku,
         barcode,
         unit,
+        boxQty,
         purchasePrice,
         salePrice,
         description,
