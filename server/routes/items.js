@@ -686,76 +686,76 @@ router.put(
         });
       }
 
-      const sql = `
-        UPDATE core.items
-        SET
-          name = $1,
-          brand = $2,
-          category = $3,
-          sku = $4,
-          barcode = $5,
-          unit = $6,
-          box_qty = $7,
-          purchase_price = $8,
-          sale_price = $8,
-          description = $9,
-          image_url = $10,
-          weight_grams = $11,
-          volume_ml = $12,
-          length_cm = $13,
-          width_cm = $14,
-          height_cm = $15,
-          is_active = $16,
-          updated_at = NOW()
-        WHERE id = $17
-          AND tenant_id = $18
-        RETURNING
-          id,
-          tenant_id,
-          name,
-          brand,
-          category,
-          sku,
-          barcode,
-          unit,
-          box_qty,
-          purchase_price,
-          sale_price,
-          description,
-          image_url,
-          weight_grams,
-          ROUND((weight_grams / 1000.0)::numeric, 3) AS weight_kg,
-          volume_ml,
-          volume_ml AS volume_cm3,
-          length_cm,
-          width_cm,
-          height_cm,
-          is_active,
-          created_at,
-          updated_at
-      `;
+     const sql = `
+  UPDATE core.items
+  SET
+    name = $1,
+    brand = $2,
+    category = $3,
+    sku = $4,
+    barcode = $5,
+    unit = $6,
+    box_qty = $7,
+    purchase_price = $8,
+    sale_price = $9,
+    description = $10,
+    image_url = $11,
+    weight_grams = $12,
+    volume_ml = $13,
+    length_cm = $14,
+    width_cm = $15,
+    height_cm = $16,
+    is_active = $17,
+    updated_at = NOW()
+  WHERE id = $18
+    AND tenant_id = $19
+  RETURNING
+    id,
+    tenant_id,
+    name,
+    brand,
+    category,
+    sku,
+    barcode,
+    unit,
+    box_qty,
+    purchase_price,
+    sale_price,
+    description,
+    image_url,
+    weight_grams,
+    ROUND((weight_grams / 1000.0)::numeric, 3) AS weight_kg,
+    volume_ml,
+    volume_ml AS volume_cm3,
+    length_cm,
+    width_cm,
+    height_cm,
+    is_active,
+    created_at,
+    updated_at
+`;
 
       const params = [
-        name,
-        brand,
-        category,
-        sku,
-        barcode,
-        unit,
-        boxQty,
-        purchasePrice,
-        salePrice,
-        description,
-        imageUrl,
-        weightGrams,
-        volumeCm3,
-        lengthCm,
-        widthCm,
-        heightCm,
-        isActive,
-        id,
-        tenantId,
-      ];
+  name,
+  brand,
+  category,
+  sku,
+  barcode,
+  unit,
+  boxQty,
+  purchasePrice,
+  salePrice,
+  description,
+  imageUrl,
+  weightGrams,
+  volumeCm3,
+  lengthCm,
+  widthCm,
+  heightCm,
+  isActive,
+  id,
+  tenantId,
+];
 
       const { rows } = await pool.query(sql, params);
 
