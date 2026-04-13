@@ -481,52 +481,55 @@ router.post(
       }
 
       const sql = `
-        INSERT INTO core.items (
-          tenant_id,
-          name,
-          brand,
-          category,
-          sku,
-          barcode,
-          unit,
-          box_qty,
-          purchase_price,
-          sale_price,
-          description,
-          image_url,
-          weight_grams,
-          volume_ml,
-          length_cm,
-          width_cm,
-          height_cm,
-          is_active
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-        RETURNING
-          id,
-          tenant_id,
-          name,
-          brand,
-          category,
-          sku,
-          barcode,
-          unit,
-          box_qty,
-          purchase_price,
-          sale_price,
-          description,
-          image_url,
-          weight_grams,
-          ROUND((weight_grams / 1000.0)::numeric, 3) AS weight_kg,
-          volume_ml,
-          volume_ml AS volume_cm3,
-          length_cm,
-          width_cm,
-          height_cm,
-          is_active,
-          created_at,
-          updated_at
-      `;
+  INSERT INTO core.items (
+    tenant_id,
+    name,
+    brand,
+    category,
+    sku,
+    barcode,
+    unit,
+    box_qty,
+    purchase_price,
+    sale_price,
+    description,
+    image_url,
+    weight_grams,
+    volume_ml,
+    length_cm,
+    width_cm,
+    height_cm,
+    is_active
+  )
+  VALUES (
+    $1, $2, $3, $4, $5, $6, $7, $8, $9,
+    $10, $11, $12, $13, $14, $15, $16, $17, $18
+  )
+  RETURNING
+    id,
+    tenant_id,
+    name,
+    brand,
+    category,
+    sku,
+    barcode,
+    unit,
+    box_qty,
+    purchase_price,
+    sale_price,
+    description,
+    image_url,
+    weight_grams,
+    ROUND((weight_grams / 1000.0)::numeric, 3) AS weight_kg,
+    volume_ml,
+    volume_ml AS volume_cm3,
+    length_cm,
+    width_cm,
+    height_cm,
+    is_active,
+    created_at,
+    updated_at
+`;
 
       const params = [
         tenantId,
