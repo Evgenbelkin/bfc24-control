@@ -359,6 +359,9 @@
           <thead>
             <tr>
               <th data-i18n="stock.tableItem">Товар</th>
+              <th>Категория</th>
+              <th>Фабрика</th>
+              <th>Арт. фабрики</th>
               <th data-i18n="stock.tableSku">Артикул / SKU</th>
               <th data-i18n="stock.tableBarcode">Штрихкод</th>
               <th data-i18n="stock.tableLocation">Место хранения</th>
@@ -367,7 +370,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="5" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
+              <td colspan="8" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -466,6 +469,7 @@
     const els = {
       searchInput: document.getElementById("searchInput"),
       locationFilter: document.getElementById("locationFilter"),
+      categoryFilter: document.getElementById("categoryFilter"),
       refreshBtn: document.getElementById("refreshBtn"),
       tbody: document.getElementById("tbody"),
       pageStatus: document.getElementById("pageStatus"),
@@ -568,23 +572,25 @@
       return ApiBridge.get(path);
     }
 
-    function renderLocationFilter() {
-      const currentValue = els.locationFilter.value;
-      const options = locationsData
-        .slice()
-        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"))
-        .map(loc => {
-          const locationTitle = `${loc.name || ""}${loc.code ? " (" + loc.code + ")" : ""}`;
-          return `<option value="${escapeHtml(String(loc.id))}">${escapeHtml(locationTitle)}</option>`;
-        })
-        .join("");
+    function renderCategoryFilter() {
+  const currentValue = els.categoryFilter.value;
 
-      els.locationFilter.innerHTML = `<option value="">${escapeHtml(i18n.t("stock.locationFilterAll"))}</option>` + options;
+  const categories = [...new Set(
+    itemsData
+      .map(item => String(item.category_name || "").trim())
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, "ru"));
 
-      if ([...els.locationFilter.options].some(opt => String(opt.value) === String(currentValue))) {
-        els.locationFilter.value = currentValue;
-      }
-    }
+  const options = categories
+    .map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
+    .join("");
+
+  els.categoryFilter.innerHTML = `<option value="">Все категории</option>` + options;
+
+  if ([...els.categoryFilter.options].some(opt => String(opt.value) === String(currentValue))) {
+    els.categoryFilter.value = currentValue;
+  }
+}
 
     function buildRows() {
       return stockData
@@ -602,6 +608,9 @@
           return {
             item_id: itemId,
             item_name: item.name || item.item_name || stockRow.item_name || stockRow.name || "",
+            category_name: item.category_name || "",
+            factory: item.factory || "",
+            factory_article: item.factory_article || "",
             sku: item.sku || item.vendor_code || item.article || item.code || stockRow.sku || "",
             barcode: item.barcode || stockRow.barcode || "",
             location_id: locationId,
@@ -617,6 +626,7 @@
     function renderTable() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
       const selectedLocationId = els.locationFilter.value;
+      const selectedCategoryName = (els.categoryFilter.value || "").trim();
 
       const allRows = buildRows();
 
@@ -626,9 +636,16 @@
           return String(row.location_id) === String(selectedLocationId);
         })
         .filter(row => {
+          if (!selectedCategoryName) return true;
+          return String(row.category_name || "").trim() === selectedCategoryName;
+        })
+        .filter(row => {
           if (!search) return true;
           const text = [
             row.item_name,
+            row.category_name,
+            row.factory,
+            row.factory_article,
             row.sku,
             row.barcode,
             row.location_name,
@@ -651,7 +668,7 @@
       els.qtyGrandTotal.textContent = formatNumber(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
 
       if (!rows.length) {
-        els.tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
+        els.tbody.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
         return;
       }
 
@@ -696,7 +713,7 @@
           batches: 0
         }, "success");
       } catch (err) {
-        els.tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
+        els.tbody.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
         setPageStatus("stock.loadErrorStatus", {
           error: Ui.translateError(err.message)
         }, "error");
@@ -706,6 +723,7 @@
     function bindEvents() {
       els.searchInput.addEventListener("input", renderTable);
       els.locationFilter.addEventListener("change", renderTable);
+      els.categoryFilter.addEventListener("change", renderTable);
       els.refreshBtn.addEventListener("click", loadData);
 
       document.addEventListener("app:language-changed", () => {
