@@ -872,7 +872,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="13" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
+              <td colspan="16" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -1457,7 +1457,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="13" class="empty">${escapeHtml(i18n.t("items.noData"))}</td>
+            <td colspan="16" class="empty">${escapeHtml(i18n.t("items.noData"))}</td>
           </tr>
         `;
         return;
@@ -1478,12 +1478,15 @@
             </td>
             <td>
               <div class="item-name">${escapeHtml(row.name)}</div>
-              <div class="item-sub">${escapeHtml([row.category, row.brand].filter(Boolean).join(" / ") || "Фабрика и артикул фабрики не заполнены")}</div>
+              <div class="item-sub">${escapeHtml([row.factory, row.factory_article].filter(Boolean).join(" / ") || "Фабрика и артикул фабрики не заполнены")}</div>
               <div class="item-sub">${escapeHtml(row.description || "")}</div>
             </td>
-            <td>${escapeHtml(row.sku)}</td>
-            <td>${escapeHtml(row.barcode)}</td>
-            <td>${escapeHtml(row.unit)}</td>
+            <td>${escapeHtml(row.category_name || "—")}</td>
+            <td>${escapeHtml(row.factory || "—")}</td>
+            <td>${escapeHtml(row.factory_article || "—")}</td>
+            <td>${escapeHtml(row.sku || "—")}</td>
+            <td>${escapeHtml(row.barcode || "—")}</td>
+            <td>${escapeHtml(row.unit || "—")}</td>
             <td>${escapeHtml(formatMoney(row.box_qty || 1))}</td>
             <td>${escapeHtml(formatMoney(row.purchase_price))}</td>
             <td>${escapeHtml(formatMoney(row.sale_price))}</td>
@@ -1507,7 +1510,7 @@
     function renderLoadingRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="13" class="empty">${escapeHtml(i18n.t("items.loadingData"))}</td>
+          <td colspan="16" class="empty">${escapeHtml(i18n.t("items.loadingData"))}</td>
         </tr>
       `;
     }
@@ -1515,7 +1518,7 @@
     function renderLoadErrorRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="13" class="empty">${escapeHtml(i18n.t("items.loadErrorRow"))}</td>
+          <td colspan="16" class="empty">${escapeHtml(i18n.t("items.loadErrorRow"))}</td>
         </tr>
       `;
     }
