@@ -1478,7 +1478,7 @@
             </td>
             <td>
               <div class="item-name">${escapeHtml(row.name)}</div>
-              <div class="item-sub">${escapeHtml([row.factory, row.factory_article].filter(Boolean).join(" / ") || "Фабрика и артикул фабрики не заполнены")}</div>
+              <div class="item-sub">${escapeHtml([row.factory, row.factory_article].filter(Boolean).join(" / "))}</div>
               <div class="item-sub">${escapeHtml(row.description || "")}</div>
             </td>
             <td>${escapeHtml(row.category_name || "—")}</td>
