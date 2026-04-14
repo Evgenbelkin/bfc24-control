@@ -128,7 +128,7 @@
 
     .filters{
       display:grid;
-      grid-template-columns:1.5fr 1fr auto;
+      grid-template-columns:1.5fr 1fr 1fr auto;
       gap:12px;
       align-items:end;
     }
@@ -312,6 +312,13 @@
         </div>
 
         <div class="field">
+          <label for="categoryFilter">Категория</label>
+          <select id="categoryFilter">
+            <option value="">Все категории</option>
+          </select>
+        </div>
+
+        <div class="field">
           <label data-i18n="stock.actionsLabel">&nbsp;</label>
           <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="stock.refreshButton">Обновить</button>
         </div>
@@ -352,9 +359,6 @@
           <thead>
             <tr>
               <th data-i18n="stock.tableItem">Товар</th>
-              <th>Категория</th>
-              <th>Фабрика</th>
-              <th>Арт. фабрики</th>
               <th data-i18n="stock.tableSku">Артикул / SKU</th>
               <th data-i18n="stock.tableBarcode">Штрихкод</th>
               <th data-i18n="stock.tableLocation">Место хранения</th>
@@ -363,7 +367,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="8" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
+              <td colspan="5" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -596,17 +600,16 @@
           const locationCode = location.code || stockRow.location_code || "";
 
           return {
-  item_id: itemId,
-  item_name: item.name || "",
-  sku: item.sku || "",
-  barcode: item.barcode || "",
-  category_name: item.category_name || "",
-  factory: item.factory || "",
-  factory_article: item.factory_article || "",
-  location_id: locationId,
-  location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
-  qty
-};
+            item_id: itemId,
+            item_name: item.name || item.item_name || stockRow.item_name || stockRow.name || "",
+            sku: item.sku || item.vendor_code || item.article || item.code || stockRow.sku || "",
+            barcode: item.barcode || stockRow.barcode || "",
+            location_id: locationId,
+            location_name: locationName,
+            location_code: locationCode,
+            location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
+            qty
+          };
         })
         .filter(row => Number(row.qty || 0) > 0);
     }
@@ -648,22 +651,22 @@
       els.qtyGrandTotal.textContent = formatNumber(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
 
       if (!rows.length) {
-        els.tbody.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
+        els.tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
         return;
       }
 
       els.tbody.innerHTML = rows.map(row => `
-  <tr>
-    <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
-    <td>${escapeHtml(row.category_name || "")}</td>
-    <td>${escapeHtml(row.factory || "")}</td>
-    <td>${escapeHtml(row.factory_article || "")}</td>
-    <td>${escapeHtml(row.sku || "")}</td>
-    <td>${escapeHtml(row.barcode || "")}</td>
-    <td>${escapeHtml(row.location_display || "")}</td>
-    <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
-  </tr>
-`).join("");
+        <tr>
+          <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
+          <td>${escapeHtml(row.category_name || "")}</td>
+          <td>${escapeHtml(row.factory || "")}</td>
+          <td>${escapeHtml(row.factory_article || "")}</td>
+          <td>${escapeHtml(row.sku || "")}</td>
+          <td>${escapeHtml(row.barcode || "")}</td>
+          <td>${escapeHtml(row.location_display || "")}</td>
+          <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
+        </tr>
+      `).join("");
     }
 
     async function loadData() {
@@ -683,6 +686,7 @@
         locationsData = normalize(locationsRes, "locations");
 
         renderLocationFilter();
+        renderCategoryFilter();
         renderTable();
 
         setPageStatus("stock.loadedStatus", {
@@ -692,7 +696,7 @@
           batches: 0
         }, "success");
       } catch (err) {
-        els.tbody.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
+        els.tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
         setPageStatus("stock.loadErrorStatus", {
           error: Ui.translateError(err.message)
         }, "error");
@@ -707,6 +711,7 @@
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
         renderLocationFilter();
+        renderCategoryFilter();
         renderTable();
         restoreStatusesAfterLanguageChange();
       });
