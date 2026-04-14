@@ -784,6 +784,8 @@
       name: document.getElementById("name"),
       brand: document.getElementById("brand"),
       category: document.getElementById("category"),
+      categoryName: document.getElementById("categoryName"),
+      categoryOptions: document.getElementById("categoryOptions"),
       sku: document.getElementById("sku"),
       barcode: document.getElementById("barcode"),
       purchasePrice: document.getElementById("purchasePrice"),
@@ -1049,8 +1051,11 @@
       return {
         id: row.id,
         name: row.name || row.item_name || "",
-        brand: row.brand || "",
-        category: row.category || "",
+        brand: row.factory_article || row.brand || "",
+        category: row.factory || row.category || "",
+        category_name: row.category_name || "",
+        factory: row.factory || row.category || "",
+        factory_article: row.factory_article || row.brand || "",
         sku: row.sku || row.vendor_code || row.article || "",
         barcode: row.barcode || "",
         unit: row.unit || "pcs",
@@ -1102,6 +1107,7 @@
       els.name.value = "";
       els.brand.value = "";
       els.category.value = "";
+      if (els.categoryName) els.categoryName.value = "";
       els.sku.value = "";
       els.barcode.value = "";
       els.purchasePrice.value = "0";
@@ -1123,8 +1129,9 @@
       syncFormTexts();
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = item.name || "";
-      els.brand.value = item.brand || "";
-      els.category.value = item.category || "";
+      els.brand.value = item.factory_article || item.brand || "";
+      els.category.value = item.factory || item.category || "";
+      if (els.categoryName) els.categoryName.value = item.category_name || "";
       els.sku.value = item.sku || "";
       els.barcode.value = item.barcode || "";
       els.purchasePrice.value = String(item.purchase_price ?? 0);
@@ -1149,6 +1156,9 @@
         if (!search) return true;
         const text = [
           row.name,
+          row.category_name,
+          row.factory,
+          row.factory_article,
           row.brand,
           row.category,
           row.sku,
@@ -1211,7 +1221,7 @@
             </td>
             <td>
               <div class="item-name">${escapeHtml(row.name)}</div>
-              <div class="item-sub">${escapeHtml([row.category, row.brand].filter(Boolean).join(" / ") || "Фабрика и артикул фабрики не заполнены")}</div>
+              <div class="item-sub">${escapeHtml([row.category_name, row.factory, row.factory_article].filter(Boolean).join(" / ") || "Категория, фабрика и артикул фабрики не заполнены")}</div>
               <div class="item-sub">${escapeHtml(row.description || "")}</div>
             </td>
             <td>${escapeHtml(row.sku)}</td>
@@ -1253,6 +1263,20 @@
       `;
     }
 
+    async function loadCategories() {
+      if (!els.categoryOptions) return;
+      try {
+        const tenantId = getTenantId();
+        const data = await apiGet(`/items/categories?tenant_id=${tenantId}`);
+        const rows = extractList(data, ["categories", "items", "rows"]);
+        els.categoryOptions.innerHTML = rows
+          .map((row) => `<option value="${escapeHtml(row.name || "")}"></option>`)
+          .join("");
+      } catch (err) {
+        console.warn("[items] loadCategories failed:", err);
+      }
+    }
+
     async function loadData() {
       try {
         const tenantId = getTenantId();
@@ -1263,6 +1287,7 @@
 
         const data = await apiGet(`/items?tenant_id=${tenantId}`);
         itemsData = extractList(data, ["items", "data", "rows"]).map(normalizeItem);
+        await loadCategories();
 
         renderTable();
 
@@ -1288,6 +1313,7 @@
         const name = (els.name.value || "").trim();
         const brand = (els.brand.value || "").trim();
         const category = (els.category.value || "").trim();
+        const category_name = els.categoryName ? (els.categoryName.value || "").trim() : "";
         const sku = (els.sku.value || "").trim();
         const barcode = (els.barcode.value || "").trim();
         const purchase_price = Number(els.purchasePrice.value || 0);
@@ -1340,6 +1366,9 @@
           name,
           brand: brand || null,
           category: category || null,
+          factory: category || null,
+          factory_article: brand || null,
+          category_name: category_name || null,
           sku: sku || null,
           barcode: barcode || null,
           unit,
