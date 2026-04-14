@@ -596,16 +596,17 @@
           const locationCode = location.code || stockRow.location_code || "";
 
           return {
-            item_id: itemId,
-            item_name: item.name || item.item_name || stockRow.item_name || stockRow.name || "",
-            sku: item.sku || item.vendor_code || item.article || item.code || stockRow.sku || "",
-            barcode: item.barcode || stockRow.barcode || "",
-            location_id: locationId,
-            location_name: locationName,
-            location_code: locationCode,
-            location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
-            qty
-          };
+  item_id: itemId,
+  item_name: item.name || "",
+  sku: item.sku || "",
+  barcode: item.barcode || "",
+  category_name: item.category_name || "",
+  factory: item.factory || "",
+  factory_article: item.factory_article || "",
+  location_id: locationId,
+  location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
+  qty
+};
         })
         .filter(row => Number(row.qty || 0) > 0);
     }
@@ -652,14 +653,17 @@
       }
 
       els.tbody.innerHTML = rows.map(row => `
-        <tr>
-          <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
-          <td>${escapeHtml(row.sku)}</td>
-          <td>${escapeHtml(row.barcode)}</td>
-          <td>${escapeHtml(row.location_display)}</td>
-          <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
-        </tr>
-      `).join("");
+  <tr>
+    <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
+    <td>${escapeHtml(row.category_name || "")}</td>
+    <td>${escapeHtml(row.factory || "")}</td>
+    <td>${escapeHtml(row.factory_article || "")}</td>
+    <td>${escapeHtml(row.sku || "")}</td>
+    <td>${escapeHtml(row.barcode || "")}</td>
+    <td>${escapeHtml(row.location_display || "")}</td>
+    <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
+  </tr>
+`).join("");
     }
 
     async function loadData() {
