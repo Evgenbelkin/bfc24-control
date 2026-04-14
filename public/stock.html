@@ -572,6 +572,25 @@
       return ApiBridge.get(path);
     }
 
+
+    function renderLocationFilter() {
+      const currentValue = els.locationFilter.value;
+      const options = locationsData
+        .slice()
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"))
+        .map(loc => {
+          const locationTitle = `${loc.name || ""}${loc.code ? " (" + loc.code + ")" : ""}`;
+          return `<option value="${escapeHtml(String(loc.id))}">${escapeHtml(locationTitle)}</option>`;
+        })
+        .join("");
+
+      els.locationFilter.innerHTML = `<option value="">${escapeHtml(i18n.t("stock.locationFilterAll"))}</option>` + options;
+
+      if ([...els.locationFilter.options].some(opt => String(opt.value) === String(currentValue))) {
+        els.locationFilter.value = currentValue;
+      }
+    }
+
     function renderCategoryFilter() {
   const currentValue = els.categoryFilter.value;
 
