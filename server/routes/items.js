@@ -204,14 +204,71 @@ async function checkItemDuplicates({ tenantId, sku, barcode, excludeId = null })
   return { ok: true };
 }
 
+
+async function findOrCreateCategory({ tenantId, name }) {
+  const categoryName = normalizeOptionalText(name);
+  if (!categoryName) return null;
+
+  const existing = await pool.query(
+    `
+      SELECT id, name
+      FROM core.categories
+      WHERE tenant_id = $1
+        AND LOWER(name) = LOWER($2)
+      LIMIT 1
+    `,
+    [tenantId, categoryName]
+  );
+
+  if (existing.rows.length) {
+    return existing.rows[0];
+  }
+
+  try {
+    const inserted = await pool.query(
+      `
+        INSERT INTO core.categories
+        (
+          tenant_id,
+          name,
+          is_active
+        )
+        VALUES ($1, $2, TRUE)
+        RETURNING id, name
+      `,
+      [tenantId, categoryName]
+    );
+
+    return inserted.rows[0] || null;
+  } catch (err) {
+    const duplicate = err && (err.code === "23505" || /duplicate key/i.test(String(err.message || "")));
+    if (!duplicate) throw err;
+
+    const fallback = await pool.query(
+      `
+        SELECT id, name
+        FROM core.categories
+        WHERE tenant_id = $1
+          AND LOWER(name) = LOWER($2)
+        LIMIT 1
+      `,
+      [tenantId, categoryName]
+    );
+
+    return fallback.rows[0] || null;
+  }
+}
+
 function getItemSelectSql(whereSql) {
   return `
     SELECT
       i.id,
       i.tenant_id,
       i.name,
-      i.brand,
-      i.category,
+      i.factory,
+      i.factory_article,
+      i.category_id,
+      c.name AS category_name,
       i.sku,
       i.barcode,
       i.unit,
@@ -231,6 +288,9 @@ function getItemSelectSql(whereSql) {
       i.created_at,
       i.updated_at
     FROM core.items i
+    LEFT JOIN core.categories c
+      ON c.id = i.category_id
+     AND c.tenant_id = i.tenant_id
     ${whereSql}
   `;
 }
@@ -254,8 +314,9 @@ router.get("/", authRequired, async (req, res) => {
       params.push(`%${search}%`);
       whereSql += ` AND (
         i.name ILIKE $${params.length}
-        OR COALESCE(i.brand, '') ILIKE $${params.length}
-        OR COALESCE(i.category, '') ILIKE $${params.length}
+        OR COALESCE(i.factory_article, '') ILIKE $${params.length}
+        OR COALESCE(i.factory, '') ILIKE $${params.length}
+        OR COALESCE(c.name, '') ILIKE $${params.length}
         OR COALESCE(i.sku, '') ILIKE $${params.length}
         OR COALESCE(i.barcode, '') ILIKE $${params.length}
         OR COALESCE(i.description, '') ILIKE $${params.length}
@@ -282,6 +343,53 @@ router.get("/", authRequired, async (req, res) => {
     });
   }
 });
+
+
+router.get(
+  "/categories",
+  authRequired,
+  async (req, res) => {
+    try {
+      const tenantId = getEffectiveTenantId(req);
+
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: "tenant_not_defined",
+        });
+      }
+
+      const { rows } = await pool.query(
+        `
+          SELECT
+            id,
+            tenant_id,
+            name,
+            is_active,
+            created_at,
+            updated_at
+          FROM core.categories
+          WHERE tenant_id = $1
+            AND is_active = TRUE
+          ORDER BY name ASC
+        `,
+        [tenantId]
+      );
+
+      return res.json({
+        ok: true,
+        categories: rows,
+      });
+    } catch (err) {
+      console.error("[GET /items/categories] error:", err);
+      return res.status(500).json({
+        ok: false,
+        error: "categories_list_failed",
+        details: err.message,
+      });
+    }
+  }
+);
 
 router.post(
   "/upload-image",
@@ -406,8 +514,9 @@ router.post(
       }
 
       const name = String(req.body.name || "").trim();
-      const brand = normalizeOptionalText(req.body.brand);
-      const category = normalizeOptionalText(req.body.category);
+      const factoryArticle = normalizeOptionalText(req.body.factory_article ?? req.body.brand);
+      const factory = normalizeOptionalText(req.body.factory ?? req.body.category);
+      const categoryName = normalizeOptionalText(req.body.category_name);
       const sku = normalizeOptionalText(req.body.sku);
       const barcode = normalizeOptionalText(req.body.barcode);
       const unit = normalizeOptionalText(req.body.unit) || "pcs";
@@ -480,12 +589,18 @@ router.post(
         });
       }
 
+      const categoryRecord = categoryName
+        ? await findOrCreateCategory({ tenantId, name: categoryName })
+        : null;
+      const categoryId = categoryRecord ? Number(categoryRecord.id) : null;
+
       const sql = `
   INSERT INTO core.items (
     tenant_id,
     name,
-    brand,
-    category,
+    factory,
+    factory_article,
+    category_id,
     sku,
     barcode,
     unit,
@@ -503,14 +618,15 @@ router.post(
   )
   VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8, $9,
-    $10, $11, $12, $13, $14, $15, $16, $17, $18
+    $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
   )
   RETURNING
     id,
     tenant_id,
     name,
-    brand,
-    category,
+    factory,
+    factory_article,
+    category_id,
     sku,
     barcode,
     unit,
@@ -534,8 +650,9 @@ router.post(
       const params = [
         tenantId,
         name,
-        brand,
-        category,
+        factory,
+        factoryArticle,
+        categoryId,
         sku,
         barcode,
         unit,
@@ -553,10 +670,11 @@ router.post(
       ];
 
       const { rows } = await pool.query(sql, params);
+      const item = rows[0] ? { ...rows[0], category_name: categoryRecord ? categoryRecord.name : null } : null;
 
       return res.status(201).json({
         ok: true,
-        item: rows[0],
+        item,
       });
     } catch (err) {
       console.error("[POST /items] error:", err);
@@ -612,8 +730,9 @@ router.put(
       const existingImageUrl = existsResult.rows[0].image_url || null;
 
       const name = String(req.body.name || "").trim();
-      const brand = normalizeOptionalText(req.body.brand);
-      const category = normalizeOptionalText(req.body.category);
+      const factoryArticle = normalizeOptionalText(req.body.factory_article ?? req.body.brand);
+      const factory = normalizeOptionalText(req.body.factory ?? req.body.category);
+      const categoryName = normalizeOptionalText(req.body.category_name);
       const sku = normalizeOptionalText(req.body.sku);
       const barcode = normalizeOptionalText(req.body.barcode);
       const unit = normalizeOptionalText(req.body.unit) || "pcs";
@@ -689,35 +808,42 @@ router.put(
         });
       }
 
+      const categoryRecord = categoryName
+        ? await findOrCreateCategory({ tenantId, name: categoryName })
+        : null;
+      const categoryId = categoryRecord ? Number(categoryRecord.id) : null;
+
      const sql = `
   UPDATE core.items
   SET
     name = $1,
-    brand = $2,
-    category = $3,
-    sku = $4,
-    barcode = $5,
-    unit = $6,
-    box_qty = $7,
-    purchase_price = $8,
-    sale_price = $9,
-    description = $10,
-    image_url = $11,
-    weight_grams = $12,
-    volume_ml = $13,
-    length_cm = $14,
-    width_cm = $15,
-    height_cm = $16,
-    is_active = $17,
+    factory = $2,
+    factory_article = $3,
+    category_id = $4,
+    sku = $5,
+    barcode = $6,
+    unit = $7,
+    box_qty = $8,
+    purchase_price = $9,
+    sale_price = $10,
+    description = $11,
+    image_url = $12,
+    weight_grams = $13,
+    volume_ml = $14,
+    length_cm = $15,
+    width_cm = $16,
+    height_cm = $17,
+    is_active = $18,
     updated_at = NOW()
-  WHERE id = $18
-    AND tenant_id = $19
+  WHERE id = $19
+    AND tenant_id = $20
   RETURNING
     id,
     tenant_id,
     name,
-    brand,
-    category,
+    factory,
+    factory_article,
+    category_id,
     sku,
     barcode,
     unit,
@@ -740,8 +866,9 @@ router.put(
 
       const params = [
   name,
-  brand,
-  category,
+  factory,
+  factoryArticle,
+  categoryId,
   sku,
   barcode,
   unit,
@@ -761,6 +888,7 @@ router.put(
 ];
 
       const { rows } = await pool.query(sql, params);
+      const item = rows[0] ? { ...rows[0], category_name: categoryRecord ? categoryRecord.name : null } : null;
 
       if (existingImageUrl && existingImageUrl !== imageUrl) {
         await deleteUploadedFileByUrl(existingImageUrl);
@@ -768,7 +896,7 @@ router.put(
 
       return res.json({
         ok: true,
-        item: rows[0],
+        item,
       });
     } catch (err) {
       console.error("[PUT /items/:id] error:", err);
