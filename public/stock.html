@@ -312,13 +312,6 @@
         </div>
 
         <div class="field">
-          <label for="categoryFilter">Категория</label>
-          <select id="categoryFilter">
-            <option value="">Все категории</option>
-          </select>
-        </div>
-
-        <div class="field">
           <label data-i18n="stock.actionsLabel">&nbsp;</label>
           <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="stock.refreshButton">Обновить</button>
         </div>
@@ -359,6 +352,9 @@
           <thead>
             <tr>
               <th data-i18n="stock.tableItem">Товар</th>
+              <th>Категория</th>
+              <th>Фабрика</th>
+              <th>Арт. фабрики</th>
               <th data-i18n="stock.tableSku">Артикул / SKU</th>
               <th data-i18n="stock.tableBarcode">Штрихкод</th>
               <th data-i18n="stock.tableLocation">Место хранения</th>
@@ -367,7 +363,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="5" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
+              <td colspan="8" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -466,7 +462,6 @@
     const els = {
       searchInput: document.getElementById("searchInput"),
       locationFilter: document.getElementById("locationFilter"),
-      categoryFilter: document.getElementById("categoryFilter"),
       refreshBtn: document.getElementById("refreshBtn"),
       tbody: document.getElementById("tbody"),
       pageStatus: document.getElementById("pageStatus"),
@@ -587,25 +582,6 @@
       }
     }
 
-    function renderCategoryFilter() {
-      const currentValue = els.categoryFilter.value;
-      const categories = [...new Set(
-        itemsData
-          .map(item => String(item.category_name || "").trim())
-          .filter(Boolean)
-      )].sort((a, b) => a.localeCompare(b, "ru"));
-
-      const options = categories
-        .map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
-        .join("");
-
-      els.categoryFilter.innerHTML = `<option value="">Все категории</option>` + options;
-
-      if ([...els.categoryFilter.options].some(opt => String(opt.value) === String(currentValue))) {
-        els.categoryFilter.value = currentValue;
-      }
-    }
-
     function buildRows() {
       return stockData
         .map(stockRow => {
@@ -624,9 +600,6 @@
             item_name: item.name || item.item_name || stockRow.item_name || stockRow.name || "",
             sku: item.sku || item.vendor_code || item.article || item.code || stockRow.sku || "",
             barcode: item.barcode || stockRow.barcode || "",
-            category_name: item.category_name || "",
-            factory: item.factory || item.category || "",
-            factory_article: item.factory_article || item.brand || "",
             location_id: locationId,
             location_name: locationName,
             location_code: locationCode,
@@ -640,7 +613,6 @@
     function renderTable() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
       const selectedLocationId = els.locationFilter.value;
-      const selectedCategoryName = (els.categoryFilter.value || "").trim();
 
       const allRows = buildRows();
 
@@ -650,18 +622,11 @@
           return String(row.location_id) === String(selectedLocationId);
         })
         .filter(row => {
-          if (!selectedCategoryName) return true;
-          return String(row.category_name || "").trim() === selectedCategoryName;
-        })
-        .filter(row => {
           if (!search) return true;
           const text = [
             row.item_name,
             row.sku,
             row.barcode,
-            row.category_name,
-            row.factory,
-            row.factory_article,
             row.location_name,
             row.location_code
           ].join(" ").toLowerCase();
@@ -682,16 +647,13 @@
       els.qtyGrandTotal.textContent = formatNumber(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
 
       if (!rows.length) {
-        els.tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
+        els.tbody.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
         return;
       }
 
       els.tbody.innerHTML = rows.map(row => `
         <tr>
-          <td>
-            <div>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</div>
-            <div class="muted">${escapeHtml([row.category_name, row.factory, row.factory_article].filter(Boolean).join(" / ") || "Категория, фабрика и артикул фабрики не заполнены")}</div>
-          </td>
+          <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
           <td>${escapeHtml(row.sku)}</td>
           <td>${escapeHtml(row.barcode)}</td>
           <td>${escapeHtml(row.location_display)}</td>
@@ -717,7 +679,6 @@
         locationsData = normalize(locationsRes, "locations");
 
         renderLocationFilter();
-        renderCategoryFilter();
         renderTable();
 
         setPageStatus("stock.loadedStatus", {
@@ -727,7 +688,7 @@
           batches: 0
         }, "success");
       } catch (err) {
-        els.tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
+        els.tbody.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
         setPageStatus("stock.loadErrorStatus", {
           error: Ui.translateError(err.message)
         }, "error");
@@ -737,13 +698,11 @@
     function bindEvents() {
       els.searchInput.addEventListener("input", renderTable);
       els.locationFilter.addEventListener("change", renderTable);
-      els.categoryFilter.addEventListener("change", renderTable);
       els.refreshBtn.addEventListener("click", loadData);
 
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
         renderLocationFilter();
-        renderCategoryFilter();
         renderTable();
         restoreStatusesAfterLanguageChange();
       });
