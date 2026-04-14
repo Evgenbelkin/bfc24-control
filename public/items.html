@@ -441,130 +441,6 @@
       padding:24px 12px;
     }
 
-
-    .import-panel{
-      margin-top:16px;
-      border:1px dashed #cbd5e1;
-      border-radius:14px;
-      background:#f8fafc;
-      padding:16px;
-      display:none;
-    }
-
-    .import-panel.show{
-      display:block;
-    }
-
-    .import-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:14px;
-      margin-top:14px;
-    }
-
-    .import-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:14px;
-    }
-
-    .import-file-note{
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.5;
-    }
-
-    .import-summary{
-      display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .import-stat{
-      background:#fff;
-      border:1px solid #e8edf4;
-      border-radius:14px;
-      padding:12px;
-    }
-
-    .import-stat-label{
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:6px;
-    }
-
-    .import-stat-value{
-      font-size:22px;
-      font-weight:800;
-    }
-
-    .preview-wrap{
-      overflow:auto;
-      margin-top:14px;
-      border:1px solid #e8edf4;
-      border-radius:14px;
-      background:#fff;
-    }
-
-    .preview-table{
-      width:100%;
-      min-width:980px;
-      border-collapse:collapse;
-    }
-
-    .preview-table th,
-    .preview-table td{
-      border-bottom:1px solid #eef1f5;
-      padding:10px 10px;
-      text-align:left;
-      vertical-align:top;
-      font-size:13px;
-    }
-
-    .preview-table th{
-      background:#f8fafc;
-      font-weight:700;
-      position:sticky;
-      top:0;
-      z-index:1;
-    }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:24px;
-      padding:4px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      white-space:nowrap;
-    }
-
-    .pill-success{
-      background:#dcfce7;
-      color:#166534;
-      border:1px solid #bbf7d0;
-    }
-
-    .pill-danger{
-      background:#fee2e2;
-      color:#991b1b;
-      border:1px solid #fecaca;
-    }
-
-    .import-empty{
-      margin-top:14px;
-      padding:16px;
-      border:1px dashed #dbe3ef;
-      border-radius:14px;
-      background:#fff;
-      color:var(--muted);
-      font-size:13px;
-    }
-
     @media (max-width: 1100px){
       .form-grid{
         grid-template-columns:repeat(2,minmax(0,1fr));
@@ -581,10 +457,6 @@
       .photo-preview{
         width:100%;
         max-width:220px;
-      }
-      .import-summary,
-      .import-grid{
-        grid-template-columns:1fr;
       }
     }
 
@@ -752,7 +624,6 @@
           <div class="toolbar-actions">
             <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
             <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
-            <button type="button" class="btn btn-light" id="importExcelBtn">Импорт Excel</button>
             <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="items.refreshButton">Обновить список</button>
           </div>
         </div>
@@ -760,83 +631,6 @@
 
       <div id="pageStatus" class="status info"></div>
       <div id="submitStatus" class="status"></div>
-
-      <div id="importPanel" class="import-panel">
-        <div class="card-title" style="margin-bottom:8px;">Импорт Excel</div>
-        <div class="muted">Загрузи .xlsx файл, проверь preview и только потом запускай импорт. Существующие SKU не создаются повторно.</div>
-
-        <div class="import-grid">
-          <div class="field">
-            <label for="importFile">Файл Excel</label>
-            <input id="importFile" type="file" accept=".xlsx,.xls" />
-            <div class="import-file-note">Поддерживаются Excel-файлы. Пропускаем только строки без SKU, а также дубли SKU в системе и внутри файла.</div>
-          </div>
-
-          <div class="field">
-            <label>Выбранный файл</label>
-            <input id="importFileName" type="text" readonly placeholder="Файл не выбран" />
-            <div class="import-actions">
-              <button type="button" class="btn btn-secondary" id="previewImportBtn">Показать preview</button>
-              <button type="button" class="btn btn-primary" id="runImportBtn" disabled>Импортировать</button>
-              <button type="button" class="btn btn-light" id="closeImportBtn">Закрыть</button>
-            </div>
-          </div>
-        </div>
-
-        <div id="importStatus" class="status"></div>
-
-        <div id="importSummary" class="import-summary" style="display:none;">
-          <div class="import-stat">
-            <div class="import-stat-label">Всего строк</div>
-            <div class="import-stat-value" id="importTotalRows">0</div>
-          </div>
-          <div class="import-stat">
-            <div class="import-stat-label">Новых</div>
-            <div class="import-stat-value" id="importNewRows">0</div>
-          </div>
-          <div class="import-stat">
-            <div class="import-stat-label">Пропущено</div>
-            <div class="import-stat-value" id="importSkippedRows">0</div>
-          </div>
-          <div class="import-stat">
-            <div class="import-stat-label">Дубли в системе</div>
-            <div class="import-stat-value" id="importDupSystemRows">0</div>
-          </div>
-          <div class="import-stat">
-            <div class="import-stat-label">Дубли в файле / без SKU</div>
-            <div class="import-stat-value" id="importOtherSkippedRows">0</div>
-          </div>
-        </div>
-
-        <div id="importPreviewEmpty" class="import-empty">Сначала выбери файл и нажми «Показать preview».</div>
-
-        <div id="importPreviewWrap" class="preview-wrap" style="display:none;">
-          <table class="preview-table">
-            <thead>
-              <tr>
-                <th>Строка</th>
-                <th>Статус</th>
-                <th>Причина</th>
-                <th>SKU</th>
-                <th>Наименование</th>
-                <th>Категория</th>
-                <th>Фабрика</th>
-                <th>Артикул фабрики</th>
-                <th>ШК</th>
-                <th>Ед.</th>
-                <th>Шт/кор</th>
-                <th>Цена продажи</th>
-              </tr>
-            </thead>
-            <tbody id="importPreviewBody">
-              <tr>
-                <td colspan="12" class="empty">Preview пока не загружен.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
     </div>
 
     <div class="card">
@@ -980,8 +774,6 @@
     let currentImageUrl = null;
     let pendingImageFile = null;
     let pendingImagePreviewUrl = null;
-    let importFileObject = null;
-    let importPreviewData = null;
 
     let pageStatusState = null;
     let submitStatusState = null;
@@ -997,7 +789,6 @@
       purchasePrice: document.getElementById("purchasePrice"),
       salePrice: document.getElementById("salePrice"),
       unit: document.getElementById("unit"),
-      boxQty: document.getElementById("boxQty"),
       description: document.getElementById("description"),
       imageFile: document.getElementById("imageFile"),
       removeImageBtn: document.getElementById("removeImageBtn"),
@@ -1011,23 +802,6 @@
       saveBtn: document.getElementById("saveBtn"),
       cancelEditBtn: document.getElementById("cancelEditBtn"),
       refreshBtn: document.getElementById("refreshBtn"),
-      importExcelBtn: document.getElementById("importExcelBtn"),
-      importPanel: document.getElementById("importPanel"),
-      importFile: document.getElementById("importFile"),
-      importFileName: document.getElementById("importFileName"),
-      previewImportBtn: document.getElementById("previewImportBtn"),
-      runImportBtn: document.getElementById("runImportBtn"),
-      closeImportBtn: document.getElementById("closeImportBtn"),
-      importStatus: document.getElementById("importStatus"),
-      importSummary: document.getElementById("importSummary"),
-      importTotalRows: document.getElementById("importTotalRows"),
-      importNewRows: document.getElementById("importNewRows"),
-      importSkippedRows: document.getElementById("importSkippedRows"),
-      importDupSystemRows: document.getElementById("importDupSystemRows"),
-      importOtherSkippedRows: document.getElementById("importOtherSkippedRows"),
-      importPreviewEmpty: document.getElementById("importPreviewEmpty"),
-      importPreviewWrap: document.getElementById("importPreviewWrap"),
-      importPreviewBody: document.getElementById("importPreviewBody"),
       tbody: document.getElementById("tbody"),
       pageStatus: document.getElementById("pageStatus"),
       submitStatus: document.getElementById("submitStatus"),
@@ -1333,6 +1107,7 @@
       els.purchasePrice.value = "0";
       els.salePrice.value = "0";
       els.unit.value = "pcs";
+      els.boxQty.value = "1";
       els.description.value = "";
       clearImageSelection({ clearCurrent: true });
       els.weightKg.value = "";
@@ -1355,7 +1130,6 @@
       els.purchasePrice.value = String(item.purchase_price ?? 0);
       els.salePrice.value = String(item.sale_price ?? 0);
       els.unit.value = item.unit || "pcs";
-      els.boxQty.value = item.box_qty ? String(item.box_qty) : "1";
       els.description.value = item.description || "";
       currentImageUrl = item.image_url || null;
       clearImageSelection({ clearCurrent: false });
@@ -1519,6 +1293,7 @@
         const purchase_price = Number(els.purchasePrice.value || 0);
         const sale_price = Number(els.salePrice.value || 0);
         const unit = (els.unit.value || "").trim() || "pcs";
+        const box_qty = Number(els.boxQty.value || 1);
         const description = (els.description.value || "").trim();
 
         const weight_kg = readOptionalNumber(els.weightKg.value);
@@ -1536,6 +1311,10 @@
 
         if (!Number.isFinite(sale_price) || sale_price < 0) {
           throw new Error(i18n.t("items.salePriceInvalid"));
+        }
+
+        if (!Number.isFinite(box_qty) || box_qty <= 0) {
+          throw new Error("Штук в коробке должно быть больше 0");
         }
 
         for (const [value, message] of [
@@ -1564,6 +1343,7 @@
           sku: sku || null,
           barcode: barcode || null,
           unit,
+          box_qty,
           purchase_price,
           sale_price,
           description: description || null,
@@ -1593,190 +1373,6 @@
       }
     }
 
-
-    function getImportReasonText(reason) {
-      switch (String(reason || "")) {
-        case "no_sku":
-          return "Нет SKU";
-        case "duplicate_sku_in_system":
-          return "SKU уже есть в системе";
-        case "duplicate_sku_in_file":
-          return "Повтор SKU в файле";
-        case "sku_already_exists":
-          return "SKU уже есть в системе";
-        default:
-          return reason ? String(reason) : "—";
-      }
-    }
-
-    function getImportStatusPill(status) {
-      if (String(status || "") === "new") {
-        return '<span class="pill pill-success">Новый</span>';
-      }
-      return '<span class="pill pill-danger">Пропуск</span>';
-    }
-
-    async function readFileAsBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = String(reader.result || "");
-          const base64 = result.includes(",") ? result.split(",").pop() : result;
-          resolve(base64 || "");
-        };
-        reader.onerror = () => reject(new Error("Не удалось прочитать Excel-файл"));
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function resetImportPreviewUi() {
-      importPreviewData = null;
-      hideStatus(els.importStatus);
-      els.importSummary.style.display = "none";
-      els.importPreviewWrap.style.display = "none";
-      els.importPreviewEmpty.style.display = "block";
-      els.importPreviewBody.innerHTML = '<tr><td colspan="12" class="empty">Preview пока не загружен.</td></tr>';
-      els.runImportBtn.disabled = true;
-    }
-
-    function openImportPanel() {
-      els.importPanel.classList.add("show");
-    }
-
-    function closeImportPanel() {
-      els.importPanel.classList.remove("show");
-    }
-
-    function renderImportPreview(data) {
-      importPreviewData = data || null;
-
-      if (!data) {
-        resetImportPreviewUi();
-        return;
-      }
-
-      els.importSummary.style.display = "grid";
-      els.importTotalRows.textContent = String(data.total_rows || 0);
-      els.importNewRows.textContent = String(data.new_count || 0);
-      els.importSkippedRows.textContent = String(data.skipped_count || 0);
-      els.importDupSystemRows.textContent = String(data.duplicate_sku_in_system_count || 0);
-      els.importOtherSkippedRows.textContent = String((data.duplicate_sku_in_file_count || 0) + (data.no_sku_count || 0));
-
-      const rows = Array.isArray(data.preview_rows) ? data.preview_rows : [];
-      if (!rows.length) {
-        els.importPreviewWrap.style.display = "none";
-        els.importPreviewEmpty.style.display = "block";
-        els.importPreviewEmpty.textContent = "В файле нет строк для preview.";
-        els.runImportBtn.disabled = true;
-        return;
-      }
-
-      els.importPreviewBody.innerHTML = rows.map((row) => `
-        <tr>
-          <td>${escapeHtml(row.row_number ?? "")}</td>
-          <td>${getImportStatusPill(row.status)}</td>
-          <td>${escapeHtml(getImportReasonText(row.reason))}</td>
-          <td>${escapeHtml(row.sku || "")}</td>
-          <td>${escapeHtml(row.name || "")}</td>
-          <td>${escapeHtml(row.category_name || "")}</td>
-          <td>${escapeHtml(row.factory || "")}</td>
-          <td>${escapeHtml(row.factory_article || "")}</td>
-          <td>${escapeHtml(row.barcode || "")}</td>
-          <td>${escapeHtml(row.unit || "")}</td>
-          <td>${escapeHtml(formatMoney(row.box_qty || 0))}</td>
-          <td>${escapeHtml(formatMoney(row.sale_price || 0))}</td>
-        </tr>
-      `).join("");
-
-      els.importPreviewWrap.style.display = "block";
-      els.importPreviewEmpty.style.display = "none";
-      els.runImportBtn.disabled = !(Number(data.new_count || 0) > 0);
-    }
-
-    async function handleImportPreview() {
-      try {
-        if (!importFileObject) {
-          throw new Error("Сначала выбери Excel-файл");
-        }
-
-        showStatus(els.importStatus, "Читаем файл и строим preview...", "info");
-        const fileBase64 = await readFileAsBase64(importFileObject);
-
-        const data = await apiPost("/items/import/preview", {
-          tenant_id: getTenantId(),
-          file_base64: fileBase64
-        });
-
-        renderImportPreview(data);
-        showStatus(
-          els.importStatus,
-          `Preview готов. Всего строк: ${data.total_rows || 0}. Новых: ${data.new_count || 0}. Пропущено: ${data.skipped_count || 0}.`,
-          "success"
-        );
-      } catch (err) {
-        resetImportPreviewUi();
-        showStatus(els.importStatus, Ui.translateError(err.message), "error");
-      }
-    }
-
-    async function handleImportRun() {
-      try {
-        if (!importFileObject) {
-          throw new Error("Сначала выбери Excel-файл");
-        }
-
-        if (!importPreviewData) {
-          throw new Error("Сначала построй preview");
-        }
-
-        if (!(Number(importPreviewData.new_count || 0) > 0)) {
-          throw new Error("В файле нет новых SKU для импорта");
-        }
-
-        const confirmed = window.confirm(`Будет создано новых товаров: ${importPreviewData.new_count}. Продолжить импорт?`);
-        if (!confirmed) {
-          return;
-        }
-
-        showStatus(els.importStatus, "Импортируем товары...", "info");
-        const fileBase64 = await readFileAsBase64(importFileObject);
-
-        const result = await apiPost("/items/import", {
-          tenant_id: getTenantId(),
-          file_base64: fileBase64
-        });
-
-        showStatus(
-          els.importStatus,
-          `Импорт завершён. Создано: ${result.created_count || 0}. Пропущено: ${result.skipped_count || 0}.`,
-          "success"
-        );
-
-        els.importFile.value = "";
-        els.importFileName.value = "";
-        importFileObject = null;
-        await loadData();
-        if (typeof loadCategories === "function") {
-          await loadCategories();
-        }
-        renderImportPreview({
-          total_rows: result.total_rows || 0,
-          new_count: 0,
-          skipped_count: result.skipped_count || 0,
-          duplicate_sku_in_system_count: result.duplicate_sku_in_system_count || 0,
-          duplicate_sku_in_file_count: result.duplicate_sku_in_file_count || 0,
-          no_sku_count: result.no_sku_count || 0,
-          preview_rows: (result.created || []).slice(0, 0),
-        });
-        els.importPreviewWrap.style.display = "none";
-        els.importPreviewEmpty.style.display = "block";
-        els.importPreviewEmpty.textContent = "Импорт выполнен. Можешь выбрать следующий файл.";
-      } catch (err) {
-        showStatus(els.importStatus, Ui.translateError(err.message), "error");
-      }
-    }
-
-
     function bindEvents() {
       els.itemForm.addEventListener("submit", handleSubmit);
       els.searchInput.addEventListener("input", renderTable);
@@ -1785,21 +1381,6 @@
       });
       els.cancelEditBtn.addEventListener("click", resetForm);
       els.refreshBtn.addEventListener("click", loadData);
-      els.importExcelBtn.addEventListener("click", openImportPanel);
-      els.closeImportBtn.addEventListener("click", closeImportPanel);
-      els.previewImportBtn.addEventListener("click", handleImportPreview);
-      els.runImportBtn.addEventListener("click", handleImportRun);
-      els.importFile.addEventListener("change", (event) => {
-        importFileObject = event.target.files && event.target.files[0] ? event.target.files[0] : null;
-        els.importFileName.value = importFileObject ? importFileObject.name : "";
-        resetImportPreviewUi();
-        if (importFileObject) {
-          openImportPanel();
-          showStatus(els.importStatus, `Файл выбран: ${importFileObject.name}`, "info");
-        } else {
-          hideStatus(els.importStatus);
-        }
-      });
       els.imageFile.addEventListener("change", (event) => {
         const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
         revokePendingPreviewUrl();
@@ -1846,7 +1427,6 @@
       syncFormTexts();
       updateVolumeDisplay();
       setImagePreview(null);
-      resetImportPreviewUi();
       loadData();
     }
 
