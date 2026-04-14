@@ -863,7 +863,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="13" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
+              <td colspan="16" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -992,8 +992,6 @@
       name: document.getElementById("name"),
       brand: document.getElementById("brand"),
       category: document.getElementById("category"),
-      categoryName: document.getElementById("categoryName"),
-      categoryOptions: document.getElementById("categoryOptions"),
       sku: document.getElementById("sku"),
       barcode: document.getElementById("barcode"),
       purchasePrice: document.getElementById("purchasePrice"),
@@ -1277,11 +1275,8 @@
       return {
         id: row.id,
         name: row.name || row.item_name || "",
-        brand: row.factory_article || row.brand || "",
-        category: row.factory || row.category || "",
-        category_name: row.category_name || "",
-        factory: row.factory || row.category || "",
-        factory_article: row.factory_article || row.brand || "",
+        brand: row.brand || "",
+        category: row.category || "",
         sku: row.sku || row.vendor_code || row.article || "",
         barcode: row.barcode || "",
         unit: row.unit || "pcs",
@@ -1298,27 +1293,6 @@
         is_active: row.is_active === false ? false : true,
         created_at: row.created_at || row.date || null
       };
-    }
-
-    let categoriesData = [];
-
-    function renderCategoryOptions() {
-      if (!els.categoryOptions) return;
-      els.categoryOptions.innerHTML = categoriesData
-        .map((row) => `<option value="${escapeHtml(row.name || "")}"></option>`)
-        .join("");
-    }
-
-    async function loadCategories() {
-      try {
-        const tenantId = getTenantId();
-        const data = await apiGet(`/items/categories?tenant_id=${tenantId}`);
-        categoriesData = extractList(data, ["categories", "data", "rows"]);
-        renderCategoryOptions();
-      } catch (err) {
-        categoriesData = [];
-        renderCategoryOptions();
-      }
     }
 
     function getFormTitleText() {
@@ -1359,8 +1333,6 @@
       els.purchasePrice.value = "0";
       els.salePrice.value = "0";
       els.unit.value = "pcs";
-      els.boxQty.value = "1";
-      if (els.categoryName) els.categoryName.value = "";
       els.description.value = "";
       clearImageSelection({ clearCurrent: true });
       els.weightKg.value = "";
@@ -1376,9 +1348,8 @@
       syncFormTexts();
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = item.name || "";
-      els.brand.value = item.factory_article || item.brand || "";
-      els.category.value = item.factory || item.category || "";
-      if (els.categoryName) els.categoryName.value = item.category_name || "";
+      els.brand.value = item.brand || "";
+      els.category.value = item.category || "";
       els.sku.value = item.sku || "";
       els.barcode.value = item.barcode || "";
       els.purchasePrice.value = String(item.purchase_price ?? 0);
@@ -1404,9 +1375,6 @@
         if (!search) return true;
         const text = [
           row.name,
-          row.category_name,
-          row.factory,
-          row.factory_article,
           row.brand,
           row.category,
           row.sku,
@@ -1521,7 +1489,6 @@
         renderLoadingRow();
         setPageStatus("items.loadingStatus", { tenantId }, "info");
 
-        await loadCategories();
         const data = await apiGet(`/items?tenant_id=${tenantId}`);
         itemsData = extractList(data, ["items", "data", "rows"]).map(normalizeItem);
 
@@ -1549,13 +1516,11 @@
         const name = (els.name.value || "").trim();
         const brand = (els.brand.value || "").trim();
         const category = (els.category.value || "").trim();
-        const category_name = els.categoryName ? (els.categoryName.value || "").trim() : "";
         const sku = (els.sku.value || "").trim();
         const barcode = (els.barcode.value || "").trim();
         const purchase_price = Number(els.purchasePrice.value || 0);
         const sale_price = Number(els.salePrice.value || 0);
         const unit = (els.unit.value || "").trim() || "pcs";
-        const box_qty = Number(els.boxQty.value || 1);
         const description = (els.description.value || "").trim();
 
         const weight_kg = readOptionalNumber(els.weightKg.value);
@@ -1573,10 +1538,6 @@
 
         if (!Number.isFinite(sale_price) || sale_price < 0) {
           throw new Error(i18n.t("items.salePriceInvalid"));
-        }
-
-        if (!Number.isFinite(box_qty) || box_qty <= 0) {
-          throw new Error("Штук в коробке должно быть больше 0");
         }
 
         for (const [value, message] of [
@@ -1602,13 +1563,9 @@
           name,
           brand: brand || null,
           category: category || null,
-          factory: category || null,
-          factory_article: brand || null,
-          category_name: category_name || null,
           sku: sku || null,
           barcode: barcode || null,
           unit,
-          box_qty,
           purchase_price,
           sale_price,
           description: description || null,
@@ -1892,7 +1849,6 @@
       updateVolumeDisplay();
       setImagePreview(null);
       resetImportPreviewUi();
-      loadCategories();
       loadData();
     }
 
