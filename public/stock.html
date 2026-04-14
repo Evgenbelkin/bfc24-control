@@ -128,7 +128,7 @@
 
     .filters{
       display:grid;
-      grid-template-columns:1.5fr 1fr 1fr auto;
+      grid-template-columns:1.5fr 1fr auto;
       gap:12px;
       align-items:end;
     }
@@ -212,6 +212,33 @@
       font-weight:800;
     }
 
+
+    .bulk-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .bulk-note{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .check-col{
+      width:44px;
+      min-width:44px;
+      text-align:center;
+    }
+
+    .check-col input[type="checkbox"]{
+      width:16px;
+      height:16px;
+      cursor:pointer;
+    }
+
     .table-wrap{
       overflow:auto;
     }
@@ -253,32 +280,6 @@
       text-align:center;
       color:var(--muted);
       padding:24px 12px;
-    }
-
-    .check-col{
-      width:44px;
-      min-width:44px;
-      text-align:center;
-    }
-
-    .check-col input{
-      width:18px;
-      height:18px;
-      margin:0;
-      box-shadow:none;
-    }
-
-    .actions-row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin-top:14px;
-    }
-
-    .selected-note{
-      font-size:13px;
-      color:var(--muted);
     }
 
     @media (max-width: 900px){
@@ -338,13 +339,6 @@
         </div>
 
         <div class="field">
-          <label for="categoryFilter">Категория</label>
-          <select id="categoryFilter">
-            <option value="">Все категории</option>
-          </select>
-        </div>
-
-        <div class="field">
           <label data-i18n="stock.actionsLabel">&nbsp;</label>
           <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="stock.refreshButton">Обновить</button>
         </div>
@@ -375,11 +369,11 @@
 
       <div id="pageStatus" class="status info"></div>
 
-      <div class="actions-row">
+      <div class="bulk-actions">
         <button type="button" class="btn btn-light" id="selectFilteredBtn">Выбрать строки по текущим фильтрам</button>
         <button type="button" class="btn btn-light" id="clearSelectionBtn">Снять выбор</button>
         <button type="button" class="btn btn-primary" id="exportSelectedBtn">Выгрузить выбранное</button>
-        <div class="selected-note" id="selectedInfo">Выбрано строк: 0</div>
+        <div class="bulk-note" id="selectedCountLabel">Выбрано строк: 0</div>
       </div>
     </div>
 
@@ -495,7 +489,7 @@
     let itemsData = [];
     let locationsData = [];
     let pageStatusState = null;
-    let selectedRows = new Set();
+    let selectedRowKeys = new Set();
 
     const els = {
       searchInput: document.getElementById("searchInput"),
@@ -507,7 +501,12 @@
       itemsCount: document.getElementById("itemsCount"),
       locationsCount: document.getElementById("locationsCount"),
       qtyTotal: document.getElementById("qtyTotal"),
-      qtyGrandTotal: document.getElementById("qtyGrandTotal")
+      qtyGrandTotal: document.getElementById("qtyGrandTotal"),
+      selectAllRows: document.getElementById("selectAllRows"),
+      selectFilteredBtn: document.getElementById("selectFilteredBtn"),
+      clearSelectionBtn: document.getElementById("clearSelectionBtn"),
+      exportSelectedBtn: document.getElementById("exportSelectedBtn"),
+      selectedCountLabel: document.getElementById("selectedCountLabel")
     };
 
     function goBack() {
@@ -598,21 +597,21 @@
       return num.toFixed(3);
     }
 
-    function getRowSelectionKey(row) {
-      return [
-        row.item_id || "",
-        row.location_id || "",
-        row.sku || "",
-        row.barcode || ""
-      ].join("|");
+    async function apiGet(path) {
+      return ApiBridge.get(path);
     }
 
-    function updateSelectedInfo() {
-      if (!els.selectedInfo) return;
-      els.selectedInfo.textContent = `Выбрано строк: ${selectedRows.size}`;
+    function getRowKey(row) {
+      return `${row.item_id || ""}__${row.location_id || ""}`;
     }
 
-    function getFilteredAndSortedRows() {
+    function updateSelectedCount() {
+      if (els.selectedCountLabel) {
+        els.selectedCountLabel.textContent = `Выбрано строк: ${selectedRowKeys.size}`;
+      }
+    }
+
+    function getFilteredRows() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
       const selectedLocationId = els.locationFilter.value;
       const selectedCategoryName = (els.categoryFilter.value || "").trim();
@@ -660,21 +659,45 @@
         els.selectAllRows.indeterminate = false;
         return;
       }
-      const selectedCount = rows.filter(row => selectedRows.has(getRowSelectionKey(row))).length;
-      els.selectAllRows.checked = selectedCount === rows.length;
-      els.selectAllRows.indeterminate = selectedCount > 0 && selectedCount < rows.length;
+      const visibleKeys = rows.map(getRowKey);
+      const selectedVisibleCount = visibleKeys.filter(key => selectedRowKeys.has(key)).length;
+      els.selectAllRows.checked = selectedVisibleCount === visibleKeys.length;
+      els.selectAllRows.indeterminate = selectedVisibleCount > 0 && selectedVisibleCount < visibleKeys.length;
+    }
+
+    function selectFilteredRows() {
+      const { rows } = getFilteredRows();
+      rows.forEach(row => selectedRowKeys.add(getRowKey(row)));
+      updateSelectedCount();
+      renderTable();
+    }
+
+    function clearSelection() {
+      selectedRowKeys = new Set();
+      updateSelectedCount();
+      renderTable();
+    }
+
+    function toggleSelectAllVisible(checked) {
+      const { rows } = getFilteredRows();
+      rows.forEach(row => {
+        const key = getRowKey(row);
+        if (checked) selectedRowKeys.add(key);
+        else selectedRowKeys.delete(key);
+      });
+      updateSelectedCount();
+      renderTable();
     }
 
     function exportSelectedRows() {
-      const { rows } = getFilteredAndSortedRows();
-      const selected = rows.filter(row => selectedRows.has(getRowSelectionKey(row)));
-
-      if (!selected.length) {
-        setPageStatus("stock.loadErrorStatus", { error: "Сначала выбери строки для выгрузки" }, "error");
+      const { allRows } = getFilteredRows();
+      const selectedRows = allRows.filter(row => selectedRowKeys.has(getRowKey(row)));
+      if (!selectedRows.length) {
+        showStatus("Сначала выбери строки для выгрузки", "error");
         return;
       }
 
-      const headers = [
+      const header = [
         "Товар",
         "Категория",
         "Фабрика",
@@ -685,9 +708,13 @@
         "Количество"
       ];
 
-      const lines = [
-        headers.join(";"),
-        ...selected.map(row => [
+      const escapeCsv = (value) => {
+        const text = String(value ?? "").replaceAll('"', '""');
+        return `"${text}"`;
+      };
+
+      const lines = [header.map(escapeCsv).join(",")].concat(
+        selectedRows.map(row => [
           row.item_name || "",
           row.category_name || "",
           row.factory || "",
@@ -696,53 +723,39 @@
           row.barcode || "",
           row.location_display || "",
           formatNumber(row.qty)
-        ].map(value => `\"${String(value).replaceAll("\"", '\"\"')}\"`).join(";"))
-      ];
+        ].map(escapeCsv).join(","))
+      );
 
-      const csv = "\ufeff" + lines.join("\r\n");
+      const csv = "\uFEFF" + lines.join("\r\n");
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      const dt = new Date();
-      const stamp = [
-        dt.getFullYear(),
-        String(dt.getMonth() + 1).padStart(2, "0"),
-        String(dt.getDate()).padStart(2, "0"),
-        "-",
-        String(dt.getHours()).padStart(2, "0"),
-        String(dt.getMinutes()).padStart(2, "0")
-      ].join("");
-      link.href = url;
-      link.download = `stock_export_${stamp}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `stock_export_${new Date().toISOString().slice(0,19).replace(/[T:]/g, "-")}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      showStatus(`Выгружено строк: ${selectedRows.length}`, "success");
     }
 
-    async function apiGet(path) {
-      return ApiBridge.get(path);
+    function renderLocationFilter() {
+      const currentValue = els.locationFilter.value;
+      const options = locationsData
+        .slice()
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"))
+        .map(loc => {
+          const locationTitle = `${loc.name || ""}${loc.code ? " (" + loc.code + ")" : ""}`;
+          return `<option value="${escapeHtml(String(loc.id))}">${escapeHtml(locationTitle)}</option>`;
+        })
+        .join("");
+
+      els.locationFilter.innerHTML = `<option value="">${escapeHtml(i18n.t("stock.locationFilterAll"))}</option>` + options;
+
+      if ([...els.locationFilter.options].some(opt => String(opt.value) === String(currentValue))) {
+        els.locationFilter.value = currentValue;
+      }
     }
-
-    function renderCategoryFilter() {
-  const currentValue = els.categoryFilter.value;
-
-  const categories = [...new Set(
-    itemsData
-      .map(item => String(item.category_name || "").trim())
-      .filter(Boolean)
-  )].sort((a, b) => a.localeCompare(b, "ru"));
-
-  const options = categories
-    .map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
-    .join("");
-
-  els.categoryFilter.innerHTML = `<option value="">Все категории</option>` + options;
-
-  if ([...els.categoryFilter.options].some(opt => String(opt.value) === String(currentValue))) {
-    els.categoryFilter.value = currentValue;
-  }
-}
 
     function buildRows() {
       return stockData
@@ -766,14 +779,15 @@
             location_name: locationName,
             location_code: locationCode,
             location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
-            qty
+            qty,
+            row_key: `${itemId || ""}__${locationId || ""}`
           };
         })
         .filter(row => Number(row.qty || 0) > 0);
     }
 
     function renderTable() {
-      const { allRows, rows } = getFilteredAndSortedRows();
+      const { allRows, rows } = getFilteredRows();
 
       els.rowsCount.textContent = String(rows.length);
       els.itemsCount.textContent = String(new Set(allRows.map(row => String(row.item_id || ""))).size);
@@ -782,25 +796,21 @@
       els.qtyGrandTotal.textContent = formatNumber(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
 
       if (!rows.length) {
+        if (els.selectAllRows) {
+          els.selectAllRows.checked = false;
+          els.selectAllRows.indeterminate = false;
+        }
         els.tbody.innerHTML = `<tr><td colspan="9" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
-        syncSelectAllCheckbox(rows);
-        updateSelectedInfo();
+        updateSelectedCount();
         return;
       }
 
       els.tbody.innerHTML = rows.map(row => {
-        const key = getRowSelectionKey(row);
+        const key = getRowKey(row);
+        const checked = selectedRowKeys.has(key) ? "checked" : "";
         return `
         <tr>
-          <td class="check-col">
-            <input
-              type="checkbox"
-              class="row-checkbox"
-              data-row-key="${escapeHtml(key)}"
-              ${selectedRows.has(key) ? "checked" : ""}
-              aria-label="Выбрать строку"
-            />
-          </td>
+          <td class="check-col"><input type="checkbox" class="row-checkbox" data-row-key="${escapeHtml(key)}" ${checked} /></td>
           <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
           <td>${escapeHtml(row.category_name || "")}</td>
           <td>${escapeHtml(row.factory || "")}</td>
@@ -810,14 +820,25 @@
           <td>${escapeHtml(row.location_display || "")}</td>
           <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
         </tr>
-      `;
-      }).join("");
+      `;}).join("");
 
+      document.querySelectorAll('.row-checkbox').forEach((checkbox) => {
+        checkbox.addEventListener('change', (event) => {
+          const key = String(event.target.dataset.rowKey || "");
+          if (!key) return;
+          if (event.target.checked) selectedRowKeys.add(key);
+          else selectedRowKeys.delete(key);
+          updateSelectedCount();
+          syncSelectAllCheckbox(rows);
+        });
+      });
+
+      updateSelectedCount();
       syncSelectAllCheckbox(rows);
-      updateSelectedInfo();
     }
 
     async function loadData() {
+
       try {
         setPageStatus("stock.loadingStatus", {}, "info");
 
@@ -834,7 +855,6 @@
         locationsData = normalize(locationsRes, "locations");
 
         renderLocationFilter();
-        renderCategoryFilter();
         renderTable();
 
         setPageStatus("stock.loadedStatus", {
@@ -859,7 +879,6 @@
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
         renderLocationFilter();
-        renderCategoryFilter();
         renderTable();
         restoreStatusesAfterLanguageChange();
       });
@@ -870,6 +889,7 @@
       i18n.applyTranslations();
       i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
+      updateSelectedCount();
       loadData();
     }
 
