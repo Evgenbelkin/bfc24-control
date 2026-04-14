@@ -1354,6 +1354,7 @@
       els.purchasePrice.value = String(item.purchase_price ?? 0);
       els.salePrice.value = String(item.sale_price ?? 0);
       els.unit.value = item.unit || "pcs";
+      els.boxQty.value = item.box_qty ? String(item.box_qty) : "1";
       els.description.value = item.description || "";
       currentImageUrl = item.image_url || null;
       clearImageSelection({ clearCurrent: false });
