@@ -313,6 +313,44 @@
       background:#fff;
     }
 
+
+    .photo-box.is-clickable{
+      cursor:zoom-in;
+    }
+
+    .image-modal{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:9999;
+      cursor:zoom-out;
+    }
+
+    .image-modal.show{
+      display:flex;
+    }
+
+    .image-modal-content{
+      max-width:min(92vw, 980px);
+      max-height:88vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .image-modal-content img{
+      max-width:100%;
+      max-height:88vh;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+      display:block;
+    }
+
     @media (max-width: 900px){
       .filters,
       .stats{
@@ -445,6 +483,13 @@
     </div>
   </div>
 
+  <div id="imageModal" class="image-modal" aria-hidden="true">
+    <div class="image-modal-content">
+      <img id="imageModalImg" alt="Фото товара" />
+    </div>
+  </div>
+
+
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
@@ -556,8 +601,27 @@
       selectFilteredBtn: document.getElementById("selectFilteredBtn"),
       clearSelectionBtn: document.getElementById("clearSelectionBtn"),
       exportSelectedBtn: document.getElementById("exportSelectedBtn"),
-      selectedCountLabel: document.getElementById("selectedCountLabel")
+      selectedCountLabel: document.getElementById("selectedCountLabel"),
+      imageModal: document.getElementById("imageModal"),
+      imageModalImg: document.getElementById("imageModalImg")
     };
+
+
+    function openImageModal(src) {
+      if (!src || !els.imageModal || !els.imageModalImg) return;
+      els.imageModalImg.src = src;
+      els.imageModal.classList.add("show");
+      els.imageModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeImageModal() {
+      if (!els.imageModal || !els.imageModalImg) return;
+      els.imageModal.classList.remove("show");
+      els.imageModal.setAttribute("aria-hidden", "true");
+      els.imageModalImg.removeAttribute("src");
+      document.body.style.overflow = "";
+    }
 
     function goBack() {
       window.location.href = "/index.html";
@@ -894,7 +958,10 @@
           <tr>
             <td class="check-col"><input type="checkbox" class="row-checkbox" data-row-key="${escapeHtml(key)}" ${checked} /></td>
             <td class="photo-col">
-              <div class="photo-box">
+              <div
+                class="photo-box ${row.image_url ? "is-clickable" : ""}"
+                ${row.image_url ? `onclick="openStockImageModal('${escapeHtml(row.image_url)}')"` : ""}
+              >
                 ${row.image_url ? `<img src="${escapeHtml(row.image_url)}" alt="Фото товара" />` : "Нет фото"}
               </div>
             </td>
@@ -979,6 +1046,14 @@
       if (els.exportSelectedBtn) {
         els.exportSelectedBtn.addEventListener("click", exportSelectedRows);
       }
+      if (els.imageModal) {
+        els.imageModal.addEventListener("click", closeImageModal);
+      }
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && els.imageModal && els.imageModal.classList.contains("show")) {
+          closeImageModal();
+        }
+      });
 
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
@@ -1002,6 +1077,7 @@
 
     window.goBack = goBack;
     window.logout = logout;
+    window.openStockImageModal = openImageModal;
   </script>
 </body>
 </html>
