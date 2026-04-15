@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const XLSX = require("xlsx");
+const ExcelJS = require("exceljs");
 const pool = require("../db");
 const {
   authRequired,
@@ -16,9 +17,14 @@ const {
 
 const router = express.Router();
 const UPLOADS_DIR = path.join(__dirname, "..", "..", "uploads");
+const ITEMS_UPLOADS_DIR = path.join(UPLOADS_DIR, "items");
 
 if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+if (!fs.existsSync(ITEMS_UPLOADS_DIR)) {
+  fs.mkdirSync(ITEMS_UPLOADS_DIR, { recursive: true });
 }
 
 const ALLOWED_IMAGE_MIME_TYPES = {
@@ -162,7 +168,8 @@ function normalizeHeaderName(value) {
     .toUpperCase();
 }
 
-function getWorkbookFromBase64(fileBase64) {
+
+function getWorkbookBufferFromBase64(fileBase64) {
   const cleanedBase64 = String(fileBase64 || "")
     .replace(/^data:[^;]+;base64,/, "")
     .trim();
@@ -182,11 +189,118 @@ function getWorkbookFromBase64(fileBase64) {
     throw new Error("invalid_file_data");
   }
 
+  return buffer;
+}
+
+function getWorkbookFromBase64(fileBase64) {
+  const buffer = getWorkbookBufferFromBase64(fileBase64);
+
   try {
     return XLSX.read(buffer, { type: "buffer" });
   } catch (err) {
     throw new Error("invalid_excel_file");
   }
+}
+
+function getExcelImageRowNumber(image) {
+  const candidates = [
+    image?.range?.tl?.nativeRow,
+    image?.range?.tl?.row,
+    image?.range?.br?.nativeRow,
+    image?.range?.br?.row,
+  ];
+
+  for (const value of candidates) {
+    if (Number.isInteger(value) && value >= 0) {
+      return value + 1;
+    }
+  }
+
+  return null;
+}
+
+function getExcelImageMedia(workbook, imageId) {
+  const media = Array.isArray(workbook?.model?.media) ? workbook.model.media : [];
+  return (
+    media.find((item) => Number(item?.index) === Number(imageId)) ||
+    media[Number(imageId)] ||
+    media[Number(imageId) - 1] ||
+    null
+  );
+}
+
+async function extractImportImagesByRow(fileBase64) {
+  const buffer = getWorkbookBufferFromBase64(fileBase64);
+  const workbook = new ExcelJS.Workbook();
+
+  try {
+    await workbook.xlsx.load(buffer);
+  } catch (err) {
+    throw new Error("invalid_excel_file");
+  }
+
+  const worksheet = Array.isArray(workbook.worksheets) && workbook.worksheets.length
+    ? workbook.worksheets[0]
+    : null;
+
+  if (!worksheet || typeof worksheet.getImages !== "function") {
+    return new Map();
+  }
+
+  const imageMap = new Map();
+  const worksheetImages = worksheet.getImages();
+
+  for (const image of worksheetImages) {
+    const rowNumber = getExcelImageRowNumber(image);
+    if (!rowNumber || imageMap.has(rowNumber)) {
+      continue;
+    }
+
+    const media = getExcelImageMedia(workbook, image.imageId);
+    if (!media) {
+      continue;
+    }
+
+    const extension = String(media.extension || "png").toLowerCase();
+    let imageBuffer = media.buffer || null;
+
+    if (!imageBuffer && media.base64) {
+      imageBuffer = Buffer.from(String(media.base64).replace(/^data:[^;]+;base64,/, ""), "base64");
+    }
+
+    if (!imageBuffer || !imageBuffer.length) {
+      continue;
+    }
+
+    imageMap.set(rowNumber, {
+      buffer: Buffer.from(imageBuffer),
+      extension: extension === "jpeg" ? "jpg" : extension,
+    });
+  }
+
+  return imageMap;
+}
+
+async function saveImportedItemImageBySku({ sku, buffer, extension }) {
+  const safeSku = sanitizeFilenameBase(sku || "item");
+  const safeExtension = String(extension || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+  const filename = `${safeSku}.${safeExtension}`;
+  const fullPath = path.join(ITEMS_UPLOADS_DIR, filename);
+
+  try {
+    const existingFiles = await fs.promises.readdir(ITEMS_UPLOADS_DIR);
+    await Promise.all(
+      existingFiles
+        .filter((fileName) => fileName.startsWith(`${safeSku}.`) && fileName !== filename)
+        .map((fileName) => fs.promises.unlink(path.join(ITEMS_UPLOADS_DIR, fileName)).catch(() => null))
+    );
+  } catch (err) {
+    console.error("[items/import] failed to cleanup old item images:", err);
+  }
+
+  await fs.promises.writeFile(fullPath, buffer);
+
+  return `/uploads/items/${filename}`;
 }
 
 function parseImportRowsFromWorkbook(workbook) {
@@ -649,6 +763,7 @@ router.post(
   requireRole("owner", "admin", "client_owner", "client_manager", "client"),
   async (req, res) => {
     const client = await pool.connect();
+    let createdImageUrls = [];
 
     try {
       const tenantId = getEffectiveTenantId(req);
@@ -662,6 +777,7 @@ router.post(
       }
 
       const preview = await buildImportPreview({ tenantId, fileBase64 });
+      const importImagesByRow = await extractImportImagesByRow(fileBase64);
       const rowsToCreate = preview.rows.filter((row) => row.status === "new");
 
       const projectedTotal = (await pool.query(`SELECT COUNT(*)::int AS count FROM core.items WHERE tenant_id = $1`, [tenantId])).rows[0].count + rowsToCreate.length;
@@ -673,6 +789,7 @@ router.post(
 
       const created = [];
       const skipped = preview.rows.filter((row) => row.status !== "new");
+      createdImageUrls = [];
 
       await client.query("BEGIN");
 
@@ -704,6 +821,18 @@ router.post(
         const weightKg = row.weight_kg > 0 ? row.weight_kg : null;
         const volumeCm3 = computeVolumeCm3FromDimensions(lengthCm, widthCm, heightCm);
         const weightGrams = weightKg === null ? null : Number(weightKg) * 1000;
+        const rowImage = importImagesByRow.get(row.row_number) || null;
+        const imageUrl = rowImage
+          ? await saveImportedItemImageBySku({
+              sku: row.sku,
+              buffer: rowImage.buffer,
+              extension: rowImage.extension,
+            })
+          : null;
+
+        if (imageUrl) {
+          createdImageUrls.push(imageUrl);
+        }
 
         const { rows: insertedRows } = await client.query(
           `
@@ -747,7 +876,7 @@ router.post(
             0,
             row.sale_price >= 0 ? row.sale_price : 0,
             row.description || null,
-            null,
+            imageUrl,
             weightGrams,
             volumeCm3,
             lengthCm,
@@ -780,6 +909,9 @@ router.post(
       });
     } catch (err) {
       await client.query("ROLLBACK");
+      if (typeof createdImageUrls !== "undefined" && Array.isArray(createdImageUrls)) {
+        await Promise.all(createdImageUrls.map((imageUrl) => deleteUploadedFileByUrl(imageUrl)));
+      }
       console.error("[POST /items/import] error:", err);
       return res.status(500).json({
         ok: false,
