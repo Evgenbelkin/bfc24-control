@@ -36,7 +36,7 @@ const ALLOWED_IMAGE_MIME_TYPES = {
 };
 
 const IMPORT_REQUIRED_COLUMNS = ["MARK"];
-const IMPORT_PREVIEW_LIMIT = 50;
+const IMPORT_PREVIEW_LIMIT = 500;
 
 function normalizeOptionalText(value) {
   if (value === null || value === undefined) return null;
