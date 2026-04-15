@@ -1,6 +1,7 @@
 const express = require("express");
 const pool = require("../db");
-const XLSX = require("xlsx");
+const ExcelJS = require("exceljs");
+const axios = require("axios");
 const {
   authRequired,
   requireRole,
@@ -29,6 +30,117 @@ function calcFinanceFilled(batch) {
   const deliveryCost = Number(batch.delivery_cost || 0);
 
   return unitCost > 0 && usdRate > 0 && cnyRate > 0 && deliveryCost > 0;
+}
+
+
+function detectExcelImageExtension(contentType, imageUrl = "") {
+  const type = String(contentType || "").toLowerCase();
+
+  if (type.includes("png")) return "png";
+  if (type.includes("gif")) return "gif";
+  if (type.includes("webp")) return "webp";
+  if (type.includes("jpeg") || type.includes("jpg")) return "jpeg";
+
+  const lowerUrl = String(imageUrl || "").toLowerCase();
+  if (lowerUrl.endsWith(".png")) return "png";
+  if (lowerUrl.endsWith(".gif")) return "gif";
+  if (lowerUrl.endsWith(".webp")) return "webp";
+  if (lowerUrl.endsWith(".jpeg") || lowerUrl.endsWith(".jpg")) return "jpeg";
+
+  return "jpeg";
+}
+
+async function fetchImageBuffer(imageUrl) {
+  const url = normalizeText(imageUrl);
+  if (!url) return null;
+
+  try {
+    const response = await axios.get(url, {
+      responseType: "arraybuffer",
+      timeout: 15000,
+      maxContentLength: 10 * 1024 * 1024,
+      maxBodyLength: 10 * 1024 * 1024,
+      validateStatus: (status) => status >= 200 && status < 300,
+    });
+
+    const buffer = Buffer.from(response.data);
+    if (!buffer.length) return null;
+
+    return {
+      buffer,
+      extension: detectExcelImageExtension(response.headers["content-type"], url),
+    };
+  } catch (err) {
+    console.error("[stock/export-xlsx] image fetch failed:", url, err.message);
+    return null;
+  }
+}
+
+async function buildStockExportWorkbook(rows) {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Остатки");
+
+  worksheet.columns = [
+    { header: "Фото", key: "photo", width: 14 },
+    { header: "Товар", key: "item_name", width: 28 },
+    { header: "Категория", key: "category_name", width: 18 },
+    { header: "Фабрика", key: "factory", width: 18 },
+    { header: "Арт. фабрики", key: "factory_article", width: 18 },
+    { header: "Артикул / SKU", key: "sku", width: 18 },
+    { header: "Штрихкод", key: "barcode", width: 18 },
+    { header: "Место хранения", key: "location_display", width: 28 },
+    { header: "Количество", key: "qty", width: 14 },
+  ];
+
+  const headerRow = worksheet.getRow(1);
+  headerRow.font = { bold: true };
+  headerRow.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+  headerRow.height = 24;
+  worksheet.views = [{ state: "frozen", ySplit: 1 }];
+
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    const excelRowNumber = index + 2;
+
+    worksheet.getRow(excelRowNumber).height = 54;
+
+    worksheet.getCell(`B${excelRowNumber}`).value = row.item_name || "";
+    worksheet.getCell(`C${excelRowNumber}`).value = row.category_name || "";
+    worksheet.getCell(`D${excelRowNumber}`).value = row.factory || "";
+    worksheet.getCell(`E${excelRowNumber}`).value = row.factory_article || "";
+    worksheet.getCell(`F${excelRowNumber}`).value = row.sku || "";
+    worksheet.getCell(`G${excelRowNumber}`).value = row.barcode || "";
+    worksheet.getCell(`H${excelRowNumber}`).value = row.location_display || "";
+    worksheet.getCell(`I${excelRowNumber}`).value = Number(row.qty || 0);
+
+    const imageUrl = normalizeText(row.image_url);
+    if (imageUrl) {
+      const imageData = await fetchImageBuffer(imageUrl);
+
+      if (imageData) {
+        const imageId = workbook.addImage({
+          buffer: imageData.buffer,
+          extension: imageData.extension,
+        });
+
+        worksheet.addImage(imageId, {
+          tl: { col: 0.15, row: excelRowNumber - 1 + 0.15 },
+          ext: { width: 52, height: 52 },
+          editAs: "oneCell",
+        });
+      } else {
+        worksheet.getCell(`A${excelRowNumber}`).value = "Нет фото";
+      }
+    } else {
+      worksheet.getCell(`A${excelRowNumber}`).value = "Нет фото";
+    }
+  }
+
+  worksheet.eachRow((row) => {
+    row.alignment = { vertical: "middle", wrapText: true };
+  });
+
+  return workbook;
 }
 
 router.get("/", authRequired, async (req, res) => {
@@ -78,6 +190,7 @@ router.get("/", authRequired, async (req, res) => {
 
 
 
+
 router.post("/export-xlsx", authRequired, async (req, res) => {
   try {
     const rowsInput = Array.isArray(req.body.rows) ? req.body.rows : [];
@@ -101,64 +214,13 @@ router.post("/export-xlsx", authRequired, async (req, res) => {
       qty: Number(row.qty || 0),
     }));
 
-    const workbook = XLSX.utils.book_new();
-    const sheetRows = [
-      [
-        "Фото",
-        "Товар",
-        "Категория",
-        "Фабрика",
-        "Арт. фабрики",
-        "Артикул / SKU",
-        "Штрихкод",
-        "Место хранения",
-        "Количество",
-      ],
-      ...rows.map((row) => ([
-        row.image_url,
-        row.item_name,
-        row.category_name,
-        row.factory,
-        row.factory_article,
-        row.sku,
-        row.barcode,
-        row.location_display,
-        row.qty,
-      ])),
-    ];
-
-    const worksheet = XLSX.utils.aoa_to_sheet(sheetRows);
-    worksheet["!cols"] = [
-      { wch: 40 },
-      { wch: 30 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 28 },
-      { wch: 12 },
-    ];
-
-    rows.forEach((row, index) => {
-      if (!row.image_url) return;
-      const cellAddress = XLSX.utils.encode_cell({ c: 0, r: index + 1 });
-      if (!worksheet[cellAddress]) return;
-      worksheet[cellAddress].l = { Target: row.image_url };
-    });
-
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Остатки");
-
-    const filename = `stock_export_${new Date().toISOString().slice(0,19).replace(/[T:]/g, "-")}.xlsx`;
-    const fileBase64 = XLSX.write(workbook, {
-      type: "base64",
-      bookType: "xlsx",
-    });
+    const workbook = await buildStockExportWorkbook(rows);
+    const buffer = await workbook.xlsx.writeBuffer();
 
     return res.json({
       ok: true,
-      filename,
-      file_base64: fileBase64,
+      filename: `stock_export_${new Date().toISOString().slice(0,19).replace(/[T:]/g, "-")}.xlsx`,
+      file_base64: Buffer.from(buffer).toString("base64"),
     });
   } catch (e) {
     console.error("[POST /stock/export-xlsx] error:", e);
@@ -168,6 +230,7 @@ router.post("/export-xlsx", authRequired, async (req, res) => {
     });
   }
 });
+
 
 router.get(
   "/batches",
