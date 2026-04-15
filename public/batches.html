@@ -638,12 +638,15 @@
           return text.includes(search);
         })
         .sort((a, b) => {
-          const byItem = String(a.item_name || "").localeCompare(String(b.item_name || ""), "ru");
-          if (byItem !== 0) return byItem;
-          const byDate = String(a.batch_date || "").localeCompare(String(b.batch_date || ""), "ru");
-          if (byDate !== 0) return byDate;
-          return Number(a.id || 0) - Number(b.id || 0);
-        });
+  const dateA = new Date(a.batch_date);
+  const dateB = new Date(b.batch_date);
+
+  if (dateA.getTime() !== dateB.getTime()) {
+    return dateB - dateA; // новые сверху
+  }
+
+  return Number(b.id || 0) - Number(a.id || 0); // новые id сверху
+});
 
       if (!rows.length) {
         els.batchesTbody.innerHTML = `
