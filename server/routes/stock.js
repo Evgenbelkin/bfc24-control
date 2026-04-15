@@ -276,7 +276,7 @@ router.get(
           ON i.id = b.item_id
          AND i.tenant_id = b.tenant_id
         WHERE b.tenant_id = $1
-        ORDER BY b.batch_date ASC, b.id ASC
+        ORDER BY b.batch_date DESC, b.id DESC
       `;
 
       const { rows } = await pool.query(sql, [tenantId]);
