@@ -55,20 +55,24 @@ async function fetchImageBuffer(imageUrl) {
   if (!url) return null;
 
   try {
-    const response = await axios.get(url, {
-      responseType: "arraybuffer",
-      timeout: 15000,
-      maxContentLength: 10 * 1024 * 1024,
-      maxBodyLength: 10 * 1024 * 1024,
-      validateStatus: (status) => status >= 200 && status < 300,
-    });
+    const response = await fetch(url);
 
-    const buffer = Buffer.from(response.data);
+    if (!response.ok) {
+      console.error("[stock/export-xlsx] image fetch failed:", url, response.status);
+      return null;
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
     if (!buffer.length) return null;
 
     return {
       buffer,
-      extension: detectExcelImageExtension(response.headers["content-type"], url),
+      extension: detectExcelImageExtension(
+        response.headers.get("content-type"),
+        url
+      ),
     };
   } catch (err) {
     console.error("[stock/export-xlsx] image fetch failed:", url, err.message);
