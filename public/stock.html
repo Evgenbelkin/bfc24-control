@@ -29,7 +29,7 @@
     }
 
     .wrap{
-      max-width:1200px;
+      max-width:1400px;
       margin:0 auto;
       padding:24px 16px 48px;
     }
@@ -98,7 +98,10 @@
       background:var(--primary);
       color:#fff;
     }
-    .btn-primary:hover{background:var(--primary-hover)}
+
+    .btn-primary:hover{
+      background:var(--primary-hover);
+    }
 
     .btn-light{
       background:#fff;
@@ -212,6 +215,20 @@
       font-weight:800;
     }
 
+    .bulk-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .bulk-note{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+    }
+
     .table-wrap{
       overflow:auto;
     }
@@ -221,7 +238,7 @@
       border-collapse:collapse;
       margin-top:10px;
       background:#fff;
-      min-width:900px;
+      min-width:1280px;
     }
 
     th, td{
@@ -253,6 +270,47 @@
       text-align:center;
       color:var(--muted);
       padding:24px 12px;
+    }
+
+    .check-col{
+      width:44px;
+      min-width:44px;
+      text-align:center;
+    }
+
+    .check-col input[type="checkbox"]{
+      width:16px;
+      height:16px;
+      cursor:pointer;
+    }
+
+    .photo-col{
+      width:72px;
+      min-width:72px;
+    }
+
+    .photo-box{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      padding:4px;
+    }
+
+    .photo-box img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background:#fff;
     }
 
     @media (max-width: 900px){
@@ -366,6 +424,7 @@
           <thead>
             <tr>
               <th class="check-col"><input type="checkbox" id="selectAllRows" /></th>
+              <th class="photo-col">Фото</th>
               <th data-i18n="stock.tableItem">Товар</th>
               <th>Категория</th>
               <th>Фабрика</th>
@@ -378,7 +437,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="9" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
+              <td colspan="10" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -414,12 +473,12 @@
     };
 
     async function requestFallback(method, path, body) {
-      const token = localStorage.getItem("token") || "";
+      const tokenLocal = localStorage.getItem("token") || "";
       const response = await fetch(path, {
         method,
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: "Bearer " + token } : {})
+          ...(tokenLocal ? { Authorization: "Bearer " + tokenLocal } : {})
         },
         ...(body !== undefined ? { body: JSON.stringify(body) } : {})
       });
@@ -465,6 +524,12 @@
           return window.API.get(path);
         }
         return requestFallback("GET", path);
+      },
+      post(path, body) {
+        if (window.API && typeof window.API.post === "function") {
+          return window.API.post(path, body);
+        }
+        return requestFallback("POST", path, body);
       }
     };
 
@@ -534,6 +599,7 @@
       if (pageStatusState) {
         showStatus(i18n.format(pageStatusState.key, pageStatusState.vars || {}), pageStatusState.type);
       }
+      updateSelectedCount();
     }
 
     function normalize(data, type = "") {
@@ -586,6 +652,10 @@
       return ApiBridge.get(path);
     }
 
+    async function apiPost(path, body) {
+      return ApiBridge.post(path, body);
+    }
+
     function getRowKey(row) {
       return `${row.item_id || ""}__${row.location_id || ""}`;
     }
@@ -594,6 +664,80 @@
       if (els.selectedCountLabel) {
         els.selectedCountLabel.textContent = `Выбрано строк: ${selectedRowKeys.size}`;
       }
+    }
+
+    function renderLocationFilter() {
+      const currentValue = els.locationFilter.value;
+      const options = locationsData
+        .slice()
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"))
+        .map(loc => {
+          const locationTitle = `${loc.name || ""}${loc.code ? " (" + loc.code + ")" : ""}`;
+          return `<option value="${escapeHtml(String(loc.id))}">${escapeHtml(locationTitle)}</option>`;
+        })
+        .join("");
+
+      els.locationFilter.innerHTML = `<option value="">${escapeHtml(i18n.t("stock.locationFilterAll"))}</option>` + options;
+
+      if ([...els.locationFilter.options].some(opt => String(opt.value) === String(currentValue))) {
+        els.locationFilter.value = currentValue;
+      }
+    }
+
+    function renderCategoryFilter() {
+      const currentValue = els.categoryFilter.value;
+
+      const categories = [...new Set(
+        itemsData
+          .map(item => String(item.category_name || "").trim())
+          .filter(Boolean)
+      )].sort((a, b) => a.localeCompare(b, "ru"));
+
+      const options = categories
+        .map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
+        .join("");
+
+      els.categoryFilter.innerHTML = `<option value="">Все категории</option>` + options;
+
+      if ([...els.categoryFilter.options].some(opt => String(opt.value) === String(currentValue))) {
+        els.categoryFilter.value = currentValue;
+      }
+    }
+
+    function buildRows() {
+      return stockData
+        .map(stockRow => {
+          const itemId = stockRow.item_id ?? stockRow.itemId ?? stockRow.product_id ?? stockRow.productId ?? null;
+          const locationId = stockRow.location_id ?? stockRow.locationId ?? null;
+          const qty = Number(stockRow.qty ?? stockRow.quantity ?? stockRow.stock_qty ?? 0);
+
+          const item = itemsData.find(i => String(i.id) === String(itemId)) || {};
+          const location = locationsData.find(l => String(l.id) === String(locationId)) || {};
+
+          const locationName = location.name || stockRow.location_name || "";
+          const locationCode = location.code || stockRow.location_code || "";
+          let imageUrl = String(item.image_url || "").trim();
+          if (imageUrl && imageUrl.startsWith("/")) {
+            imageUrl = window.location.origin + imageUrl;
+          }
+
+          return {
+            item_id: itemId,
+            item_name: item.name || item.item_name || stockRow.item_name || stockRow.name || "",
+            category_name: item.category_name || "",
+            factory: item.factory || "",
+            factory_article: item.factory_article || "",
+            sku: item.sku || item.vendor_code || item.article || item.code || stockRow.sku || "",
+            barcode: item.barcode || stockRow.barcode || "",
+            image_url: imageUrl,
+            location_id: locationId,
+            location_name: locationName,
+            location_code: locationCode,
+            location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
+            qty
+          };
+        })
+        .filter(row => Number(row.qty || 0) > 0);
     }
 
     function getFilteredRows() {
@@ -674,7 +818,7 @@
       renderTable();
     }
 
-    function exportSelectedRows() {
+    async function exportSelectedRows() {
       const { allRows } = getFilteredRows();
       const selectedRows = allRows.filter(row => selectedRowKeys.has(getRowKey(row)));
       if (!selectedRows.length) {
@@ -682,116 +826,46 @@
         return;
       }
 
-      const header = [
-        "Товар",
-        "Категория",
-        "Фабрика",
-        "Арт. фабрики",
-        "Артикул / SKU",
-        "Штрихкод",
-        "Место хранения",
-        "Количество"
-      ];
+      const payloadRows = selectedRows.map(row => ({
+        item_name: row.item_name || "",
+        category_name: row.category_name || "",
+        factory: row.factory || "",
+        factory_article: row.factory_article || "",
+        sku: row.sku || "",
+        barcode: row.barcode || "",
+        image_url: row.image_url || "",
+        location_display: row.location_display || "",
+        qty: Number(row.qty || 0)
+      }));
 
-      const escapeCsv = (value) => {
-        const csvText = String(value ?? "").replaceAll('"', '""');
-        return `"${csvText}"`;
-      };
+      const result = await apiPost("/stock/export-xlsx", {
+        rows: payloadRows
+      });
 
-      const lines = [header.map(escapeCsv).join(",")].concat(
-        selectedRows.map(row => [
-          row.item_name || "",
-          row.category_name || "",
-          row.factory || "",
-          row.factory_article || "",
-          row.sku || "",
-          row.barcode || "",
-          row.location_display || "",
-          formatNumber(row.qty)
-        ].map(escapeCsv).join(","))
-      );
+      if (!result || !result.file_base64) {
+        throw new Error("Файл экспорта не сформирован");
+      }
 
-      const csv = "\uFEFF" + lines.join("\r\n");
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const byteCharacters = atob(result.file_base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i += 1) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([
+        byteArray
+      ], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `stock_export_${new Date().toISOString().slice(0,19).replace(/[T:]/g, "-")}.csv`;
+      a.download = result.filename || `stock_export_${new Date().toISOString().slice(0,19).replace(/[T:]/g, "-")}.xlsx`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
       showStatus(`Выгружено строк: ${selectedRows.length}`, "success");
-    }
-
-    function renderLocationFilter() {
-      const currentValue = els.locationFilter.value;
-      const options = locationsData
-        .slice()
-        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"))
-        .map(loc => {
-          const locationTitle = `${loc.name || ""}${loc.code ? " (" + loc.code + ")" : ""}`;
-          return `<option value="${escapeHtml(String(loc.id))}">${escapeHtml(locationTitle)}</option>`;
-        })
-        .join("");
-
-      els.locationFilter.innerHTML = `<option value="">${escapeHtml(i18n.t("stock.locationFilterAll"))}</option>` + options;
-
-      if ([...els.locationFilter.options].some(opt => String(opt.value) === String(currentValue))) {
-        els.locationFilter.value = currentValue;
-      }
-    }
-
-    function renderCategoryFilter() {
-      const currentValue = els.categoryFilter.value;
-
-      const categories = [...new Set(
-        itemsData
-          .map(item => String(item.category_name || "").trim())
-          .filter(Boolean)
-      )].sort((a, b) => a.localeCompare(b, "ru"));
-
-      const options = categories
-        .map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
-        .join("");
-
-      els.categoryFilter.innerHTML = `<option value="">Все категории</option>` + options;
-
-      if ([...els.categoryFilter.options].some(opt => String(opt.value) === String(currentValue))) {
-        els.categoryFilter.value = currentValue;
-      }
-    }
-
-    function buildRows() {
-      return stockData
-        .map(stockRow => {
-          const itemId = stockRow.item_id ?? stockRow.itemId ?? stockRow.product_id ?? stockRow.productId ?? null;
-          const locationId = stockRow.location_id ?? stockRow.locationId ?? null;
-          const qty = Number(stockRow.qty ?? stockRow.quantity ?? stockRow.stock_qty ?? 0);
-
-          const item = itemsData.find(i => String(i.id) === String(itemId)) || {};
-          const location = locationsData.find(l => String(l.id) === String(locationId)) || {};
-
-          const locationName = location.name || stockRow.location_name || "";
-          const locationCode = location.code || stockRow.location_code || "";
-
-          return {
-            item_id: itemId,
-            item_name: item.name || item.item_name || stockRow.item_name || stockRow.name || "",
-            category_name: item.category_name || "",
-            factory: item.factory || "",
-            factory_article: item.factory_article || "",
-            sku: item.sku || item.vendor_code || item.article || item.code || stockRow.sku || "",
-            barcode: item.barcode || stockRow.barcode || "",
-            location_id: locationId,
-            location_name: locationName,
-            location_code: locationCode,
-            location_display: `${locationName}${locationCode ? " (" + locationCode + ")" : ""}`,
-            qty,
-            row_key: `${itemId || ""}__${locationId || ""}`
-          };
-        })
-        .filter(row => Number(row.qty || 0) > 0);
     }
 
     function renderTable() {
@@ -808,7 +882,7 @@
           els.selectAllRows.checked = false;
           els.selectAllRows.indeterminate = false;
         }
-        els.tbody.innerHTML = `<tr><td colspan="9" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
+        els.tbody.innerHTML = `<tr><td colspan="10" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
         updateSelectedCount();
         return;
       }
@@ -817,18 +891,23 @@
         const key = getRowKey(row);
         const checked = selectedRowKeys.has(key) ? "checked" : "";
         return `
-        <tr>
-          <td class="check-col"><input type="checkbox" class="row-checkbox" data-row-key="${escapeHtml(key)}" ${checked} /></td>
-          <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
-          <td>${escapeHtml(row.category_name || "")}</td>
-          <td>${escapeHtml(row.factory || "")}</td>
-          <td>${escapeHtml(row.factory_article || "")}</td>
-          <td>${escapeHtml(row.sku || "")}</td>
-          <td>${escapeHtml(row.barcode || "")}</td>
-          <td>${escapeHtml(row.location_display || "")}</td>
-          <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
-        </tr>
-      `;
+          <tr>
+            <td class="check-col"><input type="checkbox" class="row-checkbox" data-row-key="${escapeHtml(key)}" ${checked} /></td>
+            <td class="photo-col">
+              <div class="photo-box">
+                ${row.image_url ? `<img src="${escapeHtml(row.image_url)}" alt="Фото товара" />` : "Нет фото"}
+              </div>
+            </td>
+            <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
+            <td>${escapeHtml(row.category_name || "")}</td>
+            <td>${escapeHtml(row.factory || "")}</td>
+            <td>${escapeHtml(row.factory_article || "")}</td>
+            <td>${escapeHtml(row.sku || "")}</td>
+            <td>${escapeHtml(row.barcode || "")}</td>
+            <td>${escapeHtml(row.location_display || "")}</td>
+            <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
+          </tr>
+        `;
       }).join("");
 
       document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
@@ -873,7 +952,7 @@
           batches: 0
         }, "success");
       } catch (err) {
-        els.tbody.innerHTML = `<tr><td colspan="9" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
+        els.tbody.innerHTML = `<tr><td colspan="10" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
         setPageStatus("stock.loadErrorStatus", {
           error: Ui.translateError(err.message)
         }, "error");
@@ -886,6 +965,11 @@
       els.categoryFilter.addEventListener("change", renderTable);
       els.refreshBtn.addEventListener("click", loadData);
 
+      if (els.selectAllRows) {
+        els.selectAllRows.addEventListener("change", (event) => {
+          toggleSelectAllVisible(Boolean(event.target.checked));
+        });
+      }
       if (els.selectFilteredBtn) {
         els.selectFilteredBtn.addEventListener("click", selectFilteredRows);
       }
@@ -894,11 +978,6 @@
       }
       if (els.exportSelectedBtn) {
         els.exportSelectedBtn.addEventListener("click", exportSelectedRows);
-      }
-      if (els.selectAllRows) {
-        els.selectAllRows.addEventListener("change", (event) => {
-          toggleSelectAllVisible(event.target.checked);
-        });
       }
 
       document.addEventListener("app:language-changed", () => {

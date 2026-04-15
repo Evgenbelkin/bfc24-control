@@ -1,5 +1,6 @@
 const express = require("express");
 const pool = require("../db");
+const XLSX = require("xlsx");
 const {
   authRequired,
   requireRole,
@@ -71,6 +72,99 @@ router.get("/", authRequired, async (req, res) => {
     return res.status(500).json({
       ok: false,
       error: "stock_list_failed",
+    });
+  }
+});
+
+
+
+router.post("/export-xlsx", authRequired, async (req, res) => {
+  try {
+    const rowsInput = Array.isArray(req.body.rows) ? req.body.rows : [];
+
+    if (!rowsInput.length) {
+      return res.status(400).json({
+        ok: false,
+        error: "rows_required",
+      });
+    }
+
+    const rows = rowsInput.map((row) => ({
+      item_name: normalizeText(row.item_name) || "",
+      category_name: normalizeText(row.category_name) || "",
+      factory: normalizeText(row.factory) || "",
+      factory_article: normalizeText(row.factory_article) || "",
+      sku: normalizeText(row.sku) || "",
+      barcode: normalizeText(row.barcode) || "",
+      image_url: normalizeText(row.image_url) || "",
+      location_display: normalizeText(row.location_display) || "",
+      qty: Number(row.qty || 0),
+    }));
+
+    const workbook = XLSX.utils.book_new();
+    const sheetRows = [
+      [
+        "Фото",
+        "Товар",
+        "Категория",
+        "Фабрика",
+        "Арт. фабрики",
+        "Артикул / SKU",
+        "Штрихкод",
+        "Место хранения",
+        "Количество",
+      ],
+      ...rows.map((row) => ([
+        row.image_url,
+        row.item_name,
+        row.category_name,
+        row.factory,
+        row.factory_article,
+        row.sku,
+        row.barcode,
+        row.location_display,
+        row.qty,
+      ])),
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(sheetRows);
+    worksheet["!cols"] = [
+      { wch: 40 },
+      { wch: 30 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 28 },
+      { wch: 12 },
+    ];
+
+    rows.forEach((row, index) => {
+      if (!row.image_url) return;
+      const cellAddress = XLSX.utils.encode_cell({ c: 0, r: index + 1 });
+      if (!worksheet[cellAddress]) return;
+      worksheet[cellAddress].l = { Target: row.image_url };
+    });
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Остатки");
+
+    const filename = `stock_export_${new Date().toISOString().slice(0,19).replace(/[T:]/g, "-")}.xlsx`;
+    const fileBase64 = XLSX.write(workbook, {
+      type: "base64",
+      bookType: "xlsx",
+    });
+
+    return res.json({
+      ok: true,
+      filename,
+      file_base64: fileBase64,
+    });
+  } catch (e) {
+    console.error("[POST /stock/export-xlsx] error:", e);
+    return res.status(500).json({
+      ok: false,
+      error: "stock_export_failed",
     });
   }
 });
