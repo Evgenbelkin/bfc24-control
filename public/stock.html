@@ -128,7 +128,7 @@
 
     .filters{
       display:grid;
-      grid-template-columns:1.5fr 1fr auto;
+      grid-template-columns:1.5fr 1fr 1fr auto;
       gap:12px;
       align-items:end;
     }
@@ -210,33 +210,6 @@
     .stat-value{
       font-size:22px;
       font-weight:800;
-    }
-
-
-    .bulk-actions{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:14px;
-    }
-
-    .bulk-note{
-      color:var(--muted);
-      font-size:13px;
-      font-weight:700;
-    }
-
-    .check-col{
-      width:44px;
-      min-width:44px;
-      text-align:center;
-    }
-
-    .check-col input[type="checkbox"]{
-      width:16px;
-      height:16px;
-      cursor:pointer;
     }
 
     .table-wrap{
@@ -339,6 +312,13 @@
         </div>
 
         <div class="field">
+          <label for="categoryFilter">Категория</label>
+          <select id="categoryFilter">
+            <option value="">Все категории</option>
+          </select>
+        </div>
+
+        <div class="field">
           <label data-i18n="stock.actionsLabel">&nbsp;</label>
           <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="stock.refreshButton">Обновить</button>
         </div>
@@ -385,7 +365,11 @@
         <table>
           <thead>
             <tr>
+              <th class="check-col"><input type="checkbox" id="selectAllRows" /></th>
               <th data-i18n="stock.tableItem">Товар</th>
+              <th>Категория</th>
+              <th>Фабрика</th>
+              <th>Арт. фабрики</th>
               <th data-i18n="stock.tableSku">Артикул / SKU</th>
               <th data-i18n="stock.tableBarcode">Штрихкод</th>
               <th data-i18n="stock.tableLocation">Место хранения</th>
@@ -394,7 +378,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="5" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
+              <td colspan="9" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -494,6 +478,7 @@
     const els = {
       searchInput: document.getElementById("searchInput"),
       locationFilter: document.getElementById("locationFilter"),
+      categoryFilter: document.getElementById("categoryFilter"),
       refreshBtn: document.getElementById("refreshBtn"),
       tbody: document.getElementById("tbody"),
       pageStatus: document.getElementById("pageStatus"),
@@ -709,8 +694,8 @@
       ];
 
       const escapeCsv = (value) => {
-        const text = String(value ?? "").replaceAll('"', '""');
-        return `"${text}"`;
+        const csvText = String(value ?? "").replaceAll('"', '""');
+        return `"${csvText}"`;
       };
 
       const lines = [header.map(escapeCsv).join(",")].concat(
@@ -757,6 +742,26 @@
       }
     }
 
+    function renderCategoryFilter() {
+      const currentValue = els.categoryFilter.value;
+
+      const categories = [...new Set(
+        itemsData
+          .map(item => String(item.category_name || "").trim())
+          .filter(Boolean)
+      )].sort((a, b) => a.localeCompare(b, "ru"));
+
+      const options = categories
+        .map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
+        .join("");
+
+      els.categoryFilter.innerHTML = `<option value="">Все категории</option>` + options;
+
+      if ([...els.categoryFilter.options].some(opt => String(opt.value) === String(currentValue))) {
+        els.categoryFilter.value = currentValue;
+      }
+    }
+
     function buildRows() {
       return stockData
         .map(stockRow => {
@@ -773,6 +778,9 @@
           return {
             item_id: itemId,
             item_name: item.name || item.item_name || stockRow.item_name || stockRow.name || "",
+            category_name: item.category_name || "",
+            factory: item.factory || "",
+            factory_article: item.factory_article || "",
             sku: item.sku || item.vendor_code || item.article || item.code || stockRow.sku || "",
             barcode: item.barcode || stockRow.barcode || "",
             location_id: locationId,
@@ -820,10 +828,11 @@
           <td>${escapeHtml(row.location_display || "")}</td>
           <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
         </tr>
-      `;}).join("");
+      `;
+      }).join("");
 
-      document.querySelectorAll('.row-checkbox').forEach((checkbox) => {
-        checkbox.addEventListener('change', (event) => {
+      document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+        checkbox.addEventListener("change", (event) => {
           const key = String(event.target.dataset.rowKey || "");
           if (!key) return;
           if (event.target.checked) selectedRowKeys.add(key);
@@ -838,7 +847,6 @@
     }
 
     async function loadData() {
-
       try {
         setPageStatus("stock.loadingStatus", {}, "info");
 
@@ -855,6 +863,7 @@
         locationsData = normalize(locationsRes, "locations");
 
         renderLocationFilter();
+        renderCategoryFilter();
         renderTable();
 
         setPageStatus("stock.loadedStatus", {
@@ -864,7 +873,7 @@
           batches: 0
         }, "success");
       } catch (err) {
-        els.tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
+        els.tbody.innerHTML = `<tr><td colspan="9" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
         setPageStatus("stock.loadErrorStatus", {
           error: Ui.translateError(err.message)
         }, "error");
@@ -874,11 +883,28 @@
     function bindEvents() {
       els.searchInput.addEventListener("input", renderTable);
       els.locationFilter.addEventListener("change", renderTable);
+      els.categoryFilter.addEventListener("change", renderTable);
       els.refreshBtn.addEventListener("click", loadData);
+
+      if (els.selectFilteredBtn) {
+        els.selectFilteredBtn.addEventListener("click", selectFilteredRows);
+      }
+      if (els.clearSelectionBtn) {
+        els.clearSelectionBtn.addEventListener("click", clearSelection);
+      }
+      if (els.exportSelectedBtn) {
+        els.exportSelectedBtn.addEventListener("click", exportSelectedRows);
+      }
+      if (els.selectAllRows) {
+        els.selectAllRows.addEventListener("change", (event) => {
+          toggleSelectAllVisible(event.target.checked);
+        });
+      }
 
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
         renderLocationFilter();
+        renderCategoryFilter();
         renderTable();
         restoreStatusesAfterLanguageChange();
       });
