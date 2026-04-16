@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
+const ExcelJS = require("exceljs");
 const pool = require("../db");
 const { authRequired, requireRole, getEffectiveTenantId } = require("../middleware/auth");
 
@@ -36,6 +37,15 @@ function isConsignmentPayment(paymentMethod, saleType, isConsignment) {
   );
 }
 
+function formatDateForFilename(dateValue) {
+  const d = new Date(dateValue);
+  if (Number.isNaN(d.getTime())) return "unknown-date";
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 async function getItemById(client, tenantId, itemId) {
   const { rows } = await client.query(
     `
@@ -47,6 +57,9 @@ async function getItemById(client, tenantId, itemId) {
         i.barcode,
         i.sale_price,
         i.purchase_price,
+        i.box_qty,
+        i.weight_grams,
+        i.volume_ml,
         i.is_active
       FROM core.items i
       WHERE i.tenant_id = $1
@@ -211,6 +224,155 @@ async function deductFromBatchesFIFO(client, tenantId, itemId, qtyNeeded) {
   };
 }
 
+function computeLineWeightKg(qty, boxQty, weightGrams) {
+  const q = Number(qty || 0);
+  const bq = Number(boxQty || 0);
+  const wg = Number(weightGrams || 0);
+
+  if (!Number.isFinite(q) || q <= 0) return 0;
+  if (!Number.isFinite(bq) || bq <= 0) return 0;
+  if (!Number.isFinite(wg) || wg <= 0) return 0;
+
+  return round4((q / bq) * (wg / 1000));
+}
+
+function computeLineVolumeM3(qty, boxQty, volumeCm3) {
+  const q = Number(qty || 0);
+  const bq = Number(boxQty || 0);
+  const v = Number(volumeCm3 || 0);
+
+  if (!Number.isFinite(q) || q <= 0) return 0;
+  if (!Number.isFinite(bq) || bq <= 0) return 0;
+  if (!Number.isFinite(v) || v <= 0) return 0;
+
+  return round4((q / bq) * (v / 1000000));
+}
+
+async function getSaleDetails(client, tenantId, saleId) {
+  const saleQuery = await client.query(
+    `
+      SELECT
+        s.id,
+        s.tenant_id,
+        s.counterparty_id,
+        s.location_id,
+        s.sale_type,
+        s.payment_status,
+        s.payment_method,
+        s.total_amount,
+        s.paid_amount,
+        s.debt_amount,
+        s.comment,
+        s.created_by,
+        s.created_at,
+        cp.name AS counterparty_name
+      FROM core.sales s
+      LEFT JOIN core.counterparties cp
+        ON cp.id = s.counterparty_id
+       AND cp.tenant_id = s.tenant_id
+      WHERE s.tenant_id = $1
+        AND s.id = $2
+      LIMIT 1
+    `,
+    [tenantId, saleId]
+  );
+
+  const sale = saleQuery.rows[0] || null;
+  if (!sale) return null;
+
+  const linesQuery = await client.query(
+    `
+      SELECT
+        si.id,
+        si.sale_id,
+        si.item_id,
+        si.qty,
+        si.price,
+        si.line_amount,
+        si.cost_price,
+        si.discount_amount,
+        si.gross_profit,
+        si.batch_deductions,
+        i.name AS item_name,
+        i.sku AS item_sku,
+        i.barcode AS item_barcode,
+        i.box_qty,
+        i.weight_grams,
+        i.volume_ml,
+        m.location_id,
+        l.name AS location_name,
+        l.code AS location_code,
+        m.comment AS line_comment
+      FROM core.sale_items si
+      LEFT JOIN core.items i
+        ON i.id = si.item_id
+       AND i.tenant_id = si.tenant_id
+      LEFT JOIN LATERAL (
+        SELECT
+          mm.location_id,
+          mm.comment
+        FROM core.movements mm
+        WHERE mm.tenant_id = si.tenant_id
+          AND mm.ref_type = 'sale'
+          AND mm.ref_id = si.sale_id
+          AND mm.item_id = si.item_id
+          AND mm.movement_type = 'sale'
+        ORDER BY mm.id ASC
+        LIMIT 1
+      ) m ON TRUE
+      LEFT JOIN core.locations l
+        ON l.id = m.location_id
+       AND l.tenant_id = si.tenant_id
+      WHERE si.tenant_id = $1
+        AND si.sale_id = $2
+      ORDER BY si.id ASC
+    `,
+    [tenantId, saleId]
+  );
+
+  const lines = linesQuery.rows.map((line) => {
+    const lineWeightKg = computeLineWeightKg(line.qty, line.box_qty, line.weight_grams);
+    const lineVolumeM3 = computeLineVolumeM3(line.qty, line.box_qty, line.volume_ml);
+    const totalCost = round2(Number(line.qty || 0) * Number(line.cost_price || 0));
+
+    return {
+      id: line.id,
+      item_id: line.item_id,
+      item_name: line.item_name,
+      item_sku: line.item_sku,
+      item_barcode: line.item_barcode,
+      location_id: line.location_id,
+      location_name: line.location_name,
+      location_code: line.location_code,
+      qty: Number(line.qty || 0),
+      price: Number(line.price || 0),
+      line_amount: Number(line.line_amount || 0),
+      cost_price: Number(line.cost_price || 0),
+      total_cost: totalCost,
+      discount_amount: Number(line.discount_amount || 0),
+      gross_profit: Number(line.gross_profit || 0),
+      batch_deductions: line.batch_deductions,
+      comment: line.line_comment || null,
+      box_qty: Number(line.box_qty || 0),
+      weight_grams: Number(line.weight_grams || 0),
+      volume_ml: Number(line.volume_ml || 0),
+      line_weight_kg: lineWeightKg,
+      line_volume_m3: lineVolumeM3,
+    };
+  });
+
+  const totals = {
+    total_amount: round2(lines.reduce((sum, line) => sum + Number(line.line_amount || 0), 0)),
+    total_cost: round2(lines.reduce((sum, line) => sum + Number(line.total_cost || 0), 0)),
+    gross_profit: round2(lines.reduce((sum, line) => sum + Number(line.gross_profit || 0), 0)),
+    total_qty: round4(lines.reduce((sum, line) => sum + Number(line.qty || 0), 0)),
+    total_weight_kg: round4(lines.reduce((sum, line) => sum + Number(line.line_weight_kg || 0), 0)),
+    total_volume_m3: round4(lines.reduce((sum, line) => sum + Number(line.line_volume_m3 || 0), 0)),
+  };
+
+  return { sale, lines, totals };
+}
+
 router.get(
   "/",
   authRequired,
@@ -296,6 +458,198 @@ router.get(
       return res.status(500).json({
         ok: false,
         error: "sales_list_failed",
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+router.get(
+  "/:id/export",
+  authRequired,
+  requireRole("owner", "client"),
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      const tenantId = getEffectiveTenantId(req);
+      const saleId = Number(req.params.id);
+
+      if (!Number.isFinite(saleId) || saleId <= 0) {
+        return res.status(400).json({ ok: false, error: "invalid_sale_id" });
+      }
+
+      const details = await getSaleDetails(client, tenantId, saleId);
+
+      if (!details) {
+        return res.status(404).json({ ok: false, error: "sale_not_found" });
+      }
+
+      const { sale, lines, totals } = details;
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet("Продажа");
+
+      sheet.columns = [
+        { header: "№", key: "n", width: 6 },
+        { header: "Товар", key: "item_name", width: 36 },
+        { header: "SKU", key: "item_sku", width: 18 },
+        { header: "ШК", key: "item_barcode", width: 20 },
+        { header: "МХ", key: "location_name", width: 22 },
+        { header: "Кол-во", key: "qty", width: 12 },
+        { header: "Цена", key: "price", width: 14 },
+        { header: "Сумма", key: "line_amount", width: 14 },
+        { header: "Себестоимость", key: "total_cost", width: 16 },
+        { header: "Прибыль", key: "gross_profit", width: 14 },
+        { header: "Вес, кг", key: "line_weight_kg", width: 12 },
+        { header: "Объём, м³", key: "line_volume_m3", width: 12 },
+        { header: "Комментарий", key: "comment", width: 30 },
+      ];
+
+      sheet.mergeCells("A1:D1");
+      sheet.getCell("A1").value = `Документ продажи #${sale.id}`;
+      sheet.getCell("A1").font = { bold: true, size: 14 };
+
+      sheet.getCell("A3").value = "Дата";
+      sheet.getCell("B3").value = sale.created_at ? new Date(sale.created_at) : "";
+      sheet.getCell("C3").value = "Клиент";
+      sheet.getCell("D3").value = sale.counterparty_name || "—";
+
+      sheet.getCell("A4").value = "Статус оплаты";
+      sheet.getCell("B4").value = sale.payment_status || "—";
+      sheet.getCell("C4").value = "Способ оплаты";
+      sheet.getCell("D4").value = sale.payment_method || "—";
+
+      sheet.getCell("A5").value = "Комментарий";
+      sheet.getCell("B5").value = sale.comment || "—";
+      sheet.mergeCells("B5:D5");
+
+      const headerRowIndex = 7;
+      const headerRow = sheet.getRow(headerRowIndex);
+      headerRow.values = sheet.columns.map((c) => c.header);
+      headerRow.font = { bold: true };
+      headerRow.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFF3F4F6" },
+      };
+      headerRow.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE5E7EB" } },
+          bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
+          left: { style: "thin", color: { argb: "FFE5E7EB" } },
+          right: { style: "thin", color: { argb: "FFE5E7EB" } },
+        };
+      });
+
+      lines.forEach((line, index) => {
+        const row = sheet.addRow({
+          n: index + 1,
+          item_name: line.item_name || "",
+          item_sku: line.item_sku || "",
+          item_barcode: line.item_barcode || "",
+          location_name: line.location_name || "",
+          qty: line.qty || 0,
+          price: line.price || 0,
+          line_amount: line.line_amount || 0,
+          total_cost: line.total_cost || 0,
+          gross_profit: line.gross_profit || 0,
+          line_weight_kg: line.line_weight_kg || 0,
+          line_volume_m3: line.line_volume_m3 || 0,
+          comment: line.comment || "",
+        });
+
+        row.eachCell((cell) => {
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFF3F4F6" } },
+            bottom: { style: "thin", color: { argb: "FFF3F4F6" } },
+            left: { style: "thin", color: { argb: "FFF3F4F6" } },
+            right: { style: "thin", color: { argb: "FFF3F4F6" } },
+          };
+        });
+      });
+
+      const totalStartRow = sheet.rowCount + 2;
+      sheet.getCell(`A${totalStartRow}`).value = "Итого";
+      sheet.getCell(`B${totalStartRow}`).value = "Шт";
+      sheet.getCell(`C${totalStartRow}`).value = totals.total_qty || 0;
+      sheet.getCell(`D${totalStartRow}`).value = "Сумма";
+      sheet.getCell(`E${totalStartRow}`).value = totals.total_amount || 0;
+      sheet.getCell(`F${totalStartRow}`).value = "Себестоимость";
+      sheet.getCell(`G${totalStartRow}`).value = totals.total_cost || 0;
+      sheet.getCell(`H${totalStartRow}`).value = "Прибыль";
+      sheet.getCell(`I${totalStartRow}`).value = totals.gross_profit || 0;
+      sheet.getCell(`J${totalStartRow}`).value = "Вес, кг";
+      sheet.getCell(`K${totalStartRow}`).value = totals.total_weight_kg || 0;
+      sheet.getCell(`L${totalStartRow}`).value = "Объём, м³";
+      sheet.getCell(`M${totalStartRow}`).value = totals.total_volume_m3 || 0;
+
+      sheet.getColumn("B").numFmt = "0.####";
+      sheet.getColumn("C").numFmt = "0.####";
+      sheet.getColumn("F").numFmt = "#,##0.00";
+      sheet.getColumn("G").numFmt = "#,##0.00";
+      sheet.getColumn("H").numFmt = "#,##0.00";
+      sheet.getColumn("I").numFmt = "#,##0.00";
+      sheet.getColumn("J").numFmt = "0.###";
+      sheet.getColumn("K").numFmt = "0.####";
+      sheet.getColumn("L").numFmt = "0.####";
+      sheet.getColumn("M").numFmt = "0.####";
+
+      const fileDate = formatDateForFilename(sale.created_at);
+      const fileName = `sale-${sale.id}-${fileDate}.xlsx`;
+
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+
+      await workbook.xlsx.write(res);
+      return res.end();
+    } catch (error) {
+      console.error("[GET /sales/:id/export] error:", error);
+      return res.status(500).json({
+        ok: false,
+        error: "sale_export_failed",
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+router.get(
+  "/:id",
+  authRequired,
+  requireRole("owner", "client"),
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      const tenantId = getEffectiveTenantId(req);
+      const saleId = Number(req.params.id);
+
+      if (!Number.isFinite(saleId) || saleId <= 0) {
+        return res.status(400).json({ ok: false, error: "invalid_sale_id" });
+      }
+
+      const details = await getSaleDetails(client, tenantId, saleId);
+
+      if (!details) {
+        return res.status(404).json({ ok: false, error: "sale_not_found" });
+      }
+
+      return res.json({
+        ok: true,
+        sale: details.sale,
+        lines: details.lines,
+        totals: details.totals,
+      });
+    } catch (error) {
+      console.error("[GET /sales/:id] error:", error);
+      return res.status(500).json({
+        ok: false,
+        error: "sale_details_failed",
       });
     } finally {
       client.release();
@@ -482,6 +836,11 @@ router.post(
           gross_profit: grossProfit,
           batch_deductions: fifoResult.deductions,
           item_name: item.name,
+          item_sku: item.sku,
+          item_barcode: item.barcode,
+          box_qty: Number(item.box_qty || 0),
+          weight_grams: Number(item.weight_grams || 0),
+          volume_ml: Number(item.volume_ml || 0),
           location_name: location.name,
           location_code: location.code,
           comment: srcLine.comment || commonComment || null,
@@ -744,6 +1103,8 @@ router.post(
         lines: preparedLines.map((line) => ({
           item_id: line.item_id,
           item_name: line.item_name,
+          item_sku: line.item_sku,
+          item_barcode: line.item_barcode,
           location_id: line.location_id,
           location_name: line.location_name,
           qty: line.qty,
@@ -755,6 +1116,8 @@ router.post(
           gross_profit: line.gross_profit,
           new_qty: line.new_qty,
           batch_deductions: line.batch_deductions,
+          line_weight_kg: computeLineWeightKg(line.qty, line.box_qty, line.weight_grams),
+          line_volume_m3: computeLineVolumeM3(line.qty, line.box_qty, line.volume_ml),
         })),
       });
     } catch (error) {
