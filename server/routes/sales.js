@@ -1,9 +1,66 @@
 const express = require("express");
 const router = express.Router();
 
+const fs = require("fs");
+const path = require("path");
 const ExcelJS = require("exceljs");
 const pool = require("../db");
 const { authRequired, requireRole, getEffectiveTenantId } = require("../middleware/auth");
+
+const PROJECT_ROOT_DIR = path.join(__dirname, "..", "..");
+const UPLOADS_DIR = path.join(PROJECT_ROOT_DIR, "uploads");
+
+function formatDateTimeRu(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleString("ru-RU");
+}
+
+function getPaymentStatusLabel(value) {
+  if (value === "paid") return "Оплачен";
+  if (value === "partial") return "Частично оплачен";
+  return "Не оплачен";
+}
+
+function getPaymentMethodLabel(value) {
+  if (value === "cash") return "Наличные";
+  if (value === "card") return "Карта";
+  if (value === "transfer") return "Перевод";
+  if (value === "mixed") return "Смешанная";
+  if (value === "consignment") return "Под реализацию";
+  return value || "—";
+}
+
+function getExcelImageExtension(imageUrl) {
+  const lower = String(imageUrl || "").toLowerCase();
+  if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "jpeg";
+  if (lower.endsWith(".png")) return "png";
+  if (lower.endsWith(".gif")) return "gif";
+  return null;
+}
+
+async function getImageBufferByImageUrl(imageUrl) {
+  const normalized = String(imageUrl || "").trim();
+  if (!normalized || !normalized.startsWith("/uploads/")) {
+    return null;
+  }
+
+  const fileName = path.basename(normalized);
+  const candidatePaths = [
+    path.join(UPLOADS_DIR, fileName),
+    path.join(PROJECT_ROOT_DIR, normalized.replace(/^\//, "")),
+  ];
+
+  for (const fullPath of candidatePaths) {
+    try {
+      await fs.promises.access(fullPath, fs.constants.R_OK);
+      return await fs.promises.readFile(fullPath);
+    } catch (_) {}
+  }
+
+  return null;
+}
 
 function toNumber(value) {
   if (value === null || value === undefined || value === "") return null;
@@ -296,7 +353,6 @@ async function getSaleDetails(client, tenantId, saleId) {
         i.name AS item_name,
         i.sku AS item_sku,
         i.barcode AS item_barcode,
-        i.image_url,
         i.box_qty,
         i.weight_grams,
         i.volume_ml,
@@ -342,7 +398,6 @@ async function getSaleDetails(client, tenantId, saleId) {
       item_name: line.item_name,
       item_sku: line.item_sku,
       item_barcode: line.item_barcode,
-      image_url: line.image_url,
       location_id: line.location_id,
       location_name: line.location_name,
       location_code: line.location_code,
@@ -489,47 +544,87 @@ router.get(
       }
 
       const { sale, lines, totals } = details;
-      const workbook = new ExcelJS.Workbook();
-      const sheet = workbook.addWorksheet("Продажа");
 
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "BFC24 CONTROL";
+      workbook.company = "BFC24";
+      workbook.created = new Date();
+
+      const sheet = workbook.addWorksheet("Продажа", {
+        views: [{ state: "frozen", ySplit: 8 }]
+      });
+
+      sheet.properties.defaultRowHeight = 22;
       sheet.columns = [
         { header: "№", key: "n", width: 6 },
-        { header: "Товар", key: "item_name", width: 36 },
+        { header: "Фото", key: "photo", width: 14 },
+        { header: "Товар", key: "item_name", width: 30 },
         { header: "SKU", key: "item_sku", width: 18 },
-        { header: "ШК", key: "item_barcode", width: 20 },
-        { header: "МХ", key: "location_name", width: 22 },
+        { header: "МХ", key: "location_name", width: 20 },
         { header: "Кол-во", key: "qty", width: 12 },
         { header: "Цена", key: "price", width: 14 },
-        { header: "Сумма", key: "line_amount", width: 14 },
-        { header: "Себестоимость", key: "total_cost", width: 16 },
-        { header: "Прибыль", key: "gross_profit", width: 14 },
+        { header: "Сумма", key: "line_amount", width: 16 },
         { header: "Вес, кг", key: "line_weight_kg", width: 12 },
         { header: "Объём, м³", key: "line_volume_m3", width: 12 },
-        { header: "Комментарий", key: "comment", width: 30 },
+        { header: "Комментарий", key: "comment", width: 26 },
       ];
 
-      sheet.mergeCells("A1:D1");
-      sheet.getCell("A1").value = `Документ продажи #${sale.id}`;
-      sheet.getCell("A1").font = { bold: true, size: 14 };
+      sheet.mergeCells("A1:K1");
+      const titleCell = sheet.getCell("A1");
+      titleCell.value = `Документ продажи #${sale.id}`;
+      titleCell.font = { bold: true, size: 16, color: { argb: "FF111827" } };
+      titleCell.alignment = { vertical: "middle", horizontal: "left" };
+      sheet.getRow(1).height = 24;
 
       sheet.getCell("A3").value = "Дата";
-      sheet.getCell("B3").value = sale.created_at ? new Date(sale.created_at) : "";
+      sheet.getCell("B3").value = formatDateTimeRu(sale.created_at);
       sheet.getCell("C3").value = "Клиент";
       sheet.getCell("D3").value = sale.counterparty_name || "—";
 
       sheet.getCell("A4").value = "Статус оплаты";
-      sheet.getCell("B4").value = sale.payment_status || "—";
+      sheet.getCell("B4").value = getPaymentStatusLabel(sale.payment_status);
       sheet.getCell("C4").value = "Способ оплаты";
-      sheet.getCell("D4").value = sale.payment_method || "—";
+      sheet.getCell("D4").value = getPaymentMethodLabel(sale.payment_method);
 
       sheet.getCell("A5").value = "Комментарий";
       sheet.getCell("B5").value = sale.comment || "—";
       sheet.mergeCells("B5:D5");
 
+      sheet.getCell("F3").value = "Сумма";
+      sheet.getCell("G3").value = Number(totals.total_amount || 0);
+      sheet.getCell("H3").value = "Всего штук";
+      sheet.getCell("I3").value = Number(totals.total_qty || 0);
+
+      sheet.getCell("F4").value = "Вес, кг";
+      sheet.getCell("G4").value = Number(totals.total_weight_kg || 0);
+      sheet.getCell("H4").value = "Объём, м³";
+      sheet.getCell("I4").value = Number(totals.total_volume_m3 || 0);
+
+      for (const cellAddress of ["A3", "A4", "A5", "C3", "C4", "F3", "H3", "F4", "H4"]) {
+        sheet.getCell(cellAddress).font = { bold: true, color: { argb: "FF374151" } };
+      }
+
+      const summaryValueCells = ["B3", "D3", "B4", "D4", "B5", "G3", "I3", "G4", "I4"];
+      for (const cellAddress of summaryValueCells) {
+        sheet.getCell(cellAddress).fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFF9FAFB" },
+        };
+        sheet.getCell(cellAddress).border = {
+          top: { style: "thin", color: { argb: "FFE5E7EB" } },
+          bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
+          left: { style: "thin", color: { argb: "FFE5E7EB" } },
+          right: { style: "thin", color: { argb: "FFE5E7EB" } },
+        };
+      }
+
       const headerRowIndex = 7;
       const headerRow = sheet.getRow(headerRowIndex);
-      headerRow.values = sheet.columns.map((c) => c.header);
-      headerRow.font = { bold: true };
+      headerRow.values = sheet.columns.map((column) => column.header);
+      headerRow.height = 24;
+      headerRow.font = { bold: true, color: { argb: "FF111827" } };
+      headerRow.alignment = { vertical: "middle", horizontal: "center" };
       headerRow.fill = {
         type: "pattern",
         pattern: "solid",
@@ -544,24 +639,28 @@ router.get(
         };
       });
 
-      lines.forEach((line, index) => {
-        const row = sheet.addRow({
+      for (let index = 0; index < lines.length; index += 1) {
+        const line = lines[index];
+        const rowIndex = headerRowIndex + 1 + index;
+
+        const row = sheet.getRow(rowIndex);
+        row.values = {
           n: index + 1,
+          photo: "",
           item_name: line.item_name || "",
           item_sku: line.item_sku || "",
-          item_barcode: line.item_barcode || "",
           location_name: line.location_name || "",
-          qty: line.qty || 0,
-          price: line.price || 0,
-          line_amount: line.line_amount || 0,
-          total_cost: line.total_cost || 0,
-          gross_profit: line.gross_profit || 0,
-          line_weight_kg: line.line_weight_kg || 0,
-          line_volume_m3: line.line_volume_m3 || 0,
-          comment: line.comment || "",
-        });
+          qty: Number(line.qty || 0),
+          price: Number(line.price || 0),
+          line_amount: Number(line.line_amount || 0),
+          line_weight_kg: Number(line.line_weight_kg || 0),
+          line_volume_m3: Number(line.line_volume_m3 || 0),
+          comment: line.comment || sale.comment || "",
+        };
+        row.height = 64;
 
         row.eachCell((cell) => {
+          cell.alignment = { vertical: "middle", horizontal: "left", wrapText: true };
           cell.border = {
             top: { style: "thin", color: { argb: "FFF3F4F6" } },
             bottom: { style: "thin", color: { argb: "FFF3F4F6" } },
@@ -569,33 +668,67 @@ router.get(
             right: { style: "thin", color: { argb: "FFF3F4F6" } },
           };
         });
-      });
 
-      const totalStartRow = sheet.rowCount + 2;
-      sheet.getCell(`A${totalStartRow}`).value = "Итого";
-      sheet.getCell(`B${totalStartRow}`).value = "Шт";
-      sheet.getCell(`C${totalStartRow}`).value = totals.total_qty || 0;
-      sheet.getCell(`D${totalStartRow}`).value = "Сумма";
-      sheet.getCell(`E${totalStartRow}`).value = totals.total_amount || 0;
-      sheet.getCell(`F${totalStartRow}`).value = "Себестоимость";
-      sheet.getCell(`G${totalStartRow}`).value = totals.total_cost || 0;
-      sheet.getCell(`H${totalStartRow}`).value = "Прибыль";
-      sheet.getCell(`I${totalStartRow}`).value = totals.gross_profit || 0;
-      sheet.getCell(`J${totalStartRow}`).value = "Вес, кг";
-      sheet.getCell(`K${totalStartRow}`).value = totals.total_weight_kg || 0;
-      sheet.getCell(`L${totalStartRow}`).value = "Объём, м³";
-      sheet.getCell(`M${totalStartRow}`).value = totals.total_volume_m3 || 0;
+        row.getCell(1).alignment = { vertical: "middle", horizontal: "center" };
+        row.getCell(6).alignment = { vertical: "middle", horizontal: "right" };
+        row.getCell(7).alignment = { vertical: "middle", horizontal: "right" };
+        row.getCell(8).alignment = { vertical: "middle", horizontal: "right" };
+        row.getCell(9).alignment = { vertical: "middle", horizontal: "right" };
+        row.getCell(10).alignment = { vertical: "middle", horizontal: "right" };
 
-      sheet.getColumn("B").numFmt = "0.####";
-      sheet.getColumn("C").numFmt = "0.####";
-      sheet.getColumn("F").numFmt = "#,##0.00";
-      sheet.getColumn("G").numFmt = "#,##0.00";
-      sheet.getColumn("H").numFmt = "#,##0.00";
-      sheet.getColumn("I").numFmt = "#,##0.00";
-      sheet.getColumn("J").numFmt = "0.###";
-      sheet.getColumn("K").numFmt = "0.####";
-      sheet.getColumn("L").numFmt = "0.####";
-      sheet.getColumn("M").numFmt = "0.####";
+        const imageExtension = getExcelImageExtension(line.image_url);
+        if (imageExtension) {
+          const imageBuffer = await getImageBufferByImageUrl(line.image_url);
+          if (imageBuffer) {
+            const imageId = workbook.addImage({
+              buffer: imageBuffer,
+              extension: imageExtension,
+            });
+
+            sheet.addImage(imageId, {
+              tl: { col: 1 + 0.15, row: (rowIndex - 1) + 0.15 },
+              ext: { width: 80, height: 80 },
+              editAs: "oneCell",
+            });
+          } else {
+            row.getCell(2).value = "Нет фото";
+            row.getCell(2).alignment = { vertical: "middle", horizontal: "center" };
+          }
+        } else {
+          row.getCell(2).value = "Нет фото";
+          row.getCell(2).alignment = { vertical: "middle", horizontal: "center" };
+        }
+      }
+
+      const totalRowIndex = sheet.rowCount + 2;
+      sheet.getCell(`A${totalRowIndex}`).value = "Итого";
+      sheet.getCell(`A${totalRowIndex}`).font = { bold: true };
+
+      sheet.getCell(`F${totalRowIndex}`).value = Number(totals.total_qty || 0);
+      sheet.getCell(`G${totalRowIndex}`).value = Number(totals.total_amount || 0);
+      sheet.getCell(`I${totalRowIndex}`).value = Number(totals.total_weight_kg || 0);
+      sheet.getCell(`J${totalRowIndex}`).value = Number(totals.total_volume_m3 || 0);
+
+      for (const col of ["A", "F", "G", "I", "J"]) {
+        const cell = sheet.getCell(`${col}${totalRowIndex}`);
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFF9FAFB" },
+        };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE5E7EB" } },
+          bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
+          left: { style: "thin", color: { argb: "FFE5E7EB" } },
+          right: { style: "thin", color: { argb: "FFE5E7EB" } },
+        };
+      }
+
+      sheet.getColumn("F").numFmt = "0.####";
+      sheet.getColumn("G").numFmt = '#,##0.00';
+      sheet.getColumn("H").numFmt = '#,##0.00';
+      sheet.getColumn("I").numFmt = '0.###';
+      sheet.getColumn("J").numFmt = '0.####';
 
       const fileDate = formatDateForFilename(sale.created_at);
       const fileName = `sale-${sale.id}-${fileDate}.xlsx`;
@@ -1107,7 +1240,6 @@ router.post(
           item_name: line.item_name,
           item_sku: line.item_sku,
           item_barcode: line.item_barcode,
-          image_url: line.image_url,
           location_id: line.location_id,
           location_name: line.location_name,
           qty: line.qty,
