@@ -270,7 +270,8 @@ router.get(
           b.updated_at,
           i.name AS item_name,
           i.sku,
-          i.barcode
+          i.barcode,
+          i.image_url
         FROM core.item_batches b
         JOIN core.items i
           ON i.id = b.item_id

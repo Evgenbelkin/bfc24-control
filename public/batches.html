@@ -23,6 +23,12 @@
       --ok-bg:#f0fdf4;
       --ok-line:#bbf7d0;
       --ok-text:#166534;
+      --info-bg:#eff6ff;
+      --info-line:#bfdbfe;
+      --info-text:#1d4ed8;
+      --warn-bg:#fff7ed;
+      --warn-line:#fed7aa;
+      --warn-text:#9a3412;
     }
 
     *{box-sizing:border-box}
@@ -35,7 +41,7 @@
     }
 
     .wrap{
-      max-width:1600px;
+      max-width:1720px;
       margin:0 auto;
       padding:24px 16px 48px;
     }
@@ -104,6 +110,7 @@
       background:var(--primary);
       color:#fff;
     }
+
     .btn-primary:hover{background:var(--primary-hover)}
 
     .btn-light{
@@ -124,13 +131,21 @@
       border:none;
     }
 
-    .btn-save:hover{
-      background:var(--primary-hover);
-    }
-
+    .btn-save:hover{background:var(--primary-hover)}
     .btn-save:disabled{
       background:#93c5fd;
       cursor:not-allowed;
+    }
+
+    .btn-ghost{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-ghost:hover{
+      border-color:#cbd5e1;
+      background:#f8fafc;
     }
 
     .card{
@@ -155,7 +170,7 @@
 
     .filters{
       display:grid;
-      grid-template-columns:1.5fr auto;
+      grid-template-columns:1.2fr 220px 220px auto;
       gap:12px;
       align-items:end;
     }
@@ -230,7 +245,7 @@
       border-collapse:collapse;
       margin-top:10px;
       background:#fff;
-      min-width:1400px;
+      min-width:1320px;
     }
 
     th, td{
@@ -303,33 +318,233 @@
     .batch-save-status.success{ color:var(--ok-text); }
     .batch-save-status.info{ color:#1d4ed8; }
 
-    .cell-stack{
+    .mono{
+      font-variant-numeric:tabular-nums;
+    }
+
+    .photo-col{
+      width:72px;
+      min-width:72px;
+    }
+
+    .photo-box{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      padding:4px;
+    }
+
+    .photo-box img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background:#fff;
+    }
+
+    .photo-box.is-clickable{
+      cursor:zoom-in;
+    }
+
+    .batch-main-row td{
+      vertical-align:middle;
+    }
+
+    .batch-actions{
+      min-width:190px;
+    }
+
+    .analysis-row td{
+      padding:0;
+      background:#fff !important;
+    }
+
+    .analysis-panel{
+      border-top:1px dashed #dbe2ea;
+      padding:16px;
+      background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+    }
+
+    .analysis-grid{
+      display:grid;
+      grid-template-columns:1.2fr 1fr 1fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    .analysis-block{
+      border:1px solid #e6edf5;
+      border-radius:16px;
+      background:#fff;
+      padding:14px;
+      box-shadow:0 4px 16px rgba(15,23,42,.04);
+    }
+
+    .analysis-title{
+      font-size:15px;
+      font-weight:700;
+      margin:0 0 10px;
+    }
+
+    .analysis-photo-wrap{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+
+    .analysis-photo-large{
+      width:84px;
+      height:84px;
+      border-radius:16px;
+      border:1px solid #e5e7eb;
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      padding:4px;
+      flex:0 0 auto;
+    }
+
+    .analysis-photo-large img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .analysis-item-lines{
       display:flex;
       flex-direction:column;
       gap:6px;
-      min-width:110px;
+      min-width:0;
     }
 
-    .calc-cell{
-      white-space:nowrap;
+    .analysis-item-name{
+      font-size:16px;
       font-weight:700;
+      line-height:1.35;
     }
 
-    .subtext{
+    .analysis-item-sub{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    .metrics{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .metric{
+      border:1px solid #ecf0f5;
+      border-radius:14px;
+      background:#fafcff;
+      padding:10px 12px;
+    }
+
+    .metric-label{
       font-size:12px;
       color:var(--muted);
+      margin-bottom:6px;
     }
 
-    .batch-row-actions{
-      min-width:160px;
+    .metric-value{
+      font-size:18px;
+      font-weight:800;
+      line-height:1.2;
     }
 
-    .mono{
-      font-variant-numeric: tabular-nums;
+    .metric-value.ok{ color:var(--ok-text); }
+    .metric-value.warn{ color:var(--warn-text); }
+    .metric-value.danger{ color:var(--danger-text); }
+    .metric-value.info{ color:var(--info-text); }
+
+    .analysis-form{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .analysis-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .analysis-help{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .image-modal{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:9999;
+      cursor:zoom-out;
+    }
+
+    .image-modal.show{
+      display:flex;
+    }
+
+    .image-modal-content{
+      max-width:min(92vw, 980px);
+      max-height:88vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .image-modal-content img{
+      max-width:100%;
+      max-height:88vh;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+      display:block;
+    }
+
+    @media (max-width: 1200px){
+      .filters{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .analysis-grid{
+        grid-template-columns:1fr;
+      }
     }
 
     @media (max-width: 900px){
       .filters{
+        grid-template-columns:1fr;
+      }
+
+      .metrics,
+      .analysis-form{
         grid-template-columns:1fr;
       }
 
@@ -368,7 +583,7 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтр</h2>
+      <h2 class="card-title">Фильтр и сравнительный курс</h2>
 
       <div class="filters">
         <div class="field">
@@ -377,9 +592,23 @@
         </div>
 
         <div class="field">
+          <label for="currentCnyRateInput">Текущий курс ¥</label>
+          <input id="currentCnyRateInput" type="number" min="0" step="0.0001" placeholder="Например: 11.80" />
+        </div>
+
+        <div class="field">
+          <label for="currentUsdRateInput">Текущий курс $</label>
+          <input id="currentUsdRateInput" type="number" min="0" step="0.0001" placeholder="Например: 92.50" />
+        </div>
+
+        <div class="field">
           <label>&nbsp;</label>
           <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
         </div>
+      </div>
+
+      <div class="muted" style="margin-top:10px;">
+        Основная таблица оставлена короткой. Сравнительный анализ раскрывается отдельно по каждой партии и не изменяет исторические данные партии.
       </div>
 
       <div id="pageStatus" class="status info"></div>
@@ -387,24 +616,19 @@
 
     <div class="card">
       <h2 class="card-title">Партии товаров</h2>
-      <div class="muted">Редактирование финансов партии: закупка в юанях, курс юаня, доставка в долларах и курс доллара. Себестоимость и сумма остатка считаются автоматически.</div>
+      <div class="muted">Сохраняемые поля партии: закупка в юанях, курс юаня, доставка в долларах и курс доллара. Аналитика ниже раскрывается по кнопке “Анализ”.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
+              <th class="photo-col">Фото</th>
               <th>Товар</th>
               <th>Артикул / SKU</th>
               <th>Штрихкод</th>
               <th>Дата партии</th>
               <th>Кол-во в партии</th>
               <th>Остаток партии</th>
-              <th>Закупка, ¥/шт</th>
-              <th>Курс ¥</th>
-              <th>Доставка, $/партия</th>
-              <th>Курс $</th>
-              <th>Закупка, ₽/шт</th>
-              <th>Доставка, ₽/шт</th>
               <th>Себестоимость 1 шт, ₽</th>
               <th>Сумма остатка, ₽</th>
               <th>Статус</th>
@@ -413,11 +637,17 @@
           </thead>
           <tbody id="batchesTbody">
             <tr>
-              <td colspan="16" class="empty">Загрузка партий...</td>
+              <td colspan="11" class="empty">Загрузка партий...</td>
             </tr>
           </tbody>
         </table>
       </div>
+    </div>
+  </div>
+
+  <div id="imageModal" class="image-modal" aria-hidden="true">
+    <div class="image-modal-content">
+      <img id="imageModalImg" alt="Фото товара" />
     </div>
   </div>
 
@@ -500,12 +730,17 @@
     let authUser = null;
     let batchesData = [];
     let pageStatusState = null;
+    let expandedBatchId = null;
 
     const els = {
       searchInput: document.getElementById("searchInput"),
+      currentCnyRateInput: document.getElementById("currentCnyRateInput"),
+      currentUsdRateInput: document.getElementById("currentUsdRateInput"),
       refreshBtn: document.getElementById("refreshBtn"),
       batchesTbody: document.getElementById("batchesTbody"),
-      pageStatus: document.getElementById("pageStatus")
+      pageStatus: document.getElementById("pageStatus"),
+      imageModal: document.getElementById("imageModal"),
+      imageModalImg: document.getElementById("imageModalImg")
     };
 
     function goBack() {
@@ -515,6 +750,8 @@
     function logout() {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("batches_current_cny_rate");
+      localStorage.removeItem("batches_current_usd_rate");
       window.location.href = "/login.html";
     }
 
@@ -525,6 +762,22 @@
       } catch {
         authUser = null;
       }
+    }
+
+    function openImageModal(src) {
+      if (!src || !els.imageModal || !els.imageModalImg) return;
+      els.imageModalImg.src = src;
+      els.imageModal.classList.add("show");
+      els.imageModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeImageModal() {
+      if (!els.imageModal || !els.imageModalImg) return;
+      els.imageModal.classList.remove("show");
+      els.imageModal.setAttribute("aria-hidden", "true");
+      els.imageModalImg.removeAttribute("src");
+      document.body.style.overflow = "";
     }
 
     function getTenantId() {
@@ -570,9 +823,18 @@
 
     function formatNumber(value, digits = 0) {
       const num = Number(value || 0);
+      if (!Number.isFinite(num)) return digits > 0 ? Number(0).toFixed(digits) : "0";
       if (digits > 0) return num.toFixed(digits);
       if (Number.isInteger(num)) return String(num);
       return num.toFixed(3);
+    }
+
+    function formatSignedNumber(value, digits = 2) {
+      const num = Number(value || 0);
+      const formatted = formatNumber(Math.abs(num), digits);
+      if (num > 0) return `+${formatted}`;
+      if (num < 0) return `-${formatted}`;
+      return formatted;
     }
 
     function toNumber(value) {
@@ -586,6 +848,17 @@
       const d = new Date(value);
       if (Number.isNaN(d.getTime())) return String(value);
       return d.toLocaleDateString("ru-RU");
+    }
+
+    function getStoredCurrentRate(key) {
+      const raw = localStorage.getItem(key);
+      if (raw === null || raw === undefined || raw === "") return "";
+      return raw;
+    }
+
+    function persistCurrentRates() {
+      localStorage.setItem("batches_current_cny_rate", String(els.currentCnyRateInput.value || ""));
+      localStorage.setItem("batches_current_usd_rate", String(els.currentUsdRateInput.value || ""));
     }
 
     function calcBatchFinance(row) {
@@ -618,10 +891,231 @@
       };
     }
 
-    function formatInputValue(value) {
-  const num = Number(value || 0);
-  return num === 0 ? '' : num.toFixed(4);
-}
+    function calcCompareFinance(row, salePriceInput) {
+      const base = calcBatchFinance(row);
+      const unitCostCny = toNumber(row.unit_cost);
+      const deliveryUsd = toNumber(row.delivery_cost);
+      const qtyTotal = toNumber(row.qty_total);
+      const qtyRemaining = toNumber(row.qty_remaining);
+      const currentCnyRate = toNumber(els.currentCnyRateInput.value);
+      const currentUsdRate = toNumber(els.currentUsdRateInput.value);
+      const salePrice = toNumber(salePriceInput);
+
+      const currentPurchaseRubPerUnit = unitCostCny * currentCnyRate;
+      const currentDeliveryRubTotal = deliveryUsd * currentUsdRate;
+      const currentDeliveryRubPerUnit = qtyTotal > 0 ? currentDeliveryRubTotal / qtyTotal : 0;
+      const currentUnitCostRub = currentPurchaseRubPerUnit + currentDeliveryRubPerUnit;
+
+      const diffRubPerUnit = currentUnitCostRub - base.unitCostRub;
+      const diffPercent = base.unitCostRub > 0 ? ((currentUnitCostRub / base.unitCostRub) - 1) * 100 : 0;
+
+      const reserveToZeroPerUnit = salePrice - currentUnitCostRub;
+      const resultPerUnit = salePrice - currentUnitCostRub;
+      const resultRemainingRub = resultPerUnit * qtyRemaining;
+      const marginPercent = salePrice > 0 ? (resultPerUnit / salePrice) * 100 : 0;
+
+      return {
+        currentCnyRate,
+        currentUsdRate,
+        currentPurchaseRubPerUnit,
+        currentDeliveryRubPerUnit,
+        currentUnitCostRub,
+        diffRubPerUnit,
+        diffPercent,
+        salePrice,
+        reserveToZeroPerUnit,
+        resultPerUnit,
+        resultRemainingRub,
+        marginPercent
+      };
+    }
+
+    function getValueTone(value, positiveGood = true) {
+      const num = Number(value || 0);
+      if (num === 0) return "info";
+      if (positiveGood) return num > 0 ? "ok" : "danger";
+      return num > 0 ? "warn" : "ok";
+    }
+
+    function buildPhotoHtml(row, large = false) {
+      const imageUrl = row.image_url ? String(row.image_url).trim() : "";
+      if (!imageUrl) {
+        return large
+          ? `<div class="analysis-photo-large">Нет фото</div>`
+          : `<div class="photo-box">Нет фото</div>`;
+      }
+
+      return large
+        ? `<div class="analysis-photo-large photo-box is-clickable" onclick="openImageModal('${escapeHtml(imageUrl)}')"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(row.item_name || "Фото")}" /></div>`
+        : `<div class="photo-box is-clickable" onclick="openImageModal('${escapeHtml(imageUrl)}')"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(row.item_name || "Фото")}" /></div>`;
+    }
+
+    function renderMainRow(row) {
+      const calc = calcBatchFinance(row);
+      const statusClass = calc.isFinanceFilled ? "ok" : "missing";
+      const statusText = calc.isFinanceFilled ? "Заполнено" : "Не заполнено";
+      const trClass = calc.isFinanceFilled ? "batch-row-finance-ok" : "batch-row-finance-missing";
+      const isExpanded = String(expandedBatchId || "") === String(row.id || "");
+
+      return `
+        <tr class="batch-main-row ${trClass}" data-batch-id="${escapeHtml(String(row.id))}">
+          <td class="photo-col">${buildPhotoHtml(row, false)}</td>
+          <td>${escapeHtml(row.item_name || "")}</td>
+          <td>${escapeHtml(row.sku || "")}</td>
+          <td>${escapeHtml(row.barcode || "")}</td>
+          <td>${escapeHtml(formatBatchDate(row.batch_date))}</td>
+          <td class="mono">${escapeHtml(formatNumber(row.qty_total))}</td>
+          <td class="mono">${escapeHtml(formatNumber(row.qty_remaining))}</td>
+          <td class="mono">${escapeHtml(formatNumber(calc.unitCostRub, 2))}</td>
+          <td class="mono">${escapeHtml(formatNumber(calc.stockSumRub, 2))}</td>
+          <td><span class="batch-status ${statusClass}">${escapeHtml(statusText)}</span></td>
+          <td class="batch-actions">
+            <button type="button" class="btn btn-small btn-ghost js-toggle-analysis">${isExpanded ? "Скрыть анализ" : "Анализ"}</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderAnalysisRow(row) {
+      const calc = calcBatchFinance(row);
+      const compare = calcCompareFinance(row, row._analysisSalePrice || "");
+      const saveStatusHtml = row._saveStatusText
+        ? `<div class="batch-save-status ${escapeHtml(row._saveStatusType || "")}">${escapeHtml(row._saveStatusText)}</div>`
+        : `<div class="batch-save-status"></div>`;
+
+      return `
+        <tr class="analysis-row" data-analysis-for="${escapeHtml(String(row.id))}">
+          <td colspan="11">
+            <div class="analysis-panel">
+              <div class="analysis-grid">
+                <div class="analysis-block">
+                  <div class="analysis-title">Партия и историческая себестоимость</div>
+                  <div class="analysis-photo-wrap">
+                    ${buildPhotoHtml(row, true)}
+                    <div class="analysis-item-lines">
+                      <div class="analysis-item-name">${escapeHtml(row.item_name || "")}</div>
+                      <div class="analysis-item-sub">SKU: ${escapeHtml(row.sku || "—")}</div>
+                      <div class="analysis-item-sub">Штрихкод: ${escapeHtml(row.barcode || "—")}</div>
+                      <div class="analysis-item-sub">Дата партии: ${escapeHtml(formatBatchDate(row.batch_date))}</div>
+                      <div class="analysis-item-sub">Остаток партии: ${escapeHtml(formatNumber(row.qty_remaining))} шт</div>
+                    </div>
+                  </div>
+
+                  <div class="analysis-form" style="margin-top:12px;">
+                    <div class="field">
+                      <label>Закупка, ¥/шт</label>
+                      <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="unit_cost" value="${escapeHtml(formatNumber(row.unit_cost))}" />
+                    </div>
+                    <div class="field">
+                      <label>Курс ¥</label>
+                      <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="cny_rate" value="${escapeHtml(formatNumber(row.cny_rate))}" />
+                    </div>
+                    <div class="field">
+                      <label>Доставка, $/партия</label>
+                      <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="delivery_cost" value="${escapeHtml(formatNumber(row.delivery_cost))}" />
+                    </div>
+                    <div class="field">
+                      <label>Курс $</label>
+                      <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="usd_rate" value="${escapeHtml(formatNumber(row.usd_rate))}" />
+                    </div>
+                  </div>
+
+                  <div class="metrics" style="margin-top:12px;">
+                    <div class="metric">
+                      <div class="metric-label">Закупка, ₽/шт</div>
+                      <div class="metric-value mono js-purchase-rub-per-unit">${escapeHtml(formatNumber(calc.purchaseRubPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Доставка, ₽/шт</div>
+                      <div class="metric-value mono js-delivery-rub-per-unit">${escapeHtml(formatNumber(calc.deliveryRubPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Историческая себестоимость 1 шт, ₽</div>
+                      <div class="metric-value mono js-unit-cost-rub">${escapeHtml(formatNumber(calc.unitCostRub, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Сумма остатка, ₽</div>
+                      <div class="metric-value mono js-stock-sum-rub">${escapeHtml(formatNumber(calc.stockSumRub, 2))}</div>
+                    </div>
+                  </div>
+
+                  <div class="analysis-actions">
+                    <button type="button" class="btn btn-small btn-save js-save-batch">Сохранить партию</button>
+                    <span class="batch-status ${calc.isFinanceFilled ? "ok" : "missing"} js-batch-status">${calc.isFinanceFilled ? "Заполнено" : "Не заполнено"}</span>
+                  </div>
+                  ${saveStatusHtml}
+                </div>
+
+                <div class="analysis-block">
+                  <div class="analysis-title">Сравнение по текущему курсу</div>
+                  <div class="metrics">
+                    <div class="metric">
+                      <div class="metric-label">Текущий курс ¥</div>
+                      <div class="metric-value mono js-current-cny-rate">${escapeHtml(formatNumber(compare.currentCnyRate, 4))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Текущий курс $</div>
+                      <div class="metric-value mono js-current-usd-rate">${escapeHtml(formatNumber(compare.currentUsdRate, 4))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Себестоимость по текущему курсу, ₽/шт</div>
+                      <div class="metric-value mono js-current-unit-cost-rub">${escapeHtml(formatNumber(compare.currentUnitCostRub, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Разница, ₽/шт</div>
+                      <div class="metric-value mono js-diff-rub-per-unit ${getValueTone(compare.diffRubPerUnit, false)}">${escapeHtml(formatSignedNumber(compare.diffRubPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Разница, %</div>
+                      <div class="metric-value mono js-diff-percent ${getValueTone(compare.diffPercent, false)}">${escapeHtml(formatSignedNumber(compare.diffPercent, 2))}%</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Текущая доставка, ₽/шт</div>
+                      <div class="metric-value mono js-current-delivery-rub-per-unit">${escapeHtml(formatNumber(compare.currentDeliveryRubPerUnit, 2))}</div>
+                    </div>
+                  </div>
+
+                  <div class="analysis-help">
+                    Этот блок не меняет партию. Он только показывает, насколько изменилась бы себестоимость, если привозить товар сегодня по текущему курсу сверху страницы.
+                  </div>
+                </div>
+
+                <div class="analysis-block">
+                  <div class="analysis-title">Порог снижения и риск минуса</div>
+                  <div class="field">
+                    <label>Цена продажи сейчас, ₽/шт</label>
+                    <input class="input-mini js-analysis-sale-price" type="number" min="0" step="0.0001" value="${escapeHtml(formatNumber(row._analysisSalePrice || 0))}" />
+                  </div>
+
+                  <div class="metrics" style="margin-top:12px;">
+                    <div class="metric">
+                      <div class="metric-label">Запас до нуля, ₽/шт</div>
+                      <div class="metric-value mono js-reserve-to-zero ${getValueTone(compare.reserveToZeroPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.reserveToZeroPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Результат, ₽/шт</div>
+                      <div class="metric-value mono js-result-per-unit ${getValueTone(compare.resultPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.resultPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Результат по остатку, ₽</div>
+                      <div class="metric-value mono js-result-remaining ${getValueTone(compare.resultRemainingRub, true)}">${escapeHtml(formatSignedNumber(compare.resultRemainingRub, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Маржа, %</div>
+                      <div class="metric-value mono js-margin-percent ${getValueTone(compare.marginPercent, true)}">${escapeHtml(formatSignedNumber(compare.marginPercent, 2))}%</div>
+                    </div>
+                  </div>
+
+                  <div class="analysis-help">
+                    Если “Запас до нуля” положительный — цену ещё можно снижать. Если отрицательный — при такой цене продажа уже идёт в минус.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
 
     function renderBatches() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
@@ -638,141 +1132,128 @@
           return text.includes(search);
         })
         .sort((a, b) => {
-  const dateA = new Date(a.batch_date);
-  const dateB = new Date(b.batch_date);
+          const dateA = new Date(a.batch_date);
+          const dateB = new Date(b.batch_date);
 
-  if (dateA.getTime() !== dateB.getTime()) {
-    return dateB - dateA; // новые сверху
-  }
+          if (dateA.getTime() !== dateB.getTime()) {
+            return dateB - dateA;
+          }
 
-  return Number(b.id || 0) - Number(a.id || 0); // новые id сверху
-});
+          return Number(b.id || 0) - Number(a.id || 0);
+        });
 
       if (!rows.length) {
         els.batchesTbody.innerHTML = `
           <tr>
-            <td colspan="16" class="empty">Партий пока нет</td>
+            <td colspan="11" class="empty">Партий пока нет</td>
           </tr>
         `;
         return;
       }
 
-      els.batchesTbody.innerHTML = rows.map(row => {
-        const calc = calcBatchFinance(row);
-        const statusClass = calc.isFinanceFilled ? "ok" : "missing";
-        const statusText = calc.isFinanceFilled ? "Заполнено" : "Не заполнено";
-        const trClass = calc.isFinanceFilled ? "batch-row-finance-ok" : "batch-row-finance-missing";
+      let html = "";
+      rows.forEach(row => {
+        html += renderMainRow(row);
+        if (String(expandedBatchId || "") === String(row.id || "")) {
+          html += renderAnalysisRow(row);
+        }
+      });
 
-        const saveStatusHtml = row._saveStatusText
-          ? `<div class="batch-save-status ${escapeHtml(row._saveStatusType || "")}">${escapeHtml(row._saveStatusText)}</div>`
-          : `<div class="batch-save-status"></div>`;
-
-        return `
-          <tr class="${trClass}" data-batch-id="${escapeHtml(String(row.id))}">
-            <td>${escapeHtml(row.item_name || "")}</td>
-            <td>${escapeHtml(row.sku || "")}</td>
-            <td>${escapeHtml(row.barcode || "")}</td>
-            <td>${escapeHtml(formatBatchDate(row.batch_date))}</td>
-            <td class="mono">${escapeHtml(formatNumber(row.qty_total))}</td>
-            <td class="mono">${escapeHtml(formatNumber(row.qty_remaining))}</td>
-
-            <td>
-              <div class="cell-stack">
-                <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="unit_cost" value="${escapeHtml(formatNumber(row.unit_cost))}" />
-                <div class="subtext">Юань за 1 шт</div>
-              </div>
-            </td>
-
-            <td>
-              <div class="cell-stack">
-                <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="cny_rate" value="${escapeHtml(formatNumber(row.cny_rate))}" />
-                <div class="subtext">Курс юаня</div>
-              </div>
-            </td>
-
-            <td>
-              <div class="cell-stack">
-                <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="delivery_cost" value="${escapeHtml(formatNumber(row.delivery_cost))}" />
-                <div class="subtext">Доллар за партию</div>
-              </div>
-            </td>
-
-            <td>
-              <div class="cell-stack">
-                <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="usd_rate" value="${escapeHtml(formatNumber(row.usd_rate))}" />
-                <div class="subtext">Курс доллара</div>
-              </div>
-            </td>
-
-            <td class="calc-cell mono js-purchase-rub-per-unit">${escapeHtml(formatNumber(calc.purchaseRubPerUnit, 2))}</td>
-            <td class="calc-cell mono js-delivery-rub-per-unit">${escapeHtml(formatNumber(calc.deliveryRubPerUnit, 2))}</td>
-            <td class="calc-cell mono js-unit-cost-rub">${escapeHtml(formatNumber(calc.unitCostRub, 2))}</td>
-            <td class="calc-cell mono js-stock-sum-rub">${escapeHtml(formatNumber(calc.stockSumRub, 2))}</td>
-
-            <td>
-              <span class="batch-status ${statusClass} js-batch-status">${escapeHtml(statusText)}</span>
-            </td>
-
-            <td class="batch-row-actions">
-              <button type="button" class="btn btn-small btn-save js-save-batch">Сохранить</button>
-              ${saveStatusHtml}
-            </td>
-          </tr>
-        `;
-      }).join("");
-
+      els.batchesTbody.innerHTML = html;
       bindBatchRowEvents();
     }
 
-    function updateBatchRowCalculatedValues(tr) {
-      const qtyTotal = toNumber(tr.children[4].textContent);
-      const qtyRemaining = toNumber(tr.children[5].textContent);
-      const unitCost = toNumber(tr.querySelector('[data-field="unit_cost"]').value);
-      const cnyRate = toNumber(tr.querySelector('[data-field="cny_rate"]').value);
-      const deliveryCost = toNumber(tr.querySelector('[data-field="delivery_cost"]').value);
-      const usdRate = toNumber(tr.querySelector('[data-field="usd_rate"]').value);
+    function updateAnalysisMetrics(panel) {
+      const tr = panel.closest('tr.analysis-row');
+      if (!tr) return;
 
-      const purchaseRubPerUnit = unitCost * cnyRate;
-      const deliveryRubTotal = deliveryCost * usdRate;
-      const deliveryRubPerUnit = qtyTotal > 0 ? deliveryRubTotal / qtyTotal : 0;
-      const unitCostRub = purchaseRubPerUnit + deliveryRubPerUnit;
-      const stockSumRub = unitCostRub * qtyRemaining;
+      const batchId = tr.dataset.analysisFor;
+      const row = batchesData.find(item => String(item.id) === String(batchId));
+      if (!row) return;
 
-      tr.querySelector('.js-purchase-rub-per-unit').textContent = formatNumber(purchaseRubPerUnit, 2);
-      tr.querySelector('.js-delivery-rub-per-unit').textContent = formatNumber(deliveryRubPerUnit, 2);
-      tr.querySelector('.js-unit-cost-rub').textContent = formatNumber(unitCostRub, 2);
-      tr.querySelector('.js-stock-sum-rub').textContent = formatNumber(stockSumRub, 2);
+      const calc = calcBatchFinance(row);
+      const salePriceInput = panel.querySelector('.js-analysis-sale-price');
+      const compare = calcCompareFinance(row, salePriceInput ? salePriceInput.value : "");
 
-      const isFinanceFilled = unitCost > 0 && cnyRate > 0 && deliveryCost > 0 && usdRate > 0;
-      const statusEl = tr.querySelector('.js-batch-status');
+      panel.querySelector('.js-purchase-rub-per-unit').textContent = formatNumber(calc.purchaseRubPerUnit, 2);
+      panel.querySelector('.js-delivery-rub-per-unit').textContent = formatNumber(calc.deliveryRubPerUnit, 2);
+      panel.querySelector('.js-unit-cost-rub').textContent = formatNumber(calc.unitCostRub, 2);
+      panel.querySelector('.js-stock-sum-rub').textContent = formatNumber(calc.stockSumRub, 2);
+
+      panel.querySelector('.js-current-cny-rate').textContent = formatNumber(compare.currentCnyRate, 4);
+      panel.querySelector('.js-current-usd-rate').textContent = formatNumber(compare.currentUsdRate, 4);
+      panel.querySelector('.js-current-unit-cost-rub').textContent = formatNumber(compare.currentUnitCostRub, 2);
+      panel.querySelector('.js-current-delivery-rub-per-unit').textContent = formatNumber(compare.currentDeliveryRubPerUnit, 2);
+
+      const diffRubEl = panel.querySelector('.js-diff-rub-per-unit');
+      diffRubEl.textContent = formatSignedNumber(compare.diffRubPerUnit, 2);
+      diffRubEl.className = 'metric-value mono js-diff-rub-per-unit ' + getValueTone(compare.diffRubPerUnit, false);
+
+      const diffPercentEl = panel.querySelector('.js-diff-percent');
+      diffPercentEl.textContent = `${formatSignedNumber(compare.diffPercent, 2)}%`;
+      diffPercentEl.className = 'metric-value mono js-diff-percent ' + getValueTone(compare.diffPercent, false);
+
+      const reserveEl = panel.querySelector('.js-reserve-to-zero');
+      reserveEl.textContent = formatSignedNumber(compare.reserveToZeroPerUnit, 2);
+      reserveEl.className = 'metric-value mono js-reserve-to-zero ' + getValueTone(compare.reserveToZeroPerUnit, true);
+
+      const resultUnitEl = panel.querySelector('.js-result-per-unit');
+      resultUnitEl.textContent = formatSignedNumber(compare.resultPerUnit, 2);
+      resultUnitEl.className = 'metric-value mono js-result-per-unit ' + getValueTone(compare.resultPerUnit, true);
+
+      const resultRemainingEl = panel.querySelector('.js-result-remaining');
+      resultRemainingEl.textContent = formatSignedNumber(compare.resultRemainingRub, 2);
+      resultRemainingEl.className = 'metric-value mono js-result-remaining ' + getValueTone(compare.resultRemainingRub, true);
+
+      const marginEl = panel.querySelector('.js-margin-percent');
+      marginEl.textContent = `${formatSignedNumber(compare.marginPercent, 2)}%`;
+      marginEl.className = 'metric-value mono js-margin-percent ' + getValueTone(compare.marginPercent, true);
+
+      const statusEl = panel.querySelector('.js-batch-status');
+      const isFinanceFilled = calc.isFinanceFilled;
       statusEl.textContent = isFinanceFilled ? 'Заполнено' : 'Не заполнено';
       statusEl.className = 'batch-status js-batch-status ' + (isFinanceFilled ? 'ok' : 'missing');
-
-      tr.classList.toggle('batch-row-finance-ok', isFinanceFilled);
-      tr.classList.toggle('batch-row-finance-missing', !isFinanceFilled);
-
-      const saveStatus = tr.querySelector('.batch-save-status');
-      if (saveStatus) {
-        saveStatus.textContent = '';
-        saveStatus.className = 'batch-save-status';
-      }
     }
 
     function bindBatchRowEvents() {
-      els.batchesTbody.querySelectorAll('tr[data-batch-id]').forEach(tr => {
+      els.batchesTbody.querySelectorAll('.js-toggle-analysis').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tr = btn.closest('tr[data-batch-id]');
+          if (!tr) return;
+          const batchId = tr.dataset.batchId;
+          expandedBatchId = String(expandedBatchId || '') === String(batchId) ? null : batchId;
+          renderBatches();
+        });
+      });
+
+      els.batchesTbody.querySelectorAll('tr.analysis-row').forEach(tr => {
+        const batchId = tr.dataset.analysisFor;
+        const row = batchesData.find(item => String(item.id) === String(batchId));
+        if (!row) return;
+
         tr.querySelectorAll('.js-batch-input').forEach(input => {
-          input.addEventListener('input', () => updateBatchRowCalculatedValues(tr));
+          input.addEventListener('input', () => {
+            const field = input.dataset.field;
+            row[field] = toNumber(input.value);
+            row._saveStatusType = '';
+            row._saveStatusText = '';
+            updateAnalysisMetrics(tr);
+            renderBatchesMainOnly(batchId);
+          });
         });
 
-        const saveBtn = tr.querySelector('.js-save-batch');
-        saveBtn.addEventListener('click', async () => {
-          const batchId = tr.dataset.batchId;
-          const unitCost = toNumber(tr.querySelector('[data-field="unit_cost"]').value);
-          const cnyRate = toNumber(tr.querySelector('[data-field="cny_rate"]').value);
-          const deliveryCost = toNumber(tr.querySelector('[data-field="delivery_cost"]').value);
-          const usdRate = toNumber(tr.querySelector('[data-field="usd_rate"]').value);
-          const statusEl = tr.querySelector('.batch-save-status');
+        const salePriceInput = tr.querySelector('.js-analysis-sale-price');
+        if (salePriceInput) {
+          salePriceInput.addEventListener('input', () => {
+            row._analysisSalePrice = toNumber(salePriceInput.value);
+            updateAnalysisMetrics(tr);
+          });
+        }
 
+        const saveBtn = tr.querySelector('.js-save-batch');
+        const statusEl = tr.querySelector('.batch-save-status');
+
+        saveBtn.addEventListener('click', async () => {
           try {
             saveBtn.disabled = true;
             if (statusEl) {
@@ -781,10 +1262,10 @@
             }
 
             const result = await ApiBridge.patch(`/stock/batches/${batchId}`, {
-              unit_cost: unitCost,
-              cny_rate: cnyRate,
-              delivery_cost: deliveryCost,
-              usd_rate: usdRate
+              unit_cost: toNumber(row.unit_cost),
+              cny_rate: toNumber(row.cny_rate),
+              delivery_cost: toNumber(row.delivery_cost),
+              usd_rate: toNumber(row.usd_rate)
             });
 
             const updated = result && result.batch ? result.batch : null;
@@ -792,11 +1273,12 @@
               throw new Error('empty_batch_response');
             }
 
-            const index = batchesData.findIndex(row => String(row.id) === String(batchId));
+            const index = batchesData.findIndex(item => String(item.id) === String(batchId));
             if (index >= 0) {
               batchesData[index] = {
                 ...batchesData[index],
                 ...updated,
+                _analysisSalePrice: batchesData[index]._analysisSalePrice || 0,
                 _saveStatusType: 'success',
                 _saveStatusText: 'Сохранено'
               };
@@ -812,7 +1294,28 @@
             saveBtn.disabled = false;
           }
         });
+
+        updateAnalysisMetrics(tr);
       });
+    }
+
+    function renderBatchesMainOnly(batchId) {
+      const mainRow = els.batchesTbody.querySelector(`tr.batch-main-row[data-batch-id="${CSS.escape(String(batchId))}"]`);
+      if (!mainRow) return;
+
+      const row = batchesData.find(item => String(item.id) === String(batchId));
+      if (!row) return;
+
+      const calc = calcBatchFinance(row);
+      const statusClass = calc.isFinanceFilled ? "ok" : "missing";
+      const statusText = calc.isFinanceFilled ? "Заполнено" : "Не заполнено";
+      const trClass = calc.isFinanceFilled ? "batch-row-finance-ok" : "batch-row-finance-missing";
+
+      mainRow.className = `batch-main-row ${trClass}`;
+      const cells = mainRow.children;
+      if (cells[7]) cells[7].textContent = formatNumber(calc.unitCostRub, 2);
+      if (cells[8]) cells[8].textContent = formatNumber(calc.stockSumRub, 2);
+      if (cells[9]) cells[9].innerHTML = `<span class="batch-status ${statusClass}">${escapeHtml(statusText)}</span>`;
     }
 
     async function loadData() {
@@ -824,6 +1327,7 @@
 
         batchesData = normalize(batchesRes, "batches").map(row => ({
           ...row,
+          _analysisSalePrice: 0,
           _saveStatusType: '',
           _saveStatusText: ''
         }));
@@ -833,7 +1337,7 @@
       } catch (err) {
         els.batchesTbody.innerHTML = `
           <tr>
-            <td colspan="16" class="empty">Ошибка загрузки партий</td>
+            <td colspan="11" class="empty">Ошибка загрузки партий</td>
           </tr>
         `;
         setPageStatus("stock.loadErrorStatus", {
@@ -846,25 +1350,44 @@
       els.searchInput.addEventListener("input", renderBatches);
       els.refreshBtn.addEventListener("click", loadData);
 
-      document.addEventListener("app:language-changed", () => {
-        if (window.i18n && typeof i18n.applyTranslations === "function") {
-          i18n.applyTranslations();
-          if (typeof i18n.renderLanguageSwitcher === "function") {
-            i18n.renderLanguageSwitcher("langSwitcher");
-          }
-        }
+      els.currentCnyRateInput.addEventListener("input", () => {
+        persistCurrentRates();
         renderBatches();
+      });
+
+      els.currentUsdRateInput.addEventListener("input", () => {
+        persistCurrentRates();
+        renderBatches();
+      });
+
+      if (els.imageModal) {
+        els.imageModal.addEventListener("click", closeImageModal);
+      }
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeImageModal();
+        }
+      });
+
+      document.addEventListener("app:language-changed", () => {
+        if (pageStatusState) {
+          showStatus(i18n.format(pageStatusState.key, pageStatusState.vars || {}), pageStatusState.type);
+        }
       });
     }
 
     function bootstrap() {
       parseUser();
-      if (window.i18n && typeof i18n.applyTranslations === "function") {
-        i18n.applyTranslations();
-        if (typeof i18n.renderLanguageSwitcher === "function") {
-          i18n.renderLanguageSwitcher("langSwitcher");
-        }
+
+      els.currentCnyRateInput.value = getStoredCurrentRate("batches_current_cny_rate");
+      els.currentUsdRateInput.value = getStoredCurrentRate("batches_current_usd_rate");
+
+      if (window.i18n) {
+        window.i18n.applyTranslations();
+        window.i18n.renderLanguageSwitcher("langSwitcher");
       }
+
       bindEvents();
       loadData();
     }
@@ -873,6 +1396,8 @@
 
     window.goBack = goBack;
     window.logout = logout;
+    window.openImageModal = openImageModal;
+    window.closeImageModal = closeImageModal;
   </script>
 </body>
 </html>
