@@ -1096,10 +1096,52 @@
       }
     }
 
-    function exportSale(id) {
-      const tenantId = getTenantId();
-      const url = `/sales/${encodeURIComponent(id)}/export?tenant_id=${encodeURIComponent(tenantId)}`;
-      window.open(url, "_blank");
+    async function exportSale(id) {
+      try {
+        const tenantId = getTenantId();
+        const token = localStorage.getItem("token") || "";
+
+        if (!token) {
+          throw new Error("auth_required");
+        }
+
+        showStatus(`Подготовка Excel по продаже #${id}...`, "info");
+
+        const response = await fetch(`/sales/${encodeURIComponent(id)}/export?tenant_id=${encodeURIComponent(tenantId)}`, {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token
+          }
+        });
+
+        if (!response.ok) {
+          let errorText = `HTTP ${response.status}`;
+          try {
+            const data = await response.json();
+            errorText = data.error || data.message || errorText;
+          } catch (_) {}
+          throw new Error(errorText);
+        }
+
+        const blob = await response.blob();
+        const contentDisposition = response.headers.get("Content-Disposition") || "";
+        const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/i);
+        const fileName = fileNameMatch && fileNameMatch[1] ? fileNameMatch[1] : `sale-${id}.xlsx`;
+
+        const objectUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        window.URL.revokeObjectURL(objectUrl);
+
+        showStatus(`Excel по продаже #${id} подготовлен`, "success");
+      } catch (err) {
+        showStatus(`Ошибка выгрузки Excel: ${Ui.translateError(err.message)}`, "error");
+      }
     }
 
     function openImageModal(src) {
