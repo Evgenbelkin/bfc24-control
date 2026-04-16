@@ -558,10 +558,26 @@ router.get(
       });
 
       sheet.properties.defaultRowHeight = 22;
+      sheet.pageSetup = {
+        paperSize: 9,
+        orientation: "landscape",
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+        margins: {
+          left: 0.3,
+          right: 0.3,
+          top: 0.5,
+          bottom: 0.5,
+          header: 0.2,
+          footer: 0.2,
+        },
+      };
+
       sheet.columns = [
         { header: "№", key: "n", width: 6 },
         { header: "Фото", key: "photo", width: 14 },
-        { header: "Товар", key: "item_name", width: 30 },
+        { header: "Товар", key: "item_name", width: 28 },
         { header: "SKU", key: "item_sku", width: 18 },
         { header: "МХ", key: "location_name", width: 20 },
         { header: "Кол-во", key: "qty", width: 12 },
@@ -572,74 +588,105 @@ router.get(
         { header: "Комментарий", key: "comment", width: 26 },
       ];
 
+      function setBorder(cell, color = "FFE5E7EB") {
+        cell.border = {
+          top: { style: "thin", color: { argb: color } },
+          bottom: { style: "thin", color: { argb: color } },
+          left: { style: "thin", color: { argb: color } },
+          right: { style: "thin", color: { argb: color } },
+        };
+      }
+
+      function fillCell(cellAddress, fillColor = "FFF9FAFB") {
+        const cell = sheet.getCell(cellAddress);
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: fillColor },
+        };
+        setBorder(cell);
+      }
+
+      function fillCells(cellAddresses, fillColor = "FFF9FAFB") {
+        for (const cellAddress of cellAddresses) {
+          fillCell(cellAddress, fillColor);
+        }
+      }
+
       sheet.mergeCells("A1:K1");
       const titleCell = sheet.getCell("A1");
       titleCell.value = `Документ продажи #${sale.id}`;
-      titleCell.font = { bold: true, size: 16, color: { argb: "FF111827" } };
+      titleCell.font = { bold: true, size: 18, color: { argb: "FF111827" } };
       titleCell.alignment = { vertical: "middle", horizontal: "left" };
-      sheet.getRow(1).height = 24;
+      sheet.getRow(1).height = 30;
 
       sheet.getCell("A3").value = "Дата";
       sheet.getCell("B3").value = formatDateTimeRu(sale.created_at);
-      sheet.getCell("C3").value = "Клиент";
-      sheet.getCell("D3").value = sale.counterparty_name || "—";
+      sheet.mergeCells("B3:D3");
 
-      sheet.getCell("A4").value = "Статус оплаты";
-      sheet.getCell("B4").value = getPaymentStatusLabel(sale.payment_status);
-      sheet.getCell("C4").value = "Способ оплаты";
-      sheet.getCell("D4").value = getPaymentMethodLabel(sale.payment_method);
+      sheet.getCell("A4").value = "Клиент";
+      sheet.getCell("B4").value = sale.counterparty_name || "—";
+      sheet.mergeCells("B4:D4");
 
-      sheet.getCell("A5").value = "Комментарий";
-      sheet.getCell("B5").value = sale.comment || "—";
-      sheet.mergeCells("B5:D5");
+      sheet.getCell("A5").value = "Статус оплаты";
+      sheet.getCell("B5").value = getPaymentStatusLabel(sale.payment_status);
+      sheet.getCell("C5").value = "Способ оплаты";
+      sheet.getCell("D5").value = getPaymentMethodLabel(sale.payment_method);
+
+      sheet.getCell("A6").value = "Комментарий";
+      sheet.getCell("B6").value = sale.comment || "—";
+      sheet.mergeCells("B6:D6");
 
       sheet.getCell("F3").value = "Сумма";
       sheet.getCell("G3").value = Number(totals.total_amount || 0);
-      sheet.getCell("H3").value = "Всего штук";
-      sheet.getCell("I3").value = Number(totals.total_qty || 0);
+      sheet.mergeCells("G3:H3");
 
-      sheet.getCell("F4").value = "Вес, кг";
-      sheet.getCell("G4").value = Number(totals.total_weight_kg || 0);
-      sheet.getCell("H4").value = "Объём, м³";
-      sheet.getCell("I4").value = Number(totals.total_volume_m3 || 0);
+      sheet.getCell("F4").value = "Всего штук";
+      sheet.getCell("G4").value = Number(totals.total_qty || 0);
+      sheet.mergeCells("G4:H4");
 
-      for (const cellAddress of ["A3", "A4", "A5", "C3", "C4", "F3", "H3", "F4", "H4"]) {
-        sheet.getCell(cellAddress).font = { bold: true, color: { argb: "FF374151" } };
+      sheet.getCell("I3").value = "Вес, кг";
+      sheet.getCell("J3").value = Number(totals.total_weight_kg || 0);
+      sheet.mergeCells("J3:K3");
+
+      sheet.getCell("I4").value = "Объём, м³";
+      sheet.getCell("J4").value = Number(totals.total_volume_m3 || 0);
+      sheet.mergeCells("J4:K4");
+
+      for (const cellAddress of ["A3", "A4", "A5", "A6", "C5", "F3", "F4", "I3", "I4"]) {
+        const cell = sheet.getCell(cellAddress);
+        cell.font = { bold: true, color: { argb: "FF374151" } };
+        cell.alignment = { vertical: "middle", horizontal: "left" };
       }
 
-      const summaryValueCells = ["B3", "D3", "B4", "D4", "B5", "G3", "I3", "G4", "I4"];
-      for (const cellAddress of summaryValueCells) {
-        sheet.getCell(cellAddress).fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "FFF9FAFB" },
-        };
-        sheet.getCell(cellAddress).border = {
-          top: { style: "thin", color: { argb: "FFE5E7EB" } },
-          bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
-          left: { style: "thin", color: { argb: "FFE5E7EB" } },
-          right: { style: "thin", color: { argb: "FFE5E7EB" } },
-        };
+      fillCells(
+        ["B3", "C3", "D3", "B4", "C4", "D4", "B5", "D5", "B6", "C6", "D6", "G3", "H3", "G4", "H4", "J3", "K3", "J4", "K4"],
+        "FFF9FAFB"
+      );
+
+      for (const cellAddress of ["B3", "B4", "B5", "D5", "B6", "G3", "G4", "J3", "J4"]) {
+        const cell = sheet.getCell(cellAddress);
+        cell.alignment = { vertical: "middle", horizontal: "left" };
       }
 
-      const headerRowIndex = 7;
+      sheet.getCell("B5").font = {
+        bold: true,
+        color: { argb: sale.payment_status === "paid" ? "FF166534" : sale.payment_status === "partial" ? "FF1D4ED8" : "FF92400E" },
+      };
+
+      const headerRowIndex = 8;
       const headerRow = sheet.getRow(headerRowIndex);
       headerRow.values = sheet.columns.map((column) => column.header);
-      headerRow.height = 24;
+      headerRow.height = 26;
       headerRow.font = { bold: true, color: { argb: "FF111827" } };
-      headerRow.alignment = { vertical: "middle", horizontal: "center" };
+      headerRow.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
       headerRow.fill = {
         type: "pattern",
         pattern: "solid",
-        fgColor: { argb: "FFF3F4F6" },
+        fgColor: { argb: "FFE5E7EB" },
       };
       headerRow.eachCell((cell) => {
-        cell.border = {
-          top: { style: "thin", color: { argb: "FFE5E7EB" } },
-          bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
-          left: { style: "thin", color: { argb: "FFE5E7EB" } },
-          right: { style: "thin", color: { argb: "FFE5E7EB" } },
-        };
+        setBorder(cell, "FFD1D5DB");
       });
 
       for (let index = 0; index < lines.length; index += 1) {
@@ -660,16 +707,11 @@ router.get(
           line_volume_m3: Number(line.line_volume_m3 || 0),
           comment: line.comment || sale.comment || "",
         };
-        row.height = 64;
+        row.height = 72;
 
         row.eachCell((cell) => {
           cell.alignment = { vertical: "middle", horizontal: "left", wrapText: true };
-          cell.border = {
-            top: { style: "thin", color: { argb: "FFF3F4F6" } },
-            bottom: { style: "thin", color: { argb: "FFF3F4F6" } },
-            left: { style: "thin", color: { argb: "FFF3F4F6" } },
-            right: { style: "thin", color: { argb: "FFF3F4F6" } },
-          };
+          setBorder(cell, "FFE5E7EB");
         });
 
         row.getCell(1).alignment = { vertical: "middle", horizontal: "center" };
@@ -689,47 +731,49 @@ router.get(
             });
 
             sheet.addImage(imageId, {
-              tl: { col: 1 + 0.15, row: (rowIndex - 1) + 0.15 },
+              tl: { col: 1 + 0.2, row: (rowIndex - 1) + 0.15 },
               ext: { width: 80, height: 80 },
               editAs: "oneCell",
             });
           } else {
             row.getCell(2).value = "Нет фото";
             row.getCell(2).alignment = { vertical: "middle", horizontal: "center" };
+            row.getCell(2).font = { color: { argb: "FF94A3B8" }, italic: true };
           }
         } else {
           row.getCell(2).value = "Нет фото";
           row.getCell(2).alignment = { vertical: "middle", horizontal: "center" };
+          row.getCell(2).font = { color: { argb: "FF94A3B8" }, italic: true };
         }
       }
 
       const totalRowIndex = sheet.rowCount + 2;
-      sheet.getCell(`A${totalRowIndex}`).value = "Итого";
-      sheet.getCell(`A${totalRowIndex}`).font = { bold: true };
+      sheet.mergeCells(`A${totalRowIndex}:E${totalRowIndex}`);
+      sheet.getCell(`A${totalRowIndex}`).value = "ИТОГО";
+      sheet.getCell(`A${totalRowIndex}`).font = { bold: true, size: 12, color: { argb: "FF111827" } };
+      sheet.getCell(`A${totalRowIndex}`).alignment = { vertical: "middle", horizontal: "left" };
 
       sheet.getCell(`F${totalRowIndex}`).value = Number(totals.total_qty || 0);
       sheet.getCell(`G${totalRowIndex}`).value = Number(totals.total_amount || 0);
       sheet.getCell(`I${totalRowIndex}`).value = Number(totals.total_weight_kg || 0);
       sheet.getCell(`J${totalRowIndex}`).value = Number(totals.total_volume_m3 || 0);
 
-      for (const col of ["A", "F", "G", "I", "J"]) {
-        const cell = sheet.getCell(`${col}${totalRowIndex}`);
-        cell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "FFF9FAFB" },
-        };
-        cell.border = {
-          top: { style: "thin", color: { argb: "FFE5E7EB" } },
-          bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
-          left: { style: "thin", color: { argb: "FFE5E7EB" } },
-          right: { style: "thin", color: { argb: "FFE5E7EB" } },
-        };
-      }
+      fillCells(
+        [
+          `A${totalRowIndex}`, `B${totalRowIndex}`, `C${totalRowIndex}`, `D${totalRowIndex}`, `E${totalRowIndex}`,
+          `F${totalRowIndex}`, `G${totalRowIndex}`, `I${totalRowIndex}`, `J${totalRowIndex}`
+        ],
+        "FFF3F4F6"
+      );
+
+      sheet.getCell(`F${totalRowIndex}`).font = { bold: true };
+      sheet.getCell(`G${totalRowIndex}`).font = { bold: true };
+      sheet.getCell(`I${totalRowIndex}`).font = { bold: true };
+      sheet.getCell(`J${totalRowIndex}`).font = { bold: true };
 
       sheet.getColumn("F").numFmt = "0.####";
-      sheet.getColumn("G").numFmt = '#,##0.00';
-      sheet.getColumn("H").numFmt = '#,##0.00';
+      sheet.getColumn("G").numFmt = '#,##0.00" ₽"';
+      sheet.getColumn("H").numFmt = '#,##0.00" ₽"';
       sheet.getColumn("I").numFmt = '0.###';
       sheet.getColumn("J").numFmt = '0.####';
 
