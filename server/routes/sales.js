@@ -771,11 +771,30 @@ router.get(
       sheet.getCell(`I${totalRowIndex}`).font = { bold: true };
       sheet.getCell(`J${totalRowIndex}`).font = { bold: true };
 
-      sheet.getColumn("F").numFmt = "0.####";
+      sheet.getColumn("F").numFmt = '#,##0.####';
       sheet.getColumn("G").numFmt = '#,##0.00" ₽"';
       sheet.getColumn("H").numFmt = '#,##0.00" ₽"';
-      sheet.getColumn("I").numFmt = '0.###';
-      sheet.getColumn("J").numFmt = '0.####';
+      sheet.getColumn("I").numFmt = '#,##0.###';
+      sheet.getColumn("J").numFmt = '#,##0.####';
+
+      sheet.getCell("G3").numFmt = '#,##0.00" ₽"';
+      sheet.getCell("G4").numFmt = '#,##0.####';
+      sheet.getCell("J3").numFmt = '#,##0.###';
+      sheet.getCell("J4").numFmt = '#,##0.####';
+
+      for (let index = 0; index < lines.length; index += 1) {
+        const rowIndex = headerRowIndex + 1 + index;
+        sheet.getCell(`F${rowIndex}`).numFmt = '#,##0.####';
+        sheet.getCell(`G${rowIndex}`).numFmt = '#,##0.00" ₽"';
+        sheet.getCell(`H${rowIndex}`).numFmt = '#,##0.00" ₽"';
+        sheet.getCell(`I${rowIndex}`).numFmt = '#,##0.###';
+        sheet.getCell(`J${rowIndex}`).numFmt = '#,##0.####';
+      }
+
+      sheet.getCell(`F${totalRowIndex}`).numFmt = '#,##0.####';
+      sheet.getCell(`G${totalRowIndex}`).numFmt = '#,##0.00" ₽"';
+      sheet.getCell(`I${totalRowIndex}`).numFmt = '#,##0.###';
+      sheet.getCell(`J${totalRowIndex}`).numFmt = '#,##0.####';
 
       const fileDate = formatDateForFilename(sale.created_at);
       const fileName = `sale-${sale.id}-${fileDate}.xlsx`;
