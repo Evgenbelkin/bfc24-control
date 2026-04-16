@@ -26,16 +26,63 @@ router.get("/", authRequired, async (req, res) => {
       `
       SELECT
         d.id,
+        d.tenant_id,
         d.counterparty_id,
         c.name AS client_name,
+        d.sale_id,
         d.initial_amount,
         d.paid_amount,
         d.balance_amount,
         d.status,
         d.comment,
-        d.created_at
+        d.created_at,
+        sale_loc.name AS location_name,
+        sale_loc.code AS location_code,
+        COALESCE(sale_items_info.total_qty, 0) AS qty,
+        COALESCE(sale_items_info.item_name, '') AS item_name
       FROM core.debts d
-      LEFT JOIN core.counterparties c ON c.id = d.counterparty_id
+      LEFT JOIN core.counterparties c
+        ON c.id = d.counterparty_id
+       AND c.tenant_id = d.tenant_id
+      LEFT JOIN core.sales s
+        ON s.id = d.sale_id
+       AND s.tenant_id = d.tenant_id
+      LEFT JOIN core.locations sale_loc
+        ON sale_loc.id = s.location_id
+       AND sale_loc.tenant_id = d.tenant_id
+      LEFT JOIN LATERAL (
+        SELECT
+          COALESCE(SUM(product_rows.total_qty_per_item), 0) AS total_qty,
+          string_agg(
+            product_rows.product_text,
+            ' | '
+            ORDER BY product_rows.product_text
+          ) AS item_name
+        FROM (
+          SELECT
+            i.id AS item_id,
+            COALESCE(SUM(si.qty), 0) AS total_qty_per_item,
+            trim(
+              concat_ws(
+                ', ',
+                NULLIF(i.sku, ''),
+                NULLIF(i.name, '')
+              )
+            ) ||
+            CASE
+              WHEN COALESCE(SUM(si.qty), 0) > 0
+                THEN ' × ' || trim(to_char(COALESCE(SUM(si.qty), 0), 'FM999999990.####'))
+              ELSE ''
+            END AS product_text
+          FROM core.sale_items si
+          LEFT JOIN core.items i
+            ON i.id = si.item_id
+           AND i.tenant_id = si.tenant_id
+          WHERE si.sale_id = d.sale_id
+            AND si.tenant_id = d.tenant_id
+          GROUP BY i.id, i.sku, i.name
+        ) AS product_rows
+      ) AS sale_items_info ON TRUE
       WHERE d.tenant_id = $1
       ORDER BY d.id DESC
       `,
@@ -101,6 +148,14 @@ router.post(
       const balance = Number(debt.balance_amount);
       const payAmount = Number(amount);
 
+      if (!Number.isFinite(payAmount) || payAmount <= 0) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_amount",
+        });
+      }
+
       if (payAmount > balance) {
         await client.query("ROLLBACK");
         return res.status(400).json({
@@ -127,7 +182,6 @@ router.post(
         [newPaid, newBalance, newStatus, debtId]
       );
 
-      // запись оплаты
       await client.query(
         `
         INSERT INTO core.debt_payments
@@ -144,7 +198,6 @@ router.post(
         [tenantId, debtId, payAmount, payment_method, comment || null, userId]
       );
 
-      // запись денег
       await client.query(
         `
         INSERT INTO core.cash_transactions

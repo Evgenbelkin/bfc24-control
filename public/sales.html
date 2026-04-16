@@ -1019,6 +1019,62 @@
       return Number.isFinite(boxQty) ? boxQty : 0;
     }
 
+    function getLocationsForSelectedItem() {
+      if (!selectedItem || !selectedItem.id) return [];
+
+      const boxQty = getSelectedBoxQty();
+
+      return allLocations
+        .map((loc) => {
+          const qty = Number(getStockQtyFor(selectedItem.id, loc.id) || 0);
+          return {
+            id: loc.id,
+            name: loc.name || "",
+            code: loc.code || "",
+            qty,
+            boxes: boxQty > 0 ? Math.floor(qty / boxQty) : null,
+            isSelected: String(loc.id) === String(els.locationId.value || "")
+          };
+        })
+        .filter((loc) => loc.qty > 0)
+        .sort((a, b) => {
+          if (b.qty !== a.qty) return b.qty - a.qty;
+          return String(a.name || "").localeCompare(String(b.name || ""), "ru");
+        });
+    }
+
+    function renderSelectedItemLocations() {
+      const locations = getLocationsForSelectedItem();
+      if (!locations.length) {
+        return `
+          <div class="selected-stock zero">
+            ${escapeHtml("Товар сейчас не найден ни в одной МХ с положительным остатком")}
+          </div>
+        `;
+      }
+
+      const boxQty = getSelectedBoxQty();
+      const chips = locations.map((loc) => {
+        const title = `${loc.name}${loc.code ? ` (${loc.code})` : ""}`;
+        const boxText = boxQty > 0 && loc.boxes !== null ? ` | коробок: ${loc.boxes}` : "";
+        const cls = loc.isSelected ? "pill" : (loc.qty <= 0 ? "pill danger" : "pill warn");
+        return `
+          <span class="${cls}" style="margin:4px 6px 0 0; display:inline-flex;">
+            ${escapeHtml(`${title}: ${formatQty(loc.qty)} шт${boxText}`)}
+          </span>
+        `;
+      }).join("");
+
+      return `
+        <div class="selected-stock" style="margin-top:10px; color:#111827; font-weight:700;">
+          ${escapeHtml("Где сейчас лежит товар:")}
+        </div>
+        <div style="margin-top:4px;">
+          ${chips}
+        </div>
+      `;
+    }
+
     function updateSaleModeUi() {
       const mode = els.saleMode ? String(els.saleMode.value || "pcs") : "pcs";
       const boxQty = getSelectedBoxQty();
@@ -1051,6 +1107,7 @@
       const mode = els.saleMode ? String(els.saleMode.value || "pcs") : "pcs";
       let stockInfo = "";
       let boxInfo = "";
+      const locationsInfo = renderSelectedItemLocations();
 
       if (boxQty > 0) {
         const fullBoxes = stockQty !== null ? Math.floor(Number(stockQty || 0) / boxQty) : null;
@@ -1095,6 +1152,7 @@
         </div>
         ${stockInfo}
         ${boxInfo}
+        ${locationsInfo}
       `;
       updateSaleModeUi();
     }
