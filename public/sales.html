@@ -16,6 +16,7 @@
       --primary-hover:#1d4ed8;
       --danger:#dc2626;
       --success:#16a34a;
+      --warning:#d97706;
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:16px;
     }
@@ -29,7 +30,7 @@
     }
 
     .wrap{
-      max-width:980px;
+      max-width:1280px;
       margin:0 auto;
       padding:24px 16px 48px;
     }
@@ -106,6 +107,17 @@
       border:1px solid var(--line);
     }
 
+    .btn-danger{
+      background:#fff;
+      color:var(--danger);
+      border:1px solid #fecaca;
+    }
+
+    .btn-success{
+      background:var(--success);
+      color:#fff;
+    }
+
     .grid{
       display:grid;
       grid-template-columns:1fr;
@@ -126,6 +138,12 @@
       margin:0 0 14px;
     }
 
+    .section-title{
+      font-size:16px;
+      font-weight:800;
+      margin:0 0 12px;
+    }
+
     .muted{
       color:var(--muted);
       font-size:13px;
@@ -137,6 +155,13 @@
       gap:14px;
     }
 
+    .line-grid{
+      display:grid;
+      grid-template-columns:2fr 1.2fr 0.9fr 0.9fr 0.9fr;
+      gap:14px;
+      align-items:end;
+    }
+
     .field{
       display:flex;
       flex-direction:column;
@@ -145,6 +170,10 @@
     }
 
     .field.full{
+      grid-column:1 / -1;
+    }
+
+    .line-grid .field.full{
       grid-column:1 / -1;
     }
 
@@ -303,13 +332,146 @@
       color:var(--danger);
     }
 
+    .line-builder{
+      margin-top:18px;
+      padding:16px;
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:16px;
+    }
+
+    .line-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:14px;
+    }
+
+    .doc-table-wrap{
+      margin-top:16px;
+      overflow:auto;
+      border:1px solid #e8edf4;
+      border-radius:16px;
+      background:#fff;
+    }
+
+    .doc-table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:1100px;
+    }
+
+    .doc-table th,
+    .doc-table td{
+      padding:12px 10px;
+      border-bottom:1px solid #eef2f7;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    .doc-table thead th{
+      position:sticky;
+      top:0;
+      z-index:2;
+      background:#f8fafc;
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.02em;
+    }
+
+    .doc-table tbody tr:hover{
+      background:#fafcff;
+    }
+
+    .doc-table .num{
+      text-align:right;
+      white-space:nowrap;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .doc-empty{
+      padding:18px;
+      text-align:center;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .totals-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-top:16px;
+    }
+
+    .total-card{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .total-card .label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .total-card .value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:700;
+      background:#eef4ff;
+      color:#1d4ed8;
+    }
+
+    .pill.warn{
+      background:#fff7ed;
+      color:var(--warning);
+    }
+
+    .pill.danger{
+      background:#fef2f2;
+      color:#b91c1c;
+    }
+
+    .small-muted{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:4px;
+      line-height:1.45;
+    }
+
+    .actions-cell{
+      white-space:nowrap;
+    }
+
     .hidden{
       display:none !important;
     }
 
+    @media (max-width: 1100px){
+      .line-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+
     @media (max-width: 760px){
       .form-grid,
-      .stats{
+      .stats,
+      .totals-grid,
+      .line-grid{
         grid-template-columns:1fr;
       }
 
@@ -349,8 +511,8 @@
 
     <div class="grid">
       <div class="card">
-        <h2 class="card-title" data-i18n="sales.cardTitle">Новая продажа</h2>
-        <div class="muted" data-i18n="sales.subtitle">Экран работает с backend SaaS. Для owner tenant_id передаётся обязательно.</div>
+        <h2 class="card-title">Новый документ продажи</h2>
+        <div class="muted">Теперь продажа собирается в один документ с несколькими строками. Backend /sales/sell уже принимает массив line_items, поэтому списание и sale_items пойдут одной операцией.</div>
 
         <div class="stats">
           <div class="stat">
@@ -376,79 +538,146 @@
         <form id="saleForm" autocomplete="off">
           <div class="form-grid" style="margin-top:18px;">
             <div class="field">
-              <label for="tenantId" data-i18n="sales.tenantIdLabel">Tenant ID</label>
+              <label for="tenantId">Tenant ID</label>
               <input id="tenantId" type="number" min="1" value="1" />
-              <div class="hint" data-i18n="sales.tenantIdHint">Для owner обязательно.</div>
+              <div class="hint">Для owner обязательно.</div>
             </div>
 
             <div class="field">
-              <label for="paymentMethod" data-i18n="sales.paymentMethodLabel">Способ оплаты</label>
+              <label for="paymentMethod">Способ оплаты</label>
               <select id="paymentMethod">
-                <option value="cash" data-i18n="sales.paymentCash">Наличные</option>
-                <option value="card" data-i18n="sales.paymentCard">Карта</option>
-                <option value="transfer" data-i18n="sales.paymentTransfer">Перевод</option>
-                <option value="consignment" data-i18n="sales.paymentConsignment">Под реализацию</option>
-              </select>
-            </div>
-
-            <div class="field full">
-              <label for="itemSearch" data-i18n="sales.itemSearchLabel">Товар</label>
-              <div class="autocomplete">
-                <input
-                  id="itemSearch"
-                  type="text"
-                  data-i18n-placeholder="sales.itemSearchPlaceholder"
-                  placeholder="Начни вводить название, штрихкод, SKU или артикул"
-                  autocomplete="off"
-                />
-                <div id="itemResults" class="results"></div>
-              </div>
-              <div id="selectedItemBox" class="selected-box"></div>
-            </div>
-
-            <div class="field">
-              <label for="locationId" data-i18n="sales.locationLabel">Место хранения</label>
-              <select id="locationId">
-                <option value="" data-i18n="sales.locationEmpty">Выберите МХ</option>
+                <option value="cash">Наличные</option>
+                <option value="card">Карта</option>
+                <option value="transfer">Перевод</option>
+                <option value="consignment">Под реализацию</option>
               </select>
             </div>
 
             <div class="field">
-              <label for="counterpartyId" data-i18n="sales.clientLabel">Клиент</label>
+              <label for="counterpartyId">Клиент</label>
               <select id="counterpartyId">
-                <option value="" data-i18n="sales.clientEmpty">Без клиента</option>
+                <option value="">Без клиента</option>
               </select>
             </div>
 
             <div class="field">
-              <label for="saleMode">Режим продажи</label>
-              <select id="saleMode">
-                <option value="pcs">Штуки</option>
-                <option value="boxes" selected>Коробки</option>
-              </select>
-              <div class="hint" id="saleModeHint">По умолчанию продажа идёт коробками, если у товара заполнено "Штук в коробке".</div>
+              <label for="commonComment">Комментарий к документу</label>
+              <textarea id="commonComment" placeholder="Общий комментарий к продаже"></textarea>
+            </div>
+          </div>
+
+          <div class="line-builder">
+            <div class="section-title">Добавление строки в документ</div>
+
+            <div class="line-grid">
+              <div class="field">
+                <label for="itemSearch">Товар</label>
+                <div class="autocomplete">
+                  <input
+                    id="itemSearch"
+                    type="text"
+                    placeholder="Начни вводить название, штрихкод, SKU или артикул"
+                    autocomplete="off"
+                  />
+                  <div id="itemResults" class="results"></div>
+                </div>
+                <div id="selectedItemBox" class="selected-box"></div>
+              </div>
+
+              <div class="field">
+                <label for="locationId">Место хранения</label>
+                <select id="locationId">
+                  <option value="">Выберите МХ</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="saleMode">Режим продажи</label>
+                <select id="saleMode">
+                  <option value="pcs">Штуки</option>
+                  <option value="boxes" selected>Коробки</option>
+                </select>
+                <div class="hint" id="saleModeHint">По умолчанию продажа идёт коробками, если у товара заполнено "Штук в коробке".</div>
+              </div>
+
+              <div class="field">
+                <label for="qty">Количество</label>
+                <input id="qty" type="number" min="1" step="1" value="1" />
+                <div class="hint" id="qtyModeHint"></div>
+              </div>
+
+              <div class="field">
+                <label for="price">Цена за единицу</label>
+                <input id="price" type="number" min="0" step="0.01" value="0" />
+              </div>
+
+              <div class="field full">
+                <label for="lineComment">Комментарий к строке</label>
+                <textarea id="lineComment" placeholder="Комментарий только для этой строки"></textarea>
+              </div>
             </div>
 
-            <div class="field">
-              <label for="qty" data-i18n="sales.qtyLabel">Количество</label>
-              <input id="qty" type="number" min="1" step="1" value="1" />
-              <div class="hint" id="qtyModeHint"></div>
+            <div class="line-actions">
+              <button type="button" class="btn btn-success" id="addLineBtn">Добавить строку</button>
+              <button type="button" class="btn btn-light" id="resetLineBtn">Очистить ввод строки</button>
+              <span class="small-muted">Сначала собираешь все позиции, потом проводишь весь документ одной кнопкой.</span>
             </div>
 
-            <div class="field">
-              <label for="price" data-i18n="sales.priceLabel">Цена за единицу</label>
-              <input id="price" type="number" min="0" step="0.01" value="0" />
+            <div id="lineStatus" class="status"></div>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div class="section-title">Строки документа</div>
+
+            <div class="doc-table-wrap">
+              <table class="doc-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Товар</th>
+                    <th>МХ</th>
+                    <th>Режим</th>
+                    <th class="num">Ввод</th>
+                    <th class="num">Итог шт</th>
+                    <th class="num">Цена</th>
+                    <th class="num">Сумма</th>
+                    <th>Остаток</th>
+                    <th>Комментарий</th>
+                    <th>Действия</th>
+                  </tr>
+                </thead>
+                <tbody id="documentLinesBody">
+                  <tr>
+                    <td colspan="11" class="doc-empty">Пока нет ни одной строки. Добавь товары в документ.</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
-            <div class="field full">
-              <label for="comment" data-i18n="sales.commentLabel">Комментарий</label>
-              <textarea id="comment" data-i18n-placeholder="sales.commentPlaceholder" placeholder="Комментарий к продаже"></textarea>
+            <div class="totals-grid">
+              <div class="total-card">
+                <div class="label">Строк в документе</div>
+                <div class="value" id="docLinesCount">0</div>
+              </div>
+              <div class="total-card">
+                <div class="label">Всего штук</div>
+                <div class="value" id="docQtyTotal">0</div>
+              </div>
+              <div class="total-card">
+                <div class="label">Сумма документа</div>
+                <div class="value" id="docAmountTotal">0 ₽</div>
+              </div>
+              <div class="total-card">
+                <div class="label">Позиций</div>
+                <div class="value" id="docUniqueItems">0</div>
+              </div>
             </div>
           </div>
 
           <div class="inline" style="margin-top:18px;">
-            <button type="submit" class="btn btn-primary" id="submitBtn" data-i18n="sales.submitButton">Провести продажу</button>
-            <button type="button" class="btn btn-light" onclick="loadInitialData()" id="refreshDataBtn" data-i18n="sales.refreshDataButton">Обновить данные</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Провести продажу</button>
+            <button type="button" class="btn btn-light" onclick="loadInitialData()" id="refreshDataBtn">Обновить данные</button>
+            <button type="button" class="btn btn-light" id="clearDocumentBtn">Очистить документ</button>
           </div>
         </form>
 
@@ -566,31 +795,43 @@
     let allClients = [];
     let stockMap = {};
     let selectedItem = null;
+    let documentLines = [];
 
     let pageStatusState = null;
     let submitStatusState = null;
+    let lineStatusState = null;
 
     const els = {
       tenantId: document.getElementById("tenantId"),
       paymentMethod: document.getElementById("paymentMethod"),
+      counterpartyId: document.getElementById("counterpartyId"),
+      commonComment: document.getElementById("commonComment"),
       itemSearch: document.getElementById("itemSearch"),
       itemResults: document.getElementById("itemResults"),
       selectedItemBox: document.getElementById("selectedItemBox"),
       locationId: document.getElementById("locationId"),
-      counterpartyId: document.getElementById("counterpartyId"),
       saleMode: document.getElementById("saleMode"),
       qty: document.getElementById("qty"),
       qtyModeHint: document.getElementById("qtyModeHint"),
       saleModeHint: document.getElementById("saleModeHint"),
       price: document.getElementById("price"),
-      comment: document.getElementById("comment"),
+      lineComment: document.getElementById("lineComment"),
       itemsCount: document.getElementById("itemsCount"),
       locationsCount: document.getElementById("locationsCount"),
       clientsCount: document.getElementById("clientsCount"),
       stockCount: document.getElementById("stockCount"),
       pageStatus: document.getElementById("pageStatus"),
+      lineStatus: document.getElementById("lineStatus"),
       submitStatus: document.getElementById("submitStatus"),
-      saleForm: document.getElementById("saleForm")
+      saleForm: document.getElementById("saleForm"),
+      addLineBtn: document.getElementById("addLineBtn"),
+      resetLineBtn: document.getElementById("resetLineBtn"),
+      clearDocumentBtn: document.getElementById("clearDocumentBtn"),
+      documentLinesBody: document.getElementById("documentLinesBody"),
+      docLinesCount: document.getElementById("docLinesCount"),
+      docQtyTotal: document.getElementById("docQtyTotal"),
+      docAmountTotal: document.getElementById("docAmountTotal"),
+      docUniqueItems: document.getElementById("docUniqueItems")
     };
 
     function showStatus(el, text, type = "info") {
@@ -603,14 +844,29 @@
       el.textContent = "";
     }
 
-    function setPageStatus(key, vars, type) {
-      pageStatusState = { key, vars: vars || {}, type };
-      showStatus(els.pageStatus, i18n.format(key, vars || {}), type);
+    function setPageStatus(keyOrText, vars, type, rawText = false) {
+      if (rawText) {
+        pageStatusState = { rawText: keyOrText, type };
+        showStatus(els.pageStatus, keyOrText, type);
+        return;
+      }
+      pageStatusState = { key: keyOrText, vars: vars || {}, type };
+      showStatus(els.pageStatus, i18n.format(keyOrText, vars || {}), type);
     }
 
-    function setSubmitStatus(key, vars, type) {
-      submitStatusState = { key, vars: vars || {}, type };
-      showStatus(els.submitStatus, i18n.format(key, vars || {}), type);
+    function setSubmitStatus(keyOrText, vars, type, rawText = false) {
+      if (rawText) {
+        submitStatusState = { rawText: keyOrText, type };
+        showStatus(els.submitStatus, keyOrText, type);
+        return;
+      }
+      submitStatusState = { key: keyOrText, vars: vars || {}, type };
+      showStatus(els.submitStatus, i18n.format(keyOrText, vars || {}), type);
+    }
+
+    function setLineStatus(text, type = "info") {
+      lineStatusState = { rawText: text, type };
+      showStatus(els.lineStatus, text, type);
     }
 
     function clearSubmitStatus() {
@@ -618,20 +874,22 @@
       hideStatus(els.submitStatus);
     }
 
+    function clearLineStatus() {
+      lineStatusState = null;
+      hideStatus(els.lineStatus);
+    }
+
     function restoreStatusesAfterLanguageChange() {
       if (pageStatusState) {
-        showStatus(
-          els.pageStatus,
-          i18n.format(pageStatusState.key, pageStatusState.vars || {}),
-          pageStatusState.type
-        );
+        if (pageStatusState.rawText) showStatus(els.pageStatus, pageStatusState.rawText, pageStatusState.type);
+        else showStatus(els.pageStatus, i18n.format(pageStatusState.key, pageStatusState.vars || {}), pageStatusState.type);
       }
       if (submitStatusState) {
-        showStatus(
-          els.submitStatus,
-          i18n.format(submitStatusState.key, submitStatusState.vars || {}),
-          submitStatusState.type
-        );
+        if (submitStatusState.rawText) showStatus(els.submitStatus, submitStatusState.rawText, submitStatusState.type);
+        else showStatus(els.submitStatus, i18n.format(submitStatusState.key, submitStatusState.vars || {}), submitStatusState.type);
+      }
+      if (lineStatusState) {
+        showStatus(els.lineStatus, lineStatusState.rawText, lineStatusState.type);
       }
     }
 
@@ -725,10 +983,34 @@
         .toLowerCase();
     }
 
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatMoney(value) {
+      const num = Number(value || 0);
+      return `${num.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`;
+    }
+
+    function formatQty(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 4 });
+    }
+
+    function getStockQtyFor(itemId, locationId) {
+      if (!itemId || !locationId) return null;
+      const key = `${itemId}_${locationId}`;
+      return Number(stockMap[key] || 0);
+    }
+
     function getCurrentStockQty() {
       if (!selectedItem || !els.locationId.value) return null;
-      const key = `${selectedItem.id}_${els.locationId.value}`;
-      return Number(stockMap[key] || 0);
+      return getStockQtyFor(selectedItem.id, els.locationId.value);
     }
 
     function getSelectedBoxQty() {
@@ -760,6 +1042,7 @@
       if (!selectedItem) {
         els.selectedItemBox.classList.remove("active");
         els.selectedItemBox.innerHTML = "";
+        updateSaleModeUi();
         return;
       }
 
@@ -790,25 +1073,25 @@
       if (stockQty !== null) {
         stockInfo = `
           <div class="selected-stock ${stockQty <= 0 ? "zero" : ""}">
-            ${escapeHtml(i18n.format("sales.selectedStockAtLocation", { qty: stockQty }))}
+            ${escapeHtml(`Остаток в выбранной МХ: ${formatQty(stockQty)} шт`)}
           </div>
         `;
       } else {
         stockInfo = `
           <div class="selected-stock">
-            ${escapeHtml(i18n.t("sales.selectedStockChooseLocation"))}
+            ${escapeHtml("Сначала выбери место хранения, чтобы увидеть остаток")}
           </div>
         `;
       }
 
       els.selectedItemBox.classList.add("active");
       els.selectedItemBox.innerHTML = `
-        <div><strong>${escapeHtml(i18n.t("sales.selectedItemTitle"))}</strong> ${escapeHtml(selectedItem.name || i18n.t("sales.noName"))}</div>
+        <div><strong>Выбранный товар:</strong> ${escapeHtml(selectedItem.name || "Без названия")}</div>
         <div class="muted" style="margin-top:6px;">
           ID: ${escapeHtml(String(selectedItem.id ?? ""))}
           ${selectedItem.sku ? " | SKU: " + escapeHtml(selectedItem.sku) : ""}
-          ${selectedItem.barcode ? " | " + escapeHtml(i18n.t("sales.shortBarcode")) + ": " + escapeHtml(selectedItem.barcode) : ""}
-          ${selectedItem.vendor_code ? " | " + escapeHtml(i18n.t("sales.shortArticle")) + ": " + escapeHtml(selectedItem.vendor_code) : ""}
+          ${selectedItem.barcode ? " | ШК: " + escapeHtml(selectedItem.barcode) : ""}
+          ${selectedItem.vendor_code ? " | Арт: " + escapeHtml(selectedItem.vendor_code) : ""}
         </div>
         ${stockInfo}
         ${boxInfo}
@@ -820,8 +1103,8 @@
       if (!items.length) {
         els.itemResults.innerHTML = `
           <div class="result-item">
-            <div class="result-title">${escapeHtml(i18n.t("sales.searchNoResultsTitle"))}</div>
-            <div class="result-sub">${escapeHtml(i18n.t("sales.searchNoResultsText"))}</div>
+            <div class="result-title">Ничего не найдено</div>
+            <div class="result-sub">Попробуй другое название, SKU, штрихкод или артикул.</div>
           </div>
         `;
         els.itemResults.style.display = "block";
@@ -830,12 +1113,12 @@
 
       els.itemResults.innerHTML = items.map((item) => `
         <div class="result-item" data-id="${escapeHtml(String(item.id))}">
-          <div class="result-title">${escapeHtml(item.name || i18n.t("sales.noName"))}</div>
+          <div class="result-title">${escapeHtml(item.name || "Без названия")}</div>
           <div class="result-sub">
             ID: ${escapeHtml(String(item.id ?? ""))}
             ${item.sku ? " | SKU: " + escapeHtml(item.sku) : ""}
-            ${item.barcode ? " | " + escapeHtml(i18n.t("sales.shortBarcode")) + ": " + escapeHtml(item.barcode) : ""}
-            ${item.vendor_code ? " | " + escapeHtml(i18n.t("sales.shortArticle")) + ": " + escapeHtml(item.vendor_code) : ""}
+            ${item.barcode ? " | ШК: " + escapeHtml(item.barcode) : ""}
+            ${item.vendor_code ? " | Арт: " + escapeHtml(item.vendor_code) : ""}
           </div>
         </div>
       `).join("");
@@ -862,7 +1145,7 @@
     }
 
     function fillLocations() {
-      els.locationId.innerHTML = `<option value="">${escapeHtml(i18n.t("sales.locationEmpty"))}</option>` +
+      els.locationId.innerHTML = `<option value="">Выберите МХ</option>` +
         allLocations.map((loc) => `
           <option value="${escapeHtml(String(loc.id))}">
             ${escapeHtml(loc.name || "")}${loc.code ? " (" + escapeHtml(loc.code) + ")" : ""}
@@ -871,7 +1154,7 @@
     }
 
     function fillClients() {
-      els.counterpartyId.innerHTML = `<option value="">${escapeHtml(i18n.t("sales.clientEmpty"))}</option>` +
+      els.counterpartyId.innerHTML = `<option value="">Без клиента</option>` +
         allClients.map((client) => `
           <option value="${escapeHtml(String(client.id))}">
             ${escapeHtml(client.name || "")}
@@ -881,7 +1164,7 @@
 
     async function loadItems() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error(i18n.t("sales.tenantRequired"));
+      if (!tenantId) throw new Error("tenant_required");
 
       const data = await apiGet(`/items?tenant_id=${tenantId}`);
       const items = extractList(data, ["items", "data", "rows"]).map(normalizeItem);
@@ -892,7 +1175,7 @@
 
     async function loadLocations() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error(i18n.t("sales.tenantRequired"));
+      if (!tenantId) throw new Error("tenant_required");
 
       const data = await apiGet(`/locations?tenant_id=${tenantId}`);
       allLocations = extractList(data, ["locations", "data", "rows"]);
@@ -902,7 +1185,7 @@
 
     async function loadClients() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error(i18n.t("sales.tenantRequired"));
+      if (!tenantId) throw new Error("tenant_required");
 
       const data = await apiGet(`/clients?tenant_id=${tenantId}`);
       allClients = extractList(data, ["clients", "counterparties", "data", "rows"]);
@@ -912,7 +1195,7 @@
 
     async function loadStock() {
       const tenantId = getTenantId();
-      if (!tenantId) throw new Error(i18n.t("sales.tenantRequired"));
+      if (!tenantId) throw new Error("tenant_required");
 
       const data = await apiGet(`/stock?tenant_id=${tenantId}`);
       const rows = extractList(data, ["stock", "data", "rows"]).map(normalizeStockRow);
@@ -929,7 +1212,7 @@
 
     async function loadInitialData() {
       try {
-        setPageStatus("sales.loadingDataStatus", {}, "info");
+        setPageStatus("Загрузка товаров, клиентов, мест хранения и остатков...", {}, "info", true);
         selectedItem = null;
         renderSelectedItem();
         els.itemResults.style.display = "none";
@@ -942,17 +1225,16 @@
         ]);
 
         renderSelectedItem();
+        renderDocumentLines();
 
-        setPageStatus("sales.loadedDataStatus", {
-          items: allItems.length,
-          locations: allLocations.length,
-          clients: allClients.length,
-          stock: els.stockCount.textContent
-        }, "success");
+        setPageStatus(
+          `Данные загружены. Товаров: ${allItems.length}, МХ: ${allLocations.length}, клиентов: ${allClients.length}, остатков: ${els.stockCount.textContent}`,
+          {},
+          "success",
+          true
+        );
       } catch (err) {
-        setPageStatus("sales.loadErrorStatus", {
-          error: Ui.translateError(err.message)
-        }, "error");
+        setPageStatus(`Ошибка загрузки: ${Ui.translateError(err.message)}`, {}, "error", true);
       }
     }
 
@@ -971,13 +1253,187 @@
       renderItemResults(filtered);
     }
 
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    function buildDraftLineFromInputs() {
+      if (!selectedItem || !selectedItem.id) {
+        throw new Error("Сначала выбери товар");
+      }
+
+      if (!els.locationId.value) {
+        throw new Error("Сначала выбери место хранения");
+      }
+
+      const enteredQty = Number(els.qty.value);
+      if (!Number.isFinite(enteredQty) || enteredQty <= 0) {
+        throw new Error("Количество должно быть больше нуля");
+      }
+
+      const saleMode = String(els.saleMode.value || "pcs");
+      const boxQty = getSelectedBoxQty();
+
+      if (saleMode === "boxes" && (!Number.isFinite(boxQty) || boxQty <= 0)) {
+        throw new Error("У выбранного товара не заполнено поле 'Штук в коробке'");
+      }
+
+      const qty = saleMode === "boxes" ? (enteredQty * boxQty) : enteredQty;
+      const price = Number(els.price.value || 0);
+
+      if (!Number.isFinite(price) || price < 0) {
+        throw new Error("Цена указана неверно");
+      }
+
+      const location = allLocations.find((loc) => String(loc.id) === String(els.locationId.value));
+      const stockQty = getStockQtyFor(selectedItem.id, els.locationId.value);
+
+      if (stockQty === null) {
+        throw new Error("Не удалось определить остаток");
+      }
+
+      const reservedQty = documentLines
+        .filter((line) => String(line.item_id) === String(selectedItem.id) && String(line.location_id) === String(els.locationId.value))
+        .reduce((sum, line) => sum + Number(line.qty || 0), 0);
+
+      const freeQty = Number(stockQty) - Number(reservedQty);
+
+      if (qty > freeQty) {
+        throw new Error(`Недостаточно остатка. В наличии: ${formatQty(stockQty)} шт, уже добавлено в документ: ${formatQty(reservedQty)} шт, свободно: ${formatQty(freeQty)} шт`);
+      }
+
+      return {
+        item_id: Number(selectedItem.id),
+        item_name: selectedItem.name || "",
+        item_sku: selectedItem.sku || "",
+        item_barcode: selectedItem.barcode || "",
+        item_vendor_code: selectedItem.vendor_code || "",
+        location_id: Number(els.locationId.value),
+        location_name: location ? (location.name || "") : "",
+        location_code: location ? (location.code || "") : "",
+        sale_mode: saleMode,
+        entered_qty: enteredQty,
+        box_qty: boxQty > 0 ? boxQty : null,
+        qty: qty,
+        price: Number(price.toFixed(2)),
+        amount: Number((qty * price).toFixed(2)),
+        comment: (els.lineComment.value || "").trim() || null,
+        stock_qty: Number(stockQty),
+        reserved_qty: Number(reservedQty),
+        free_qty_after_add: Number((freeQty - qty).toFixed(4))
+      };
+    }
+
+    function clearLineInputs(keepLocation = false) {
+      selectedItem = null;
+      els.itemSearch.value = "";
+      els.itemResults.style.display = "none";
+      els.selectedItemBox.classList.remove("active");
+      els.selectedItemBox.innerHTML = "";
+      if (!keepLocation) {
+        els.locationId.value = "";
+      }
+      els.saleMode.value = "boxes";
+      els.qty.value = "1";
+      els.price.value = "0";
+      els.lineComment.value = "";
+      updateSaleModeUi();
+      renderSelectedItem();
+      clearLineStatus();
+    }
+
+    function addDocumentLine() {
+      clearSubmitStatus();
+
+      try {
+        const draftLine = buildDraftLineFromInputs();
+        documentLines.push(draftLine);
+        renderDocumentLines();
+
+        setLineStatus(
+          `Строка добавлена: ${draftLine.item_name || "Без названия"} — ${formatQty(draftLine.qty)} шт на сумму ${formatMoney(draftLine.amount)}`,
+          "success"
+        );
+
+        clearLineInputs(true);
+      } catch (err) {
+        setLineStatus(Ui.translateError(err.message), "error");
+      }
+    }
+
+    function removeDocumentLine(index) {
+      if (index < 0 || index >= documentLines.length) return;
+      documentLines.splice(index, 1);
+      renderDocumentLines();
+      setLineStatus("Строка удалена из документа", "info");
+    }
+
+    function clearDocument() {
+      documentLines = [];
+      renderDocumentLines();
+      clearSubmitStatus();
+      setLineStatus("Документ очищен", "info");
+    }
+
+    function renderDocumentLines() {
+      if (!documentLines.length) {
+        els.documentLinesBody.innerHTML = `
+          <tr>
+            <td colspan="11" class="doc-empty">Пока нет ни одной строки. Добавь товары в документ.</td>
+          </tr>
+        `;
+      } else {
+        els.documentLinesBody.innerHTML = documentLines.map((line, index) => {
+          const locationText = `${line.location_name || ""}${line.location_code ? " (" + line.location_code + ")" : ""}`;
+          const modeText = line.sale_mode === "boxes"
+            ? `Коробки${line.box_qty ? ` (${line.box_qty} шт/кор)` : ""}`
+            : "Штуки";
+
+          const stockPillClass =
+            line.free_qty_after_add < 0 ? "danger" :
+            line.free_qty_after_add === 0 ? "warn" :
+            "";
+
+          const stockPillText =
+            line.free_qty_after_add < 0
+              ? `Минус: ${formatQty(line.free_qty_after_add)}`
+              : `После строки: ${formatQty(line.free_qty_after_add)} шт`;
+
+          return `
+            <tr>
+              <td>${index + 1}</td>
+              <td>
+                <div><strong>${escapeHtml(line.item_name || "Без названия")}</strong></div>
+                <div class="small-muted">
+                  ${line.item_sku ? "SKU: " + escapeHtml(line.item_sku) : ""}
+                  ${line.item_barcode ? (line.item_sku ? " | " : "") + "ШК: " + escapeHtml(line.item_barcode) : ""}
+                  ${line.item_vendor_code ? ((line.item_sku || line.item_barcode) ? " | " : "") + "Арт: " + escapeHtml(line.item_vendor_code) : ""}
+                </div>
+              </td>
+              <td>${escapeHtml(locationText)}</td>
+              <td>${escapeHtml(modeText)}</td>
+              <td class="num">${escapeHtml(formatQty(line.entered_qty))}</td>
+              <td class="num">${escapeHtml(formatQty(line.qty))}</td>
+              <td class="num">${escapeHtml(formatMoney(line.price))}</td>
+              <td class="num">${escapeHtml(formatMoney(line.amount))}</td>
+              <td>
+                <div class="pill ${stockPillClass}">${escapeHtml(stockPillText)}</div>
+                <div class="small-muted">Было: ${escapeHtml(formatQty(line.stock_qty))} шт / Уже в документе до этой строки: ${escapeHtml(formatQty(line.reserved_qty))} шт</div>
+              </td>
+              <td>${escapeHtml(line.comment || "—")}</td>
+              <td class="actions-cell">
+                <button type="button" class="btn btn-danger" onclick="removeDocumentLine(${index})">Удалить</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      const totalLines = documentLines.length;
+      const totalQty = documentLines.reduce((sum, line) => sum + Number(line.qty || 0), 0);
+      const totalAmount = documentLines.reduce((sum, line) => sum + Number(line.amount || 0), 0);
+      const uniqueItems = new Set(documentLines.map((line) => String(line.item_id))).size;
+
+      els.docLinesCount.textContent = String(totalLines);
+      els.docQtyTotal.textContent = formatQty(totalQty);
+      els.docAmountTotal.textContent = formatMoney(totalAmount);
+      els.docUniqueItems.textContent = String(uniqueItems);
     }
 
     async function handleSubmit(e) {
@@ -986,87 +1442,43 @@
 
       try {
         const tenantId = getTenantId();
-        if (!tenantId) throw new Error(i18n.t("sales.tenantRequired"));
-        if (!selectedItem || !selectedItem.id) throw new Error(i18n.t("sales.itemRequired"));
-        if (!els.locationId.value) throw new Error(i18n.t("sales.locationRequired"));
-
-        const enteredQty = Number(els.qty.value);
-        if (!Number.isFinite(enteredQty) || enteredQty <= 0) throw new Error(i18n.t("sales.qtyInvalid"));
-
-        const saleMode = els.saleMode ? String(els.saleMode.value || "pcs") : "pcs";
-        const boxQty = getSelectedBoxQty();
-
-        if (saleMode === "boxes" && (!Number.isFinite(boxQty) || boxQty <= 0)) {
-          throw new Error("У выбранного товара не заполнено поле 'Штук в коробке'");
-        }
-
-        const qty = saleMode === "boxes" ? (enteredQty * boxQty) : enteredQty;
-
-        const price = Number(els.price.value || 0);
-        if (!Number.isFinite(price) || price < 0) throw new Error(i18n.t("sales.priceInvalid"));
-
-        const stockQty = getCurrentStockQty();
-        if (stockQty === null) {
-          throw new Error(i18n.t("sales.stockUnknown"));
-        }
-
-        if (qty > stockQty) {
-          throw new Error(i18n.format("sales.notEnoughStock", { qty: stockQty }));
-        }
-
-        const paymentMethod = els.paymentMethod.value;
-        const amount = +(qty * price).toFixed(2);
+        if (!tenantId) throw new Error("Нужно указать tenant_id");
+        if (!documentLines.length) throw new Error("Документ пустой. Добавь хотя бы одну строку");
 
         const body = {
           tenant_id: tenantId,
-          item_id: Number(selectedItem.id),
-          location_id: Number(els.locationId.value),
-          qty,
-          price,
-          amount,
-          payment_method: paymentMethod,
-          comment: (els.comment.value || "").trim() || null
+          payment_method: els.paymentMethod.value,
+          comment: (els.commonComment.value || "").trim() || null,
+          line_items: documentLines.map((line) => ({
+            item_id: Number(line.item_id),
+            location_id: Number(line.location_id),
+            qty: Number(line.qty),
+            price: Number(line.price),
+            amount: Number(line.amount),
+            comment: line.comment || null
+          }))
         };
-
-        if (saleMode === "boxes") {
-          const saleComment = `Продано коробками: ${enteredQty} кор. × ${boxQty} шт = ${qty} шт`;
-          body.comment = body.comment ? `${body.comment}
-${saleComment}` : saleComment;
-        }
 
         if (els.counterpartyId.value) {
           body.counterparty_id = Number(els.counterpartyId.value);
         }
 
-        setSubmitStatus("sales.submittingStatus", {}, "info");
+        setSubmitStatus("Провожу продажу по всему документу...", {}, "info", true);
 
         const result = await apiPost("/sales/sell", body);
 
         await loadStock();
-        renderSelectedItem();
+        documentLines = [];
+        renderDocumentLines();
 
-        setSubmitStatus("sales.successStatus", {
-          json: JSON.stringify(result, null, 2)
-        }, "success");
-
-        els.qty.value = 1;
-        els.price.value = 0;
-        els.comment.value = "";
         els.paymentMethod.value = "cash";
-        if (els.saleMode) {
-          els.saleMode.value = "boxes";
-        }
-        updateSaleModeUi();
         els.counterpartyId.value = "";
-        els.locationId.value = "";
-        els.itemSearch.value = "";
-        selectedItem = null;
-        renderSelectedItem();
-        els.itemResults.style.display = "none";
+        els.commonComment.value = "";
+        clearLineInputs();
+
+        setSubmitStatus(`Продажа успешно проведена.\n\n${JSON.stringify(result, null, 2)}`, {}, "success", true);
       } catch (err) {
-        setSubmitStatus("sales.errorStatus", {
-          error: Ui.translateError(err.message)
-        }, "error");
+        setSubmitStatus(`Ошибка проведения продажи: ${Ui.translateError(err.message)}`, {}, "error", true);
       }
     }
 
@@ -1083,12 +1495,14 @@ ${saleComment}` : saleComment;
         renderSelectedItem();
       });
 
-      if (els.saleMode) {
-        els.saleMode.addEventListener("change", () => {
-          renderSelectedItem();
-          updateSaleModeUi();
-        });
-      }
+      els.saleMode.addEventListener("change", () => {
+        renderSelectedItem();
+        updateSaleModeUi();
+      });
+
+      els.addLineBtn.addEventListener("click", addDocumentLine);
+      els.resetLineBtn.addEventListener("click", () => clearLineInputs());
+      els.clearDocumentBtn.addEventListener("click", clearDocument);
 
       document.addEventListener("click", (e) => {
         const inAutocomplete = e.target.closest(".autocomplete");
@@ -1108,6 +1522,7 @@ ${saleComment}` : saleComment;
         fillLocations();
         fillClients();
         renderSelectedItem();
+        renderDocumentLines();
         if (els.itemSearch.value.trim()) {
           onItemSearchInput();
         }
@@ -1130,11 +1545,10 @@ ${saleComment}` : saleComment;
 
       i18n.applyTranslations();
       i18n.renderLanguageSwitcher("langSwitcher");
-      if (els.saleMode) {
-        els.saleMode.value = "boxes";
-      }
+      els.saleMode.value = "boxes";
       updateSaleModeUi();
       bindEvents();
+      renderDocumentLines();
       loadInitialData();
     }
 
@@ -1143,6 +1557,7 @@ ${saleComment}` : saleComment;
     window.goBack = goBack;
     window.logout = logout;
     window.loadInitialData = loadInitialData;
+    window.removeDocumentLine = removeDocumentLine;
   </script>
 </body>
 </html>
