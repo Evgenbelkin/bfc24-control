@@ -381,6 +381,74 @@
       margin-top:4px;
     }
 
+    .line-photo-cell{
+      width:84px;
+      min-width:84px;
+    }
+
+    .line-photo-box{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      padding:4px;
+      margin:0 auto;
+      cursor:zoom-in;
+    }
+
+    .line-photo-box img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background:#fff;
+    }
+
+    .line-photo-box.empty{
+      cursor:default;
+    }
+
+    .image-modal{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:9999;
+      cursor:zoom-out;
+    }
+
+    .image-modal.show{
+      display:flex;
+    }
+
+    .image-modal-content{
+      max-width:min(92vw, 980px);
+      max-height:88vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .image-modal-content img{
+      max-width:100%;
+      max-height:88vh;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+      display:block;
+    }
+
     .toolbar-inline{
       display:flex;
       gap:10px;
@@ -594,6 +662,7 @@
               <thead>
                 <tr>
                   <th>#</th>
+                  <th class="line-photo-cell">Фото</th>
                   <th>Товар</th>
                   <th>МХ</th>
                   <th class="num">Шт</th>
@@ -608,7 +677,7 @@
               </thead>
               <tbody id="detailLinesBody">
                 <tr>
-                  <td colspan="11" class="empty">Документ не выбран</td>
+                  <td colspan="12" class="empty">Документ не выбран</td>
                 </tr>
               </tbody>
             </table>
@@ -622,6 +691,12 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="image-modal" id="imageModal" onclick="closeImageModal()">
+    <div class="image-modal-content">
+      <img id="imageModalImg" src="" alt="Фото товара" />
     </div>
   </div>
 
@@ -736,7 +811,9 @@
       detailComment: document.getElementById("detailComment"),
       detailLinesBody: document.getElementById("detailLinesBody"),
       exportBtn: document.getElementById("exportBtn"),
-      closeDetailBtn: document.getElementById("closeDetailBtn")
+      closeDetailBtn: document.getElementById("closeDetailBtn"),
+      imageModal: document.getElementById("imageModal"),
+      imageModalImg: document.getElementById("imageModalImg")
     };
 
     function escapeHtml(value) {
@@ -954,13 +1031,18 @@
       if (!lines.length) {
         els.detailLinesBody.innerHTML = `
           <tr>
-            <td colspan="11" class="empty">Строк нет</td>
+            <td colspan="12" class="empty">Строк нет</td>
           </tr>
         `;
       } else {
         els.detailLinesBody.innerHTML = lines.map((line, index) => `
           <tr>
             <td>${index + 1}</td>
+            <td class="line-photo-cell">
+              ${line.image_url
+                ? `<div class="line-photo-box" onclick="openImageModal('${escapeHtml(line.image_url)}')"><img src="${escapeHtml(line.image_url)}" alt="${escapeHtml(line.item_name || "Фото")}" /></div>`
+                : `<div class="line-photo-box empty">Нет фото</div>`}
+            </td>
             <td>
               <div><strong>${escapeHtml(line.item_name || "Без названия")}</strong></div>
               <div class="small-muted">
@@ -1020,6 +1102,17 @@
       window.open(url, "_blank");
     }
 
+    function openImageModal(src) {
+      if (!src) return;
+      els.imageModalImg.src = src;
+      els.imageModal.classList.add("show");
+    }
+
+    function closeImageModal() {
+      els.imageModal.classList.remove("show");
+      els.imageModalImg.src = "";
+    }
+
     function bindEvents() {
       els.searchInput.addEventListener("input", renderTable);
       els.paymentStatusFilter.addEventListener("change", renderTable);
@@ -1063,6 +1156,8 @@
     window.logout = logout;
     window.openSale = openSale;
     window.exportSale = exportSale;
+    window.openImageModal = openImageModal;
+    window.closeImageModal = closeImageModal;
   </script>
 </body>
 </html>
