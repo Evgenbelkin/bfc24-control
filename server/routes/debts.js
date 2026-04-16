@@ -10,6 +10,7 @@ const router = express.Router();
 
 /**
  * Список долгов
+ * Один товар = одна строка
  */
 router.get("/", authRequired, async (req, res) => {
   try {
@@ -36,10 +37,14 @@ router.get("/", authRequired, async (req, res) => {
         d.status,
         d.comment,
         d.created_at,
-        sale_loc.name AS location_name,
-        sale_loc.code AS location_code,
-        COALESCE(sale_items_info.total_qty, 0) AS qty,
-        COALESCE(sale_items_info.item_name, '') AS item_name
+        COALESCE(si.qty, 0) AS qty,
+        trim(
+          concat_ws(
+            ', ',
+            NULLIF(i.sku, ''),
+            NULLIF(i.name, '')
+          )
+        ) AS item_name
       FROM core.debts d
       LEFT JOIN core.counterparties c
         ON c.id = d.counterparty_id
@@ -47,44 +52,14 @@ router.get("/", authRequired, async (req, res) => {
       LEFT JOIN core.sales s
         ON s.id = d.sale_id
        AND s.tenant_id = d.tenant_id
-      LEFT JOIN core.locations sale_loc
-        ON sale_loc.id = s.location_id
-       AND sale_loc.tenant_id = d.tenant_id
-      LEFT JOIN LATERAL (
-        SELECT
-          COALESCE(SUM(product_rows.total_qty_per_item), 0) AS total_qty,
-          string_agg(
-            product_rows.product_text,
-            ' | '
-            ORDER BY product_rows.product_text
-          ) AS item_name
-        FROM (
-          SELECT
-            i.id AS item_id,
-            COALESCE(SUM(si.qty), 0) AS total_qty_per_item,
-            trim(
-              concat_ws(
-                ', ',
-                NULLIF(i.sku, ''),
-                NULLIF(i.name, '')
-              )
-            ) ||
-            CASE
-              WHEN COALESCE(SUM(si.qty), 0) > 0
-                THEN ' × ' || trim(to_char(COALESCE(SUM(si.qty), 0), 'FM999999990.####'))
-              ELSE ''
-            END AS product_text
-          FROM core.sale_items si
-          LEFT JOIN core.items i
-            ON i.id = si.item_id
-           AND i.tenant_id = si.tenant_id
-          WHERE si.sale_id = d.sale_id
-            AND si.tenant_id = d.tenant_id
-          GROUP BY i.id, i.sku, i.name
-        ) AS product_rows
-      ) AS sale_items_info ON TRUE
+      LEFT JOIN core.sale_items si
+        ON si.sale_id = s.id
+       AND si.tenant_id = s.tenant_id
+      LEFT JOIN core.items i
+        ON i.id = si.item_id
+       AND i.tenant_id = si.tenant_id
       WHERE d.tenant_id = $1
-      ORDER BY d.id DESC
+      ORDER BY d.id DESC, si.id ASC
       `,
       [tenantId]
     );
