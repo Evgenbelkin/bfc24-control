@@ -1052,7 +1052,7 @@
                 </div>
 
                 <div class="analysis-block">
-                  <div class="analysis-title">Сравнение по текущему курсу</div>
+                  <div class="analysis-title">Рынок сейчас</div>
                   <div class="metrics">
                     <div class="metric">
                       <div class="metric-label">Текущий курс ¥</div>
@@ -1063,15 +1063,15 @@
                       <div class="metric-value mono js-current-usd-rate">${escapeHtml(formatNumber(compare.currentUsdRate, 4))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Себестоимость по текущему курсу, ₽/шт</div>
+                      <div class="metric-label">Себестоимость сейчас, ₽/шт</div>
                       <div class="metric-value mono js-current-unit-cost-rub">${escapeHtml(formatNumber(compare.currentUnitCostRub, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Разница, ₽/шт</div>
+                      <div class="metric-label">Изменение к партии, ₽</div>
                       <div class="metric-value mono js-diff-rub-per-unit ${getValueTone(compare.diffRubPerUnit, false)}">${escapeHtml(formatSignedNumber(compare.diffRubPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Разница, %</div>
+                      <div class="metric-label">Изменение к партии, %</div>
                       <div class="metric-value mono js-diff-percent ${getValueTone(compare.diffPercent, false)}">${escapeHtml(formatSignedNumber(compare.diffPercent, 2))}%</div>
                     </div>
                     <div class="metric">
@@ -1086,7 +1086,7 @@
                 </div>
 
                 <div class="analysis-block">
-                  <div class="analysis-title">Порог снижения и риск минуса</div>
+                  <div class="analysis-title">Цена и прибыль</div>
                   <div class="field">
                     <label>Цена продажи сейчас, ₽/шт</label>
                     <input class="input-mini js-analysis-sale-price" type="number" min="0" step="0.0001" value="${escapeHtml(formatNumber(row._analysisSalePrice || 0))}" />
@@ -1094,33 +1094,33 @@
 
                   <div class="metrics" style="margin-top:12px;">
                     <div class="metric">
-                      <div class="metric-label">Запас до нуля, ₽/шт</div>
+                      <div class="metric-label">Минимальная цена, ₽/шт</div>
                       <div class="metric-value mono js-reserve-to-zero ${getValueTone(compare.reserveToZeroPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.reserveToZeroPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Результат по рынку, ₽/шт</div>
+                      <div class="metric-label">Прибыль сейчас, ₽/шт</div>
                       <div class="metric-value mono js-result-per-unit ${getValueTone(compare.resultPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.resultPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Результат по рынку (остаток), ₽</div>
+                      <div class="metric-label">Итого прибыль (остаток), ₽</div>
                       <div class="metric-value mono js-result-remaining ${getValueTone(compare.resultRemainingRub, true)}">${escapeHtml(formatSignedNumber(compare.resultRemainingRub, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Маржа по рынку, %</div>
+                      <div class="metric-label">Маржа, %</div>
                       <div class="metric-value mono js-margin-percent ${getValueTone(compare.marginPercent, true)}">${escapeHtml(formatSignedNumber(compare.marginPercent, 2))}%</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Прибыль по партии, ₽/шт</div>
+                      <div class="metric-label">Реальная прибыль, ₽/шт</div>
                       <div class="metric-value mono js-historical-result-per-unit ${getValueTone(compare.historicalResultPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.historicalResultPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Прибыль по партии (остаток), ₽</div>
+                      <div class="metric-label">Реальная прибыль (остаток), ₽</div>
                       <div class="metric-value mono js-historical-result-remaining ${getValueTone(compare.historicalResultRemainingRub, true)}">${escapeHtml(formatSignedNumber(compare.historicalResultRemainingRub, 2))}</div>
                     </div>
                   </div>
 
                   <div class="analysis-help">
-                    “Результат по рынку” считает прибыль или убыток, если привозить товар сегодня по текущим курсам сверху страницы. “Прибыль по партии” считает реальную прибыль или убыток именно по текущему остатку этой партии.
+                    “Минимальная цена” — это порог ниже, которого продажа по текущему рынку уйдёт в минус. “Прибыль сейчас” считается по текущим курсам сверху страницы. “Реальная прибыль” считается по фактической себестоимости именно этой партии.
                   </div>
                 </div>
               </div>
