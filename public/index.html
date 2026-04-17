@@ -704,8 +704,8 @@
             </div>
             <div class="card__arrow">→</div>
           </div>
-          <h3>Партии / Себестоимость</h3>
-          <div class="muted">Финансы партий, курсы, доставка и автоматический расчёт себестоимости.</div>
+          <h3 data-i18n="index.batchesModuleTitle">Партии / Себестоимость</h3>
+          <div class="muted" data-i18n="index.batchesModuleDesc">Финансы партий, курсы, доставка и автоматический расчёт себестоимости.</div>
         </div>
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
@@ -793,10 +793,10 @@
             </div>
             <div class="card__arrow">→</div>
           </div>
-          <h3>История продаж</h3>
-          <div class="muted">Журнал документов продажи, просмотр состава и экспорт в Excel</div>
+          <h3 data-i18n="index.salesHistoryTitle">История продаж</h3>
+          <div class="muted" data-i18n="index.salesHistoryDesc">Журнал документов продажи, просмотр состава и экспорт в Excel</div>
         </div>
-        <div class="card__footer">Открыть модуль</div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
 
       <div class="card" onclick="window.location.href='/writeoff.html'">
@@ -903,10 +903,10 @@
             </div>
             <div class="card__arrow">→</div>
           </div>
-          <h3>Оборачиваемость</h3>
-          <div class="muted">Контроль залеживания, скорости продаж и замороженных денег в остатках</div>
+          <h3 data-i18n="index.turnoverTitle">Оборачиваемость</h3>
+          <div class="muted" data-i18n="index.turnoverDesc">Контроль залеживания, скорости продаж и замороженных денег в остатках</div>
         </div>
-        <div class="card__footer">Открыть модуль</div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
 
       <div class="card" onclick="window.location.href='/debts.html'">
@@ -1044,7 +1044,7 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;"),
-      translateError: (value) => String(value || "Ошибка"),
+      translateError: (value) => String(value || i18n.t("common.error")),
       displayDateTime: (value) => {
         if (!value) return "";
         const d = new Date(value);
@@ -1274,7 +1274,7 @@ if (card.id === "subscriptionCard") {
             emptyBox.className = "menu-access-empty";
             menu.appendChild(emptyBox);
           }
-          emptyBox.innerHTML = "<strong>Нет доступных модулей</strong><div>Обратитесь к администратору клиента для выдачи прав доступа.</div>";
+          emptyBox.innerHTML = `<strong>${Ui.escapeHtml(i18n.t("index.menuAccessEmptyTitle"))}</strong><div>${Ui.escapeHtml(i18n.t("index.menuAccessEmptyText"))}</div>`;
         } else if (emptyBox) {
           emptyBox.remove();
         }
@@ -1405,14 +1405,14 @@ if (card.id === "subscriptionCard") {
       };
 
       if (!payload.phone && !payload.email) {
-        setSubscriptionStatus("error", i18n.t("index.subscriptionValidationError"));
+        setSubscriptionStatus("error", i18n.t("index.subscription.errorRequired"));
         return;
       }
 
       subscriptionSubmitBtn.disabled = true;
       subscriptionCancelBtn.disabled = true;
       subscriptionModalClose.disabled = true;
-      setSubscriptionStatus("success", i18n.t("index.subscriptionSending"));
+      setSubscriptionStatus("success", i18n.t("index.subscription.sending"));
 
       try {
         const data = window.API && typeof window.API.post === "function"
@@ -1423,7 +1423,7 @@ if (card.id === "subscriptionCard") {
           throw new Error(data?.error || data?.message || "request_failed");
         }
 
-        setSubscriptionStatus("success", i18n.t("index.subscriptionSuccess"));
+        setSubscriptionStatus("success", i18n.t("index.subscription.success"));
 
         if (subscriptionForm) {
           subscriptionForm.reset();
