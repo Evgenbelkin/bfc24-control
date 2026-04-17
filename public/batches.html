@@ -914,6 +914,9 @@
       const resultRemainingRub = resultPerUnit * qtyRemaining;
       const marginPercent = salePrice > 0 ? (resultPerUnit / salePrice) * 100 : 0;
 
+      const historicalResultPerUnit = salePrice - base.unitCostRub;
+      const historicalResultRemainingRub = historicalResultPerUnit * qtyRemaining;
+
       return {
         currentCnyRate,
         currentUsdRate,
@@ -926,7 +929,9 @@
         reserveToZeroPerUnit,
         resultPerUnit,
         resultRemainingRub,
-        marginPercent
+        marginPercent,
+        historicalResultPerUnit,
+        historicalResultRemainingRub
       };
     }
 
@@ -1093,21 +1098,29 @@
                       <div class="metric-value mono js-reserve-to-zero ${getValueTone(compare.reserveToZeroPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.reserveToZeroPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Результат, ₽/шт</div>
+                      <div class="metric-label">Результат по рынку, ₽/шт</div>
                       <div class="metric-value mono js-result-per-unit ${getValueTone(compare.resultPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.resultPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Результат по остатку, ₽</div>
+                      <div class="metric-label">Результат по рынку (остаток), ₽</div>
                       <div class="metric-value mono js-result-remaining ${getValueTone(compare.resultRemainingRub, true)}">${escapeHtml(formatSignedNumber(compare.resultRemainingRub, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Маржа, %</div>
+                      <div class="metric-label">Маржа по рынку, %</div>
                       <div class="metric-value mono js-margin-percent ${getValueTone(compare.marginPercent, true)}">${escapeHtml(formatSignedNumber(compare.marginPercent, 2))}%</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Прибыль по партии, ₽/шт</div>
+                      <div class="metric-value mono js-historical-result-per-unit ${getValueTone(compare.historicalResultPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.historicalResultPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">Прибыль по партии (остаток), ₽</div>
+                      <div class="metric-value mono js-historical-result-remaining ${getValueTone(compare.historicalResultRemainingRub, true)}">${escapeHtml(formatSignedNumber(compare.historicalResultRemainingRub, 2))}</div>
                     </div>
                   </div>
 
                   <div class="analysis-help">
-                    Если “Запас до нуля” положительный — цену ещё можно снижать. Если отрицательный — при такой цене продажа уже идёт в минус.
+                    “Результат по рынку” считает прибыль или убыток, если привозить товар сегодня по текущим курсам сверху страницы. “Прибыль по партии” считает реальную прибыль или убыток именно по текущему остатку этой партии.
                   </div>
                 </div>
               </div>
@@ -1208,6 +1221,14 @@
       const marginEl = panel.querySelector('.js-margin-percent');
       marginEl.textContent = `${formatSignedNumber(compare.marginPercent, 2)}%`;
       marginEl.className = 'metric-value mono js-margin-percent ' + getValueTone(compare.marginPercent, true);
+
+      const historicalUnitEl = panel.querySelector('.js-historical-result-per-unit');
+      historicalUnitEl.textContent = formatSignedNumber(compare.historicalResultPerUnit, 2);
+      historicalUnitEl.className = 'metric-value mono js-historical-result-per-unit ' + getValueTone(compare.historicalResultPerUnit, true);
+
+      const historicalRemainingEl = panel.querySelector('.js-historical-result-remaining');
+      historicalRemainingEl.textContent = formatSignedNumber(compare.historicalResultRemainingRub, 2);
+      historicalRemainingEl.className = 'metric-value mono js-historical-result-remaining ' + getValueTone(compare.historicalResultRemainingRub, true);
 
       const statusEl = panel.querySelector('.js-batch-status');
       const isFinanceFilled = calc.isFinanceFilled;
