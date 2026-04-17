@@ -985,7 +985,15 @@
         sold: "Продано",
         noProblemProductsTitle: "Нет проблемных товаров",
         noProblemProductsText: "По текущему периоду не найдено товаров с риском или замедлением.",
-        problemProductsErrorTitle: "Ошибка проблемных товаров"
+        problemProductsErrorTitle: "Ошибка проблемных товаров",
+        problemSectionTitle: "Проблемные товары",
+        problemSectionNote: "оборачиваемость и риск",
+        statusHealthy: "Норма",
+        statusWarning: "Замедление",
+        statusRisk: "Риск",
+        statusCritical: "Критично",
+        statusStaleNoSales: "Без продаж",
+        statusOutOfStock: "Нет остатка"
       },
 
       turnover: {
@@ -3125,7 +3133,15 @@
         sold: "已售",
         noProblemProductsTitle: "没有问题商品",
         noProblemProductsText: "当前周期内未发现存在风险或滞销的商品。",
-        problemProductsErrorTitle: "问题商品加载错误"
+        problemProductsErrorTitle: "问题商品加载错误",
+        problemSectionTitle: "问题商品",
+        problemSectionNote: "周转与风险",
+        statusHealthy: "正常",
+        statusWarning: "放缓",
+        statusRisk: "风险",
+        statusCritical: "严重",
+        statusStaleNoSales: "无销售",
+        statusOutOfStock: "无库存"
       },
 
       turnover: {
