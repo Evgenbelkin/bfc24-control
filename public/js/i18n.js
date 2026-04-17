@@ -993,6 +993,7 @@
         statusRisk: "Риск",
         statusCritical: "Критично",
         statusStaleNoSales: "Без продаж",
+        statusNoSales: "Нет продаж",
         statusOutOfStock: "Нет остатка"
       },
 
@@ -2124,6 +2125,7 @@
         statusRisk: "Risk",
         statusCritical: "Critical",
         statusStaleNoSales: "No sales",
+        statusNoSales: "No sales",
         statusOutOfStock: "Out of stock",
         statusNoSales: "No sales",
         yellowThresholdLabel: "Yellow threshold",
@@ -3141,6 +3143,7 @@
         statusRisk: "风险",
         statusCritical: "严重",
         statusStaleNoSales: "无销售",
+        statusNoSales: "无销售",
         statusOutOfStock: "无库存"
       },
 
