@@ -375,12 +375,12 @@
           </div>
 
           <div class="field">
-            <label for="receiveMode">Режим приёмки</label>
+            <label for="receiveMode" data-i18n="incoming.receiveModeLabel">Режим приёмки</label>
             <select id="receiveMode">
-  <option value="pcs">Штуки</option>
-  <option value="boxes" selected>Коробки</option>
+  <option value="pcs" data-i18n="incoming.receiveModePieces">Штуки</option>
+  <option value="boxes" selected data-i18n="incoming.receiveModeBoxes">Коробки</option>
 </select>
-            <div id="receiveModeHint" class="hint">Складской учёт ведётся в штуках. Коробки — только режим ввода.</div>
+            <div id="receiveModeHint" class="hint" data-i18n="incoming.receiveModeHint">Складской учёт ведётся в штуках. Коробки — только режим ввода.</div>
           </div>
 
           <div class="field">
@@ -638,7 +638,7 @@
       const boxQty = Number(selectedItem?.box_qty || 0);
 
       if (els.qtyLabel) {
-        els.qtyLabel.textContent = mode === "boxes" ? "Количество коробок" : i18n.t("incoming.qtyLabel");
+        els.qtyLabel.textContent = mode === "boxes" ? i18n.t("incoming.qtyBoxesLabel") : i18n.t("incoming.qtyLabel");
       }
 
       if (!els.qtyModeHint) return;
@@ -652,16 +652,16 @@
       els.qtyModeHint.style.display = "block";
 
       if (selectedItem && boxQty > 0) {
-        els.qtyModeHint.textContent = `1 коробка = ${boxQty} шт. В остатки уйдёт количество в штуках автоматически.`;
+        els.qtyModeHint.textContent = i18n.format("incoming.qtyModeHintBoxesReady", { boxQty });
         return;
       }
 
       if (selectedItem) {
-        els.qtyModeHint.textContent = "У этого товара не заполнено поле «Штук в коробке». Приёмка коробками недоступна.";
+        els.qtyModeHint.textContent = i18n.t("incoming.qtyModeHintBoxesUnavailable");
         return;
       }
 
-      els.qtyModeHint.textContent = "Выбери товар, чтобы система показала, сколько штук в одной коробке.";
+      els.qtyModeHint.textContent = i18n.t("incoming.qtyModeHintSelectItem");
     }
 
 
@@ -683,7 +683,7 @@
           ${selectedItem.sku ? " | SKU: " + Ui.escapeHtml(selectedItem.sku) : ""}
           ${selectedItem.barcode ? " | " + Ui.escapeHtml(i18n.t("incoming.shortBarcode")) + ": " + Ui.escapeHtml(selectedItem.barcode) : ""}
           ${selectedItem.vendor_code ? " | " + Ui.escapeHtml(i18n.t("incoming.shortArticle")) + ": " + Ui.escapeHtml(selectedItem.vendor_code) : ""}
-          | Штук в коробке: ${Ui.escapeHtml(String(boxQty > 0 ? boxQty : "не задано"))}
+          | ${Ui.escapeHtml(i18n.t("incoming.boxQtyLabel"))}: ${Ui.escapeHtml(String(boxQty > 0 ? boxQty : i18n.t("incoming.boxQtyNotSet")))}
         </div>
       `;
 
@@ -823,7 +823,7 @@
 
         if (mode === "boxes") {
           if (!boxQty || boxQty <= 0) {
-            throw new Error("У выбранного товара не заполнено поле «Штук в коробке». Приёмка коробками невозможна.");
+            throw new Error(i18n.t("incoming.boxQtyMissingError"));
           }
           finalQty = inputQty * boxQty;
         }
@@ -834,7 +834,7 @@
           commentParts.push(originalComment);
         }
         if (mode === "boxes") {
-          commentParts.push(`Принято коробками: ${inputQty} кор. × ${boxQty} шт = ${finalQty} шт`);
+          commentParts.push(i18n.format("incoming.receivedByBoxesComment", { inputQty, boxQty, finalQty }));
         }
 
         const body = {
