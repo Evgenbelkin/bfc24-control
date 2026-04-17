@@ -2099,7 +2099,16 @@
         sold: "Sold",
         noProblemProductsTitle: "No problem items",
         noProblemProductsText: "No items with risk or slowdown were found for the current period.",
-        problemProductsErrorTitle: "Problem items error"
+        problemProductsErrorTitle: "Problem items error",
+        problemSectionTitle: "Problem items",
+        problemSectionNote: "turnover and risk",
+        statusHealthy: "Healthy",
+        statusWarning: "Warning",
+        statusRisk: "Risk",
+        statusCritical: "Critical",
+        statusStaleNoSales: "No sales",
+        statusNoSales: "No sales",
+        statusOutOfStock: "Out of stock"
       },
 
       turnover: {
