@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru" translate="no" data-page-title-i18n="stock.pageTitle">
+<html lang="ru" translate="no" data-page-title-i18n="batches.pageTitle">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL — Партии / Себестоимость</title>
+  <title data-i18n="batches.pageTitle">BFC24 CONTROL — Партии / Себестоимость</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="google" content="notranslate" />
 
@@ -570,74 +570,74 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">Партии / Себестоимость</div>
+      <div class="title" data-i18n="batches.heading">Партии / Себестоимость</div>
 
       <div class="topbar-right">
         <div id="langSwitcher" class="lang-switcher"></div>
 
         <div class="top-actions">
-          <button class="btn btn-light" onclick="goBack()">Назад</button>
-          <button class="btn btn-light" onclick="logout()">Выйти</button>
+          <button class="btn btn-light" onclick="goBack()" data-i18n="common.backButton">Назад</button>
+          <button class="btn btn-light" onclick="logout()" data-i18n="common.logoutButton">Выйти</button>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтр и сравнительный курс</h2>
+      <h2 class="card-title" data-i18n="batches.filterCardTitle">Фильтр и сравнительный курс</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск по товару / артикулу / штрихкоду</label>
-          <input id="searchInput" type="text" placeholder="Например: Самолет, SKU, barcode" />
+          <label for="searchInput" data-i18n="batches.searchLabel">Поиск по товару / артикулу / штрихкоду</label>
+          <input id="searchInput" type="text" placeholder="Например: Самолет, SKU, barcode" data-i18n-placeholder="batches.searchPlaceholder" />
         </div>
 
         <div class="field">
-          <label for="currentCnyRateInput">Текущий курс ¥</label>
-          <input id="currentCnyRateInput" type="number" min="0" step="0.0001" placeholder="Например: 11.80" />
+          <label for="currentCnyRateInput" data-i18n="batches.currentCnyRateLabel">Текущий курс ¥</label>
+          <input id="currentCnyRateInput" type="number" min="0" step="0.0001" placeholder="Например: 11.80" data-i18n-placeholder="batches.currentCnyRatePlaceholder" />
         </div>
 
         <div class="field">
-          <label for="currentUsdRateInput">Текущий курс $</label>
-          <input id="currentUsdRateInput" type="number" min="0" step="0.0001" placeholder="Например: 92.50" />
+          <label for="currentUsdRateInput" data-i18n="batches.currentUsdRateLabel">Текущий курс $</label>
+          <input id="currentUsdRateInput" type="number" min="0" step="0.0001" placeholder="Например: 92.50" data-i18n-placeholder="batches.currentUsdRatePlaceholder" />
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="common.refreshButton">Обновить</button>
         </div>
       </div>
 
       <div class="muted" style="margin-top:10px;">
-        Основная таблица оставлена короткой. Сравнительный анализ раскрывается отдельно по каждой партии и не изменяет исторические данные партии.
+        <span data-i18n="batches.filterHint">Основная таблица оставлена короткой. Сравнительный анализ раскрывается отдельно по каждой партии и не изменяет исторические данные партии.</span>
       </div>
 
       <div id="pageStatus" class="status info"></div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Партии товаров</h2>
-      <div class="muted">Сохраняемые поля партии: закупка в юанях, курс юаня, доставка в долларах и курс доллара. Аналитика ниже раскрывается по кнопке “Анализ”.</div>
+      <h2 class="card-title" data-i18n="batches.tableCardTitle">Партии товаров</h2>
+      <div class="muted" data-i18n="batches.tableCardHint">Сохраняемые поля партии: закупка в юанях, курс юаня, доставка в долларах и курс доллара. Аналитика ниже раскрывается по кнопке “Анализ”.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th class="photo-col">Фото</th>
-              <th>Товар</th>
-              <th>Артикул / SKU</th>
-              <th>Штрихкод</th>
-              <th>Дата партии</th>
-              <th>Кол-во в партии</th>
-              <th>Остаток партии</th>
-              <th>Себестоимость 1 шт, ₽</th>
-              <th>Сумма остатка, ₽</th>
-              <th>Статус</th>
-              <th>Действие</th>
+              <th class="photo-col" data-i18n="batches.tablePhoto">Фото</th>
+              <th data-i18n="batches.tableItem">Товар</th>
+              <th data-i18n="batches.tableSku">Артикул / SKU</th>
+              <th data-i18n="batches.tableBarcode">Штрихкод</th>
+              <th data-i18n="batches.tableBatchDate">Дата партии</th>
+              <th data-i18n="batches.tableQtyTotal">Кол-во в партии</th>
+              <th data-i18n="batches.tableQtyRemaining">Остаток партии</th>
+              <th data-i18n="batches.tableUnitCostRub">Себестоимость 1 шт, ₽</th>
+              <th data-i18n="batches.tableStockSumRub">Сумма остатка, ₽</th>
+              <th data-i18n="batches.tableStatus">Статус</th>
+              <th data-i18n="batches.tableAction">Действие</th>
             </tr>
           </thead>
           <tbody id="batchesTbody">
             <tr>
-              <td colspan="11" class="empty">Загрузка партий...</td>
+              <td colspan="11" class="empty" data-i18n="batches.loadingRows">Загрузка партий...</td>
             </tr>
           </tbody>
         </table>
@@ -647,7 +647,7 @@
 
   <div id="imageModal" class="image-modal" aria-hidden="true">
     <div class="image-modal-content">
-      <img id="imageModalImg" alt="Фото товара" />
+      <img id="imageModalImg" alt="Фото товара" data-i18n-title="batches.imageAlt" />
     </div>
   </div>
 
@@ -663,7 +663,7 @@
     }
 
     const Ui = window.AppUI || {
-      translateError: (value) => String(value || "Ошибка"),
+      translateError: (value) => String(value || (window.i18n ? t("batches.errorDefault") : "Error")),
     };
 
     async function requestFallback(method, path, body) {
@@ -767,6 +767,7 @@
     function openImageModal(src) {
       if (!src || !els.imageModal || !els.imageModalImg) return;
       els.imageModalImg.src = src;
+      els.imageModalImg.alt = t("batches.imageAlt");
       els.imageModal.classList.add("show");
       els.imageModal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
@@ -799,6 +800,16 @@
       } else {
         showStatus(String(key), type);
       }
+    }
+
+    function t(key, vars = {}) {
+      if (window.i18n && typeof window.i18n.format === "function") {
+        return window.i18n.format(key, vars);
+      }
+      if (window.i18n && typeof window.i18n.t === "function") {
+        return window.i18n.t(key);
+      }
+      return key;
     }
 
     function normalize(data, type = "") {
@@ -847,7 +858,7 @@
       if (!value) return "";
       const d = new Date(value);
       if (Number.isNaN(d.getTime())) return String(value);
-      return d.toLocaleDateString("ru-RU");
+      return d.toLocaleDateString(window.i18n ? i18n.getLang() : "ru-RU");
     }
 
     function getStoredCurrentRate(key) {
@@ -946,19 +957,19 @@
       const imageUrl = row.image_url ? String(row.image_url).trim() : "";
       if (!imageUrl) {
         return large
-          ? `<div class="analysis-photo-large">Нет фото</div>`
-          : `<div class="photo-box">Нет фото</div>`;
+          ? `<div class="analysis-photo-large">${escapeHtml(t("batches.noPhoto"))}</div>`
+          : `<div class="photo-box">${escapeHtml(t("batches.noPhoto"))}</div>`;
       }
 
       return large
-        ? `<div class="analysis-photo-large photo-box is-clickable" onclick="openImageModal('${escapeHtml(imageUrl)}')"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(row.item_name || "Фото")}" /></div>`
-        : `<div class="photo-box is-clickable" onclick="openImageModal('${escapeHtml(imageUrl)}')"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(row.item_name || "Фото")}" /></div>`;
+        ? `<div class="analysis-photo-large photo-box is-clickable" onclick="openImageModal('${escapeHtml(imageUrl)}')"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(row.item_name || t("batches.photoAlt"))}" /></div>`
+        : `<div class="photo-box is-clickable" onclick="openImageModal('${escapeHtml(imageUrl)}')"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(row.item_name || t("batches.photoAlt"))}" /></div>`;
     }
 
     function renderMainRow(row) {
       const calc = calcBatchFinance(row);
       const statusClass = calc.isFinanceFilled ? "ok" : "missing";
-      const statusText = calc.isFinanceFilled ? "Заполнено" : "Не заполнено";
+      const statusText = calc.isFinanceFilled ? t("batches.statusFilled") : t("batches.statusMissing");
       const trClass = calc.isFinanceFilled ? "batch-row-finance-ok" : "batch-row-finance-missing";
       const isExpanded = String(expandedBatchId || "") === String(row.id || "");
 
@@ -975,7 +986,7 @@
           <td class="mono">${escapeHtml(formatNumber(calc.stockSumRub, 2))}</td>
           <td><span class="batch-status ${statusClass}">${escapeHtml(statusText)}</span></td>
           <td class="batch-actions">
-            <button type="button" class="btn btn-small btn-ghost js-toggle-analysis">${isExpanded ? "Скрыть анализ" : "Анализ"}</button>
+            <button type="button" class="btn btn-small btn-ghost js-toggle-analysis">${isExpanded ? t("batches.hideAnalysisButton") : t("batches.analysisButton")}</button>
           </td>
         </tr>
       `;
@@ -994,133 +1005,133 @@
             <div class="analysis-panel">
               <div class="analysis-grid">
                 <div class="analysis-block">
-                  <div class="analysis-title">Партия и историческая себестоимость</div>
+                  <div class="analysis-title">${escapeHtml(t("batches.analysisHistoricalTitle"))}</div>
                   <div class="analysis-photo-wrap">
                     ${buildPhotoHtml(row, true)}
                     <div class="analysis-item-lines">
                       <div class="analysis-item-name">${escapeHtml(row.item_name || "")}</div>
                       <div class="analysis-item-sub">SKU: ${escapeHtml(row.sku || "—")}</div>
-                      <div class="analysis-item-sub">Штрихкод: ${escapeHtml(row.barcode || "—")}</div>
-                      <div class="analysis-item-sub">Дата партии: ${escapeHtml(formatBatchDate(row.batch_date))}</div>
-                      <div class="analysis-item-sub">Остаток партии: ${escapeHtml(formatNumber(row.qty_remaining))} шт</div>
+                      <div class="analysis-item-sub">${escapeHtml(t("batches.analysisBarcodeValue", { value: row.barcode || "—" }))}</div>
+                      <div class="analysis-item-sub">${escapeHtml(t("batches.analysisBatchDateValue", { value: formatBatchDate(row.batch_date) }))}</div>
+                      <div class="analysis-item-sub">${escapeHtml(t("batches.analysisQtyRemainingValue", { value: formatNumber(row.qty_remaining) }))}</div>
                     </div>
                   </div>
 
                   <div class="analysis-form" style="margin-top:12px;">
                     <div class="field">
-                      <label>Закупка, ¥/шт</label>
+                      <label>${escapeHtml(t("batches.inputUnitCost"))}</label>
                       <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="unit_cost" value="${escapeHtml(formatNumber(row.unit_cost))}" />
                     </div>
                     <div class="field">
-                      <label>Курс ¥</label>
+                      <label>${escapeHtml(t("batches.inputCnyRate"))}</label>
                       <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="cny_rate" value="${escapeHtml(formatNumber(row.cny_rate))}" />
                     </div>
                     <div class="field">
-                      <label>Доставка, $/партия</label>
+                      <label>${escapeHtml(t("batches.inputDeliveryCost"))}</label>
                       <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="delivery_cost" value="${escapeHtml(formatNumber(row.delivery_cost))}" />
                     </div>
                     <div class="field">
-                      <label>Курс $</label>
+                      <label>${escapeHtml(t("batches.inputUsdRate"))}</label>
                       <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="usd_rate" value="${escapeHtml(formatNumber(row.usd_rate))}" />
                     </div>
                   </div>
 
                   <div class="metrics" style="margin-top:12px;">
                     <div class="metric">
-                      <div class="metric-label">Закупка, ₽/шт</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricPurchaseRubPerUnit"))}</div>
                       <div class="metric-value mono js-purchase-rub-per-unit">${escapeHtml(formatNumber(calc.purchaseRubPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Доставка, ₽/шт</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricDeliveryRubPerUnit"))}</div>
                       <div class="metric-value mono js-delivery-rub-per-unit">${escapeHtml(formatNumber(calc.deliveryRubPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Историческая себестоимость 1 шт, ₽</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricHistoricalUnitCostRub"))}</div>
                       <div class="metric-value mono js-unit-cost-rub">${escapeHtml(formatNumber(calc.unitCostRub, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Сумма остатка, ₽</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricStockSumRub"))}</div>
                       <div class="metric-value mono js-stock-sum-rub">${escapeHtml(formatNumber(calc.stockSumRub, 2))}</div>
                     </div>
                   </div>
 
                   <div class="analysis-actions">
-                    <button type="button" class="btn btn-small btn-save js-save-batch">Сохранить партию</button>
-                    <span class="batch-status ${calc.isFinanceFilled ? "ok" : "missing"} js-batch-status">${calc.isFinanceFilled ? "Заполнено" : "Не заполнено"}</span>
+                    <button type="button" class="btn btn-small btn-save js-save-batch">${escapeHtml(t("batches.saveBatchButton"))}</button>
+                    <span class="batch-status ${calc.isFinanceFilled ? "ok" : "missing"} js-batch-status">${calc.isFinanceFilled ? t("batches.statusFilled") : t("batches.statusMissing")}</span>
                   </div>
                   ${saveStatusHtml}
                 </div>
 
                 <div class="analysis-block">
-                  <div class="analysis-title">Рынок сейчас</div>
+                  <div class="analysis-title">${escapeHtml(t("batches.analysisMarketNowTitle"))}</div>
                   <div class="metrics">
                     <div class="metric">
-                      <div class="metric-label">Текущий курс ¥</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricCurrentCnyRate"))}</div>
                       <div class="metric-value mono js-current-cny-rate">${escapeHtml(formatNumber(compare.currentCnyRate, 4))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Текущий курс $</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricCurrentUsdRate"))}</div>
                       <div class="metric-value mono js-current-usd-rate">${escapeHtml(formatNumber(compare.currentUsdRate, 4))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Себестоимость сейчас, ₽/шт</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricCurrentUnitCostRub"))}</div>
                       <div class="metric-value mono js-current-unit-cost-rub">${escapeHtml(formatNumber(compare.currentUnitCostRub, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Изменение к партии, ₽</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricDiffRubPerUnit"))}</div>
                       <div class="metric-value mono js-diff-rub-per-unit ${getValueTone(compare.diffRubPerUnit, false)}">${escapeHtml(formatSignedNumber(compare.diffRubPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Изменение к партии, %</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricDiffPercent"))}</div>
                       <div class="metric-value mono js-diff-percent ${getValueTone(compare.diffPercent, false)}">${escapeHtml(formatSignedNumber(compare.diffPercent, 2))}%</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Текущая доставка, ₽/шт</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricCurrentDeliveryRubPerUnit"))}</div>
                       <div class="metric-value mono js-current-delivery-rub-per-unit">${escapeHtml(formatNumber(compare.currentDeliveryRubPerUnit, 2))}</div>
                     </div>
                   </div>
 
                   <div class="analysis-help">
-                    Этот блок не меняет партию. Он только показывает, насколько изменилась бы себестоимость, если привозить товар сегодня по текущему курсу сверху страницы.
+                    ${escapeHtml(t("batches.marketHelp"))}
                   </div>
                 </div>
 
                 <div class="analysis-block">
-                  <div class="analysis-title">Цена и прибыль</div>
+                  <div class="analysis-title">${escapeHtml(t("batches.analysisPriceProfitTitle"))}</div>
                   <div class="field">
-                    <label>Цена продажи сейчас, ₽/шт</label>
+                    <label>${escapeHtml(t("batches.salePriceLabel"))}</label>
                     <input class="input-mini js-analysis-sale-price" type="number" min="0" step="0.0001" value="${escapeHtml(formatNumber(row._analysisSalePrice || 0))}" />
                   </div>
 
                   <div class="metrics" style="margin-top:12px;">
                     <div class="metric">
-                      <div class="metric-label">Минимальная цена, ₽/шт</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricReserveToZeroPerUnit"))}</div>
                       <div class="metric-value mono js-reserve-to-zero ${getValueTone(compare.reserveToZeroPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.reserveToZeroPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Прибыль сейчас, ₽/шт</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricResultPerUnit"))}</div>
                       <div class="metric-value mono js-result-per-unit ${getValueTone(compare.resultPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.resultPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Итого прибыль (остаток), ₽</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricResultRemainingRub"))}</div>
                       <div class="metric-value mono js-result-remaining ${getValueTone(compare.resultRemainingRub, true)}">${escapeHtml(formatSignedNumber(compare.resultRemainingRub, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Маржа, %</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricMarginPercent"))}</div>
                       <div class="metric-value mono js-margin-percent ${getValueTone(compare.marginPercent, true)}">${escapeHtml(formatSignedNumber(compare.marginPercent, 2))}%</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Реальная прибыль, ₽/шт</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricHistoricalResultPerUnit"))}</div>
                       <div class="metric-value mono js-historical-result-per-unit ${getValueTone(compare.historicalResultPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.historicalResultPerUnit, 2))}</div>
                     </div>
                     <div class="metric">
-                      <div class="metric-label">Реальная прибыль (остаток), ₽</div>
+                      <div class="metric-label">${escapeHtml(t("batches.metricHistoricalResultRemainingRub"))}</div>
                       <div class="metric-value mono js-historical-result-remaining ${getValueTone(compare.historicalResultRemainingRub, true)}">${escapeHtml(formatSignedNumber(compare.historicalResultRemainingRub, 2))}</div>
                     </div>
                   </div>
 
                   <div class="analysis-help">
-                    “Минимальная цена” — это порог ниже, которого продажа по текущему рынку уйдёт в минус. “Прибыль сейчас” считается по текущим курсам сверху страницы. “Реальная прибыль” считается по фактической себестоимости именно этой партии.
+                    ${escapeHtml(t("batches.profitHelp"))}
                   </div>
                 </div>
               </div>
@@ -1158,7 +1169,7 @@
       if (!rows.length) {
         els.batchesTbody.innerHTML = `
           <tr>
-            <td colspan="11" class="empty">Партий пока нет</td>
+            <td colspan="11" class="empty">${escapeHtml(t("batches.noData"))}</td>
           </tr>
         `;
         return;
@@ -1232,7 +1243,7 @@
 
       const statusEl = panel.querySelector('.js-batch-status');
       const isFinanceFilled = calc.isFinanceFilled;
-      statusEl.textContent = isFinanceFilled ? 'Заполнено' : 'Не заполнено';
+      statusEl.textContent = isFinanceFilled ? t("batches.statusFilled") : t("batches.statusMissing");
       statusEl.className = 'batch-status js-batch-status ' + (isFinanceFilled ? 'ok' : 'missing');
     }
 
@@ -1278,7 +1289,7 @@
           try {
             saveBtn.disabled = true;
             if (statusEl) {
-              statusEl.textContent = 'Сохраняем...';
+              statusEl.textContent = t("batches.savingStatus");
               statusEl.className = 'batch-save-status info';
             }
 
@@ -1301,7 +1312,7 @@
                 ...updated,
                 _analysisSalePrice: batchesData[index]._analysisSalePrice || 0,
                 _saveStatusType: 'success',
-                _saveStatusText: 'Сохранено'
+                _saveStatusText: t("batches.savedStatus")
               };
             }
 
@@ -1329,7 +1340,7 @@
 
       const calc = calcBatchFinance(row);
       const statusClass = calc.isFinanceFilled ? "ok" : "missing";
-      const statusText = calc.isFinanceFilled ? "Заполнено" : "Не заполнено";
+      const statusText = calc.isFinanceFilled ? t("batches.statusFilled") : t("batches.statusMissing");
       const trClass = calc.isFinanceFilled ? "batch-row-finance-ok" : "batch-row-finance-missing";
 
       mainRow.className = `batch-main-row ${trClass}`;
@@ -1341,7 +1352,7 @@
 
     async function loadData() {
       try {
-        setPageStatus("stock.loadingStatus", {}, "info");
+        setPageStatus("batches.loadingStatus", { tenantId: getTenantId() }, "info");
 
         const tenantId = getTenantId();
         const batchesRes = await ApiBridge.get(`/stock/batches?tenant_id=${tenantId}`);
@@ -1354,14 +1365,14 @@
         }));
 
         renderBatches();
-        setPageStatus("stock.loadedStatus", { batches: batchesData.length }, "success");
+        setPageStatus("batches.loadedStatus", { tenantId: tenantId, count: batchesData.length }, "success");
       } catch (err) {
         els.batchesTbody.innerHTML = `
           <tr>
-            <td colspan="11" class="empty">Ошибка загрузки партий</td>
+            <td colspan="11" class="empty">${escapeHtml(t("batches.loadErrorRow"))}</td>
           </tr>
         `;
-        setPageStatus("stock.loadErrorStatus", {
+        setPageStatus("batches.loadErrorStatus", {
           error: Ui.translateError(err.message)
         }, "error");
       }
@@ -1392,9 +1403,14 @@
       });
 
       document.addEventListener("app:language-changed", () => {
+        if (window.i18n) {
+          window.i18n.applyTranslations();
+          window.i18n.renderLanguageSwitcher("langSwitcher");
+        }
         if (pageStatusState) {
           showStatus(i18n.format(pageStatusState.key, pageStatusState.vars || {}), pageStatusState.type);
         }
+        renderBatches();
       });
     }
 
