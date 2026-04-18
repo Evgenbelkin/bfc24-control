@@ -511,8 +511,8 @@
 
     <div class="grid">
       <div class="card">
-        <h2 class="card-title">Новый документ продажи</h2>
-        <div class="muted">Теперь продажа собирается в один документ с несколькими строками. Backend /sales/sell уже принимает массив line_items, поэтому списание и sale_items пойдут одной операцией.</div>
+        <h2 class="card-title" data-i18n="sales.cardTitle">Новый документ продажи</h2>
+        <div class="muted" data-i18n="sales.subtitle">Теперь продажа собирается в один документ с несколькими строками. Backend /sales/sell уже принимает массив line_items, поэтому списание и sale_items пойдут одной операцией.</div>
 
         <div class="stats">
           <div class="stat">
@@ -540,43 +540,43 @@
             <div class="field">
               <label for="tenantId">Tenant ID</label>
               <input id="tenantId" type="number" min="1" value="1" />
-              <div class="hint">Для owner обязательно.</div>
+              <div class="hint" data-i18n="sales.tenantIdHint">Для owner обязательно.</div>
             </div>
 
             <div class="field">
-              <label for="paymentMethod">Способ оплаты</label>
+              <label for="paymentMethod" data-i18n="sales.paymentMethodLabel">Способ оплаты</label>
               <select id="paymentMethod">
-                <option value="cash">Наличные</option>
-                <option value="card">Карта</option>
-                <option value="transfer">Перевод</option>
-                <option value="consignment">Под реализацию</option>
+                <option value="cash" data-i18n="sales.paymentCash">Наличные</option>
+                <option value="card" data-i18n="sales.paymentCard">Карта</option>
+                <option value="transfer" data-i18n="sales.paymentTransfer">Перевод</option>
+                <option value="consignment" data-i18n="sales.paymentConsignment">Под реализацию</option>
               </select>
             </div>
 
             <div class="field">
-              <label for="counterpartyId">Клиент</label>
+              <label for="counterpartyId" data-i18n="sales.clientLabel">Клиент</label>
               <select id="counterpartyId">
-                <option value="">Без клиента</option>
+                <option value="" data-i18n="sales.clientEmpty">Без клиента</option>
               </select>
             </div>
 
             <div class="field">
-              <label for="commonComment">Комментарий к документу</label>
-              <textarea id="commonComment" placeholder="Общий комментарий к продаже"></textarea>
+              <label for="commonComment" data-i18n="sales.commonCommentLabel">Комментарий к документу</label>
+              <textarea id="commonComment" data-i18n-placeholder="sales.commonCommentPlaceholder" placeholder="Общий комментарий к продаже"></textarea>
             </div>
           </div>
 
           <div class="line-builder">
-            <div class="section-title">Добавление строки в документ</div>
+            <div class="section-title" data-i18n="sales.lineBuilderTitle">Добавление строки в документ</div>
 
             <div class="line-grid">
               <div class="field">
-                <label for="itemSearch">Товар</label>
+                <label for="itemSearch" data-i18n="sales.itemSearchLabel">Товар</label>
                 <div class="autocomplete">
                   <input
                     id="itemSearch"
                     type="text"
-                    placeholder="Начни вводить название, штрихкод, SKU или артикул"
+                    data-i18n-placeholder="sales.itemSearchPlaceholder" placeholder="Начни вводить название, штрихкод, SKU или артикул"
                     autocomplete="off"
                   />
                   <div id="itemResults" class="results"></div>
@@ -585,70 +585,70 @@
               </div>
 
               <div class="field">
-                <label for="locationId">Место хранения</label>
+                <label for="locationId" data-i18n="sales.locationLabel">Место хранения</label>
                 <select id="locationId">
-                  <option value="">Выберите МХ</option>
+                  <option value="" data-i18n="sales.locationEmpty">Выберите МХ</option>
                 </select>
               </div>
 
               <div class="field">
-                <label for="saleMode">Режим продажи</label>
+                <label for="saleMode" data-i18n="sales.saleModeLabel">Режим продажи</label>
                 <select id="saleMode">
-                  <option value="pcs">Штуки</option>
-                  <option value="boxes" selected>Коробки</option>
+                  <option value="pcs" data-i18n="sales.saleModePcs">Штуки</option>
+                  <option value="boxes" selected data-i18n="sales.saleModeBoxes">Коробки</option>
                 </select>
-                <div class="hint" id="saleModeHint">По умолчанию продажа идёт коробками, если у товара заполнено "Штук в коробке".</div>
+                <div class="hint" id="saleModeHint" data-i18n="sales.saleModeHintDefault">По умолчанию продажа идёт коробками, если у товара заполнено "Штук в коробке".</div>
               </div>
 
               <div class="field">
-                <label for="qty">Количество</label>
+                <label for="qty" data-i18n="sales.qtyLabel">Количество</label>
                 <input id="qty" type="number" min="1" step="1" value="1" />
                 <div class="hint" id="qtyModeHint"></div>
               </div>
 
               <div class="field">
-                <label for="price">Цена за единицу</label>
+                <label for="price" data-i18n="sales.priceLabel">Цена за единицу</label>
                 <input id="price" type="number" min="0" step="0.01" value="0" />
               </div>
 
               <div class="field full">
-                <label for="lineComment">Комментарий к строке</label>
-                <textarea id="lineComment" placeholder="Комментарий только для этой строки"></textarea>
+                <label for="lineComment" data-i18n="sales.lineCommentLabel">Комментарий к строке</label>
+                <textarea id="lineComment" data-i18n-placeholder="sales.lineCommentPlaceholder" placeholder="Комментарий только для этой строки"></textarea>
               </div>
             </div>
 
             <div class="line-actions">
-              <button type="button" class="btn btn-success" id="addLineBtn">Добавить строку</button>
-              <button type="button" class="btn btn-light" id="resetLineBtn">Очистить ввод строки</button>
-              <span class="small-muted">Сначала собираешь все позиции, потом проводишь весь документ одной кнопкой.</span>
+              <button type="button" class="btn btn-success" id="addLineBtn" data-i18n="sales.addLineButton">Добавить строку</button>
+              <button type="button" class="btn btn-light" id="resetLineBtn" data-i18n="sales.resetLineButton">Очистить ввод строки</button>
+              <span class="small-muted" data-i18n="sales.lineBuilderHelp">Сначала собираешь все позиции, потом проводишь весь документ одной кнопкой.</span>
             </div>
 
             <div id="lineStatus" class="status"></div>
           </div>
 
           <div style="margin-top:18px;">
-            <div class="section-title">Строки документа</div>
+            <div class="section-title" data-i18n="sales.documentLinesTitle">Строки документа</div>
 
             <div class="doc-table-wrap">
               <table class="doc-table">
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Товар</th>
-                    <th>МХ</th>
-                    <th>Режим</th>
-                    <th class="num">Ввод</th>
-                    <th class="num">Итог шт</th>
-                    <th class="num">Цена</th>
-                    <th class="num">Сумма</th>
-                    <th>Остаток</th>
-                    <th>Комментарий</th>
-                    <th>Действия</th>
+                    <th data-i18n="sales.docTableItem">Товар</th>
+                    <th data-i18n="sales.docTableLocation">МХ</th>
+                    <th data-i18n="sales.docTableMode">Режим</th>
+                    <th class="num" data-i18n="sales.docTableInput">Ввод</th>
+                    <th class="num" data-i18n="sales.docTableQty">Итог шт</th>
+                    <th class="num" data-i18n="sales.docTablePrice">Цена</th>
+                    <th class="num" data-i18n="sales.docTableAmount">Сумма</th>
+                    <th data-i18n="sales.docTableStock">Остаток</th>
+                    <th data-i18n="sales.docTableComment">Комментарий</th>
+                    <th data-i18n="sales.docTableActions">Действия</th>
                   </tr>
                 </thead>
                 <tbody id="documentLinesBody">
                   <tr>
-                    <td colspan="11" class="doc-empty">Пока нет ни одной строки. Добавь товары в документ.</td>
+                    <td colspan="11" class="doc-empty">${escapeHtml(t("sales.docEmpty", "Пока нет ни одной строки. Добавь товары в документ."))}</td>
                   </tr>
                 </tbody>
               </table>
@@ -656,28 +656,28 @@
 
             <div class="totals-grid">
               <div class="total-card">
-                <div class="label">Строк в документе</div>
+                <div class="label" data-i18n="sales.totalsLines">Строк в документе</div>
                 <div class="value" id="docLinesCount">0</div>
               </div>
               <div class="total-card">
-                <div class="label">Всего штук</div>
+                <div class="label" data-i18n="sales.totalsQty">Всего штук</div>
                 <div class="value" id="docQtyTotal">0</div>
               </div>
               <div class="total-card">
-                <div class="label">Сумма документа</div>
+                <div class="label" data-i18n="sales.totalsAmount">Сумма документа</div>
                 <div class="value" id="docAmountTotal">0 ₽</div>
               </div>
               <div class="total-card">
-                <div class="label">Позиций</div>
+                <div class="label" data-i18n="sales.totalsUniqueItems">Позиций</div>
                 <div class="value" id="docUniqueItems">0</div>
               </div>
             </div>
           </div>
 
           <div class="inline" style="margin-top:18px;">
-            <button type="submit" class="btn btn-primary" id="submitBtn">Провести продажу</button>
-            <button type="button" class="btn btn-light" onclick="loadInitialData()" id="refreshDataBtn">Обновить данные</button>
-            <button type="button" class="btn btn-light" id="clearDocumentBtn">Очистить документ</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn" data-i18n="sales.submitButton">Провести продажу</button>
+            <button type="button" class="btn btn-light" onclick="loadInitialData()" id="refreshDataBtn" data-i18n="sales.refreshDataButton">Обновить данные</button>
+            <button type="button" class="btn btn-light" id="clearDocumentBtn" data-i18n="sales.clearDocumentButton">Очистить документ</button>
           </div>
         </form>
 
@@ -701,7 +701,7 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;"),
-      translateError: (value) => String(value || "Ошибка"),
+      translateError: (value) => String(value || (window.i18n ? window.i18n.t("common.error") : "Ошибка")),
       displayDateTime: (value) => {
         if (!value) return "";
         const d = new Date(value);
@@ -734,6 +734,23 @@
       }
 
       return data;
+    }
+
+
+    function t(key, fallback = "") {
+      if (window.i18n && typeof window.i18n.t === "function") {
+        const value = window.i18n.t(key);
+        if (value && value !== key) return value;
+      }
+      return fallback || key;
+    }
+
+    function f(key, vars = {}, fallback = "") {
+      if (window.i18n && typeof window.i18n.format === "function") {
+        const value = window.i18n.format(key, vars);
+        if (value && value !== key) return value;
+      }
+      return fallback || key;
     }
 
     function getTenantIdFromStorage(fallback = 1) {
@@ -1048,7 +1065,7 @@
       if (!locations.length) {
         return `
           <div class="selected-stock zero">
-            ${escapeHtml("Товар сейчас не найден ни в одной МХ с положительным остатком")}
+            ${escapeHtml(t("sales.locationsNoPositiveStock", "Товар сейчас не найден ни в одной МХ с положительным остатком"))}
           </div>
         `;
       }
@@ -1056,18 +1073,18 @@
       const boxQty = getSelectedBoxQty();
       const chips = locations.map((loc) => {
         const title = `${loc.name}${loc.code ? ` (${loc.code})` : ""}`;
-        const boxText = boxQty > 0 && loc.boxes !== null ? ` | коробок: ${loc.boxes}` : "";
+        const boxText = boxQty > 0 && loc.boxes !== null ? f("sales.locationsChipBoxesPart", { boxes: loc.boxes }, ` | коробок: ${loc.boxes}`) : "";
         const cls = loc.isSelected ? "pill" : (loc.qty <= 0 ? "pill danger" : "pill warn");
         return `
           <span class="${cls}" style="margin:4px 6px 0 0; display:inline-flex;">
-            ${escapeHtml(`${title}: ${formatQty(loc.qty)} шт${boxText}`)}
+            ${escapeHtml(f("sales.locationsChipText", { title, qty: formatQty(loc.qty), boxText }, `${title}: ${formatQty(loc.qty)} шт${boxText}`))}
           </span>
         `;
       }).join("");
 
       return `
         <div class="selected-stock" style="margin-top:10px; color:#111827; font-weight:700;">
-          ${escapeHtml("Где сейчас лежит товар:")}
+          ${escapeHtml(t("sales.locationsWhereStored", "Где сейчас лежит товар:"))}
         </div>
         <div style="margin-top:4px;">
           ${chips}
@@ -1082,14 +1099,14 @@
       if (mode === "boxes") {
         if (els.qtyModeHint) {
           if (boxQty > 0) {
-            els.qtyModeHint.textContent = `1 коробка = ${boxQty} шт`;
+            els.qtyModeHint.textContent = f("sales.qtyModeBoxesReady", { boxQty }, `1 коробка = ${boxQty} шт`);
           } else {
-            els.qtyModeHint.textContent = "У товара не заполнено поле 'Штук в коробке'. Продажа коробками недоступна.";
+            els.qtyModeHint.textContent = t("sales.qtyModeBoxesUnavailable", "У товара не заполнено поле 'Штук в коробке'. Продажа коробками недоступна.");
           }
         }
       } else {
         if (els.qtyModeHint) {
-          els.qtyModeHint.textContent = "Количество вводится в штуках.";
+          els.qtyModeHint.textContent = t("sales.qtyModePieces", "Количество вводится в штуках.");
         }
       }
     }
@@ -1112,17 +1129,17 @@
       if (boxQty > 0) {
         const fullBoxes = stockQty !== null ? Math.floor(Number(stockQty || 0) / boxQty) : null;
         const boxStockText = fullBoxes !== null
-          ? ` | Коробок доступно: ${fullBoxes}`
+          ? f("sales.selectedBoxQtyBoxesPart", { boxes: fullBoxes }, ` | Коробок доступно: ${fullBoxes}`)
           : "";
         boxInfo = `
           <div class="selected-stock ${boxQty <= 0 ? "zero" : ""}">
-            ${escapeHtml(`Штук в коробке: ${boxQty}${boxStockText}`)}
+            ${escapeHtml(f("sales.selectedBoxQty", { boxQty, boxesPart: boxStockText }, `Штук в коробке: ${boxQty}${boxStockText}`))}
           </div>
         `;
       } else if (mode === "boxes") {
         boxInfo = `
           <div class="selected-stock zero">
-            ${escapeHtml("У товара не заполнено поле 'Штук в коробке'.")}
+            ${escapeHtml(t("sales.selectedBoxQtyMissing", "У товара не заполнено поле 'Штук в коробке'."))}
           </div>
         `;
       }
@@ -1130,25 +1147,25 @@
       if (stockQty !== null) {
         stockInfo = `
           <div class="selected-stock ${stockQty <= 0 ? "zero" : ""}">
-            ${escapeHtml(`Остаток в выбранной МХ: ${formatQty(stockQty)} шт`)}
+            ${escapeHtml(f("sales.selectedStockAtLocation", { qty: `${formatQty(stockQty)} шт` }, `Остаток в выбранной МХ: ${formatQty(stockQty)} шт`))}
           </div>
         `;
       } else {
         stockInfo = `
           <div class="selected-stock">
-            ${escapeHtml("Сначала выбери место хранения, чтобы увидеть остаток")}
+            ${escapeHtml(t("sales.selectedStockChooseLocation", "Сначала выбери место хранения, чтобы увидеть остаток"))}
           </div>
         `;
       }
 
       els.selectedItemBox.classList.add("active");
       els.selectedItemBox.innerHTML = `
-        <div><strong>Выбранный товар:</strong> ${escapeHtml(selectedItem.name || "Без названия")}</div>
+        <div><strong>${escapeHtml(t("sales.selectedItemTitle", "Выбранный товар:"))}</strong> ${escapeHtml(selectedItem.name || t("sales.noName", "Без названия"))}</div>
         <div class="muted" style="margin-top:6px;">
           ID: ${escapeHtml(String(selectedItem.id ?? ""))}
           ${selectedItem.sku ? " | SKU: " + escapeHtml(selectedItem.sku) : ""}
-          ${selectedItem.barcode ? " | ШК: " + escapeHtml(selectedItem.barcode) : ""}
-          ${selectedItem.vendor_code ? " | Арт: " + escapeHtml(selectedItem.vendor_code) : ""}
+          ${selectedItem.barcode ? " | " + escapeHtml(t("sales.shortBarcode", "ШК")) + ": " + escapeHtml(selectedItem.barcode) : ""}
+          ${selectedItem.vendor_code ? " | " + escapeHtml(t("sales.shortArticle", "Арт")) + ": " + escapeHtml(selectedItem.vendor_code) : ""}
         </div>
         ${stockInfo}
         ${boxInfo}
@@ -1161,8 +1178,8 @@
       if (!items.length) {
         els.itemResults.innerHTML = `
           <div class="result-item">
-            <div class="result-title">Ничего не найдено</div>
-            <div class="result-sub">Попробуй другое название, SKU, штрихкод или артикул.</div>
+            <div class="result-title">${escapeHtml(t("sales.searchNoResultsTitle", "Ничего не найдено"))}</div>
+            <div class="result-sub">${escapeHtml(t("sales.searchNoResultsText", "Попробуй другое название, SKU, штрихкод или артикул."))}</div>
           </div>
         `;
         els.itemResults.style.display = "block";
@@ -1171,12 +1188,12 @@
 
       els.itemResults.innerHTML = items.map((item) => `
         <div class="result-item" data-id="${escapeHtml(String(item.id))}">
-          <div class="result-title">${escapeHtml(item.name || "Без названия")}</div>
+          <div class="result-title">${escapeHtml(item.name || t("sales.noName", "Без названия"))}</div>
           <div class="result-sub">
             ID: ${escapeHtml(String(item.id ?? ""))}
             ${item.sku ? " | SKU: " + escapeHtml(item.sku) : ""}
-            ${item.barcode ? " | ШК: " + escapeHtml(item.barcode) : ""}
-            ${item.vendor_code ? " | Арт: " + escapeHtml(item.vendor_code) : ""}
+            ${item.barcode ? " | " + escapeHtml(t("sales.shortBarcode", "ШК")) + ": " + escapeHtml(item.barcode) : ""}
+            ${item.vendor_code ? " | " + escapeHtml(t("sales.shortArticle", "Арт")) + ": " + escapeHtml(item.vendor_code) : ""}
           </div>
         </div>
       `).join("");
@@ -1203,7 +1220,7 @@
     }
 
     function fillLocations() {
-      els.locationId.innerHTML = `<option value="">Выберите МХ</option>` +
+      els.locationId.innerHTML = `<option value="">${escapeHtml(t("sales.locationEmpty", "Выберите МХ"))}</option>` +
         allLocations.map((loc) => `
           <option value="${escapeHtml(String(loc.id))}">
             ${escapeHtml(loc.name || "")}${loc.code ? " (" + escapeHtml(loc.code) + ")" : ""}
@@ -1212,7 +1229,7 @@
     }
 
     function fillClients() {
-      els.counterpartyId.innerHTML = `<option value="">Без клиента</option>` +
+      els.counterpartyId.innerHTML = `<option value="">${escapeHtml(t("sales.clientEmpty", "Без клиента"))}</option>` +
         allClients.map((client) => `
           <option value="${escapeHtml(String(client.id))}">
             ${escapeHtml(client.name || "")}
@@ -1270,7 +1287,7 @@
 
     async function loadInitialData() {
       try {
-        setPageStatus("Загрузка товаров, клиентов, мест хранения и остатков...", {}, "info", true);
+        setPageStatus(f("sales.loadingDataStatus", {}, "Загрузка товаров, клиентов, мест хранения и остатков..."), {}, "info", true);
         selectedItem = null;
         renderSelectedItem();
         els.itemResults.style.display = "none";
@@ -1286,13 +1303,13 @@
         renderDocumentLines();
 
         setPageStatus(
-          `Данные загружены. Товаров: ${allItems.length}, МХ: ${allLocations.length}, клиентов: ${allClients.length}, остатков: ${els.stockCount.textContent}`,
+          f("sales.loadedDataStatus", { items: allItems.length, locations: allLocations.length, clients: allClients.length, stock: els.stockCount.textContent }, `Данные загружены. Товаров: ${allItems.length}, МХ: ${allLocations.length}, клиентов: ${allClients.length}, остатков: ${els.stockCount.textContent}`),
           {},
           "success",
           true
         );
       } catch (err) {
-        setPageStatus(`Ошибка загрузки: ${Ui.translateError(err.message)}`, {}, "error", true);
+        setPageStatus(f("sales.loadErrorStatus", { error: Ui.translateError(err.message) }, `Ошибка загрузки: ${Ui.translateError(err.message)}`), {}, "error", true);
       }
     }
 
@@ -1313,37 +1330,37 @@
 
     function buildDraftLineFromInputs() {
       if (!selectedItem || !selectedItem.id) {
-        throw new Error("Сначала выбери товар");
+        throw new Error(t("sales.itemRequired", "Сначала выбери товар"));
       }
 
       if (!els.locationId.value) {
-        throw new Error("Сначала выбери место хранения");
+        throw new Error(t("sales.locationRequired", "Сначала выбери место хранения"));
       }
 
       const enteredQty = Number(els.qty.value);
       if (!Number.isFinite(enteredQty) || enteredQty <= 0) {
-        throw new Error("Количество должно быть больше нуля");
+        throw new Error(t("sales.qtyInvalid", "Количество должно быть больше нуля"));
       }
 
       const saleMode = String(els.saleMode.value || "pcs");
       const boxQty = getSelectedBoxQty();
 
       if (saleMode === "boxes" && (!Number.isFinite(boxQty) || boxQty <= 0)) {
-        throw new Error("У выбранного товара не заполнено поле 'Штук в коробке'");
+        throw new Error(t("sales.saleModeBoxesUnavailable", "У выбранного товара не заполнено поле 'Штук в коробке'"));
       }
 
       const qty = saleMode === "boxes" ? (enteredQty * boxQty) : enteredQty;
       const price = Number(els.price.value || 0);
 
       if (!Number.isFinite(price) || price < 0) {
-        throw new Error("Цена указана неверно");
+        throw new Error(t("sales.priceInvalid", "Цена указана неверно"));
       }
 
       const location = allLocations.find((loc) => String(loc.id) === String(els.locationId.value));
       const stockQty = getStockQtyFor(selectedItem.id, els.locationId.value);
 
       if (stockQty === null) {
-        throw new Error("Не удалось определить остаток");
+        throw new Error(t("sales.stockUnknown", "Не удалось определить остаток"));
       }
 
       const reservedQty = documentLines
@@ -1353,7 +1370,7 @@
       const freeQty = Number(stockQty) - Number(reservedQty);
 
       if (qty > freeQty) {
-        throw new Error(`Недостаточно остатка. В наличии: ${formatQty(stockQty)} шт, уже добавлено в документ: ${formatQty(reservedQty)} шт, свободно: ${formatQty(freeQty)} шт`);
+        throw new Error(f("sales.notEnoughStock", { stock: formatQty(stockQty), reserved: formatQty(reservedQty), free: formatQty(freeQty) }, `Недостаточно остатка. В наличии: ${formatQty(stockQty)} шт, уже добавлено в документ: ${formatQty(reservedQty)} шт, свободно: ${formatQty(freeQty)} шт`));
       }
 
       return {
@@ -1405,7 +1422,7 @@
         renderDocumentLines();
 
         setLineStatus(
-          `Строка добавлена: ${draftLine.item_name || "Без названия"} — ${formatQty(draftLine.qty)} шт на сумму ${formatMoney(draftLine.amount)}`,
+          f("sales.lineAddedStatus", { item: draftLine.item_name || t("sales.noName","Без названия"), qty: formatQty(draftLine.qty), amount: formatMoney(draftLine.amount) }, `Строка добавлена: ${draftLine.item_name || "Без названия"} — ${formatQty(draftLine.qty)} шт на сумму ${formatMoney(draftLine.amount)}`),
           "success"
         );
 
@@ -1419,29 +1436,29 @@
       if (index < 0 || index >= documentLines.length) return;
       documentLines.splice(index, 1);
       renderDocumentLines();
-      setLineStatus("Строка удалена из документа", "info");
+      setLineStatus(t("sales.lineRemovedStatus", "Строка удалена из документа"), "info");
     }
 
     function clearDocument() {
       documentLines = [];
       renderDocumentLines();
       clearSubmitStatus();
-      setLineStatus("Документ очищен", "info");
+      setLineStatus(t("sales.documentClearedStatus", "Документ очищен"), "info");
     }
 
     function renderDocumentLines() {
       if (!documentLines.length) {
         els.documentLinesBody.innerHTML = `
           <tr>
-            <td colspan="11" class="doc-empty">Пока нет ни одной строки. Добавь товары в документ.</td>
+            <td colspan="11" class="doc-empty">${escapeHtml(t("sales.docEmpty", "Пока нет ни одной строки. Добавь товары в документ."))}</td>
           </tr>
         `;
       } else {
         els.documentLinesBody.innerHTML = documentLines.map((line, index) => {
           const locationText = `${line.location_name || ""}${line.location_code ? " (" + line.location_code + ")" : ""}`;
           const modeText = line.sale_mode === "boxes"
-            ? `Коробки${line.box_qty ? ` (${line.box_qty} шт/кор)` : ""}`
-            : "Штуки";
+            ? f("sales.docModeBoxes", { boxQty: line.box_qty || 0 }, `Коробки${line.box_qty ? ` (${line.box_qty} шт/кор)` : ""}`)
+            : t("sales.docModePieces", "Штуки");
 
           const stockPillClass =
             line.free_qty_after_add < 0 ? "danger" :
@@ -1450,18 +1467,18 @@
 
           const stockPillText =
             line.free_qty_after_add < 0
-              ? `Минус: ${formatQty(line.free_qty_after_add)}`
-              : `После строки: ${formatQty(line.free_qty_after_add)} шт`;
+              ? f("sales.docStockNegative", { qty: formatQty(line.free_qty_after_add) }, `Минус: ${formatQty(line.free_qty_after_add)}`)
+              : f("sales.docStockAfterLine", { qty: formatQty(line.free_qty_after_add) }, `После строки: ${formatQty(line.free_qty_after_add)} шт`);
 
           return `
             <tr>
               <td>${index + 1}</td>
               <td>
-                <div><strong>${escapeHtml(line.item_name || "Без названия")}</strong></div>
+                <div><strong>${escapeHtml(line.item_name || t("sales.noName", "Без названия"))}</strong></div>
                 <div class="small-muted">
                   ${line.item_sku ? "SKU: " + escapeHtml(line.item_sku) : ""}
-                  ${line.item_barcode ? (line.item_sku ? " | " : "") + "ШК: " + escapeHtml(line.item_barcode) : ""}
-                  ${line.item_vendor_code ? ((line.item_sku || line.item_barcode) ? " | " : "") + "Арт: " + escapeHtml(line.item_vendor_code) : ""}
+                  ${line.item_barcode ? (line.item_sku ? " | " : "") + escapeHtml(t("sales.shortBarcode", "ШК")) + ": " + escapeHtml(line.item_barcode) : ""}
+                  ${line.item_vendor_code ? ((line.item_sku || line.item_barcode) ? " | " : "") + escapeHtml(t("sales.shortArticle", "Арт")) + ": " + escapeHtml(line.item_vendor_code) : ""}
                 </div>
               </td>
               <td>${escapeHtml(locationText)}</td>
@@ -1472,11 +1489,11 @@
               <td class="num">${escapeHtml(formatMoney(line.amount))}</td>
               <td>
                 <div class="pill ${stockPillClass}">${escapeHtml(stockPillText)}</div>
-                <div class="small-muted">Было: ${escapeHtml(formatQty(line.stock_qty))} шт / Уже в документе до этой строки: ${escapeHtml(formatQty(line.reserved_qty))} шт</div>
+                <div class="small-muted">${escapeHtml(f("sales.docStockWasReserved", { stock: formatQty(line.stock_qty), reserved: formatQty(line.reserved_qty) }, `Было: ${formatQty(line.stock_qty)} шт / Уже в документе до этой строки: ${formatQty(line.reserved_qty)} шт`))}</div>
               </td>
-              <td>${escapeHtml(line.comment || "—")}</td>
+              <td>${escapeHtml(line.comment || t("sales.dash", "—"))}</td>
               <td class="actions-cell">
-                <button type="button" class="btn btn-danger" onclick="removeDocumentLine(${index})">Удалить</button>
+                <button type="button" class="btn btn-danger" onclick="removeDocumentLine(${index})">${escapeHtml(t("sales.removeButton", "Удалить"))}</button>
               </td>
             </tr>
           `;
@@ -1500,8 +1517,8 @@
 
       try {
         const tenantId = getTenantId();
-        if (!tenantId) throw new Error("Нужно указать tenant_id");
-        if (!documentLines.length) throw new Error("Документ пустой. Добавь хотя бы одну строку");
+        if (!tenantId) throw new Error(t("sales.tenantRequired", "Нужно указать tenant_id"));
+        if (!documentLines.length) throw new Error(t("sales.documentEmptyError", "Документ пустой. Добавь хотя бы одну строку"));
 
         const body = {
           tenant_id: tenantId,
@@ -1521,7 +1538,7 @@
           body.counterparty_id = Number(els.counterpartyId.value);
         }
 
-        setSubmitStatus("Провожу продажу по всему документу...", {}, "info", true);
+        setSubmitStatus(f("sales.submittingStatus", {}, "Провожу продажу по всему документу..."), {}, "info", true);
 
         const result = await apiPost("/sales/sell", body);
 
@@ -1534,9 +1551,9 @@
         els.commonComment.value = "";
         clearLineInputs();
 
-        setSubmitStatus(`Продажа успешно проведена.\n\n${JSON.stringify(result, null, 2)}`, {}, "success", true);
+        setSubmitStatus(f("sales.successStatus", { json: JSON.stringify(result, null, 2) }, `Продажа успешно проведена.\n\n${JSON.stringify(result, null, 2)}`), {}, "success", true);
       } catch (err) {
-        setSubmitStatus(`Ошибка проведения продажи: ${Ui.translateError(err.message)}`, {}, "error", true);
+        setSubmitStatus(f("sales.errorStatus", { error: Ui.translateError(err.message) }, `Ошибка проведения продажи: ${Ui.translateError(err.message)}`), {}, "error", true);
       }
     }
 
