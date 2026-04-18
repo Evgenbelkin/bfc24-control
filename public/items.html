@@ -715,8 +715,8 @@
       <div class="photo-actions">
         <button type="button" class="btn btn-secondary" id="removeImageBtn" data-i18n="items.removePhotoButton">Удалить фото</button>
       </div>
-      <div class="photo-help">
-        <span data-i18n-html="items.photoHelpHtml">Поддерживаются JPG, PNG, WEBP, GIF. Файл загружается в папку <b>/uploads</b>, а в базе хранится путь вида <b>/uploads/filename.jpg</b>.</span>
+      <div class="photo-help" data-i18n-html="items.photoHelpHtml">
+        Поддерживаются JPG, PNG, WEBP, GIF. Файл загружается в папку <b>/uploads</b>, а в базе хранится путь вида <b>/uploads/filename.jpg</b>.
       </div>
     </div>
   </div>
@@ -756,8 +756,8 @@
           </div>
 
           <div class="toolbar-actions">
-            <button type="submit" class="btn btn-primary" id="saveBtn" data-i18n="items.saveButton">Сохранить</button>
-            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;" data-i18n="items.cancelEditButton">Отменить редактирование</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
             <button type="button" class="btn btn-light" id="importExcelBtn" data-i18n="items.importExcelButton">Импорт Excel</button>
             <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="items.refreshButton">Обновить список</button>
           </div>
@@ -779,8 +779,8 @@
           </div>
 
           <div class="field">
-            <label data-i18n="items.selectedFileLabel">Выбранный файл</label>
-            <input id="importFileName" type="text" readonly data-i18n-placeholder="items.importFileNamePlaceholder" placeholder="Файл не выбран" />
+            <label data-i18n="items.importSelectedFileLabel">Выбранный файл</label>
+            <input id="importFileName" type="text" readonly data-i18n-placeholder="items.importFileNotSelected" placeholder="Файл не выбран" />
             <div class="import-actions">
               <button type="button" class="btn btn-secondary" id="previewImportBtn" data-i18n="items.previewImportButton">Показать preview</button>
               <button type="button" class="btn btn-primary" id="runImportBtn" disabled data-i18n="items.runImportButton">Импортировать</button>
@@ -820,18 +820,18 @@
           <table class="preview-table">
             <thead>
               <tr>
-                <th data-i18n="items.importPreviewTableRow">Строка</th>
-                <th data-i18n="items.importPreviewTableStatus">Статус</th>
-                <th data-i18n="items.importPreviewTableReason">Причина</th>
-                <th>SKU</th>
-                <th data-i18n="items.importPreviewTableName">Наименование</th>
-                <th data-i18n="items.tableCategoryName">Категория</th>
-                <th data-i18n="items.tableFactory">Фабрика</th>
-                <th data-i18n="items.importPreviewTableFactoryArticle">Артикул фабрики</th>
-                <th data-i18n="items.importPreviewTableBarcode">ШК</th>
-                <th data-i18n="items.importPreviewTableUnit">Ед.</th>
-                <th data-i18n="items.tableBoxQty">Шт/кор</th>
-                <th data-i18n="items.importPreviewTableSalePrice">Цена продажи</th>
+                <th data-i18n="items.importPreviewColRow">Строка</th>
+                <th data-i18n="items.importPreviewColStatus">Статус</th>
+                <th data-i18n="items.importPreviewColReason">Причина</th>
+                <th data-i18n="items.importPreviewColSku">SKU</th>
+                <th data-i18n="items.importPreviewColName">Наименование</th>
+                <th data-i18n="items.importPreviewColCategory">Категория</th>
+                <th data-i18n="items.importPreviewColFactory">Фабрика</th>
+                <th data-i18n="items.importPreviewColFactoryArticle">Артикул фабрики</th>
+                <th data-i18n="items.importPreviewColBarcode">ШК</th>
+                <th data-i18n="items.importPreviewColUnit">Ед.</th>
+                <th data-i18n="items.importPreviewColBoxQty">Шт/кор</th>
+                <th data-i18n="items.importPreviewColSalePrice">Цена продажи</th>
               </tr>
             </thead>
             <tbody id="importPreviewBody">
@@ -907,7 +907,7 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;"),
-      translateError: (value) => String(value || i18n.t("common.error")),
+      translateError: (value) => String(value || (window.i18n ? i18n.t("common.error") : "Ошибка")),
       displayDateTime: (value) => {
         if (!value) return "";
         const d = new Date(value);
@@ -1433,17 +1433,17 @@
 
       if (row.length_cm !== null || row.width_cm !== null || row.height_cm !== null) {
         parts.push(
-          i18n.format("items.dimensionsBoxValue", { length: formatMetric(row.length_cm, 2), width: formatMetric(row.width_cm, 2), height: formatMetric(row.height_cm, 2) })
+          i18n.format("items.dimensionBoxLine", { length: formatMetric(row.length_cm, 2), width: formatMetric(row.width_cm, 2), height: formatMetric(row.height_cm, 2) })
         );
       }
 
       if (row.weight_kg !== null) {
-        parts.push(i18n.format("items.weightKgValue", { value: formatMetric(row.weight_kg, 3) }));
+        parts.push(i18n.format("items.dimensionWeightLine", { value: formatMetric(row.weight_kg, 3) }));
       }
 
       const volumeCm3 = row.volume_cm3;
       if (volumeCm3 !== null) {
-        parts.push(i18n.format("items.volumeM3LineValue", { value: formatVolumeM3(volumeCm3) }));
+        parts.push(i18n.format("items.dimensionVolumeLine", { value: formatVolumeM3(volumeCm3) }));
       }
 
       return parts.length ? parts : ["—"];
@@ -1473,7 +1473,7 @@
                 class="table-photo-box ${row.image_url ? "is-clickable" : ""}"
                 ${row.image_url ? `onclick="openItemImageModal('${escapeHtml(row.image_url)}')"` : ""}
               >
-                ${row.image_url ? `<img src="${escapeHtml(row.image_url)}" alt="${escapeHtml(i18n.t("items.photoAlt"))}" />` : i18n.t("items.noPhoto")}
+                ${row.image_url ? `<img src="${escapeHtml(row.image_url)}" alt="${escapeHtml(i18n.t("items.photoAlt"))}" />` : escapeHtml(i18n.t("items.noPhoto"))}
               </div>
             </td>
             <td>
@@ -1589,10 +1589,10 @@
         }
 
         for (const [value, message] of [
-          [weight_kg, i18n.t("items.weightKgInvalid")],
-          [length_cm, i18n.t("items.lengthCmInvalid")],
-          [width_cm, i18n.t("items.widthCmInvalid")],
-          [height_cm, i18n.t("items.heightCmInvalid")]
+          [weight_kg, i18n.t("items.weightBoxInvalid")],
+          [length_cm, i18n.t("items.lengthBoxInvalid")],
+          [width_cm, i18n.t("items.widthBoxInvalid")],
+          [height_cm, i18n.t("items.heightBoxInvalid")]
         ]) {
           if (value !== null && value < 0) {
             throw new Error(message);
@@ -1602,7 +1602,7 @@
         let imageUrl = currentImageUrl;
 
         if (pendingImageFile) {
-          showStatus(els.submitStatus, i18n.t("items.uploadingPhotoStatus"), "info");
+          showStatus(els.submitStatus, i18n.t("items.uploadingPhoto"), "info");
           imageUrl = await uploadItemImage(pendingImageFile);
         }
 
@@ -1653,13 +1653,13 @@
         case "no_sku":
           return i18n.t("items.importReasonNoSku");
         case "duplicate_sku_in_system":
-          return i18n.t("items.importReasonDuplicateSystem");
+          return i18n.t("items.importReasonDuplicateInSystem");
         case "duplicate_sku_in_file":
-          return i18n.t("items.importReasonDuplicateFile");
+          return i18n.t("items.importReasonDuplicateInFile");
         case "sku_already_exists":
-          return i18n.t("items.importReasonDuplicateSystem");
+          return i18n.t("items.importReasonDuplicateInSystem");
         default:
-          return reason ? String(reason) : i18n.t("items.dash");
+          return reason ? String(reason) : "—";
       }
     }
 
@@ -1667,7 +1667,7 @@
       if (String(status || "") === "new") {
         return `<span class="pill pill-success">${escapeHtml(i18n.t("items.importStatusNew"))}</span>`;
       }
-      return `<span class="pill pill-danger">${escapeHtml(i18n.t("items.importStatusSkipped"))}</span>`;
+      return `<span class="pill pill-danger">${escapeHtml(i18n.t("items.importStatusSkip"))}</span>`;
     }
 
     async function readFileAsBase64(file) {
@@ -1678,7 +1678,7 @@
           const base64 = result.includes(",") ? result.split(",").pop() : result;
           resolve(base64 || "");
         };
-        reader.onerror = () => reject(new Error(i18n.t("items.readExcelFileError")));
+        reader.onerror = () => reject(new Error(i18n.t("items.importReadExcelError")));
         reader.readAsDataURL(file);
       });
     }
@@ -1753,7 +1753,7 @@
           throw new Error(i18n.t("items.importSelectFileFirst"));
         }
 
-        showStatus(els.importStatus, i18n.t("items.importPreviewBuilding"), "info");
+        showStatus(els.importStatus, i18n.t("items.importBuildingPreview"), "info");
         const fileBase64 = await readFileAsBase64(importFileObject);
 
         const data = await apiPost("/items/import/preview", {
@@ -1764,7 +1764,7 @@
         renderImportPreview(data);
         showStatus(
           els.importStatus,
-          i18n.format("items.importPreviewReadyStatus", { total: data.total_rows || 0, newCount: data.new_count || 0, skipped: data.skipped_count || 0 }),
+          i18n.format("items.importPreviewReady", { total: data.total_rows || 0, created: data.new_count || 0, skipped: data.skipped_count || 0 }),
           "success"
         );
       } catch (err) {
@@ -1784,15 +1784,15 @@
         }
 
         if (!(Number(importPreviewData.new_count || 0) > 0)) {
-          throw new Error(i18n.t("items.importNoNewSkuError"));
+          throw new Error(i18n.t("items.importNoNewSku"));
         }
 
-        const confirmed = window.confirm(i18n.format("items.importConfirmMessage", { count: importPreviewData.new_count }));
+        const confirmed = window.confirm(i18n.format("items.importConfirmRun", { count: importPreviewData.new_count }));
         if (!confirmed) {
           return;
         }
 
-        showStatus(els.importStatus, i18n.t("items.importRunningStatus"), "info");
+        showStatus(els.importStatus, i18n.t("items.importRunning"), "info");
         const fileBase64 = await readFileAsBase64(importFileObject);
 
         const result = await apiPost("/items/import", {
@@ -1802,7 +1802,7 @@
 
         showStatus(
           els.importStatus,
-          i18n.format("items.importFinishedStatus", { created: result.created_count || 0, skipped: result.skipped_count || 0 }),
+          i18n.format("items.importFinished", { created: result.created_count || 0, skipped: result.skipped_count || 0 }),
           "success"
         );
 
@@ -1849,7 +1849,7 @@
         resetImportPreviewUi();
         if (importFileObject) {
           openImportPanel();
-          showStatus(els.importStatus, i18n.format("items.importFileSelectedStatus", { name: importFileObject.name }), "info");
+          showStatus(els.importStatus, i18n.format("items.importFileChosen", { name: importFileObject.name }), "info");
         } else {
           hideStatus(els.importStatus);
         }
@@ -1878,9 +1878,6 @@
       if (els.imageModal) {
         els.imageModal.addEventListener("click", closeImageModal);
       }
-      if (els.imageModalImg) {
-        els.imageModalImg.alt = i18n.t("items.photoAlt");
-      }
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && els.imageModal && els.imageModal.classList.contains("show")) {
           closeImageModal();
@@ -1893,6 +1890,8 @@
         renderTable();
         if (importPreviewData) {
           renderImportPreview(importPreviewData);
+        } else {
+          resetImportPreviewUi();
         }
         if (els.imageModalImg) {
           els.imageModalImg.alt = i18n.t("items.photoAlt");
