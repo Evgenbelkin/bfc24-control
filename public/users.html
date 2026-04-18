@@ -435,7 +435,7 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title" id="formTitle">Создать пользователя</h2>
+      <h2 class="card-title" id="formTitle" data-i18n="users.formCreateTitle">Создать пользователя</h2>
       <div class="muted" data-i18n="users.subtitle">Управление учётными записями для входа в систему.</div>
 
       <div class="stats">
@@ -466,9 +466,9 @@
             <input id="password" type="password" data-i18n-placeholder="users.passwordPlaceholder" placeholder="Пароль нового пользователя" autocomplete="new-password" />
             <div class="helper" id="passwordHelper" data-i18n="users.passwordHelper">Обязателен при создании. При редактировании — оставьте пустым, чтобы не менять.</div>
             <div class="field full">
-            <label>Доступные модули</label>
+            <label data-i18n="users.modulesLabel">Доступные модули</label>
             <div class="modules-box">
-              <div class="helper">Отметь только те модули, которые должен видеть и использовать сотрудник.</div>
+              <div class="helper" data-i18n="users.modulesHelper">Отметь только те модули, которые должен видеть и использовать сотрудник.</div>
               <div class="modules-grid" id="modulesGrid"></div>
             </div>
           </div>
@@ -481,8 +481,8 @@
           </div>
 
           <div class="toolbar-actions">
-            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
-            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn" data-i18n="users.saveButton">Сохранить</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;" data-i18n="users.cancelEditButton">Отменить редактирование</button>
             <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="users.refreshButton">Обновить список</button>
           </div>
         </div>
@@ -505,7 +505,7 @@
               <th data-i18n="users.tableRole">Роль</th>
               <th data-i18n="users.tableActive">Активен</th>
               <th data-i18n="users.tableBlocked">Заблокирован</th>
-              <th>Модули</th>
+              <th data-i18n="users.tableModules">Модули</th>
               <th data-i18n="users.tableLastLogin">Последний вход</th>
               <th data-i18n="users.tableActions">Действия</th>
             </tr>
@@ -761,20 +761,20 @@
 
 
     const AVAILABLE_MODULES = [
-      { code: "items",     label: "Товары" },
-      { code: "locations", label: "Места хранения" },
-      { code: "clients",   label: "Клиенты" },
-      { code: "stock",     label: "Остатки" },
-      { code: "movements", label: "Движения" },
-      { code: "incoming",  label: "Приёмка" },
-      { code: "sales",     label: "Продажи" },
-      { code: "writeoff",  label: "Списание" },
-      { code: "cash",      label: "Деньги" },
-      { code: "expenses",  label: "Расходы" },
-      { code: "analytics", label: "Аналитика" },
-      { code: "turnover",  label: "Оборачиваемость" },
-      { code: "debts",     label: "Долги клиентов" },
-      { code: "users",     label: "Пользователи" }
+      { code: "items",     labelKey: "users.moduleItems" },
+      { code: "locations", labelKey: "users.moduleLocations" },
+      { code: "clients",   labelKey: "users.moduleClients" },
+      { code: "stock",     labelKey: "users.moduleStock" },
+      { code: "movements", labelKey: "users.moduleMovements" },
+      { code: "incoming",  labelKey: "users.moduleIncoming" },
+      { code: "sales",     labelKey: "users.moduleSales" },
+      { code: "writeoff",  labelKey: "users.moduleWriteoff" },
+      { code: "cash",      labelKey: "users.moduleCash" },
+      { code: "expenses",  labelKey: "users.moduleExpenses" },
+      { code: "analytics", labelKey: "users.moduleAnalytics" },
+      { code: "turnover",  labelKey: "users.moduleTurnover" },
+      { code: "debts",     labelKey: "users.moduleDebts" },
+      { code: "users",     labelKey: "users.moduleUsers" }
     ];
 
     function normalizeModules(value) {
@@ -816,7 +816,7 @@
       els.modulesGrid.innerHTML = AVAILABLE_MODULES.map((item) => `
         <label class="module-option">
           <input type="checkbox" name="userModule" value="${escapeHtml(item.code)}" />
-          <span>${escapeHtml(item.label)}</span>
+          <span>${escapeHtml(i18n.t(item.labelKey))}</span>
         </label>
       `).join("");
     }
@@ -824,13 +824,13 @@
     function renderModulesBadges(modules) {
       const normalized = normalizeModules(modules);
       if (!normalized.length) {
-        return `<span class="badge badge-muted">Нет модулей</span>`;
+        return `<span class="badge badge-muted">${escapeHtml(i18n.t("users.noModules"))}</span>`;
       }
 
       return `<div class="modules-badges">${
         normalized.map((code) => {
           const found = AVAILABLE_MODULES.find((item) => item.code === code);
-          const text = found ? found.label : code;
+          const text = found ? i18n.t(found.labelKey) : code;
           return `<span class="badge badge-success">${escapeHtml(text)}</span>`;
         }).join("")
       }</div>`;
@@ -971,7 +971,7 @@
     function renderLoadingRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="8" class="empty">${escapeHtml(i18n.t("users.loadingData"))}</td>
+          <td colspan="9" class="empty">${escapeHtml(i18n.t("users.loadingData"))}</td>
         </tr>
       `;
     }
