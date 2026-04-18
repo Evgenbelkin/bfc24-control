@@ -1702,7 +1702,12 @@ function renderTenantsTable() {
         </td>
         <td>
           <div class="stack">
-            <div class="small"><b>${safe(uc)}</b> <span class="muted">польз.</span></div>
+            <div class="tenant-main-stat">👤 ${safe(uc)} / ${safe(t.max_users ?? 0)}</div>
+            <div class="muted small">пользователей / лимит</div>
+            <div class="row-act" style="margin-top:4px;">
+              <button class="row-btn row-btn-success" onclick="increaseUsersLimit('${safe(t.id)}', 1)">+1 польз.</button>
+              <button class="row-btn row-btn-warning" onclick="increaseUsersLimit('${safe(t.id)}', 2)">+2 польз.</button>
+            </div>
             <div class="inline-badges" style="margin-top:4px;">${modsHtml}</div>
           </div>
         </td>
@@ -2131,6 +2136,58 @@ window.quickRenewTenant = async function(id) {
     await refreshAll();
   } catch(err) { console.error(err); showError(err); }
 };
+
+window.increaseUsersLimit = async function(id, delta) {
+  const t = state.tenants.find(x => String(x.id) === String(id));
+  if (!t) {
+    alert("Клиент не найден");
+    return;
+  }
+
+  const currentLimit = Number(t.max_users ?? 0);
+  const nextLimit = currentLimit + Number(delta || 0);
+
+  if (!Number.isFinite(nextLimit) || nextLimit < 0) {
+    alert("Некорректный новый лимит пользователей");
+    return;
+  }
+
+  if (!confirm(`Увеличить лимит пользователей клиенту "${t.name}" с ${currentLimit} до ${nextLimit}?`)) return;
+
+  try {
+    const payload = {
+      name: t.name ?? "",
+      slug: t.slug ?? "",
+      tariff_name: t.tariff_name ?? "Базовый",
+      plan_code: t.plan_code ?? "basic",
+      subscription_status: t.subscription_status ?? "trial",
+      status: t.status ?? "active",
+      subscription_start_at: t.subscription_start_at || null,
+      subscription_end_at: t.subscription_end_at || null,
+      max_sku: Number(t.max_sku ?? 1000),
+      max_locations: Number(t.max_locations ?? 10),
+      max_users: nextLimit,
+      contact_name: t.contact_name ?? null,
+      contact_phone: t.contact_phone ?? null,
+      contact_email: t.contact_email ?? null,
+      code: t.code ?? null,
+      phone: t.phone ?? null,
+      email: t.email ?? null,
+      comment: t.comment ?? null,
+      enabled_modules: Array.isArray(t.enabled_modules) ? t.enabled_modules : parseMods(t.enabled_modules)
+    };
+
+    const r = await apiPut(`/owner-admin/tenants/${id}`, payload);
+    if (!r?.ok) throw r;
+
+    await refreshAll();
+    alert(`Лимит пользователей обновлён: ${currentLimit} → ${nextLimit}`);
+  } catch (err) {
+    console.error(err);
+    showError(err);
+  }
+};
+
 
 window.toggleTenantActive = async function(id) {
   if (!confirm("Переключить активность клиента?")) return;
