@@ -453,7 +453,6 @@
         createdSuccess: "Товар успешно создан",
         updatedSuccess: "Товар #{id} успешно обновлён",
         saveErrorStatus: "Ошибка сохранения: {error}"
-      },
         categoryNameLabel: "Категория",
         categoryNamePlaceholder: "Например: Игрушки",
         boxQtyLabel: "Штук в коробке",
@@ -527,6 +526,8 @@
         importFinished: "Импорт завершён. Создано: {created}. Пропущено: {skipped}.",
         importDoneChooseNext: "Импорт выполнен. Можешь выбрать следующий файл.",
         importFileChosen: "Файл выбран: {name}",
+
+      },
 
       sales: {
         pageTitle: "BFC24 CONTROL — Продажа",
@@ -1734,7 +1735,6 @@
         createdSuccess: "Item created successfully",
         updatedSuccess: "Item #{id} updated successfully",
         saveErrorStatus: "Save error: {error}"
-      },
         categoryNameLabel: "Category",
         categoryNamePlaceholder: "For example: Toys",
         boxQtyLabel: "Units per box",
@@ -1797,7 +1797,7 @@
         importStatusNew: "New",
         importStatusSkip: "Skip",
         importReadExcelError: "Failed to read Excel file",
-        importPreviewNoRows: "There are no rows in the file for preview.",
+        importPreviewNoRows: "No rows available for preview in the file.",
         importSelectFileFirst: "Select an Excel file first",
         importBuildingPreview: "Reading file and building preview...",
         importPreviewReady: "Preview is ready. Total rows: {total}. New: {newCount}. Skipped: {skipped}.",
@@ -1806,8 +1806,10 @@
         importConfirmRun: "New items to be created: {count}. Continue import?",
         importRunning: "Importing items...",
         importFinished: "Import completed. Created: {created}. Skipped: {skipped}.",
-        importDoneChooseNext: "Import completed. You can select the next file.",
-        importFileChosen: "File selected: {name}",
+        importDoneChooseNext: "Import complete. You can choose the next file.",
+        importFileChosen: "Selected file: {name}",
+
+      },
 
       sales: {
         pageTitle: "BFC24 CONTROL — Sales",
@@ -2946,7 +2948,6 @@
         importFinished: "导入完成。已创建：{created}。已跳过：{skipped}。",
         importSelectNextFile: "导入完成。你可以选择下一个文件。",
         importFileSelected: "已选择文件：{name}",
-      },
         photoNotUploaded: "未上传图片",
         removePhotoButton: "删除图片",
         importFileNotSelected: "未选择文件",
@@ -2965,8 +2966,8 @@
         importPreviewColSalePrice: "销售价",
         readFileError: "无法读取文件",
         imageTypeError: "仅支持 JPG、PNG、WEBP 和 GIF",
-        dimensionBoxLine: "箱规：{length} × {width} × {height} 厘米",
-        dimensionWeightLine: "重量：{value} 千克",
+        dimensionBoxLine: "箱体：{length} × {width} × {height} cm",
+        dimensionWeightLine: "重量：{value} kg",
         dimensionVolumeLine: "体积：{value} m³",
         weightBoxInvalid: "箱重必须大于或等于 0",
         lengthBoxInvalid: "箱长必须大于或等于 0",
@@ -2979,6 +2980,8 @@
         importSelectFileFirst: "请先选择 Excel 文件",
         importDoneChooseNext: "导入完成。你可以选择下一个文件。",
         importFileChosen: "已选择文件：{name}",
+
+      },
 
       sales: {
         pageTitle: "BFC24 CONTROL — 销售",
