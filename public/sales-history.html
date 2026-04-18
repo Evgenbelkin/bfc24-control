@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" translate="no">
+<html lang="ru" translate="no" data-page-title-i18n="salesHistory.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — История продаж</title>
@@ -493,85 +493,85 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">История продаж</div>
+      <div class="title" data-i18n="salesHistory.heading">История продаж</div>
 
       <div class="topbar-right">
         <div id="langSwitcher" class="lang-switcher"></div>
 
         <div class="top-actions">
-          <button class="btn btn-light" onclick="goSales()">Продажа</button>
-          <button class="btn btn-light" onclick="goBack()">Назад</button>
-          <button class="btn btn-light" onclick="logout()">Выйти</button>
+          <button class="btn btn-light" onclick="goSales()" data-i18n="salesHistory.goSalesButton">Продажа</button>
+          <button class="btn btn-light" onclick="goBack()" data-i18n="salesHistory.backButton">Назад</button>
+          <button class="btn btn-light" onclick="logout()" data-i18n="salesHistory.logoutButton">Выйти</button>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтры</h2>
-      <div class="muted">Список уже проведённых документов продажи. Можно открыть документ и выгрузить его в Excel.</div>
+      <h2 class="card-title" data-i18n="salesHistory.filtersTitle">Фильтры</h2>
+      <div class="muted" data-i18n="salesHistory.filtersSubtitle">Список уже проведённых документов продажи. Можно открыть документ и выгрузить его в Excel.</div>
 
       <div class="filters">
         <div class="field">
-          <label for="searchInput">Поиск</label>
-          <input id="searchInput" type="text" placeholder="ID, клиент, товар, комментарий" />
+          <label for="searchInput" data-i18n="salesHistory.searchLabel">Поиск</label>
+          <input id="searchInput" type="text" placeholder="ID, клиент, товар, комментарий" data-i18n-placeholder="salesHistory.searchPlaceholder" />
         </div>
 
         <div class="field">
-          <label for="paymentStatusFilter">Статус оплаты</label>
+          <label for="paymentStatusFilter" data-i18n="salesHistory.paymentStatusLabel">Статус оплаты</label>
           <select id="paymentStatusFilter">
-            <option value="">Все</option>
-            <option value="paid">Оплачен</option>
-            <option value="partial">Частично оплачен</option>
-            <option value="unpaid">Не оплачен</option>
+            <option value="" data-i18n="salesHistory.allOption">Все</option>
+            <option value="paid" data-i18n="salesHistory.statusPaid">Оплачен</option>
+            <option value="partial" data-i18n="salesHistory.statusPartial">Частично оплачен</option>
+            <option value="unpaid" data-i18n="salesHistory.statusUnpaid">Не оплачен</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="paymentMethodFilter">Способ оплаты</label>
+          <label for="paymentMethodFilter" data-i18n="salesHistory.paymentMethodLabel">Способ оплаты</label>
           <select id="paymentMethodFilter">
-            <option value="">Все</option>
-            <option value="cash">Наличные</option>
-            <option value="card">Карта</option>
-            <option value="transfer">Перевод</option>
-            <option value="mixed">Смешанная</option>
+            <option value="" data-i18n="salesHistory.allOption">Все</option>
+            <option value="cash" data-i18n="salesHistory.methodCash">Наличные</option>
+            <option value="card" data-i18n="salesHistory.methodCard">Карта</option>
+            <option value="transfer" data-i18n="salesHistory.methodTransfer">Перевод</option>
+            <option value="mixed" data-i18n="salesHistory.methodMixed">Смешанная</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="dateFrom">Дата от</label>
+          <label for="dateFrom" data-i18n="salesHistory.dateFromLabel">Дата от</label>
           <input id="dateFrom" type="date" />
         </div>
 
         <div class="field">
-          <label for="dateTo">Дата до</label>
+          <label for="dateTo" data-i18n="salesHistory.dateToLabel">Дата до</label>
           <input id="dateTo" type="date" />
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="salesHistory.refreshButton">Обновить</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Документов</div>
+          <div class="stat-label" data-i18n="salesHistory.statsDocuments">Документов</div>
           <div class="stat-value" id="salesCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Выручка</div>
+          <div class="stat-label" data-i18n="salesHistory.statsRevenue">Выручка</div>
           <div class="stat-value" id="revenueTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Себестоимость</div>
+          <div class="stat-label" data-i18n="salesHistory.statsCost">Себестоимость</div>
           <div class="stat-value" id="costTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Валовая прибыль</div>
+          <div class="stat-label" data-i18n="salesHistory.statsProfit">Валовая прибыль</div>
           <div class="stat-value" id="profitTotal">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Всего штук</div>
+          <div class="stat-label" data-i18n="salesHistory.statsQty">Всего штук</div>
           <div class="stat-value" id="qtyTotal">0</div>
         </div>
       </div>
@@ -580,28 +580,28 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Журнал документов</h2>
+      <h2 class="card-title" data-i18n="salesHistory.journalTitle">Журнал документов</h2>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Дата</th>
-              <th>Клиент</th>
-              <th>Товары</th>
-              <th class="num">Шт</th>
-              <th class="num">Сумма</th>
-              <th class="num">Себестоимость</th>
-              <th class="num">Прибыль</th>
-              <th>Оплата</th>
-              <th>Комментарий</th>
-              <th>Действия</th>
+              <th data-i18n="salesHistory.tableDate">Дата</th>
+              <th data-i18n="salesHistory.tableClient">Клиент</th>
+              <th data-i18n="salesHistory.tableItems">Товары</th>
+              <th class="num" data-i18n="salesHistory.tableQty">Шт</th>
+              <th class="num" data-i18n="salesHistory.tableAmount">Сумма</th>
+              <th class="num" data-i18n="salesHistory.tableCost">Себестоимость</th>
+              <th class="num" data-i18n="salesHistory.tableProfit">Прибыль</th>
+              <th data-i18n="salesHistory.tablePayment">Оплата</th>
+              <th data-i18n="salesHistory.tableComment">Комментарий</th>
+              <th data-i18n="salesHistory.tableActions">Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="11" class="empty">Загрузка...</td>
+              <td colspan="11" class="empty" data-i18n="salesHistory.loading">Загрузка...</td>
             </tr>
           </tbody>
         </table>
@@ -611,12 +611,12 @@
     <div class="card" id="detailCard" style="display:none;">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;">
         <div>
-          <h2 class="card-title" id="detailTitle" style="margin-bottom:6px;">Документ продажи</h2>
-          <div class="muted" id="detailSubtitle">Детали документа</div>
+          <h2 class="card-title" id="detailTitle" style="margin-bottom:6px;" data-i18n="salesHistory.detailTitleDefault">Документ продажи</h2>
+          <div class="muted" id="detailSubtitle" data-i18n="salesHistory.detailSubtitleDefault">Детали документа</div>
         </div>
         <div class="toolbar-inline">
-          <button type="button" class="btn btn-success" id="exportBtn">Экспорт в Excel</button>
-          <button type="button" class="btn btn-light" id="closeDetailBtn">Закрыть</button>
+          <button type="button" class="btn btn-success" id="exportBtn" data-i18n="salesHistory.exportButton">Экспорт в Excel</button>
+          <button type="button" class="btn btn-light" id="closeDetailBtn" data-i18n="salesHistory.closeButton">Закрыть</button>
         </div>
       </div>
 
@@ -624,35 +624,35 @@
         <div>
           <div class="detail-grid">
             <div class="detail-card">
-              <div class="label">Клиент</div>
+              <div class="label" data-i18n="salesHistory.detailClientLabel">Клиент</div>
               <div class="value" id="detailClient">—</div>
             </div>
             <div class="detail-card">
-              <div class="label">Статус оплаты</div>
+              <div class="label" data-i18n="salesHistory.detailPaymentStatusLabel">Статус оплаты</div>
               <div class="value" id="detailPaymentStatus">—</div>
             </div>
             <div class="detail-card">
-              <div class="label">Способ оплаты</div>
+              <div class="label" data-i18n="salesHistory.detailPaymentMethodLabel">Способ оплаты</div>
               <div class="value" id="detailPaymentMethod">—</div>
             </div>
             <div class="detail-card">
-              <div class="label">Дата</div>
+              <div class="label" data-i18n="salesHistory.detailDateLabel">Дата</div>
               <div class="value" id="detailCreatedAt">—</div>
             </div>
             <div class="detail-card">
-              <div class="label">Сумма</div>
+              <div class="label" data-i18n="salesHistory.detailAmountLabel">Сумма</div>
               <div class="value" id="detailAmount">0</div>
             </div>
             <div class="detail-card">
-              <div class="label">Себестоимость</div>
+              <div class="label" data-i18n="salesHistory.detailCostLabel">Себестоимость</div>
               <div class="value" id="detailCost">0</div>
             </div>
             <div class="detail-card">
-              <div class="label">Прибыль</div>
+              <div class="label" data-i18n="salesHistory.detailProfitLabel">Прибыль</div>
               <div class="value" id="detailProfit">0</div>
             </div>
             <div class="detail-card">
-              <div class="label">Вес / объём</div>
+              <div class="label" data-i18n="salesHistory.detailWeightVolumeLabel">Вес / объём</div>
               <div class="value" id="detailWeightVolume">0 / 0</div>
             </div>
           </div>
@@ -662,22 +662,22 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th class="line-photo-cell">Фото</th>
+                  <th class="line-photo-cell" data-i18n="salesHistory.linesPhoto">Фото</th>
                   <th>Товар</th>
-                  <th>МХ</th>
-                  <th class="num">Шт</th>
-                  <th class="num">Цена</th>
-                  <th class="num">Сумма</th>
-                  <th class="num">Себестоимость</th>
-                  <th class="num">Прибыль</th>
-                  <th class="num">Вес, кг</th>
-                  <th class="num">Объём, м³</th>
-                  <th>Комментарий</th>
+                  <th data-i18n="salesHistory.linesLocation">МХ</th>
+                  <th class="num" data-i18n="salesHistory.tableQty">Шт</th>
+                  <th class="num" data-i18n="salesHistory.linesPrice">Цена</th>
+                  <th class="num" data-i18n="salesHistory.tableAmount">Сумма</th>
+                  <th class="num" data-i18n="salesHistory.tableCost">Себестоимость</th>
+                  <th class="num" data-i18n="salesHistory.tableProfit">Прибыль</th>
+                  <th class="num" data-i18n="salesHistory.linesWeight">Вес, кг</th>
+                  <th class="num" data-i18n="salesHistory.linesVolume">Объём, м³</th>
+                  <th data-i18n="salesHistory.tableComment">Комментарий</th>
                 </tr>
               </thead>
               <tbody id="detailLinesBody">
                 <tr>
-                  <td colspan="12" class="empty">Документ не выбран</td>
+                  <td colspan="12" class="empty" data-i18n="salesHistory.detailNotSelected">Документ не выбран</td>
                 </tr>
               </tbody>
             </table>
@@ -686,7 +686,7 @@
 
         <div>
           <div class="detail-card">
-            <div class="label">Комментарий к документу</div>
+            <div class="label" data-i18n="salesHistory.detailCommentLabel">Комментарий к документу</div>
             <div class="value" id="detailComment" style="font-size:14px;font-weight:600;line-height:1.5;">—</div>
           </div>
         </div>
@@ -696,7 +696,7 @@
 
   <div class="image-modal" id="imageModal" onclick="closeImageModal()">
     <div class="image-modal-content">
-      <img id="imageModalImg" src="" alt="Фото товара" />
+      <img id="imageModalImg" src="" alt="Фото товара" data-i18n-alt="salesHistory.imageAlt" />
     </div>
   </div>
 
@@ -870,17 +870,17 @@
     }
 
     function paymentMethodLabel(value) {
-      if (value === "cash") return "Наличные";
-      if (value === "card") return "Карта";
-      if (value === "transfer") return "Перевод";
-      if (value === "mixed") return "Смешанная";
-      return value || "—";
+      if (value === "cash") return i18n.t("salesHistory.methodCash");
+      if (value === "card") return i18n.t("salesHistory.methodCard");
+      if (value === "transfer") return i18n.t("salesHistory.methodTransfer");
+      if (value === "mixed") return i18n.t("salesHistory.methodMixed");
+      return value || i18n.t("salesHistory.dash");
     }
 
     function paymentStatusBadge(status) {
-      if (status === "paid") return `<span class="badge badge-paid">Оплачен</span>`;
-      if (status === "partial") return `<span class="badge badge-partial">Частично оплачен</span>`;
-      return `<span class="badge badge-unpaid">Не оплачен</span>`;
+      if (status === "paid") return `<span class="badge badge-paid">${escapeHtml(i18n.t("salesHistory.statusPaid"))}</span>`;
+      if (status === "partial") return `<span class="badge badge-partial">${escapeHtml(i18n.t("salesHistory.statusPartial"))}</span>`;
+      return `<span class="badge badge-unpaid">${escapeHtml(i18n.t("salesHistory.statusUnpaid"))}</span>`;
     }
 
     function getTenantId() {
@@ -980,7 +980,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="11" class="empty">Ничего не найдено</td>
+            <td colspan="11" class="empty">${escapeHtml(i18n.t("salesHistory.noResults"))}</td>
           </tr>
         `;
         return;
@@ -990,18 +990,18 @@
         <tr>
           <td>${escapeHtml(row.id)}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
-          <td>${escapeHtml(row.counterparty_name || "—")}</td>
-          <td>${escapeHtml(row.item_names || "—")}</td>
+          <td>${escapeHtml(row.counterparty_name || i18n.t("salesHistory.dash"))}</td>
+          <td>${escapeHtml(row.item_names || i18n.t("salesHistory.dash"))}</td>
           <td class="num">${escapeHtml(formatQty(row.total_qty))}</td>
           <td class="num">${escapeHtml(formatMoney(row.total_amount))}</td>
           <td class="num">${escapeHtml(formatMoney(row.total_cost))}</td>
           <td class="num">${escapeHtml(formatMoney(row.gross_profit))}</td>
           <td>${paymentStatusBadge(row.payment_status)}</td>
-          <td>${escapeHtml(row.comment || "—")}</td>
+          <td>${escapeHtml(row.comment || i18n.t("salesHistory.dash"))}</td>
           <td>
             <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="openSale('${escapeHtml(row.id)}')">Открыть</button>
-              <button type="button" class="btn btn-success" onclick="exportSale('${escapeHtml(row.id)}')">Excel</button>
+              <button type="button" class="btn btn-secondary" onclick="openSale('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("salesHistory.openButton"))}</button>
+              <button type="button" class="btn btn-success" onclick="exportSale('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("salesHistory.excelButton"))}</button>
             </div>
           </td>
         </tr>
@@ -1016,22 +1016,22 @@
       const totals = data.totals || {};
 
       els.detailCard.style.display = "";
-      els.detailTitle.textContent = `Документ продажи #${sale.id || ""}`;
-      els.detailSubtitle.textContent = `Создан: ${formatDate(sale.created_at)}`;
-      els.detailClient.textContent = sale.counterparty_name || "—";
+      els.detailTitle.textContent = i18n.format("salesHistory.detailTitleWithId", { id: sale.id || "" });
+      els.detailSubtitle.textContent = i18n.format("salesHistory.detailSubtitleCreated", { date: formatDate(sale.created_at) });
+      els.detailClient.textContent = sale.counterparty_name || i18n.t("salesHistory.dash");
       els.detailPaymentStatus.innerHTML = paymentStatusBadge(sale.payment_status || "unpaid");
       els.detailPaymentMethod.textContent = paymentMethodLabel(sale.payment_method);
       els.detailCreatedAt.textContent = formatDate(sale.created_at);
       els.detailAmount.textContent = formatMoney(totals.total_amount || 0);
       els.detailCost.textContent = formatMoney(totals.total_cost || 0);
       els.detailProfit.textContent = formatMoney(totals.gross_profit || 0);
-      els.detailWeightVolume.textContent = `${formatWeight(totals.total_weight_kg || 0)} кг / ${formatVolume(totals.total_volume_m3 || 0)} м³`;
-      els.detailComment.textContent = sale.comment || "—";
+      els.detailWeightVolume.textContent = i18n.format("salesHistory.detailWeightVolumeValue", { weight: formatWeight(totals.total_weight_kg || 0), volume: formatVolume(totals.total_volume_m3 || 0) });
+      els.detailComment.textContent = sale.comment || i18n.t("salesHistory.dash");
 
       if (!lines.length) {
         els.detailLinesBody.innerHTML = `
           <tr>
-            <td colspan="12" class="empty">Строк нет</td>
+            <td colspan="12" class="empty">${escapeHtml(i18n.t("salesHistory.noLines"))}</td>
           </tr>
         `;
       } else {
@@ -1040,17 +1040,17 @@
             <td>${index + 1}</td>
             <td class="line-photo-cell">
               ${line.image_url
-                ? `<div class="line-photo-box" onclick="openImageModal('${escapeHtml(line.image_url)}')"><img src="${escapeHtml(line.image_url)}" alt="${escapeHtml(line.item_name || "Фото")}" /></div>`
+                ? `<div class="line-photo-box" onclick="openImageModal('${escapeHtml(line.image_url)}')"><img src="${escapeHtml(line.image_url)}" alt="${escapeHtml(line.item_name || i18n.t("salesHistory.photoAlt"))}" /></div>`
                 : `<div class="line-photo-box empty">Нет фото</div>`}
             </td>
             <td>
-              <div><strong>${escapeHtml(line.item_name || "Без названия")}</strong></div>
+              <div><strong>${escapeHtml(line.item_name || i18n.t("salesHistory.noName"))}</strong></div>
               <div class="small-muted">
                 ${line.item_sku ? "SKU: " + escapeHtml(line.item_sku) : ""}
                 ${line.item_barcode ? (line.item_sku ? " | " : "") + "ШК: " + escapeHtml(line.item_barcode) : ""}
               </div>
             </td>
-            <td>${escapeHtml(line.location_name || "—")}</td>
+            <td>${escapeHtml(line.location_name || i18n.t("salesHistory.dash"))}</td>
             <td class="num">${escapeHtml(formatQty(line.qty))}</td>
             <td class="num">${escapeHtml(formatMoney(line.price))}</td>
             <td class="num">${escapeHtml(formatMoney(line.line_amount))}</td>
@@ -1058,7 +1058,7 @@
             <td class="num">${escapeHtml(formatMoney(line.gross_profit))}</td>
             <td class="num">${escapeHtml(formatWeight(line.line_weight_kg || 0))}</td>
             <td class="num">${escapeHtml(formatVolume(line.line_volume_m3 || 0))}</td>
-            <td>${escapeHtml(line.comment || "—")}</td>
+            <td>${escapeHtml(line.comment || i18n.t("salesHistory.dash"))}</td>
           </tr>
         `).join("");
       }
@@ -1069,30 +1069,30 @@
     async function loadData() {
       try {
         const tenantId = getTenantId();
-        showStatus(`Загрузка продаж по tenant ${tenantId}...`, "info");
+        showStatus(i18n.format("salesHistory.loadingSales", { tenantId }), "info");
         const data = await apiGet(`/sales?tenant_id=${tenantId}`);
         salesData = extractList(data, ["sales", "data", "rows"]);
         renderTable();
-        showStatus(`Загружено документов: ${salesData.length}`, "success");
+        showStatus(i18n.format("salesHistory.loadedSales", { count: salesData.length }), "success");
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="11" class="empty">Ошибка загрузки</td>
+            <td colspan="11" class="empty">${escapeHtml(i18n.t("salesHistory.loadError"))}</td>
           </tr>
         `;
-        showStatus(`Ошибка загрузки: ${Ui.translateError(err.message)}`, "error");
+        showStatus(i18n.format("salesHistory.loadErrorStatus", { error: Ui.translateError(err.message) }), "error");
       }
     }
 
     async function openSale(id) {
       try {
         const tenantId = getTenantId();
-        showStatus(`Загрузка документа #${id}...`, "info");
+        showStatus(i18n.format("salesHistory.loadingDocument", { id }), "info");
         const data = await apiGet(`/sales/${id}?tenant_id=${tenantId}`);
         renderSaleDetail(data);
-        showStatus(`Документ #${id} открыт`, "success");
+        showStatus(i18n.format("salesHistory.documentOpened", { id }), "success");
       } catch (err) {
-        showStatus(`Ошибка открытия документа: ${Ui.translateError(err.message)}`, "error");
+        showStatus(i18n.format("salesHistory.openErrorStatus", { error: Ui.translateError(err.message) }), "error");
       }
     }
 
@@ -1102,10 +1102,10 @@
         const token = localStorage.getItem("token") || "";
 
         if (!token) {
-          throw new Error("auth_required");
+          throw new Error(i18n.t("salesHistory.authRequired"));
         }
 
-        showStatus(`Подготовка Excel по продаже #${id}...`, "info");
+        showStatus(i18n.format("salesHistory.exportPreparing", { id }), "info");
 
         const response = await fetch(`/sales/${encodeURIComponent(id)}/export?tenant_id=${encodeURIComponent(tenantId)}`, {
           method: "GET",
@@ -1126,7 +1126,7 @@
         const blob = await response.blob();
         const contentDisposition = response.headers.get("Content-Disposition") || "";
         const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/i);
-        const fileName = fileNameMatch && fileNameMatch[1] ? fileNameMatch[1] : `sale-${id}.xlsx`;
+        const fileName = fileNameMatch && fileNameMatch[1] ? fileNameMatch[1] : i18n.format("salesHistory.exportFileName", { id });
 
         const objectUrl = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -1138,9 +1138,9 @@
 
         window.URL.revokeObjectURL(objectUrl);
 
-        showStatus(`Excel по продаже #${id} подготовлен`, "success");
+        showStatus(i18n.format("salesHistory.exportReady", { id }), "success");
       } catch (err) {
-        showStatus(`Ошибка выгрузки Excel: ${Ui.translateError(err.message)}`, "error");
+        showStatus(i18n.format("salesHistory.exportErrorStatus", { error: Ui.translateError(err.message) }), "error");
       }
     }
 
@@ -1170,7 +1170,7 @@
         if (!currentSale || !currentSale.sale || !currentSale.sale.id) return;
         exportSale(currentSale.sale.id);
       });
-      document.addEventListener("app:language-changed", renderTable);
+      document.addEventListener("app:language-changed", () => { if (window.i18n) { window.i18n.applyTranslations(); window.i18n.renderLanguageSwitcher("langSwitcher"); } renderTable(); if (currentSale) renderSaleDetail(currentSale); });
     }
 
     function bootstrap() {
