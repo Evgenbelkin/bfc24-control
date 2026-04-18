@@ -105,15 +105,34 @@ router.get("/", authRequired, async (req, res) => {
       FROM core.cash_transactions ct
       LEFT JOIN core.counterparties cp
         ON cp.id = ct.counterparty_id
+       AND cp.tenant_id = ct.tenant_id
       LEFT JOIN saas.users u
         ON u.id = ct.created_by
       LEFT JOIN LATERAL (
         SELECT
-          string_agg(DISTINCT i.name, ', ' ORDER BY i.name) AS item_name
-        FROM core.sale_items si
-        JOIN core.items i
-          ON i.id = si.item_id
-        WHERE si.sale_id = ct.sale_id
+          string_agg(product_rows.product_text, ' | ' ORDER BY product_rows.product_text) AS item_name
+        FROM (
+          SELECT
+            trim(
+              concat_ws(
+                ', ',
+                NULLIF(i.sku, ''),
+                NULLIF(i.name, '')
+              )
+            ) ||
+            CASE
+              WHEN COALESCE(SUM(si.qty), 0) > 0
+                THEN ' × ' || trim(to_char(COALESCE(SUM(si.qty), 0), 'FM999999990.####'))
+              ELSE ''
+            END AS product_text
+          FROM core.sale_items si
+          JOIN core.items i
+            ON i.id = si.item_id
+           AND i.tenant_id = si.tenant_id
+          WHERE si.sale_id = ct.sale_id
+            AND si.tenant_id = ct.tenant_id
+          GROUP BY i.id, i.sku, i.name
+        ) AS product_rows
       ) AS sale_items_info ON TRUE
       ${whereSql}
       ORDER BY ct.id DESC

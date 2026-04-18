@@ -328,7 +328,7 @@ EXECUTE FUNCTION saas.set_updated_at();
 
 INSERT INTO saas.roles (code, name, description, scope, is_active)
 VALUES
-    ('owner',         'Owner',         'Системный владелец SaaS', TRUE, TRUE),
+    ('owner',         'Owner',         'Системный владелец SaaS', 'system', TRUE),
     ('tenant_owner',  'Tenant Owner',  'Владелец клиента',        'tenant', TRUE),
     ('tenant_admin',  'Tenant Admin',  'Администратор клиента',   'tenant', TRUE),
     ('manager',       'Manager',       'Менеджер клиента',        'tenant', TRUE),

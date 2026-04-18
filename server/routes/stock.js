@@ -1,8 +1,11 @@
 const express = require("express");
 const pool = require("../db");
+const ExcelJS = require("exceljs");
+const axios = require("axios");
 const {
   authRequired,
   requireRole,
+  requireModuleAccess,
   getEffectiveTenantId,
 } = require("../middleware/auth");
 
@@ -18,6 +21,130 @@ function normalizeText(value) {
   if (value === null || value === undefined) return null;
   const s = String(value).trim();
   return s.length ? s : null;
+}
+
+function calcFinanceFilled(batch) {
+  const unitCost = Number(batch.unit_cost || 0);
+  const usdRate = Number(batch.usd_rate || 0);
+  const cnyRate = Number(batch.cny_rate || 0);
+  const deliveryCost = Number(batch.delivery_cost || 0);
+
+  return unitCost > 0 && usdRate > 0 && cnyRate > 0 && deliveryCost > 0;
+}
+
+
+function detectExcelImageExtension(contentType, imageUrl = "") {
+  const type = String(contentType || "").toLowerCase();
+
+  if (type.includes("png")) return "png";
+  if (type.includes("gif")) return "gif";
+  if (type.includes("webp")) return "webp";
+  if (type.includes("jpeg") || type.includes("jpg")) return "jpeg";
+
+  const lowerUrl = String(imageUrl || "").toLowerCase();
+  if (lowerUrl.endsWith(".png")) return "png";
+  if (lowerUrl.endsWith(".gif")) return "gif";
+  if (lowerUrl.endsWith(".webp")) return "webp";
+  if (lowerUrl.endsWith(".jpeg") || lowerUrl.endsWith(".jpg")) return "jpeg";
+
+  return "jpeg";
+}
+
+async function fetchImageBuffer(imageUrl) {
+  const url = normalizeText(imageUrl);
+  if (!url) return null;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.error("[stock/export-xlsx] image fetch failed:", url, response.status);
+      return null;
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    if (!buffer.length) return null;
+
+    return {
+      buffer,
+      extension: detectExcelImageExtension(
+        response.headers.get("content-type"),
+        url
+      ),
+    };
+  } catch (err) {
+    console.error("[stock/export-xlsx] image fetch failed:", url, err.message);
+    return null;
+  }
+}
+
+async function buildStockExportWorkbook(rows) {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Остатки");
+
+  worksheet.columns = [
+    { header: "Фото", key: "photo", width: 14 },
+    { header: "Товар", key: "item_name", width: 28 },
+    { header: "Категория", key: "category_name", width: 18 },
+    { header: "Фабрика", key: "factory", width: 18 },
+    { header: "Арт. фабрики", key: "factory_article", width: 18 },
+    { header: "Артикул / SKU", key: "sku", width: 18 },
+    { header: "Штрихкод", key: "barcode", width: 18 },
+    { header: "Место хранения", key: "location_display", width: 28 },
+    { header: "Количество", key: "qty", width: 14 },
+  ];
+
+  const headerRow = worksheet.getRow(1);
+  headerRow.font = { bold: true };
+  headerRow.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+  headerRow.height = 24;
+  worksheet.views = [{ state: "frozen", ySplit: 1 }];
+
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    const excelRowNumber = index + 2;
+
+    worksheet.getRow(excelRowNumber).height = 54;
+
+    worksheet.getCell(`B${excelRowNumber}`).value = row.item_name || "";
+    worksheet.getCell(`C${excelRowNumber}`).value = row.category_name || "";
+    worksheet.getCell(`D${excelRowNumber}`).value = row.factory || "";
+    worksheet.getCell(`E${excelRowNumber}`).value = row.factory_article || "";
+    worksheet.getCell(`F${excelRowNumber}`).value = row.sku || "";
+    worksheet.getCell(`G${excelRowNumber}`).value = row.barcode || "";
+    worksheet.getCell(`H${excelRowNumber}`).value = row.location_display || "";
+    worksheet.getCell(`I${excelRowNumber}`).value = Number(row.qty || 0);
+
+    const imageUrl = normalizeText(row.image_url);
+    if (imageUrl) {
+      const imageData = await fetchImageBuffer(imageUrl);
+
+      if (imageData) {
+        const imageId = workbook.addImage({
+          buffer: imageData.buffer,
+          extension: imageData.extension,
+        });
+
+        worksheet.addImage(imageId, {
+          tl: { col: 0.15, row: excelRowNumber - 1 + 0.15 },
+          ext: { width: 52, height: 52 },
+          editAs: "oneCell",
+        });
+      } else {
+        worksheet.getCell(`A${excelRowNumber}`).value = "Нет фото";
+      }
+    } else {
+      worksheet.getCell(`A${excelRowNumber}`).value = "Нет фото";
+    }
+  }
+
+  worksheet.eachRow((row) => {
+    row.alignment = { vertical: "middle", wrapText: true };
+  });
+
+  return workbook;
 }
 
 router.get("/", authRequired, async (req, res) => {
@@ -65,55 +192,267 @@ router.get("/", authRequired, async (req, res) => {
   }
 });
 
-router.get("/batches", authRequired, async (req, res) => {
-  try {
-    const tenantId = getEffectiveTenantId(req);
 
-    if (!tenantId) {
+
+
+router.post("/export-xlsx", authRequired, async (req, res) => {
+  try {
+    const rowsInput = Array.isArray(req.body.rows) ? req.body.rows : [];
+
+    if (!rowsInput.length) {
       return res.status(400).json({
         ok: false,
-        error: "tenant_not_defined",
+        error: "rows_required",
       });
     }
 
-    const sql = `
-      SELECT
-        b.id,
-        b.tenant_id,
-        b.item_id,
-        b.receipt_id,
-        b.batch_date,
-        b.qty_total,
-        b.qty_remaining,
-        b.unit_cost,
-        (b.qty_remaining * b.unit_cost) AS total_sum,
-        b.created_at,
-        b.updated_at,
-        i.name AS item_name,
-        i.sku,
-        i.barcode
-      FROM core.item_batches b
-      JOIN core.items i
-        ON i.id = b.item_id
-       AND i.tenant_id = b.tenant_id
-      WHERE b.tenant_id = $1
-      ORDER BY b.batch_date ASC, b.id ASC
-    `;
+    const rows = rowsInput.map((row) => ({
+      item_name: normalizeText(row.item_name) || "",
+      category_name: normalizeText(row.category_name) || "",
+      factory: normalizeText(row.factory) || "",
+      factory_article: normalizeText(row.factory_article) || "",
+      sku: normalizeText(row.sku) || "",
+      barcode: normalizeText(row.barcode) || "",
+      image_url: normalizeText(row.image_url) || "",
+      location_display: normalizeText(row.location_display) || "",
+      qty: Number(row.qty || 0),
+    }));
 
-    const { rows } = await pool.query(sql, [tenantId]);
+    const workbook = await buildStockExportWorkbook(rows);
+    const buffer = await workbook.xlsx.writeBuffer();
 
     return res.json({
       ok: true,
-      batches: rows,
+      filename: `stock_export_${new Date().toISOString().slice(0,19).replace(/[T:]/g, "-")}.xlsx`,
+      file_base64: Buffer.from(buffer).toString("base64"),
     });
   } catch (e) {
-    console.error("[GET /stock/batches] error:", e);
+    console.error("[POST /stock/export-xlsx] error:", e);
     return res.status(500).json({
       ok: false,
-      error: "batches_failed",
+      error: "stock_export_failed",
     });
   }
 });
+
+
+router.get(
+  "/batches",
+  authRequired,
+  requireModuleAccess("batches"),
+  async (req, res) => {
+    try {
+      const tenantId = getEffectiveTenantId(req);
+
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: "tenant_not_defined",
+        });
+      }
+
+      const sql = `
+        SELECT
+          b.id,
+          b.tenant_id,
+          b.item_id,
+          b.receipt_id,
+          b.batch_date,
+          b.qty_total,
+          b.qty_remaining,
+          b.unit_cost,
+          b.usd_rate,
+          b.cny_rate,
+          b.delivery_cost,
+          b.is_finance_filled,
+          (b.qty_remaining * b.unit_cost) AS total_sum,
+          b.created_at,
+          b.updated_at,
+          i.name AS item_name,
+          i.sku,
+          i.barcode,
+          i.image_url
+        FROM core.item_batches b
+        JOIN core.items i
+          ON i.id = b.item_id
+         AND i.tenant_id = b.tenant_id
+        WHERE b.tenant_id = $1
+        ORDER BY b.batch_date DESC, b.id DESC
+      `;
+
+      const { rows } = await pool.query(sql, [tenantId]);
+
+      return res.json({
+        ok: true,
+        batches: rows,
+      });
+    } catch (e) {
+      console.error("[GET /stock/batches] error:", e);
+      return res.status(500).json({
+        ok: false,
+        error: "batches_failed",
+      });
+    }
+  }
+);
+
+router.patch(
+  "/batches/:id",
+  authRequired,
+  requireModuleAccess("batches"),
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      const tenantId = getEffectiveTenantId(req);
+      const batchId = toNumber(req.params.id);
+
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: "tenant_not_defined",
+        });
+      }
+
+      if (!batchId || batchId <= 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_batch_id",
+        });
+      }
+
+      const unitCost = toNumber(req.body.unit_cost);
+      const usdRate = toNumber(req.body.usd_rate);
+      const cnyRate = toNumber(req.body.cny_rate);
+      const deliveryCost = toNumber(req.body.delivery_cost);
+      const batchDate = normalizeText(req.body.batch_date);
+
+      if (unitCost === null || unitCost < 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_unit_cost",
+        });
+      }
+
+      if (usdRate === null || usdRate < 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_usd_rate",
+        });
+      }
+
+      if (cnyRate === null || cnyRate < 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_cny_rate",
+        });
+      }
+
+      if (deliveryCost === null || deliveryCost < 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_delivery_cost",
+        });
+      }
+
+      if (batchDate && !/^\d{4}-\d{2}-\d{2}$/.test(batchDate)) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_batch_date",
+        });
+      }
+
+      await client.query("BEGIN");
+
+      const { rows: currentRows } = await client.query(
+        `
+          SELECT *
+          FROM core.item_batches
+          WHERE tenant_id = $1
+            AND id = $2
+          LIMIT 1
+        `,
+        [tenantId, batchId]
+      );
+
+      if (!currentRows.length) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({
+          ok: false,
+          error: "batch_not_found",
+        });
+      }
+
+      const isFinanceFilled = calcFinanceFilled({
+        unit_cost: unitCost,
+        usd_rate: usdRate,
+        cny_rate: cnyRate,
+        delivery_cost: deliveryCost,
+      });
+
+      const { rows: updatedRows } = await client.query(
+        `
+          UPDATE core.item_batches
+          SET
+            batch_date = COALESCE($3::date, batch_date),
+            unit_cost = $4,
+            usd_rate = $5,
+            cny_rate = $6,
+            delivery_cost = $7,
+            is_finance_filled = $8,
+            updated_at = NOW()
+          WHERE tenant_id = $1
+            AND id = $2
+          RETURNING *
+        `,
+        [
+          tenantId,
+          batchId,
+          batchDate,
+          unitCost,
+          usdRate,
+          cnyRate,
+          deliveryCost,
+          isFinanceFilled,
+        ]
+      );
+
+      const updatedBatch = updatedRows[0];
+
+      await client.query(
+        `
+          UPDATE core.receipt_items
+          SET purchase_price = $4
+          WHERE tenant_id = $1
+            AND receipt_id = $2
+            AND item_id = $3
+        `,
+        [
+          tenantId,
+          updatedBatch.receipt_id,
+          updatedBatch.item_id,
+          unitCost,
+        ]
+      );
+
+      await client.query("COMMIT");
+
+      return res.json({
+        ok: true,
+        batch: updatedBatch,
+      });
+    } catch (e) {
+      await client.query("ROLLBACK");
+      console.error("[PATCH /stock/batches/:id] error:", e);
+      return res.status(500).json({
+        ok: false,
+        error: "batch_update_failed",
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
 
 router.post(
   "/incoming",
@@ -136,9 +475,14 @@ router.post(
       const itemId = toNumber(req.body.item_id);
       const locationId = toNumber(req.body.location_id);
       const qty = toNumber(req.body.qty);
-      const purchasePrice = toNumber(req.body.purchase_price);
       const batchDate = normalizeText(req.body.batch_date);
       const comment = normalizeText(req.body.comment);
+
+      const purchasePrice = 0;
+      const usdRate = 0;
+      const cnyRate = 0;
+      const deliveryCost = 0;
+      const isFinanceFilled = false;
 
       if (!itemId || itemId <= 0) {
         return res.status(400).json({
@@ -158,13 +502,6 @@ router.post(
         return res.status(400).json({
           ok: false,
           error: "invalid_qty",
-        });
-      }
-
-      if (purchasePrice === null || purchasePrice < 0) {
-        return res.status(400).json({
-          ok: false,
-          error: "invalid_purchase_price",
         });
       }
 
@@ -278,12 +615,27 @@ router.post(
             batch_date,
             qty_total,
             qty_remaining,
-            unit_cost
+            unit_cost,
+            usd_rate,
+            cny_rate,
+            delivery_cost,
+            is_finance_filled
           )
-          VALUES ($1, $2, $3, $4::date, $5, $5, $6)
+          VALUES ($1, $2, $3, $4::date, $5, $5, $6, $7, $8, $9, $10)
           RETURNING *
         `,
-        [tenantId, itemId, receipt.id, effectiveBatchDate, qty, purchasePrice]
+        [
+          tenantId,
+          itemId,
+          receipt.id,
+          effectiveBatchDate,
+          qty,
+          purchasePrice,
+          usdRate,
+          cnyRate,
+          deliveryCost,
+          isFinanceFilled,
+        ]
       );
 
       const batch = batchRows[0];

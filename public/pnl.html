@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="ru" data-page-title-i18n="pnl.pageTitle">
+<head>
+  <meta charset="UTF-8" />
+  <title>BFC24 CONTROL — PnL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:#dfe3eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --warning:#d97706;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1360px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .subtitle{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+      white-space:nowrap;
+      transition:.15s ease;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .btn-primary:hover{
+      background:var(--primary-hover);
+    }
+
+    .btn-light{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-light:hover{
+      border-color:#cbd5e1;
+      background:#f8fafc;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid #eef1f5;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:16px;
+    }
+
+    .card-title{
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 14px;
+    }
+
+    .filters{
+      display:grid;
+      grid-template-columns:1fr 1fr auto auto auto;
+      gap:12px;
+      align-items:end;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      min-width:0;
+    }
+
+    .period-buttons{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .btn-period.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    input{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+
+    .status.show{display:block}
+    .status.error{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+    .status.success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .status.info{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .stat{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:24px;
+      font-weight:800;
+      line-height:1.2;
+    }
+
+    .stat-value.success{ color:var(--success); }
+    .stat-value.danger{ color:var(--danger); }
+    .stat-value.warning{ color:var(--warning); }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .summary-item{
+      border:1px solid #eef1f5;
+      border-radius:14px;
+      padding:14px;
+      background:#fff;
+    }
+
+    .summary-item .label{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:6px;
+    }
+
+    .summary-item .value{
+      font-size:20px;
+      font-weight:800;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      margin-top:10px;
+      border-radius:12px;
+    }
+
+    table{
+      width:100%;
+      min-width:700px;
+      border-collapse:separate;
+      border-spacing:0;
+      background:#fff;
+    }
+
+    th, td{
+      border-bottom:1px solid #eef1f5;
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+      background:#fff;
+      white-space:nowrap;
+    }
+
+    th{
+      background:#f8fafc;
+      font-weight:700;
+      color:#111827;
+      position:sticky;
+      top:0;
+      z-index:10;
+      box-shadow:0 2px 0 #eef1f5;
+    }
+
+    tr:hover td{
+      background:#fbfdff;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:24px 12px;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .value-positive{
+      color:var(--success);
+      font-weight:700;
+    }
+
+    .value-negative{
+      color:var(--danger);
+      font-weight:700;
+    }
+
+    .value-neutral{
+      color:var(--warning);
+      font-weight:700;
+    }
+
+    #langSwitcher{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    #langSwitcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
+    @media (max-width: 1180px){
+      .stats{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+
+      .two-col{
+        grid-template-columns:1fr;
+      }
+
+      .filters{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media (max-width: 760px){
+      .stats,
+      .summary-grid,
+      .filters{
+        grid-template-columns:1fr;
+      }
+
+      .wrap{
+        padding:16px 12px 32px;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .period-buttons{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="title" data-i18n="pnl.heading">PnL / Экономика</div>
+        <div class="subtitle" data-i18n="pnl.subtitle">Выручка, себестоимость, расходы и чистая прибыль по выбранному периоду</div>
+      </div>
+
+      <div class="top-actions">
+        <div id="langSwitcher"></div>
+        <button class="btn btn-light" onclick="goBack()" data-i18n="pnl.backButton">Назад</button>
+        <button class="btn btn-light" onclick="logout()" data-i18n="pnl.logoutButton">Выйти</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title" data-i18n="pnl.filtersTitle">Фильтры</h2>
+
+      <div class="filters">
+        <div class="field">
+          <label for="dateFrom" data-i18n="pnl.dateFromLabel">Дата от</label>
+          <input id="dateFrom" type="date" />
+        </div>
+
+        <div class="field">
+          <label for="dateTo" data-i18n="pnl.dateToLabel">Дата до</label>
+          <input id="dateTo" type="date" />
+        </div>
+
+        <div class="field">
+          <label data-i18n="pnl.quickPeriodLabel">Быстрый период</label>
+          <div class="period-buttons">
+            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn" data-i18n="pnl.periodToday">Сегодня</button>
+            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn" data-i18n="pnl.periodWeek">Неделя</button>
+            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn" data-i18n="pnl.periodMonth">Месяц</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>&nbsp;</label>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="pnl.refreshButton">Обновить</button>
+        </div>
+
+        <div class="field">
+          <label>&nbsp;</label>
+          <button type="button" class="btn btn-light" id="resetBtn" data-i18n="pnl.resetButton">Сбросить</button>
+        </div>
+      </div>
+
+      <div id="pageStatus" class="status info"></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label" data-i18n="pnl.revenueLabel">Выручка</div>
+        <div class="stat-value" id="revenueValue">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label" data-i18n="pnl.cogsLabel">Себестоимость</div>
+        <div class="stat-value warning" id="cogsValue">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label" data-i18n="pnl.grossProfitLabel">Валовая прибыль</div>
+        <div class="stat-value" id="grossProfitValue">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label" data-i18n="pnl.operatingExpensesLabel">Операционные расходы</div>
+        <div class="stat-value danger" id="expensesValue">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label" data-i18n="pnl.netProfitLabel">Чистая прибыль</div>
+        <div class="stat-value" id="netProfitValue">0</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h2 class="card-title" data-i18n="pnl.summaryTitle">Сводка</h2>
+
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.discountLabel">Скидки</div>
+            <div class="value" id="discountValue">0</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.salesCountLabel">Продаж</div>
+            <div class="value" id="salesCountValue">0</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.lineItemsCountLabel">Строк продаж</div>
+            <div class="value" id="lineItemsCountValue">0</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.soldQtyLabel">Продано единиц</div>
+            <div class="value" id="soldQtyValue">0</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.grossMarginLabel">Валовая маржа</div>
+            <div class="value" id="grossMarginValue">0%</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.netMarginLabel">Чистая маржа</div>
+            <div class="value" id="netMarginValue">0%</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.cashRevenueLabel">Выручка наличными</div>
+            <div class="value" id="cashRevenueValue">0</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.cardRevenueLabel">Выручка по карте</div>
+            <div class="value" id="cardRevenueValue">0</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.transferRevenueLabel">Выручка переводом</div>
+            <div class="value" id="transferRevenueValue">0</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.consignmentRevenueLabel">Реализация</div>
+            <div class="value" id="consignmentRevenueValue">0</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.consignmentPaidLabel">Оплачено из реализации</div>
+            <div class="value" id="consignmentPaidValue">0</div>
+          </div>
+
+          <div class="summary-item">
+            <div class="label" data-i18n="pnl.periodLabel">Период</div>
+            <div class="value" id="periodValue" data-i18n="pnl.allPeriod">Весь период</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title" data-i18n="pnl.expensesByCategoryTitle">Расходы по категориям</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="pnl.expensesTableCategory">Категория</th>
+                <th data-i18n="pnl.expensesTableAmount">Сумма</th>
+              </tr>
+            </thead>
+            <tbody id="expensesBreakdownBody">
+              <tr>
+                <td colspan="2" class="empty" data-i18n="pnl.loading">Загрузка...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="muted" style="margin-top:12px;">
+          <span data-i18n="pnl.expensesSource">Источник расходов: core.expenses</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title" data-i18n="pnl.dailyTitle">Дневная динамика PnL</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="pnl.dailyTableDate">Дата</th>
+              <th data-i18n="pnl.dailyTableRevenue">Выручка</th>
+              <th data-i18n="pnl.dailyTableCogs">Себестоимость</th>
+              <th data-i18n="pnl.dailyTableGrossProfit">Валовая прибыль</th>
+              <th data-i18n="pnl.dailyTableExpenses">Расходы</th>
+              <th data-i18n="pnl.dailyTableNetProfit">Чистая прибыль</th>
+              <th data-i18n="pnl.dailyTableSalesCount">Продаж</th>
+              <th data-i18n="pnl.dailyTableGrossMargin">Валовая маржа %</th>
+            </tr>
+          </thead>
+          <tbody id="dailyPnlBody">
+            <tr>
+              <td colspan="8" class="empty" data-i18n="pnl.loading">Загрузка...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="muted" style="margin-top:12px;">
+        <span data-i18n="pnl.dailySource">Источник: /reports/pnl-daily</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+
+  <script>
+    const FALLBACK_TENANT_ID = 1;
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/login.html";
+    }
+
+    const Ui = window.AppUI || {
+      translateError: (value) => String(value || i18n.t("common.error")),
+    };
+
+    async function requestFallback(method, path, body) {
+      const authToken = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(authToken ? { Authorization: "Bearer " + authToken } : {})
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
+
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+
+      return data;
+    }
+
+    function getTenantIdFromStorage(fallback = 1) {
+      try {
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
+      } catch {}
+      return fallback;
+    }
+
+    const ApiBridge = {
+      getTenantId(fallback = 1) {
+        if (window.API && typeof window.API.getTenantId === "function") {
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
+        }
+        return getTenantIdFromStorage(fallback);
+      },
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      }
+    };
+
+    function getCategoryLabel(key) {
+      return i18n.t(`pnl.category.${key}`) || key;
+    }
+
+    let activePeriod = "";
+
+    const els = {
+      dateFrom: document.getElementById("dateFrom"),
+      dateTo: document.getElementById("dateTo"),
+      periodTodayBtn: document.getElementById("periodTodayBtn"),
+      periodWeekBtn: document.getElementById("periodWeekBtn"),
+      periodMonthBtn: document.getElementById("periodMonthBtn"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      pageStatus: document.getElementById("pageStatus"),
+
+      revenueValue: document.getElementById("revenueValue"),
+      cogsValue: document.getElementById("cogsValue"),
+      grossProfitValue: document.getElementById("grossProfitValue"),
+      expensesValue: document.getElementById("expensesValue"),
+      netProfitValue: document.getElementById("netProfitValue"),
+
+      discountValue: document.getElementById("discountValue"),
+      salesCountValue: document.getElementById("salesCountValue"),
+      lineItemsCountValue: document.getElementById("lineItemsCountValue"),
+      soldQtyValue: document.getElementById("soldQtyValue"),
+      grossMarginValue: document.getElementById("grossMarginValue"),
+      netMarginValue: document.getElementById("netMarginValue"),
+      cashRevenueValue: document.getElementById("cashRevenueValue"),
+      cardRevenueValue: document.getElementById("cardRevenueValue"),
+      transferRevenueValue: document.getElementById("transferRevenueValue"),
+      consignmentRevenueValue: document.getElementById("consignmentRevenueValue"),
+      consignmentPaidValue: document.getElementById("consignmentPaidValue"),
+      periodValue: document.getElementById("periodValue"),
+
+      expensesBreakdownBody: document.getElementById("expensesBreakdownBody"),
+      dailyPnlBody: document.getElementById("dailyPnlBody"),
+    };
+
+    function goBack() {
+      window.location.href = "/index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
+
+    function showStatus(text, type = "info") {
+      els.pageStatus.className = "status show " + type;
+      els.pageStatus.textContent = text;
+    }
+
+    function formatMoney(value) {
+      const n = Number(value || 0);
+      return n.toLocaleString("ru-RU", {
+        minimumFractionDigits: n % 1 === 0 ? 0 : 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatPercent(value) {
+      const n = Number(value || 0);
+      return `${n.toLocaleString("ru-RU", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      })}%`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function toDateInputValue(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function setActivePeriod(period) {
+      activePeriod = period;
+      els.periodTodayBtn.classList.toggle("active", period === "today");
+      els.periodWeekBtn.classList.toggle("active", period === "week");
+      els.periodMonthBtn.classList.toggle("active", period === "month");
+    }
+
+    function setPeriod(period) {
+      const now = new Date();
+      const todayValue = toDateInputValue(now);
+
+      if (period === "today") {
+        els.dateFrom.value = todayValue;
+        els.dateTo.value = todayValue;
+      } else if (period === "week") {
+        const from = new Date(now);
+        from.setDate(from.getDate() - 6);
+        els.dateFrom.value = toDateInputValue(from);
+        els.dateTo.value = todayValue;
+      } else if (period === "month") {
+        const from = new Date(now);
+        from.setMonth(from.getMonth() - 1);
+        els.dateFrom.value = toDateInputValue(from);
+        els.dateTo.value = todayValue;
+      }
+
+      setActivePeriod(period);
+      loadAll();
+    }
+
+    function clearActivePeriod() {
+      setActivePeriod("");
+    }
+
+    function resetFilters() {
+      els.dateFrom.value = "";
+      els.dateTo.value = "";
+      clearActivePeriod();
+      loadAll();
+    }
+
+    function applyProfitColor(el, value) {
+      el.classList.remove("success", "danger", "warning");
+      const n = Number(value || 0);
+      if (n > 0) {
+        el.classList.add("success");
+      } else if (n < 0) {
+        el.classList.add("danger");
+      } else {
+        el.classList.add("warning");
+      }
+    }
+
+    function buildQuery() {
+      const tenantId = ApiBridge.getTenantId(FALLBACK_TENANT_ID);
+      const params = new URLSearchParams();
+      params.set("tenant_id", String(tenantId));
+
+      const dateFrom = String(els.dateFrom.value || "").trim();
+      const dateTo = String(els.dateTo.value || "").trim();
+
+      if (dateFrom) params.set("date_from", dateFrom);
+      if (dateTo) params.set("date_to", dateTo);
+
+      return `?${params.toString()}`;
+    }
+
+    function renderBreakdown(breakdown) {
+      const orderedKeys = [
+        "rent",
+        "salary",
+        "purchase",
+        "delivery",
+        "ads",
+        "utilities",
+        "other",
+        "uncategorized"
+      ];
+
+      const rows = orderedKeys
+        .map((key) => ({
+          key,
+          label: getCategoryLabel(key),
+          value: Number((breakdown && breakdown[key]) || 0)
+        }))
+        .filter((row) => row.value !== 0);
+
+      if (!rows.length) {
+        els.expensesBreakdownBody.innerHTML = `
+          <tr>
+            <td colspan="2" class="empty">${escapeHtml(i18n.t("pnl.noExpensesByCategory"))}</td>
+          </tr>
+        `;
+        return;
+      }
+
+      els.expensesBreakdownBody.innerHTML = rows.map((row) => `
+        <tr>
+          <td>${escapeHtml(row.label)}</td>
+          <td>${escapeHtml(formatMoney(row.value))}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderDailyTable(rows) {
+      if (!Array.isArray(rows) || !rows.length) {
+        els.dailyPnlBody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty">${escapeHtml(i18n.t("pnl.noDailyData"))}</td>
+          </tr>
+        `;
+        return;
+      }
+
+      els.dailyPnlBody.innerHTML = rows.map((row) => {
+        const net = Number(row.net_profit || 0);
+        const gross = Number(row.gross_profit || 0);
+        const expenses = Number(row.expenses || 0);
+
+        const grossClass = gross > 0 ? "value-positive" : gross < 0 ? "value-negative" : "value-neutral";
+        const netClass = net > 0 ? "value-positive" : net < 0 ? "value-negative" : "value-neutral";
+        const expensesClass = expenses > 0 ? "value-negative" : "value-neutral";
+
+        return `
+          <tr>
+            <td>${escapeHtml(row.date || "")}</td>
+            <td>${escapeHtml(formatMoney(row.revenue))}</td>
+            <td>${escapeHtml(formatMoney(row.cogs))}</td>
+            <td class="${grossClass}">${escapeHtml(formatMoney(row.gross_profit))}</td>
+            <td class="${expensesClass}">${escapeHtml(formatMoney(row.expenses))}</td>
+            <td class="${netClass}">${escapeHtml(formatMoney(row.net_profit))}</td>
+            <td>${escapeHtml(String(Number(row.sales_count || 0)))}</td>
+            <td>${row.gross_margin_pct === null ? escapeHtml(i18n.t("pnl.dash")) : escapeHtml(formatPercent(row.gross_margin_pct))}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderPnl(data) {
+      const pnl = (data && data.pnl) || {};
+      const period = (data && data.period) || {};
+
+      els.revenueValue.textContent = formatMoney(pnl.revenue);
+      els.cogsValue.textContent = formatMoney(pnl.cogs);
+      els.grossProfitValue.textContent = formatMoney(pnl.gross_profit);
+      els.expensesValue.textContent = formatMoney(pnl.operating_expenses);
+      els.netProfitValue.textContent = formatMoney(pnl.net_profit);
+
+      applyProfitColor(els.grossProfitValue, pnl.gross_profit);
+      applyProfitColor(els.netProfitValue, pnl.net_profit);
+
+      els.discountValue.textContent = formatMoney(pnl.total_discount);
+      els.salesCountValue.textContent = String(Number(pnl.sales_count || 0));
+      els.lineItemsCountValue.textContent = String(Number(pnl.line_items_count || 0));
+      els.soldQtyValue.textContent = String(Number(pnl.sold_qty_total || 0));
+      els.grossMarginValue.textContent = formatPercent(pnl.gross_margin_pct);
+      els.netMarginValue.textContent = formatPercent(pnl.net_margin_pct);
+
+      const revenueByMethod = pnl.revenue_by_method || {};
+      els.cashRevenueValue.textContent = formatMoney(revenueByMethod.cash);
+      els.cardRevenueValue.textContent = formatMoney(revenueByMethod.card);
+      els.transferRevenueValue.textContent = formatMoney(revenueByMethod.transfer);
+      els.consignmentRevenueValue.textContent = formatMoney(revenueByMethod.consignment);
+      els.consignmentPaidValue.textContent = formatMoney(revenueByMethod.consignment_paid);
+
+      if (period.date_from || period.date_to) {
+        els.periodValue.textContent = `${period.date_from || "..."} — ${period.date_to || "..."}`;
+      } else {
+        els.periodValue.textContent = i18n.t("pnl.allPeriod");
+      }
+
+      renderBreakdown(pnl.expenses_breakdown || {});
+    }
+
+    async function loadAll() {
+      try {
+        showStatus(i18n.t("pnl.loadingPnl"), "info");
+
+        const query = buildQuery();
+
+        const [pnlData, dailyData] = await Promise.all([
+          ApiBridge.get(`/reports/pnl${query}`),
+          ApiBridge.get(`/reports/pnl-daily${query}`)
+        ]);
+
+        renderPnl(pnlData);
+        renderDailyTable(dailyData.daily || []);
+
+        showStatus(i18n.t("pnl.loadedPnl"), "success");
+      } catch (err) {
+        showStatus(Ui.translateError(err.message), "error");
+      }
+    }
+
+    function bindEvents() {
+      els.periodTodayBtn.addEventListener("click", () => setPeriod("today"));
+      els.periodWeekBtn.addEventListener("click", () => setPeriod("week"));
+      els.periodMonthBtn.addEventListener("click", () => setPeriod("month"));
+
+      els.dateFrom.addEventListener("change", () => {
+        clearActivePeriod();
+      });
+
+      els.dateTo.addEventListener("change", () => {
+        clearActivePeriod();
+      });
+
+      els.refreshBtn.addEventListener("click", loadAll);
+      els.resetBtn.addEventListener("click", resetFilters);
+
+      document.addEventListener("app:language-changed", () => {
+        if (window.i18n) {
+          window.i18n.applyTranslations();
+          window.i18n.renderLanguageSwitcher("langSwitcher");
+        }
+      });
+    }
+
+    function bootstrap() {
+      bindEvents();
+      if (window.i18n) {
+        window.i18n.applyTranslations();
+        window.i18n.renderLanguageSwitcher("langSwitcher");
+      }
+      loadAll();
+    }
+
+    bootstrap();
+
+
+
+
+
+
+
+
+
+
+  </script>
+</body>
+</html>

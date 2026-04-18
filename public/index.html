@@ -302,6 +302,213 @@
       background: var(--accent-hover);
     }
 
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.56);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-dialog {
+      width: 100%;
+      max-width: 560px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 22px 22px 14px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .modal-close {
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text-main);
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 1;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.18s ease;
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover {
+      border-color: rgba(37, 99, 235, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .modal-body {
+      padding: 18px 22px 22px;
+    }
+
+    .modal-subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin: 0 0 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--text-main);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      box-shadow: var(--shadow-sm);
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .input:focus,
+    .textarea:focus {
+      border-color: rgba(37, 99, 235, 0.42);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+
+    .textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .helper-text {
+      margin-top: 6px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text-main);
+    }
+
+    .btn-primary {
+      background: var(--accent-color);
+      color: #fff;
+      border-color: var(--accent-color);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .status-box {
+      margin-top: 14px;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .status-box.open {
+      display: block;
+    }
+
+    .status-box.success {
+      background: #eefbf3;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .status-box.error {
+      background: #fff5f5;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+
+    .menu-access-empty {
+      grid-column: 1 / -1;
+      background: var(--card-bg);
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      color: var(--text-muted);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .menu-access-empty strong {
+      display: block;
+      color: var(--text-main);
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
     @media (max-width: 768px) {
       .toolbar {
         justify-content: flex-start;
@@ -322,6 +529,28 @@
     }
 
     @media (max-width: 480px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-dialog {
+        max-width: 100%;
+      }
+
+      .modal-header,
+      .modal-body {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .modal-actions {
+        flex-direction: column;
+      }
+
+      .modal-actions .btn {
+        width: 100%;
+      }
+
       body {
         padding: 20px 14px 28px;
       }
@@ -460,6 +689,28 @@
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
 
+      <div class="card" onclick="window.location.href='/batches.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="12" y="16" width="40" height="32" rx="6" stroke-width="2.4"/>
+                <path class="stroke-main" d="M20 24H44" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M20 32H32" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M37 39H46" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M41.5 34.5V43.5" stroke-width="2.8" stroke-linecap="round"/>
+                <circle class="stroke-accent" cx="41.5" cy="39" r="8" stroke-width="2.4"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.batchesModuleTitle">Партии / Себестоимость</h3>
+          <div class="muted" data-i18n="index.batchesModuleDesc">Финансы партий, курсы, доставка и автоматический расчёт себестоимости.</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+
       <div class="card" onclick="window.location.href='/movements.html'">
         <div class="card__content">
           <div class="card__top">
@@ -523,6 +774,27 @@
           </div>
           <h3 data-i18n="index.salesTitle">Продажа</h3>
           <div class="muted" data-i18n="index.salesDesc">Продажа с выбором МХ и клиента</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/sales-history.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="14" y="12" width="28" height="40" rx="4" stroke-width="2.4"/>
+                <path class="stroke-main" d="M22 22H34" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M22 30H34" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M22 38H30" stroke-width="2.4" stroke-linecap="round"/>
+                <circle class="stroke-accent" cx="46" cy="42" r="8" stroke-width="2.4"/>
+                <path class="stroke-accent" d="M46 38V42L49 45" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.salesHistoryTitle">История продаж</h3>
+          <div class="muted" data-i18n="index.salesHistoryDesc">Журнал документов продажи, просмотр состава и экспорт в Excel</div>
         </div>
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
@@ -613,6 +885,30 @@
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
 
+      <div class="card" onclick="window.location.href='/turnover.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stroke-main" d="M14 50H50" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M18 44V34" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-main" d="M30 44V26" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-main" d="M42 44V18" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M18 30L25 24L33 29L46 16" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle class="fill-accent" cx="18" cy="30" r="2.2"/>
+                <circle class="fill-accent" cx="25" cy="24" r="2.2"/>
+                <circle class="fill-accent" cx="33" cy="29" r="2.2"/>
+                <circle class="fill-accent" cx="46" cy="16" r="2.2"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.turnoverTitle">Оборачиваемость</h3>
+          <div class="muted" data-i18n="index.turnoverDesc">Контроль залеживания, скорости продаж и замороженных денег в остатках</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
       <div class="card" onclick="window.location.href='/debts.html'">
         <div class="card__content">
           <div class="card__top">
@@ -632,6 +928,45 @@
           <div class="muted" data-i18n="index.debtsDesc">Контроль реализаций и погашений</div>
         </div>
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/users.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle class="stroke-main" cx="32" cy="20" r="8" stroke-width="2.4"/>
+                <path class="stroke-main" d="M14 50C14 41.1634 22.0589 34 32 34C41.9411 34 50 41.1634 50 50" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M44 18C46.2091 18 48 19.7909 48 22C48 24.2091 46.2091 26 44 26" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M50 46C50 41.5817 46.4183 38 42 38" stroke-width="2.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.usersTitle">Пользователи</h3>
+          <div class="muted" data-i18n="index.usersDesc">Учётные записи для входа в систему</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" id="subscriptionCard">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="12" y="18" width="40" height="28" rx="6" stroke-width="2.4"/>
+                <path class="stroke-main" d="M12 28H52" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M22 38H30" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M38 13V25" stroke-width="2.8" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M33 20L38 25L43 20" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.subscription.cardTitle">Продлить подписку</h3>
+          <div class="muted" data-i18n="index.subscription.cardDesc">Оставить заявку на продление доступа и связаться с владельцем</div>
+        </div>
+        <div class="card__footer" data-i18n="index.subscription.cardButton">Отправить заявку</div>
       </div>
 
       <div class="card card--logout" id="logoutCard">
@@ -654,6 +989,48 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="subscriptionModal" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="subscriptionModalTitle">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="subscriptionModalTitle" data-i18n="index.subscription.modalTitle">Продление подписки</h2>
+          <p class="modal-subtitle" data-i18n="index.subscription.modalSubtitle">Оставь контакты, и заявка сразу попадёт в кабинет владельца.</p>
+        </div>
+        <button type="button" class="modal-close" id="subscriptionModalClose" aria-label="Закрыть" data-i18n-title="index.subscription.closeTitle">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="subscriptionForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="subscriptionContactName" data-i18n="index.subscription.contactName">Контактное лицо</label>
+              <input class="input" id="subscriptionContactName" name="contact_name" placeholder="Например: Евгений" data-i18n-placeholder="index.subscription.contactNamePlaceholder" />
+            </div>
+            <div class="field">
+              <label for="subscriptionPhone" data-i18n="index.subscription.phone">Телефон</label>
+              <input class="input" id="subscriptionPhone" name="phone" placeholder="+7..." data-i18n-placeholder="index.subscription.phonePlaceholder" />
+            </div>
+            <div class="field full">
+              <label for="subscriptionEmail" data-i18n="index.subscription.email">Email</label>
+              <input class="input" id="subscriptionEmail" name="email" type="email" placeholder="mail@example.com" data-i18n-placeholder="index.subscription.emailPlaceholder" />
+            </div>
+            <div class="field full">
+              <label for="subscriptionComment" data-i18n="index.subscription.comment">Комментарий</label>
+              <textarea class="textarea" id="subscriptionComment" name="comment" placeholder="Например: хочу продлить подписку на 1 месяц, удобно связаться в Telegram или по телефону" data-i18n-placeholder="index.subscription.commentPlaceholder"></textarea>
+              <div class="helper-text" data-i18n="index.subscription.helper">Нужно заполнить телефон или email. Можно указать оба.</div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="subscriptionCancelBtn" data-i18n="index.subscription.cancel">Отмена</button>
+            <button type="submit" class="btn btn-primary" id="subscriptionSubmitBtn" data-i18n="index.subscription.submit">Отправить заявку</button>
+          </div>
+
+          <div class="status-box" id="subscriptionStatusBox"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
@@ -667,7 +1044,7 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;"),
-      translateError: (value) => String(value || "Ошибка"),
+      translateError: (value) => String(value || i18n.t("common.error")),
       displayDateTime: (value) => {
         if (!value) return "";
         const d = new Date(value);
@@ -815,6 +1192,97 @@
       bindLanguageButtons();
     }
 
+
+    function normalizeModules(user) {
+      if (!user || typeof user !== "object") return [];
+      if (!Array.isArray(user.modules)) return [];
+      return user.modules
+        .map((x) => String(x || "").trim())
+        .filter(Boolean);
+    }
+
+    function getModuleCodeByPath(pathname) {
+      const map = {
+        "/items.html": "items",
+        "/locations.html": "locations",
+        "/clients.html": "clients",
+        "/stock.html": "stock",
+        "/batches.html": "batches",
+        "/movements.html": "movements",
+        "/incoming.html": "incoming",
+        "/sales.html": "sales",
+        "/sales-history.html": "sales",
+        "/writeoff.html": "writeoff",
+        "/cash.html": "cash",
+        "/expenses.html": "expenses",
+        "/analytics.html": "analytics",
+        "/turnover.html": "turnover",
+        "/debts.html": "debts",
+        "/users.html": "users"
+      };
+      return map[pathname] || null;
+    }
+
+    function applyModuleAccess(user) {
+      try {
+        const menu = document.getElementById("menu");
+        if (!menu) return;
+
+        const modules = new Set(normalizeModules(user));
+
+        const cards = Array.from(menu.querySelectorAll(".card"));
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          if (card.id === "logoutCard") {
+  card.style.display = "";
+  return;
+}
+
+if (card.id === "subscriptionCard") {
+  const modules = normalizeModules(user);
+  const hasLimitedModules = Array.isArray(modules) && modules.length > 0 && modules.length < 15;
+
+  card.style.display = hasLimitedModules ? "none" : "";
+  return;
+}
+
+          const onclickValue = card.getAttribute("onclick") || "";
+          const match = onclickValue.match(/window\.location\.href='([^']+)'/);
+          const path = match ? match[1] : "";
+          const moduleCode = getModuleCodeByPath(path);
+
+          if (!moduleCode) {
+            card.style.display = "";
+            visibleCount += 1;
+            return;
+          }
+
+          if (modules.has(moduleCode)) {
+            card.style.display = "";
+            visibleCount += 1;
+          } else {
+            card.style.display = "none";
+          }
+        });
+
+        let emptyBox = document.getElementById("menuAccessEmpty");
+        if (!visibleCount) {
+          if (!emptyBox) {
+            emptyBox = document.createElement("div");
+            emptyBox.id = "menuAccessEmpty";
+            emptyBox.className = "menu-access-empty";
+            menu.appendChild(emptyBox);
+          }
+          emptyBox.innerHTML = `<strong>${Ui.escapeHtml(i18n.t("index.menuAccessEmptyTitle"))}</strong><div>${Ui.escapeHtml(i18n.t("index.menuAccessEmptyText"))}</div>`;
+        } else if (emptyBox) {
+          emptyBox.remove();
+        }
+      } catch (_) {
+        // Не ломаем вход из-за проблем с фильтрацией меню
+      }
+    }
+
     function renderUserBox(user) {
       const userBox = document.getElementById("userBox");
       if (!userBox) return;
@@ -848,6 +1316,7 @@
             }
             if (savedUser) {
               renderUserBox(savedUser);
+              applyModuleAccess(savedUser);
             }
           } catch (_) {}
         }
@@ -872,12 +1341,135 @@
         }
 
         renderUserBox(user);
+        applyModuleAccess(user);
       } catch (e) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         window.location.href = "/login.html";
       }
     }
+
+    const subscriptionModal = document.getElementById("subscriptionModal");
+    const subscriptionCard = document.getElementById("subscriptionCard");
+    const subscriptionForm = document.getElementById("subscriptionForm");
+    const subscriptionStatusBox = document.getElementById("subscriptionStatusBox");
+    const subscriptionSubmitBtn = document.getElementById("subscriptionSubmitBtn");
+    const subscriptionCancelBtn = document.getElementById("subscriptionCancelBtn");
+    const subscriptionModalClose = document.getElementById("subscriptionModalClose");
+
+    function openSubscriptionModal() {
+      if (!subscriptionModal) return;
+      subscriptionStatusBox.className = "status-box";
+      subscriptionStatusBox.textContent = "";
+      subscriptionModal.classList.add("open");
+      subscriptionModal.setAttribute("aria-hidden", "false");
+
+      const savedUserRaw = localStorage.getItem("user");
+      if (savedUserRaw) {
+        try {
+          const savedUser = normalizeUserPayload(JSON.parse(savedUserRaw));
+          const contactNameInput = document.getElementById("subscriptionContactName");
+          const emailInput = document.getElementById("subscriptionEmail");
+
+          if (contactNameInput && !contactNameInput.value && savedUser?.full_name) {
+            contactNameInput.value = savedUser.full_name;
+          }
+
+          if (emailInput && !emailInput.value && savedUser?.email) {
+            emailInput.value = savedUser.email;
+          }
+        } catch (_) {}
+      }
+    }
+
+    function closeSubscriptionModal() {
+      if (!subscriptionModal) return;
+      subscriptionModal.classList.remove("open");
+      subscriptionModal.setAttribute("aria-hidden", "true");
+    }
+
+    function setSubscriptionStatus(type, message) {
+      if (!subscriptionStatusBox) return;
+      subscriptionStatusBox.className = "status-box open " + (type || "success");
+      subscriptionStatusBox.textContent = message || "";
+    }
+
+    async function submitSubscriptionRequest(event) {
+      event.preventDefault();
+
+      const payload = {
+        contact_name: document.getElementById("subscriptionContactName")?.value?.trim() || "",
+        phone: document.getElementById("subscriptionPhone")?.value?.trim() || "",
+        email: document.getElementById("subscriptionEmail")?.value?.trim() || "",
+        comment: document.getElementById("subscriptionComment")?.value?.trim() || ""
+      };
+
+      if (!payload.phone && !payload.email) {
+        setSubscriptionStatus("error", i18n.t("index.subscription.errorRequired"));
+        return;
+      }
+
+      subscriptionSubmitBtn.disabled = true;
+      subscriptionCancelBtn.disabled = true;
+      subscriptionModalClose.disabled = true;
+      setSubscriptionStatus("success", i18n.t("index.subscription.sending"));
+
+      try {
+        const data = window.API && typeof window.API.post === "function"
+          ? await window.API.post("/subscription-requests", payload)
+          : await requestFallback("POST", "/subscription-requests", payload);
+
+        if (!data || data.ok === false) {
+          throw new Error(data?.error || data?.message || "request_failed");
+        }
+
+        setSubscriptionStatus("success", i18n.t("index.subscription.success"));
+
+        if (subscriptionForm) {
+          subscriptionForm.reset();
+        }
+
+        setTimeout(() => {
+          closeSubscriptionModal();
+        }, 1200);
+      } catch (error) {
+        setSubscriptionStatus("error", Ui.translateError(error?.message || error || "internal_server_error"));
+      } finally {
+        subscriptionSubmitBtn.disabled = false;
+        subscriptionCancelBtn.disabled = false;
+        subscriptionModalClose.disabled = false;
+      }
+    }
+
+    if (subscriptionCard) {
+      subscriptionCard.addEventListener("click", openSubscriptionModal);
+    }
+
+    if (subscriptionModal) {
+      subscriptionModal.addEventListener("click", (event) => {
+        if (event.target === subscriptionModal) {
+          closeSubscriptionModal();
+        }
+      });
+    }
+
+    if (subscriptionModalClose) {
+      subscriptionModalClose.addEventListener("click", closeSubscriptionModal);
+    }
+
+    if (subscriptionCancelBtn) {
+      subscriptionCancelBtn.addEventListener("click", closeSubscriptionModal);
+    }
+
+    if (subscriptionForm) {
+      subscriptionForm.addEventListener("submit", submitSubscriptionRequest);
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && subscriptionModal?.classList.contains("open")) {
+        closeSubscriptionModal();
+      }
+    });
 
     document.getElementById("logoutCard").addEventListener("click", () => {
       localStorage.removeItem("token");

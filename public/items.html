@@ -31,7 +31,7 @@
     }
 
     .wrap{
-      max-width:1320px;
+      max-width:1480px;
       margin:0 auto;
       padding:24px 16px 48px;
     }
@@ -138,10 +138,36 @@
       font-size:13px;
     }
 
-    .form-grid{
+    .stats{
       display:grid;
       grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .stat{
+      background:#f8fafc;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:14px;
+      margin-top:18px;
     }
 
     .field{
@@ -153,6 +179,10 @@
 
     .field.full{
       grid-column:1 / -1;
+    }
+
+    .field.span-2{
+      grid-column:span 2;
     }
 
     label{
@@ -174,6 +204,11 @@
     input:focus, textarea:focus{
       border-color:#9db8ff;
       box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    input[readonly]{
+      background:#f8fafc;
+      color:#374151;
     }
 
     textarea{
@@ -221,29 +256,125 @@
       border:1px solid #bfdbfe;
     }
 
-    .stats{
+    .calc-note{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .photo-upload-box{
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .stat{
-      background:#f8fafc;
-      border:1px solid #e8edf4;
-      border-radius:14px;
+      grid-template-columns:220px 1fr;
+      gap:14px;
+      align-items:start;
       padding:14px;
+      border:1px dashed #cbd5e1;
+      border-radius:14px;
+      background:#f8fafc;
     }
 
-    .stat-label{
+    .photo-preview{
+      width:220px;
+      height:220px;
+      border-radius:14px;
+      border:1px solid #dbe3ef;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+      padding:10px;
+    }
+
+    .photo-preview img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      background:#fff;
+    }
+
+    .photo-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .photo-help{
       color:var(--muted);
       font-size:12px;
-      margin-bottom:6px;
+      line-height:1.5;
     }
 
-    .stat-value{
-      font-size:22px;
-      font-weight:800;
+    .table-photo{
+      width:72px;
+      min-width:72px;
+    }
+
+    .table-photo-box{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      padding:4px;
+    }
+
+    .table-photo-box img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background:#fff;
+    }
+
+
+    .table-photo-box.is-clickable{
+      cursor:zoom-in;
+    }
+
+    .image-modal{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:9999;
+      cursor:zoom-out;
+    }
+
+    .image-modal.show{
+      display:flex;
+    }
+
+    .image-modal-content{
+      max-width:min(92vw, 980px);
+      max-height:88vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .image-modal-content img{
+      max-width:100%;
+      max-height:88vh;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+      display:block;
     }
 
     .table-wrap{
@@ -253,7 +384,7 @@
 
     table{
       width:100%;
-      min-width:1200px;
+      min-width:1300px;
       border-collapse:collapse;
       background:#fff;
     }
@@ -285,31 +416,194 @@
       flex-wrap:wrap;
     }
 
+    .item-name{
+      font-weight:700;
+      margin-bottom:4px;
+    }
+
+    .item-sub{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
+    }
+
+    .dim-lines{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      color:#374151;
+      font-size:13px;
+    }
+
     .empty{
       text-align:center;
       color:var(--muted);
       padding:24px 12px;
     }
 
-    @media (max-width: 980px){
-      .form-grid,
-      .stats,
+
+    .import-panel{
+      margin-top:16px;
+      border:1px dashed #cbd5e1;
+      border-radius:14px;
+      background:#f8fafc;
+      padding:16px;
+      display:none;
+    }
+
+    .import-panel.show{
+      display:block;
+    }
+
+    .import-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .import-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .import-file-note{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .import-summary{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .import-stat{
+      background:#fff;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .import-stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .import-stat-value{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .preview-wrap{
+      overflow:auto;
+      margin-top:14px;
+      border:1px solid #e8edf4;
+      border-radius:14px;
+      background:#fff;
+    }
+
+    .preview-table{
+      width:100%;
+      min-width:980px;
+      border-collapse:collapse;
+    }
+
+    .preview-table th,
+    .preview-table td{
+      border-bottom:1px solid #eef1f5;
+      padding:10px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:13px;
+    }
+
+    .preview-table th{
+      background:#f8fafc;
+      font-weight:700;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:24px;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .pill-success{
+      background:#dcfce7;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+
+    .pill-danger{
+      background:#fee2e2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+
+    .import-empty{
+      margin-top:14px;
+      padding:16px;
+      border:1px dashed #dbe3ef;
+      border-radius:14px;
+      background:#fff;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    @media (max-width: 1100px){
+      .form-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
       .toolbar{
         grid-template-columns:1fr;
       }
+      .stats{
+        grid-template-columns:1fr;
+      }
+      .photo-upload-box{
+        grid-template-columns:1fr;
+      }
+      .photo-preview{
+        width:100%;
+        max-width:220px;
+      }
+      .import-summary,
+      .import-grid{
+        grid-template-columns:1fr;
+      }
+    }
 
+    @media (max-width: 780px){
+      .form-grid{
+        grid-template-columns:1fr;
+      }
+      .field.span-2{
+        grid-column:span 1;
+      }
       .title{
         font-size:24px;
       }
-
       .wrap{
         padding:16px 12px 32px;
       }
-
       .topbar{
         align-items:flex-start;
       }
-
       .topbar-right{
         width:100%;
         justify-content:space-between;
@@ -342,16 +636,36 @@
           <div class="stat-value" id="itemsCount">0</div>
         </div>
         <div class="stat">
+          <div class="stat-label" data-i18n="items.statsActive">Активных</div>
+          <div class="stat-value" id="activeItemsCount">0</div>
+        </div>
+        <div class="stat">
           <div class="stat-label" data-i18n="items.statsTenant">Tenant ID</div>
           <div class="stat-value" id="tenantValue">1</div>
         </div>
       </div>
 
-      <form id="itemForm" autocomplete="off" style="margin-top:18px;">
+      <form id="itemForm" autocomplete="off">
         <div class="form-grid">
-          <div class="field">
+          <div class="field span-2">
             <label for="name" data-i18n="items.nameLabel">Название</label>
             <input id="name" type="text" data-i18n-placeholder="items.namePlaceholder" placeholder="Например: Тест товар SaaS" />
+          </div>
+
+          <div class="field">
+            <label for="brand" data-i18n="items.factoryArticle">Артикул фабрики</label>
+            <input id="brand" type="text" data-i18n-placeholder="items.factoryArticlePlaceholder" placeholder="Например: XJ-2048" />
+          </div>
+
+          <div class="field">
+            <label for="category" data-i18n="items.factory">Фабрика</label>
+            <input id="category" type="text" data-i18n-placeholder="items.factoryPlaceholder" placeholder="Например: Shenzhen Factory" />
+          </div>
+
+          <div class="field">
+            <label for="categoryName" data-i18n="items.categoryNameLabel">Категория</label>
+            <input id="categoryName" type="text" list="categoryOptions" data-i18n-placeholder="items.categoryNamePlaceholder" placeholder="Например: Игрушки" />
+            <datalist id="categoryOptions"></datalist>
           </div>
 
           <div class="field">
@@ -378,6 +692,61 @@
             <label for="unit" data-i18n="items.unitLabel">Единица</label>
             <input id="unit" type="text" data-i18n-placeholder="items.unitPlaceholder" placeholder="Например: pcs" value="pcs" />
           </div>
+
+          <div class="field">
+            <label for="boxQty" data-i18n="items.boxQtyLabel">Штук в коробке</label>
+            <input id="boxQty" type="number" step="1" min="1" value="1" data-i18n-placeholder="items.boxQtyPlaceholder" placeholder="Например: 24" />
+          </div>
+
+          
+
+          <div class="field full">
+  <label for="description" data-i18n="items.descriptionLabel">Описание</label>
+  <textarea id="description" data-i18n-placeholder="items.descriptionPlaceholder" placeholder="Краткое описание товара"></textarea>
+</div>
+
+<div class="field full">
+  <label for="imageFile" data-i18n="items.photoLabel">Фото товара</label>
+  <div class="photo-upload-box">
+    <div id="photoPreview" class="photo-preview" data-i18n="items.photoNotUploaded">Фото не загружено</div>
+
+    <div>
+      <input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" />
+      <div class="photo-actions">
+        <button type="button" class="btn btn-secondary" id="removeImageBtn" data-i18n="items.removePhotoButton">Удалить фото</button>
+      </div>
+      <div class="photo-help" data-i18n-html="items.photoHelpHtml">
+        Поддерживаются JPG, PNG, WEBP, GIF. Файл загружается в папку <b>/uploads</b>, а в базе хранится путь вида <b>/uploads/filename.jpg</b>.
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div class="field">
+            <label for="weightKg" data-i18n="items.weightBox">Вес коробки, кг</label>
+            <input id="weightKg" type="number" step="0.001" min="0" data-i18n-placeholder="items.weightBoxPlaceholder" placeholder="Например: 12.5" />
+          </div>
+
+          <div class="field">
+            <label for="lengthCm" data-i18n="items.lengthBox">Длина коробки, см</label>
+            <input id="lengthCm" type="number" step="0.01" min="0" data-i18n-placeholder="items.lengthBoxPlaceholder" placeholder="Например: 60" />
+          </div>
+
+          <div class="field">
+            <label for="widthCm" data-i18n="items.widthBox">Ширина коробки, см</label>
+            <input id="widthCm" type="number" step="0.01" min="0" data-i18n-placeholder="items.widthBoxPlaceholder" placeholder="Например: 40" />
+          </div>
+
+          <div class="field">
+            <label for="heightCm" data-i18n="items.heightBox">Высота коробки, см</label>
+            <input id="heightCm" type="number" step="0.01" min="0" data-i18n-placeholder="items.heightBoxPlaceholder" placeholder="Например: 35" />
+          </div>
+
+          <div class="field">
+            <label for="volumeM3" data-i18n="items.volumeBox">Объём коробки, м³</label>
+            <input id="volumeM3" type="text" readonly data-i18n-placeholder="items.volumeAuto" placeholder="Рассчитывается автоматически" />
+            <div class="calc-note" data-i18n="items.volumeAutoHint">Объём считается автоматически по размерам коробки.</div>
+          </div>
         </div>
 
         <div class="toolbar">
@@ -389,6 +758,7 @@
           <div class="toolbar-actions">
             <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
             <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
+            <button type="button" class="btn btn-light" id="importExcelBtn" data-i18n="items.importExcelButton">Импорт Excel</button>
             <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="items.refreshButton">Обновить список</button>
           </div>
         </div>
@@ -396,6 +766,83 @@
 
       <div id="pageStatus" class="status info"></div>
       <div id="submitStatus" class="status"></div>
+
+      <div id="importPanel" class="import-panel">
+        <div class="card-title" style="margin-bottom:8px;" data-i18n="items.importTitle">Импорт Excel</div>
+        <div class="muted" data-i18n="items.importSubtitle">Загрузи .xlsx файл, проверь preview и только потом запускай импорт. Существующие SKU не создаются повторно.</div>
+
+        <div class="import-grid">
+          <div class="field">
+            <label for="importFile" data-i18n="items.importFileLabel">Файл Excel</label>
+            <input id="importFile" type="file" accept=".xlsx,.xls" />
+            <div class="import-file-note" data-i18n="items.importFileNote">Поддерживаются Excel-файлы. Пропускаем только строки без SKU, а также дубли SKU в системе и внутри файла.</div>
+          </div>
+
+          <div class="field">
+            <label data-i18n="items.importSelectedFileLabel">Выбранный файл</label>
+            <input id="importFileName" type="text" readonly data-i18n-placeholder="items.importFileNotSelected" placeholder="Файл не выбран" />
+            <div class="import-actions">
+              <button type="button" class="btn btn-secondary" id="previewImportBtn" data-i18n="items.previewImportButton">Показать preview</button>
+              <button type="button" class="btn btn-primary" id="runImportBtn" disabled data-i18n="items.runImportButton">Импортировать</button>
+              <button type="button" class="btn btn-light" id="closeImportBtn" data-i18n="items.closeImportButton">Закрыть</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="importStatus" class="status"></div>
+
+        <div id="importSummary" class="import-summary" style="display:none;">
+          <div class="import-stat">
+            <div class="import-stat-label" data-i18n="items.importTotalRowsLabel">Всего строк</div>
+            <div class="import-stat-value" id="importTotalRows">0</div>
+          </div>
+          <div class="import-stat">
+            <div class="import-stat-label" data-i18n="items.importNewRowsLabel">Новых</div>
+            <div class="import-stat-value" id="importNewRows">0</div>
+          </div>
+          <div class="import-stat">
+            <div class="import-stat-label" data-i18n="items.importSkippedRowsLabel">Пропущено</div>
+            <div class="import-stat-value" id="importSkippedRows">0</div>
+          </div>
+          <div class="import-stat">
+            <div class="import-stat-label" data-i18n="items.importDupSystemRowsLabel">Дубли в системе</div>
+            <div class="import-stat-value" id="importDupSystemRows">0</div>
+          </div>
+          <div class="import-stat">
+            <div class="import-stat-label" data-i18n="items.importOtherSkippedRowsLabel">Дубли в файле / без SKU</div>
+            <div class="import-stat-value" id="importOtherSkippedRows">0</div>
+          </div>
+        </div>
+
+        <div id="importPreviewEmpty" class="import-empty" data-i18n="items.importPreviewEmpty">Сначала выбери файл и нажми «Показать preview».</div>
+
+        <div id="importPreviewWrap" class="preview-wrap" style="display:none;">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th data-i18n="items.importPreviewColRow">Строка</th>
+                <th data-i18n="items.importPreviewColStatus">Статус</th>
+                <th data-i18n="items.importPreviewColReason">Причина</th>
+                <th data-i18n="items.importPreviewColSku">SKU</th>
+                <th data-i18n="items.importPreviewColName">Наименование</th>
+                <th data-i18n="items.importPreviewColCategory">Категория</th>
+                <th data-i18n="items.importPreviewColFactory">Фабрика</th>
+                <th data-i18n="items.importPreviewColFactoryArticle">Артикул фабрики</th>
+                <th data-i18n="items.importPreviewColBarcode">ШК</th>
+                <th data-i18n="items.importPreviewColUnit">Ед.</th>
+                <th data-i18n="items.importPreviewColBoxQty">Шт/кор</th>
+                <th data-i18n="items.importPreviewColSalePrice">Цена продажи</th>
+              </tr>
+            </thead>
+            <tbody id="importPreviewBody">
+              <tr>
+                <td colspan="12" class="empty" data-i18n="items.importPreviewNotLoaded">Preview пока не загружен.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
     <div class="card">
@@ -406,12 +853,18 @@
           <thead>
             <tr>
               <th data-i18n="items.tableId">ID</th>
+              <th data-i18n="items.tablePhoto">Фото</th>
               <th data-i18n="items.tableName">Название</th>
+              <th data-i18n="items.tableCategoryName">Категория</th>
+              <th data-i18n="items.tableFactory">Фабрика</th>
+              <th data-i18n="items.tableFactoryArticle">Арт. фабрики</th>
               <th data-i18n="items.tableSku">Артикул / SKU</th>
               <th data-i18n="items.tableBarcode">Штрихкод</th>
               <th data-i18n="items.tableUnit">Ед.</th>
+              <th data-i18n="items.tableBoxQty">Шт/кор</th>
               <th data-i18n="items.tablePurchase">Закупка</th>
               <th data-i18n="items.tableSale">Продажа</th>
+              <th data-i18n="items.tableMetrics">Характеристики</th>
               <th data-i18n="items.tableActive">Активно</th>
               <th data-i18n="items.tableDate">Дата</th>
               <th data-i18n="items.tableActions">Действия</th>
@@ -419,11 +872,18 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="10" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
+              <td colspan="16" class="empty" data-i18n="items.loadingData">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
       </div>
+    </div>
+  </div>
+
+
+  <div id="imageModal" class="image-modal" aria-hidden="true">
+    <div class="image-modal-content">
+      <img id="imageModalImg" alt="Фото товара" />
     </div>
   </div>
 
@@ -447,7 +907,7 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;"),
-      translateError: (value) => String(value || "Ошибка"),
+      translateError: (value) => String(value || (window.i18n ? i18n.t("common.error") : "Ошибка")),
       displayDateTime: (value) => {
         if (!value) return "";
         const d = new Date(value);
@@ -520,24 +980,17 @@
           return window.API.put(path, body);
         }
         return requestFallback("PUT", path, body);
-      },
-      patch(path, body) {
-        if (window.API && typeof window.API.patch === "function") {
-          return window.API.patch(path, body);
-        }
-        return requestFallback("PATCH", path, body);
-      },
-      delete(path) {
-        if (window.API && typeof window.API.delete === "function") {
-          return window.API.delete(path);
-        }
-        return requestFallback("DELETE", path);
       }
     };
 
     let authUser = null;
     let itemsData = [];
     let editId = null;
+    let currentImageUrl = null;
+    let pendingImageFile = null;
+    let pendingImagePreviewUrl = null;
+    let importFileObject = null;
+    let importPreviewData = null;
 
     let pageStatusState = null;
     let submitStatusState = null;
@@ -546,20 +999,54 @@
       formTitle: document.getElementById("formTitle"),
       itemForm: document.getElementById("itemForm"),
       name: document.getElementById("name"),
+      brand: document.getElementById("brand"),
+      category: document.getElementById("category"),
+      categoryName: document.getElementById("categoryName"),
+      categoryOptions: document.getElementById("categoryOptions"),
       sku: document.getElementById("sku"),
       barcode: document.getElementById("barcode"),
       purchasePrice: document.getElementById("purchasePrice"),
       salePrice: document.getElementById("salePrice"),
       unit: document.getElementById("unit"),
+      boxQty: document.getElementById("boxQty"),
+      description: document.getElementById("description"),
+      imageFile: document.getElementById("imageFile"),
+      removeImageBtn: document.getElementById("removeImageBtn"),
+      photoPreview: document.getElementById("photoPreview"),
+      weightKg: document.getElementById("weightKg"),
+      lengthCm: document.getElementById("lengthCm"),
+      widthCm: document.getElementById("widthCm"),
+      heightCm: document.getElementById("heightCm"),
+      volumeM3: document.getElementById("volumeM3"),
       searchInput: document.getElementById("searchInput"),
       saveBtn: document.getElementById("saveBtn"),
       cancelEditBtn: document.getElementById("cancelEditBtn"),
       refreshBtn: document.getElementById("refreshBtn"),
+      importExcelBtn: document.getElementById("importExcelBtn"),
+      importPanel: document.getElementById("importPanel"),
+      importFile: document.getElementById("importFile"),
+      importFileName: document.getElementById("importFileName"),
+      previewImportBtn: document.getElementById("previewImportBtn"),
+      runImportBtn: document.getElementById("runImportBtn"),
+      closeImportBtn: document.getElementById("closeImportBtn"),
+      importStatus: document.getElementById("importStatus"),
+      importSummary: document.getElementById("importSummary"),
+      importTotalRows: document.getElementById("importTotalRows"),
+      importNewRows: document.getElementById("importNewRows"),
+      importSkippedRows: document.getElementById("importSkippedRows"),
+      importDupSystemRows: document.getElementById("importDupSystemRows"),
+      importOtherSkippedRows: document.getElementById("importOtherSkippedRows"),
+      importPreviewEmpty: document.getElementById("importPreviewEmpty"),
+      importPreviewWrap: document.getElementById("importPreviewWrap"),
+      importPreviewBody: document.getElementById("importPreviewBody"),
       tbody: document.getElementById("tbody"),
       pageStatus: document.getElementById("pageStatus"),
       submitStatus: document.getElementById("submitStatus"),
       itemsCount: document.getElementById("itemsCount"),
-      tenantValue: document.getElementById("tenantValue")
+      activeItemsCount: document.getElementById("activeItemsCount"),
+      tenantValue: document.getElementById("tenantValue"),
+      imageModal: document.getElementById("imageModal"),
+      imageModalImg: document.getElementById("imageModalImg")
     };
 
     function goBack() {
@@ -654,6 +1141,115 @@
       return n % 1 === 0 ? String(n) : n.toFixed(2);
     }
 
+    function formatMetric(value, digits = 2) {
+      if (value === null || value === undefined || value === "") return "—";
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "—";
+      return n.toFixed(digits).replace(/\.?0+$/, "");
+    }
+
+    function revokePendingPreviewUrl() {
+      if (pendingImagePreviewUrl) {
+        try {
+          URL.revokeObjectURL(pendingImagePreviewUrl);
+        } catch {}
+        pendingImagePreviewUrl = null;
+      }
+    }
+
+    function setImagePreview(src) {
+      if (!src) {
+        els.photoPreview.innerHTML = i18n.t("items.photoNotUploaded");
+        return;
+      }
+
+      els.photoPreview.innerHTML = `<img src="${escapeHtml(src)}" alt="${escapeHtml(i18n.t("items.photoAlt"))}" />`;
+    }
+
+    function openImageModal(src) {
+      if (!src || !els.imageModal || !els.imageModalImg) return;
+      els.imageModalImg.src = src;
+      els.imageModal.classList.add("show");
+      els.imageModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeImageModal() {
+      if (!els.imageModal || !els.imageModalImg) return;
+      els.imageModal.classList.remove("show");
+      els.imageModal.setAttribute("aria-hidden", "true");
+      els.imageModalImg.removeAttribute("src");
+      document.body.style.overflow = "";
+    }
+
+    function clearImageSelection(options = {}) {
+      revokePendingPreviewUrl();
+      pendingImageFile = null;
+      if (options.clearCurrent !== false) {
+        currentImageUrl = null;
+      }
+      if (els.imageFile) {
+        els.imageFile.value = "";
+      }
+      setImagePreview(currentImageUrl);
+    }
+
+    function getFileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = String(reader.result || "");
+          const base64 = result.includes(",") ? result.split(",").pop() : result;
+          resolve(base64 || "");
+        };
+        reader.onerror = () => reject(new Error(i18n.t("items.readFileError")));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadItemImage(file) {
+      if (!file) return currentImageUrl;
+
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+      if (!allowedTypes.includes(String(file.type || "").toLowerCase())) {
+        throw new Error(i18n.t("items.imageTypeError"));
+      }
+
+      const fileBase64 = await getFileToBase64(file);
+
+      const response = await apiPost("/items/upload-image", {
+        filename: file.name,
+        mime_type: file.type,
+        file_base64: fileBase64
+      });
+
+      return response.image_url || null;
+    }
+
+    function computeVolumeCm3(lengthCm, widthCm, heightCm) {
+      if (
+        lengthCm === null || widthCm === null || heightCm === null ||
+        !Number.isFinite(lengthCm) || !Number.isFinite(widthCm) || !Number.isFinite(heightCm) ||
+        lengthCm <= 0 || widthCm <= 0 || heightCm <= 0
+      ) {
+        return null;
+      }
+      return lengthCm * widthCm * heightCm;
+    }
+
+    function formatVolumeM3(volumeCm3) {
+      if (volumeCm3 === null || volumeCm3 === undefined || volumeCm3 === "") return "";
+      const m3 = Number(volumeCm3) / 1000000;
+      if (!Number.isFinite(m3)) return "";
+      return m3.toFixed(4).replace(/\.?0+$/, "");
+    }
+
+    function readOptionalNumber(value) {
+      if (value === null || value === undefined || value === "") return null;
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    }
+
     function extractList(data, keys) {
       if (Array.isArray(data)) return data;
       if (!data || typeof data !== "object") return [];
@@ -682,17 +1278,56 @@
     }
 
     function normalizeItem(row) {
+      const length_cm = row.length_cm === null || row.length_cm === undefined ? null : Number(row.length_cm);
+      const width_cm = row.width_cm === null || row.width_cm === undefined ? null : Number(row.width_cm);
+      const height_cm = row.height_cm === null || row.height_cm === undefined ? null : Number(row.height_cm);
+      const computedVolume = computeVolumeCm3(length_cm, width_cm, height_cm);
+
       return {
         id: row.id,
         name: row.name || row.item_name || "",
+        brand: row.factory_article || row.brand || "",
+        category: row.factory || row.category || "",
+        category_name: row.category_name || "",
+        factory: row.factory || row.category || "",
+        factory_article: row.factory_article || row.brand || "",
         sku: row.sku || row.vendor_code || row.article || "",
         barcode: row.barcode || "",
         unit: row.unit || "pcs",
+        box_qty: Number(row.box_qty ?? 1),
         purchase_price: Number(row.purchase_price ?? row.cost_price ?? 0),
         sale_price: Number(row.sale_price ?? row.price ?? 0),
+        description: row.description || "",
+        image_url: row.image_url || "",
+        weight_kg: row.weight_kg === null || row.weight_kg === undefined ? null : Number(row.weight_kg),
+        volume_cm3: computedVolume,
+        length_cm,
+        width_cm,
+        height_cm,
         is_active: row.is_active === false ? false : true,
         created_at: row.created_at || row.date || null
       };
+    }
+
+    let categoriesData = [];
+
+    function renderCategoryOptions() {
+      if (!els.categoryOptions) return;
+      els.categoryOptions.innerHTML = categoriesData
+        .map((row) => `<option value="${escapeHtml(row.name || "")}"></option>`)
+        .join("");
+    }
+
+    async function loadCategories() {
+      try {
+        const tenantId = getTenantId();
+        const data = await apiGet(`/items/categories?tenant_id=${tenantId}`);
+        categoriesData = extractList(data, ["categories", "data", "rows"]);
+        renderCategoryOptions();
+      } catch (err) {
+        categoriesData = [];
+        renderCategoryOptions();
+      }
     }
 
     function getFormTitleText() {
@@ -712,16 +1347,36 @@
       els.cancelEditBtn.textContent = i18n.t("items.cancelEditButton");
     }
 
+    function updateVolumeDisplay() {
+      const length = readOptionalNumber(els.lengthCm.value);
+      const width = readOptionalNumber(els.widthCm.value);
+      const height = readOptionalNumber(els.heightCm.value);
+      const volumeCm3 = computeVolumeCm3(length, width, height);
+      els.volumeM3.value = volumeCm3 === null ? "" : i18n.format("items.volumeM3Value", { value: formatVolumeM3(volumeCm3) });
+      return volumeCm3;
+    }
+
     function resetForm() {
       editId = null;
       syncFormTexts();
       els.cancelEditBtn.style.display = "none";
       els.name.value = "";
+      els.brand.value = "";
+      els.category.value = "";
+      if (els.categoryName) els.categoryName.value = "";
       els.sku.value = "";
       els.barcode.value = "";
       els.purchasePrice.value = "0";
       els.salePrice.value = "0";
       els.unit.value = "pcs";
+      els.boxQty.value = "1";
+      els.description.value = "";
+      clearImageSelection({ clearCurrent: true });
+      els.weightKg.value = "";
+      els.lengthCm.value = "";
+      els.widthCm.value = "";
+      els.heightCm.value = "";
+      updateVolumeDisplay();
       clearSubmitStatus();
     }
 
@@ -730,11 +1385,23 @@
       syncFormTexts();
       els.cancelEditBtn.style.display = "inline-flex";
       els.name.value = item.name || "";
+      els.brand.value = item.factory_article || item.brand || "";
+      els.category.value = item.factory || item.category || "";
+      if (els.categoryName) els.categoryName.value = item.category_name || "";
       els.sku.value = item.sku || "";
       els.barcode.value = item.barcode || "";
       els.purchasePrice.value = String(item.purchase_price ?? 0);
       els.salePrice.value = String(item.sale_price ?? 0);
       els.unit.value = item.unit || "pcs";
+      els.boxQty.value = item.box_qty ? String(item.box_qty) : "1";
+      els.description.value = item.description || "";
+      currentImageUrl = item.image_url || null;
+      clearImageSelection({ clearCurrent: false });
+      els.weightKg.value = item.weight_kg === null ? "" : String(item.weight_kg);
+      els.lengthCm.value = item.length_cm === null ? "" : String(item.length_cm);
+      els.widthCm.value = item.width_cm === null ? "" : String(item.width_cm);
+      els.heightCm.value = item.height_cm === null ? "" : String(item.height_cm);
+      updateVolumeDisplay();
       clearSubmitStatus();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -746,8 +1413,14 @@
         if (!search) return true;
         const text = [
           row.name,
+          row.category_name,
+          row.factory,
+          row.factory_article,
+          row.brand,
+          row.category,
           row.sku,
           row.barcode,
+          row.description,
           row.unit
         ].join(" ").toLowerCase();
 
@@ -755,43 +1428,88 @@
       });
     }
 
+    function getDimensionsText(row) {
+      const parts = [];
+
+      if (row.length_cm !== null || row.width_cm !== null || row.height_cm !== null) {
+        parts.push(
+          i18n.format("items.dimensionBoxLine", { length: formatMetric(row.length_cm, 2), width: formatMetric(row.width_cm, 2), height: formatMetric(row.height_cm, 2) })
+        );
+      }
+
+      if (row.weight_kg !== null) {
+        parts.push(i18n.format("items.dimensionWeightLine", { value: formatMetric(row.weight_kg, 3) }));
+      }
+
+      const volumeCm3 = row.volume_cm3;
+      if (volumeCm3 !== null) {
+        parts.push(i18n.format("items.dimensionVolumeLine", { value: formatVolumeM3(volumeCm3) }));
+      }
+
+      return parts.length ? parts : ["—"];
+    }
+
     function renderTable() {
       const rows = getFilteredRows();
       els.itemsCount.textContent = String(itemsData.length);
+      els.activeItemsCount.textContent = String(itemsData.filter((row) => row.is_active).length);
 
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="10" class="empty">${escapeHtml(i18n.t("items.noData"))}</td>
+            <td colspan="16" class="empty">${escapeHtml(i18n.t("items.noData"))}</td>
           </tr>
         `;
         return;
       }
 
-      els.tbody.innerHTML = rows.map((row) => `
-        <tr>
-          <td>${escapeHtml(row.id)}</td>
-          <td>${escapeHtml(row.name)}</td>
-          <td>${escapeHtml(row.sku)}</td>
-          <td>${escapeHtml(row.barcode)}</td>
-          <td>${escapeHtml(row.unit)}</td>
-          <td>${escapeHtml(formatMoney(row.purchase_price))}</td>
-          <td>${escapeHtml(formatMoney(row.sale_price))}</td>
-          <td>${row.is_active ? escapeHtml(i18n.t("items.activeYes")) : escapeHtml(i18n.t("items.activeNo"))}</td>
-          <td>${escapeHtml(formatDate(row.created_at))}</td>
-          <td>
-            <div class="row-actions">
-              <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("items.editButton"))}</button>
-            </div>
-          </td>
-        </tr>
-      `).join("");
+      els.tbody.innerHTML = rows.map((row) => {
+        const dimensions = getDimensionsText(row);
+        return `
+          <tr>
+            <td>${escapeHtml(row.id)}</td>
+            <td class="table-photo">
+              <div
+                class="table-photo-box ${row.image_url ? "is-clickable" : ""}"
+                ${row.image_url ? `onclick="openItemImageModal('${escapeHtml(row.image_url)}')"` : ""}
+              >
+                ${row.image_url ? `<img src="${escapeHtml(row.image_url)}" alt="${escapeHtml(i18n.t("items.photoAlt"))}" />` : escapeHtml(i18n.t("items.noPhoto"))}
+              </div>
+            </td>
+            <td>
+              <div class="item-name">${escapeHtml(row.name)}</div>          
+              <div class="item-sub">${escapeHtml(row.description || "")}</div>
+            </td>
+            <td>${escapeHtml(row.category_name || "—")}</td>
+            <td>${escapeHtml(row.factory || "—")}</td>
+            <td>${escapeHtml(row.factory_article || "—")}</td>
+            <td>${escapeHtml(row.sku || "—")}</td>
+            <td>${escapeHtml(row.barcode || "—")}</td>
+            <td>${escapeHtml(row.unit || "—")}</td>
+            <td>${escapeHtml(formatMoney(row.box_qty || 1))}</td>
+            <td>${escapeHtml(formatMoney(row.purchase_price))}</td>
+            <td>${escapeHtml(formatMoney(row.sale_price))}</td>
+            <td>
+              <div class="dim-lines">
+                ${dimensions.map((line) => `<div>${escapeHtml(line)}</div>`).join("")}
+              </div>
+            </td>
+            <td>${row.is_active ? escapeHtml(i18n.t("items.activeYes")) : escapeHtml(i18n.t("items.activeNo"))}</td>
+            <td>${escapeHtml(formatDate(row.created_at))}</td>
+            <td>
+              <div class="row-actions">
+                <button type="button" class="btn btn-secondary" onclick="editItem('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("items.editButton"))}</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
     }
 
     function renderLoadingRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="10" class="empty">${escapeHtml(i18n.t("items.loadingData"))}</td>
+          <td colspan="16" class="empty">${escapeHtml(i18n.t("items.loadingData"))}</td>
         </tr>
       `;
     }
@@ -799,7 +1517,7 @@
     function renderLoadErrorRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="10" class="empty">${escapeHtml(i18n.t("items.loadErrorRow"))}</td>
+          <td colspan="16" class="empty">${escapeHtml(i18n.t("items.loadErrorRow"))}</td>
         </tr>
       `;
     }
@@ -814,6 +1532,7 @@
 
         const data = await apiGet(`/items?tenant_id=${tenantId}`);
         itemsData = extractList(data, ["items", "data", "rows"]).map(normalizeItem);
+        await loadCategories();
 
         renderTable();
 
@@ -837,11 +1556,21 @@
         const tenantId = getTenantId();
 
         const name = (els.name.value || "").trim();
+        const brand = (els.brand.value || "").trim();
+        const category = (els.category.value || "").trim();
+        const category_name = els.categoryName ? (els.categoryName.value || "").trim() : "";
         const sku = (els.sku.value || "").trim();
         const barcode = (els.barcode.value || "").trim();
         const purchase_price = Number(els.purchasePrice.value || 0);
         const sale_price = Number(els.salePrice.value || 0);
         const unit = (els.unit.value || "").trim() || "pcs";
+        const box_qty = Number(els.boxQty.value || 1);
+        const description = (els.description.value || "").trim();
+
+        const weight_kg = readOptionalNumber(els.weightKg.value);
+        const length_cm = readOptionalNumber(els.lengthCm.value);
+        const width_cm = readOptionalNumber(els.widthCm.value);
+        const height_cm = readOptionalNumber(els.heightCm.value);
 
         if (!name) {
           throw new Error(i18n.t("items.nameRequired"));
@@ -855,14 +1584,48 @@
           throw new Error(i18n.t("items.salePriceInvalid"));
         }
 
+        if (!Number.isFinite(box_qty) || box_qty <= 0) {
+          throw new Error(i18n.t("items.boxQtyInvalid"));
+        }
+
+        for (const [value, message] of [
+          [weight_kg, i18n.t("items.weightBoxInvalid")],
+          [length_cm, i18n.t("items.lengthBoxInvalid")],
+          [width_cm, i18n.t("items.widthBoxInvalid")],
+          [height_cm, i18n.t("items.heightBoxInvalid")]
+        ]) {
+          if (value !== null && value < 0) {
+            throw new Error(message);
+          }
+        }
+
+        let imageUrl = currentImageUrl;
+
+        if (pendingImageFile) {
+          showStatus(els.submitStatus, i18n.t("items.uploadingPhoto"), "info");
+          imageUrl = await uploadItemImage(pendingImageFile);
+        }
+
         const body = {
           tenant_id: tenantId,
           name,
+          brand: brand || null,
+          category: category || null,
+          factory_article: brand || null,
+          factory: category || null,
+          category_name: category_name || null,
           sku: sku || null,
           barcode: barcode || null,
           unit,
+          box_qty,
           purchase_price,
-          sale_price
+          sale_price,
+          description: description || null,
+          image_url: imageUrl || null,
+          weight_kg,
+          length_cm,
+          width_cm,
+          height_cm
         };
 
         if (editId) {
@@ -884,16 +1647,255 @@
       }
     }
 
+
+    function getImportReasonText(reason) {
+      switch (String(reason || "")) {
+        case "no_sku":
+          return i18n.t("items.importReasonNoSku");
+        case "duplicate_sku_in_system":
+          return i18n.t("items.importReasonDuplicateInSystem");
+        case "duplicate_sku_in_file":
+          return i18n.t("items.importReasonDuplicateInFile");
+        case "sku_already_exists":
+          return i18n.t("items.importReasonDuplicateInSystem");
+        default:
+          return reason ? String(reason) : "—";
+      }
+    }
+
+    function getImportStatusPill(status) {
+      if (String(status || "") === "new") {
+        return `<span class="pill pill-success">${escapeHtml(i18n.t("items.importStatusNew"))}</span>`;
+      }
+      return `<span class="pill pill-danger">${escapeHtml(i18n.t("items.importStatusSkip"))}</span>`;
+    }
+
+    async function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = String(reader.result || "");
+          const base64 = result.includes(",") ? result.split(",").pop() : result;
+          resolve(base64 || "");
+        };
+        reader.onerror = () => reject(new Error(i18n.t("items.importReadExcelError")));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function resetImportPreviewUi() {
+      importPreviewData = null;
+      hideStatus(els.importStatus);
+      els.importSummary.style.display = "none";
+      els.importPreviewWrap.style.display = "none";
+      els.importPreviewEmpty.style.display = "block";
+      els.importPreviewBody.innerHTML = '<tr><td colspan="12" class="empty" data-i18n="items.importPreviewNotLoaded">Preview пока не загружен.</td></tr>';
+      els.runImportBtn.disabled = true;
+    }
+
+    function openImportPanel() {
+      els.importPanel.classList.add("show");
+    }
+
+    function closeImportPanel() {
+      els.importPanel.classList.remove("show");
+    }
+
+    function renderImportPreview(data) {
+      importPreviewData = data || null;
+
+      if (!data) {
+        resetImportPreviewUi();
+        return;
+      }
+
+      els.importSummary.style.display = "grid";
+      els.importTotalRows.textContent = String(data.total_rows || 0);
+      els.importNewRows.textContent = String(data.new_count || 0);
+      els.importSkippedRows.textContent = String(data.skipped_count || 0);
+      els.importDupSystemRows.textContent = String(data.duplicate_sku_in_system_count || 0);
+      els.importOtherSkippedRows.textContent = String((data.duplicate_sku_in_file_count || 0) + (data.no_sku_count || 0));
+
+      const rows = Array.isArray(data.preview_rows) ? data.preview_rows : [];
+      if (!rows.length) {
+        els.importPreviewWrap.style.display = "none";
+        els.importPreviewEmpty.style.display = "block";
+        els.importPreviewEmpty.textContent = i18n.t("items.importPreviewNoRows");
+        els.runImportBtn.disabled = true;
+        return;
+      }
+
+      els.importPreviewBody.innerHTML = rows.map((row) => `
+        <tr>
+          <td>${escapeHtml(row.row_number ?? "")}</td>
+          <td>${getImportStatusPill(row.status)}</td>
+          <td>${escapeHtml(getImportReasonText(row.reason))}</td>
+          <td>${escapeHtml(row.sku || "")}</td>
+          <td>${escapeHtml(row.name || "")}</td>
+          <td>${escapeHtml(row.category_name || "")}</td>
+          <td>${escapeHtml(row.factory || "")}</td>
+          <td>${escapeHtml(row.factory_article || "")}</td>
+          <td>${escapeHtml(row.barcode || "")}</td>
+          <td>${escapeHtml(row.unit || "")}</td>
+          <td>${escapeHtml(formatMoney(row.box_qty || 0))}</td>
+          <td>${escapeHtml(formatMoney(row.sale_price || 0))}</td>
+        </tr>
+      `).join("");
+
+      els.importPreviewWrap.style.display = "block";
+      els.importPreviewEmpty.style.display = "none";
+      els.runImportBtn.disabled = !(Number(data.new_count || 0) > 0);
+    }
+
+    async function handleImportPreview() {
+      try {
+        if (!importFileObject) {
+          throw new Error(i18n.t("items.importSelectFileFirst"));
+        }
+
+        showStatus(els.importStatus, i18n.t("items.importBuildingPreview"), "info");
+        const fileBase64 = await readFileAsBase64(importFileObject);
+
+        const data = await apiPost("/items/import/preview", {
+          tenant_id: getTenantId(),
+          file_base64: fileBase64
+        });
+
+        renderImportPreview(data);
+        showStatus(
+          els.importStatus,
+          i18n.format("items.importPreviewReady", { total: data.total_rows || 0, created: data.new_count || 0, skipped: data.skipped_count || 0 }),
+          "success"
+        );
+      } catch (err) {
+        resetImportPreviewUi();
+        showStatus(els.importStatus, Ui.translateError(err.message), "error");
+      }
+    }
+
+    async function handleImportRun() {
+      try {
+        if (!importFileObject) {
+          throw new Error(i18n.t("items.importSelectFileFirst"));
+        }
+
+        if (!importPreviewData) {
+          throw new Error(i18n.t("items.importBuildPreviewFirst"));
+        }
+
+        if (!(Number(importPreviewData.new_count || 0) > 0)) {
+          throw new Error(i18n.t("items.importNoNewSku"));
+        }
+
+        const confirmed = window.confirm(i18n.format("items.importConfirmRun", { count: importPreviewData.new_count }));
+        if (!confirmed) {
+          return;
+        }
+
+        showStatus(els.importStatus, i18n.t("items.importRunning"), "info");
+        const fileBase64 = await readFileAsBase64(importFileObject);
+
+        const result = await apiPost("/items/import", {
+          tenant_id: getTenantId(),
+          file_base64: fileBase64
+        });
+
+        showStatus(
+          els.importStatus,
+          i18n.format("items.importFinished", { created: result.created_count || 0, skipped: result.skipped_count || 0 }),
+          "success"
+        );
+
+        els.importFile.value = "";
+        els.importFileName.value = "";
+        importFileObject = null;
+        await loadData();
+        if (typeof loadCategories === "function") {
+          await loadCategories();
+        }
+        renderImportPreview({
+          total_rows: result.total_rows || 0,
+          new_count: 0,
+          skipped_count: result.skipped_count || 0,
+          duplicate_sku_in_system_count: result.duplicate_sku_in_system_count || 0,
+          duplicate_sku_in_file_count: result.duplicate_sku_in_file_count || 0,
+          no_sku_count: result.no_sku_count || 0,
+          preview_rows: (result.created || []).slice(0, 0),
+        });
+        els.importPreviewWrap.style.display = "none";
+        els.importPreviewEmpty.style.display = "block";
+        els.importPreviewEmpty.textContent = i18n.t("items.importDoneChooseNext");
+      } catch (err) {
+        showStatus(els.importStatus, Ui.translateError(err.message), "error");
+      }
+    }
+
+
     function bindEvents() {
       els.itemForm.addEventListener("submit", handleSubmit);
       els.searchInput.addEventListener("input", renderTable);
+      [els.weightKg, els.lengthCm, els.widthCm, els.heightCm].forEach((node) => {
+        node.addEventListener("input", updateVolumeDisplay);
+      });
       els.cancelEditBtn.addEventListener("click", resetForm);
       els.refreshBtn.addEventListener("click", loadData);
+      els.importExcelBtn.addEventListener("click", openImportPanel);
+      els.closeImportBtn.addEventListener("click", closeImportPanel);
+      els.previewImportBtn.addEventListener("click", handleImportPreview);
+      els.runImportBtn.addEventListener("click", handleImportRun);
+      els.importFile.addEventListener("change", (event) => {
+        importFileObject = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+        els.importFileName.value = importFileObject ? importFileObject.name : "";
+        resetImportPreviewUi();
+        if (importFileObject) {
+          openImportPanel();
+          showStatus(els.importStatus, i18n.format("items.importFileChosen", { name: importFileObject.name }), "info");
+        } else {
+          hideStatus(els.importStatus);
+        }
+      });
+      els.imageFile.addEventListener("change", (event) => {
+        const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+        revokePendingPreviewUrl();
+        pendingImageFile = file;
+        if (file) {
+          pendingImagePreviewUrl = URL.createObjectURL(file);
+          setImagePreview(pendingImagePreviewUrl);
+        } else {
+          setImagePreview(currentImageUrl);
+        }
+      });
+      els.removeImageBtn.addEventListener("click", () => {
+        clearImageSelection({ clearCurrent: true });
+      });
+      els.photoPreview.addEventListener("click", () => {
+        const previewSrc = pendingImagePreviewUrl || currentImageUrl;
+        if (previewSrc) openImageModal(previewSrc);
+      });
+      if (els.photoPreview) {
+        els.photoPreview.style.cursor = "zoom-in";
+      }
+      if (els.imageModal) {
+        els.imageModal.addEventListener("click", closeImageModal);
+      }
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && els.imageModal && els.imageModal.classList.contains("show")) {
+          closeImageModal();
+        }
+      });
 
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
         syncFormTexts();
         renderTable();
+        if (importPreviewData) {
+          renderImportPreview(importPreviewData);
+        } else {
+          resetImportPreviewUi();
+        }
+        if (els.imageModalImg) {
+          els.imageModalImg.alt = i18n.t("items.photoAlt");
+        }
         restoreStatusesAfterLanguageChange();
       });
     }
@@ -904,6 +1906,12 @@
       i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
       syncFormTexts();
+      updateVolumeDisplay();
+      setImagePreview(null);
+      if (els.imageModalImg) {
+        els.imageModalImg.alt = i18n.t("items.photoAlt");
+      }
+      resetImportPreviewUi();
       loadData();
     }
 
@@ -913,10 +1921,15 @@
       startEdit(found);
     }
 
+    function openItemImageModal(src) {
+      openImageModal(src);
+    }
+
     bootstrap();
     window.editItem = editItem;
     window.goBack = goBack;
     window.logout = logout;
+    window.openItemImageModal = openItemImageModal;
   </script>
 </body>
 </html>

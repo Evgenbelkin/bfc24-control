@@ -383,7 +383,6 @@
               <th>ID</th>
               <th data-i18n="debts.tableClient">Клиент</th>
               <th data-i18n="debts.tableItem">Товар</th>
-              <th data-i18n="debts.tableLocation">МХ</th>
               <th data-i18n="debts.tableQty">Кол-во</th>
               <th data-i18n="debts.tableAmount">Сумма</th>
               <th data-i18n="debts.tablePaid">Оплачено</th>
@@ -396,7 +395,7 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="12" class="empty" data-i18n="debts.loadingRows">Загрузка данных...</td>
+              <td colspan="11" class="empty" data-i18n="debts.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -703,7 +702,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="12" class="empty">${escapeHtml(t("debts.noData"))}</td>
+            <td colspan="11" class="empty">${escapeHtml(t("debts.noData"))}</td>
           </tr>
         `;
         return;
@@ -716,7 +715,6 @@
             <td>${escapeHtml(row.id)}</td>
             <td>${escapeHtml(row.counterparty_name)}</td>
             <td>${escapeHtml(row.item_name)}</td>
-            <td>${escapeHtml(row.location_name)}</td>
             <td>${escapeHtml(row.qty)}</td>
             <td>${escapeHtml(formatMoney(row.initial_amount))}</td>
             <td>${escapeHtml(formatMoney(row.paid_amount))}</td>
@@ -759,7 +757,7 @@
       } catch (err) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="12" class="empty">${escapeHtml(t("debts.loadErrorRow"))}</td>
+            <td colspan="11" class="empty">${escapeHtml(t("debts.loadErrorRow"))}</td>
           </tr>
         `;
         showStatus(tf("debts.loadErrorStatus", { error: Ui.translateError(err.message) }), "error");

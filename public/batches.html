@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="ru" translate="no" data-page-title-i18n="batches.pageTitle">
+<head>
+  <meta charset="UTF-8" />
+  <title data-i18n="batches.pageTitle">BFC24 CONTROL — Партии / Себестоимость</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:#dfe3eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+      --danger-bg:#fef2f2;
+      --danger-line:#fecaca;
+      --danger-text:#991b1b;
+      --ok-bg:#f0fdf4;
+      --ok-line:#bbf7d0;
+      --ok-text:#166534;
+      --info-bg:#eff6ff;
+      --info-line:#bfdbfe;
+      --info-text:#1d4ed8;
+      --warn-bg:#fff7ed;
+      --warn-line:#fed7aa;
+      --warn-text:#9a3412;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1720px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .lang-switcher{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .lang-switcher button{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+      min-width:56px;
+    }
+
+    .lang-switcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .btn-primary:hover{background:var(--primary-hover)}
+
+    .btn-light{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-small{
+      padding:9px 12px;
+      font-size:13px;
+      border-radius:10px;
+    }
+
+    .btn-save{
+      background:var(--primary);
+      color:#fff;
+      border:none;
+    }
+
+    .btn-save:hover{background:var(--primary-hover)}
+    .btn-save:disabled{
+      background:#93c5fd;
+      cursor:not-allowed;
+    }
+
+    .btn-ghost{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-ghost:hover{
+      border-color:#cbd5e1;
+      background:#f8fafc;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid #eef1f5;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:16px;
+    }
+
+    .card-title{
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 14px;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .filters{
+      display:grid;
+      grid-template-columns:1.2fr 220px 220px auto;
+      gap:12px;
+      align-items:end;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      min-width:0;
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    input{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    .input-mini{
+      min-width:110px;
+      padding:9px 10px;
+      font-size:13px;
+      border-radius:10px;
+    }
+
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+
+    .status.show{display:block}
+    .status.error{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+    .status.success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .status.info{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .table-wrap{
+      overflow:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      background:#fff;
+      min-width:1320px;
+    }
+
+    th, td{
+      border-bottom:1px solid #eef1f5;
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    th{
+      background:#f8fafc;
+      font-weight:700;
+      color:#111827;
+      position:sticky;
+      top:0;
+      z-index:1;
+      white-space:nowrap;
+    }
+
+    tr:hover td{
+      background:#fbfdff;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:24px 12px;
+    }
+
+    .batch-row-finance-missing td{
+      background:var(--danger-bg);
+    }
+
+    .batch-row-finance-ok td{
+      background:#fcfffd;
+    }
+
+    .batch-status{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .batch-status.missing{
+      background:var(--danger-bg);
+      color:var(--danger-text);
+      border:1px solid var(--danger-line);
+    }
+
+    .batch-status.ok{
+      background:var(--ok-bg);
+      color:var(--ok-text);
+      border:1px solid var(--ok-line);
+    }
+
+    .batch-save-status{
+      margin-top:6px;
+      font-size:12px;
+      line-height:1.35;
+      min-height:16px;
+    }
+
+    .batch-save-status.error{ color:var(--danger-text); }
+    .batch-save-status.success{ color:var(--ok-text); }
+    .batch-save-status.info{ color:#1d4ed8; }
+
+    .mono{
+      font-variant-numeric:tabular-nums;
+    }
+
+    .photo-col{
+      width:72px;
+      min-width:72px;
+    }
+
+    .photo-box{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      padding:4px;
+    }
+
+    .photo-box img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background:#fff;
+    }
+
+    .photo-box.is-clickable{
+      cursor:zoom-in;
+    }
+
+    .batch-main-row td{
+      vertical-align:middle;
+    }
+
+    .batch-actions{
+      min-width:190px;
+    }
+
+    .analysis-row td{
+      padding:0;
+      background:#fff !important;
+    }
+
+    .analysis-panel{
+      border-top:1px dashed #dbe2ea;
+      padding:16px;
+      background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+    }
+
+    .analysis-grid{
+      display:grid;
+      grid-template-columns:1.2fr 1fr 1fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    .analysis-block{
+      border:1px solid #e6edf5;
+      border-radius:16px;
+      background:#fff;
+      padding:14px;
+      box-shadow:0 4px 16px rgba(15,23,42,.04);
+    }
+
+    .analysis-title{
+      font-size:15px;
+      font-weight:700;
+      margin:0 0 10px;
+    }
+
+    .analysis-photo-wrap{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+
+    .analysis-photo-large{
+      width:84px;
+      height:84px;
+      border-radius:16px;
+      border:1px solid #e5e7eb;
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      padding:4px;
+      flex:0 0 auto;
+    }
+
+    .analysis-photo-large img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .analysis-item-lines{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+
+    .analysis-item-name{
+      font-size:16px;
+      font-weight:700;
+      line-height:1.35;
+    }
+
+    .analysis-item-sub{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    .metrics{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .metric{
+      border:1px solid #ecf0f5;
+      border-radius:14px;
+      background:#fafcff;
+      padding:10px 12px;
+    }
+
+    .metric-label{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .metric-value{
+      font-size:18px;
+      font-weight:800;
+      line-height:1.2;
+    }
+
+    .metric-value.ok{ color:var(--ok-text); }
+    .metric-value.warn{ color:var(--warn-text); }
+    .metric-value.danger{ color:var(--danger-text); }
+    .metric-value.info{ color:var(--info-text); }
+
+    .analysis-form{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .analysis-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .analysis-help{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .image-modal{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:9999;
+      cursor:zoom-out;
+    }
+
+    .image-modal.show{
+      display:flex;
+    }
+
+    .image-modal-content{
+      max-width:min(92vw, 980px);
+      max-height:88vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .image-modal-content img{
+      max-width:100%;
+      max-height:88vh;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+      display:block;
+    }
+
+    @media (max-width: 1200px){
+      .filters{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .analysis-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 900px){
+      .filters{
+        grid-template-columns:1fr;
+      }
+
+      .metrics,
+      .analysis-form{
+        grid-template-columns:1fr;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .wrap{
+        padding:16px 12px 32px;
+      }
+
+      .topbar{
+        align-items:flex-start;
+      }
+
+      .topbar-right{
+        width:100%;
+        justify-content:space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title" data-i18n="batches.heading">Партии / Себестоимость</div>
+
+      <div class="topbar-right">
+        <div id="langSwitcher" class="lang-switcher"></div>
+
+        <div class="top-actions">
+          <button class="btn btn-light" onclick="goBack()" data-i18n="common.backButton">Назад</button>
+          <button class="btn btn-light" onclick="logout()" data-i18n="common.logoutButton">Выйти</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title" data-i18n="batches.filterCardTitle">Фильтр и сравнительный курс</h2>
+
+      <div class="filters">
+        <div class="field">
+          <label for="searchInput" data-i18n="batches.searchLabel">Поиск по товару / артикулу / штрихкоду</label>
+          <input id="searchInput" type="text" placeholder="Например: Самолет, SKU, barcode" data-i18n-placeholder="batches.searchPlaceholder" />
+        </div>
+
+        <div class="field">
+          <label for="currentCnyRateInput" data-i18n="batches.currentCnyRateLabel">Текущий курс ¥</label>
+          <input id="currentCnyRateInput" type="number" min="0" step="0.0001" placeholder="Например: 11.80" data-i18n-placeholder="batches.currentCnyRatePlaceholder" />
+        </div>
+
+        <div class="field">
+          <label for="currentUsdRateInput" data-i18n="batches.currentUsdRateLabel">Текущий курс $</label>
+          <input id="currentUsdRateInput" type="number" min="0" step="0.0001" placeholder="Например: 92.50" data-i18n-placeholder="batches.currentUsdRatePlaceholder" />
+        </div>
+
+        <div class="field">
+          <label>&nbsp;</label>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="common.refreshButton">Обновить</button>
+        </div>
+      </div>
+
+      <div class="muted" style="margin-top:10px;">
+        <span data-i18n="batches.filterHint">Основная таблица оставлена короткой. Сравнительный анализ раскрывается отдельно по каждой партии и не изменяет исторические данные партии.</span>
+      </div>
+
+      <div id="pageStatus" class="status info"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title" data-i18n="batches.tableCardTitle">Партии товаров</h2>
+      <div class="muted" data-i18n="batches.tableCardHint">Сохраняемые поля партии: закупка в юанях, курс юаня, доставка в долларах и курс доллара. Аналитика ниже раскрывается по кнопке “Анализ”.</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="photo-col" data-i18n="batches.tablePhoto">Фото</th>
+              <th data-i18n="batches.tableItem">Товар</th>
+              <th data-i18n="batches.tableSku">Артикул / SKU</th>
+              <th data-i18n="batches.tableBarcode">Штрихкод</th>
+              <th data-i18n="batches.tableBatchDate">Дата партии</th>
+              <th data-i18n="batches.tableQtyTotal">Кол-во в партии</th>
+              <th data-i18n="batches.tableQtyRemaining">Остаток партии</th>
+              <th data-i18n="batches.tableUnitCostRub">Себестоимость 1 шт, ₽</th>
+              <th data-i18n="batches.tableStockSumRub">Сумма остатка, ₽</th>
+              <th data-i18n="batches.tableStatus">Статус</th>
+              <th data-i18n="batches.tableAction">Действие</th>
+            </tr>
+          </thead>
+          <tbody id="batchesTbody">
+            <tr>
+              <td colspan="11" class="empty" data-i18n="batches.loadingRows">Загрузка партий...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="imageModal" class="image-modal" aria-hidden="true">
+    <div class="image-modal-content">
+      <img id="imageModalImg" alt="Фото товара" data-i18n-title="batches.imageAlt" />
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/login.html";
+    }
+
+    const Ui = window.AppUI || {
+      translateError: (value) => String(value || (window.i18n ? t("batches.errorDefault") : "Error")),
+    };
+
+    async function requestFallback(method, path, body) {
+      const token = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
+
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+
+      return data;
+    }
+
+    function getTenantIdFromStorage(fallback = 1) {
+      try {
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
+      } catch {}
+      return fallback;
+    }
+
+    const ApiBridge = {
+      getTenantId(fallback = 1) {
+        if (window.API && typeof window.API.getTenantId === "function") {
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
+        }
+        return getTenantIdFromStorage(fallback);
+      },
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      },
+      patch(path, body) {
+        if (window.API && typeof window.API.patch === "function") {
+          return window.API.patch(path, body);
+        }
+        return requestFallback("PATCH", path, body);
+      }
+    };
+
+    let authUser = null;
+    let batchesData = [];
+    let pageStatusState = null;
+    let expandedBatchId = null;
+
+    const els = {
+      searchInput: document.getElementById("searchInput"),
+      currentCnyRateInput: document.getElementById("currentCnyRateInput"),
+      currentUsdRateInput: document.getElementById("currentUsdRateInput"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      batchesTbody: document.getElementById("batchesTbody"),
+      pageStatus: document.getElementById("pageStatus"),
+      imageModal: document.getElementById("imageModal"),
+      imageModalImg: document.getElementById("imageModalImg")
+    };
+
+    function goBack() {
+      window.location.href = "/index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("batches_current_cny_rate");
+      localStorage.removeItem("batches_current_usd_rate");
+      window.location.href = "/login.html";
+    }
+
+    function parseUser() {
+      try {
+        const raw = localStorage.getItem("user");
+        authUser = raw ? JSON.parse(raw) : null;
+      } catch {
+        authUser = null;
+      }
+    }
+
+    function openImageModal(src) {
+      if (!src || !els.imageModal || !els.imageModalImg) return;
+      els.imageModalImg.src = src;
+      els.imageModalImg.alt = t("batches.imageAlt");
+      els.imageModal.classList.add("show");
+      els.imageModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeImageModal() {
+      if (!els.imageModal || !els.imageModalImg) return;
+      els.imageModal.classList.remove("show");
+      els.imageModal.setAttribute("aria-hidden", "true");
+      els.imageModalImg.removeAttribute("src");
+      document.body.style.overflow = "";
+    }
+
+    function getTenantId() {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
+        return Number(authUser.tenant_id);
+      }
+      return ApiBridge.getTenantId(1);
+    }
+
+    function showStatus(text, type = "info") {
+      els.pageStatus.className = "status show " + type;
+      els.pageStatus.textContent = text;
+    }
+
+    function setPageStatus(key, vars, type) {
+      pageStatusState = { key, vars: vars || {}, type };
+      if (window.i18n && typeof i18n.format === "function") {
+        showStatus(i18n.format(key, vars || {}), type);
+      } else {
+        showStatus(String(key), type);
+      }
+    }
+
+    function t(key, vars = {}) {
+      if (window.i18n && typeof window.i18n.format === "function") {
+        return window.i18n.format(key, vars);
+      }
+      if (window.i18n && typeof window.i18n.t === "function") {
+        return window.i18n.t(key);
+      }
+      return key;
+    }
+
+    function normalize(data, type = "") {
+      if (Array.isArray(data)) return data;
+      if (!data || typeof data !== "object") return [];
+      if (type === "batches") {
+        if (Array.isArray(data.batches)) return data.batches;
+        if (Array.isArray(data.data)) return data.data;
+        if (Array.isArray(data.rows)) return data.rows;
+      }
+      return [];
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatNumber(value, digits = 0) {
+      const num = Number(value || 0);
+      if (!Number.isFinite(num)) return digits > 0 ? Number(0).toFixed(digits) : "0";
+      if (digits > 0) return num.toFixed(digits);
+      if (Number.isInteger(num)) return String(num);
+      return num.toFixed(3);
+    }
+
+    function formatSignedNumber(value, digits = 2) {
+      const num = Number(value || 0);
+      const formatted = formatNumber(Math.abs(num), digits);
+      if (num > 0) return `+${formatted}`;
+      if (num < 0) return `-${formatted}`;
+      return formatted;
+    }
+
+    function toNumber(value) {
+      if (value === null || value === undefined || value === "") return 0;
+      const num = Number(String(value).replace(",", "."));
+      return Number.isFinite(num) ? num : 0;
+    }
+
+    function formatBatchDate(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value);
+      return d.toLocaleDateString(window.i18n ? i18n.getLang() : "ru-RU");
+    }
+
+    function getStoredCurrentRate(key) {
+      const raw = localStorage.getItem(key);
+      if (raw === null || raw === undefined || raw === "") return "";
+      return raw;
+    }
+
+    function persistCurrentRates() {
+      localStorage.setItem("batches_current_cny_rate", String(els.currentCnyRateInput.value || ""));
+      localStorage.setItem("batches_current_usd_rate", String(els.currentUsdRateInput.value || ""));
+    }
+
+    function calcBatchFinance(row) {
+      const unitCostCny = toNumber(row.unit_cost);
+      const cnyRate = toNumber(row.cny_rate);
+      const deliveryUsd = toNumber(row.delivery_cost);
+      const usdRate = toNumber(row.usd_rate);
+      const qtyTotal = toNumber(row.qty_total);
+      const qtyRemaining = toNumber(row.qty_remaining);
+
+      const purchaseRubPerUnit = unitCostCny * cnyRate;
+      const deliveryRubTotal = deliveryUsd * usdRate;
+      const deliveryRubPerUnit = qtyTotal > 0 ? deliveryRubTotal / qtyTotal : 0;
+      const unitCostRub = purchaseRubPerUnit + deliveryRubPerUnit;
+      const stockSumRub = unitCostRub * qtyRemaining;
+
+      const isFinanceFilled = (
+        unitCostCny > 0 &&
+        cnyRate > 0 &&
+        deliveryUsd > 0 &&
+        usdRate > 0
+      );
+
+      return {
+        purchaseRubPerUnit,
+        deliveryRubPerUnit,
+        unitCostRub,
+        stockSumRub,
+        isFinanceFilled
+      };
+    }
+
+    function calcCompareFinance(row, salePriceInput) {
+      const base = calcBatchFinance(row);
+      const unitCostCny = toNumber(row.unit_cost);
+      const deliveryUsd = toNumber(row.delivery_cost);
+      const qtyTotal = toNumber(row.qty_total);
+      const qtyRemaining = toNumber(row.qty_remaining);
+      const currentCnyRate = toNumber(els.currentCnyRateInput.value);
+      const currentUsdRate = toNumber(els.currentUsdRateInput.value);
+      const salePrice = toNumber(salePriceInput);
+
+      const currentPurchaseRubPerUnit = unitCostCny * currentCnyRate;
+      const currentDeliveryRubTotal = deliveryUsd * currentUsdRate;
+      const currentDeliveryRubPerUnit = qtyTotal > 0 ? currentDeliveryRubTotal / qtyTotal : 0;
+      const currentUnitCostRub = currentPurchaseRubPerUnit + currentDeliveryRubPerUnit;
+
+      const diffRubPerUnit = currentUnitCostRub - base.unitCostRub;
+      const diffPercent = base.unitCostRub > 0 ? ((currentUnitCostRub / base.unitCostRub) - 1) * 100 : 0;
+
+      const reserveToZeroPerUnit = salePrice - currentUnitCostRub;
+      const resultPerUnit = salePrice - currentUnitCostRub;
+      const resultRemainingRub = resultPerUnit * qtyRemaining;
+      const marginPercent = salePrice > 0 ? (resultPerUnit / salePrice) * 100 : 0;
+
+      const historicalResultPerUnit = salePrice - base.unitCostRub;
+      const historicalResultRemainingRub = historicalResultPerUnit * qtyRemaining;
+
+      return {
+        currentCnyRate,
+        currentUsdRate,
+        currentPurchaseRubPerUnit,
+        currentDeliveryRubPerUnit,
+        currentUnitCostRub,
+        diffRubPerUnit,
+        diffPercent,
+        salePrice,
+        reserveToZeroPerUnit,
+        resultPerUnit,
+        resultRemainingRub,
+        marginPercent,
+        historicalResultPerUnit,
+        historicalResultRemainingRub
+      };
+    }
+
+    function getValueTone(value, positiveGood = true) {
+      const num = Number(value || 0);
+      if (num === 0) return "info";
+      if (positiveGood) return num > 0 ? "ok" : "danger";
+      return num > 0 ? "warn" : "ok";
+    }
+
+    function buildPhotoHtml(row, large = false) {
+      const imageUrl = row.image_url ? String(row.image_url).trim() : "";
+      if (!imageUrl) {
+        return large
+          ? `<div class="analysis-photo-large">${escapeHtml(t("batches.noPhoto"))}</div>`
+          : `<div class="photo-box">${escapeHtml(t("batches.noPhoto"))}</div>`;
+      }
+
+      return large
+        ? `<div class="analysis-photo-large photo-box is-clickable" onclick="openImageModal('${escapeHtml(imageUrl)}')"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(row.item_name || t("batches.photoAlt"))}" /></div>`
+        : `<div class="photo-box is-clickable" onclick="openImageModal('${escapeHtml(imageUrl)}')"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(row.item_name || t("batches.photoAlt"))}" /></div>`;
+    }
+
+    function renderMainRow(row) {
+      const calc = calcBatchFinance(row);
+      const statusClass = calc.isFinanceFilled ? "ok" : "missing";
+      const statusText = calc.isFinanceFilled ? t("batches.statusFilled") : t("batches.statusMissing");
+      const trClass = calc.isFinanceFilled ? "batch-row-finance-ok" : "batch-row-finance-missing";
+      const isExpanded = String(expandedBatchId || "") === String(row.id || "");
+
+      return `
+        <tr class="batch-main-row ${trClass}" data-batch-id="${escapeHtml(String(row.id))}">
+          <td class="photo-col">${buildPhotoHtml(row, false)}</td>
+          <td>${escapeHtml(row.item_name || "")}</td>
+          <td>${escapeHtml(row.sku || "")}</td>
+          <td>${escapeHtml(row.barcode || "")}</td>
+          <td>${escapeHtml(formatBatchDate(row.batch_date))}</td>
+          <td class="mono">${escapeHtml(formatNumber(row.qty_total))}</td>
+          <td class="mono">${escapeHtml(formatNumber(row.qty_remaining))}</td>
+          <td class="mono">${escapeHtml(formatNumber(calc.unitCostRub, 2))}</td>
+          <td class="mono">${escapeHtml(formatNumber(calc.stockSumRub, 2))}</td>
+          <td><span class="batch-status ${statusClass}">${escapeHtml(statusText)}</span></td>
+          <td class="batch-actions">
+            <button type="button" class="btn btn-small btn-ghost js-toggle-analysis">${isExpanded ? t("batches.hideAnalysisButton") : t("batches.analysisButton")}</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderAnalysisRow(row) {
+      const calc = calcBatchFinance(row);
+      const compare = calcCompareFinance(row, row._analysisSalePrice || "");
+      const saveStatusHtml = row._saveStatusText
+        ? `<div class="batch-save-status ${escapeHtml(row._saveStatusType || "")}">${escapeHtml(row._saveStatusText)}</div>`
+        : `<div class="batch-save-status"></div>`;
+
+      return `
+        <tr class="analysis-row" data-analysis-for="${escapeHtml(String(row.id))}">
+          <td colspan="11">
+            <div class="analysis-panel">
+              <div class="analysis-grid">
+                <div class="analysis-block">
+                  <div class="analysis-title">${escapeHtml(t("batches.analysisHistoricalTitle"))}</div>
+                  <div class="analysis-photo-wrap">
+                    ${buildPhotoHtml(row, true)}
+                    <div class="analysis-item-lines">
+                      <div class="analysis-item-name">${escapeHtml(row.item_name || "")}</div>
+                      <div class="analysis-item-sub">SKU: ${escapeHtml(row.sku || "—")}</div>
+                      <div class="analysis-item-sub">${escapeHtml(t("batches.analysisBarcodeValue", { value: row.barcode || "—" }))}</div>
+                      <div class="analysis-item-sub">${escapeHtml(t("batches.analysisBatchDateValue", { value: formatBatchDate(row.batch_date) }))}</div>
+                      <div class="analysis-item-sub">${escapeHtml(t("batches.analysisQtyRemainingValue", { value: formatNumber(row.qty_remaining) }))}</div>
+                    </div>
+                  </div>
+
+                  <div class="analysis-form" style="margin-top:12px;">
+                    <div class="field">
+                      <label>${escapeHtml(t("batches.inputUnitCost"))}</label>
+                      <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="unit_cost" value="${escapeHtml(formatNumber(row.unit_cost))}" />
+                    </div>
+                    <div class="field">
+                      <label>${escapeHtml(t("batches.inputCnyRate"))}</label>
+                      <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="cny_rate" value="${escapeHtml(formatNumber(row.cny_rate))}" />
+                    </div>
+                    <div class="field">
+                      <label>${escapeHtml(t("batches.inputDeliveryCost"))}</label>
+                      <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="delivery_cost" value="${escapeHtml(formatNumber(row.delivery_cost))}" />
+                    </div>
+                    <div class="field">
+                      <label>${escapeHtml(t("batches.inputUsdRate"))}</label>
+                      <input class="input-mini js-batch-input" type="number" min="0" step="0.0001" data-field="usd_rate" value="${escapeHtml(formatNumber(row.usd_rate))}" />
+                    </div>
+                  </div>
+
+                  <div class="metrics" style="margin-top:12px;">
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricPurchaseRubPerUnit"))}</div>
+                      <div class="metric-value mono js-purchase-rub-per-unit">${escapeHtml(formatNumber(calc.purchaseRubPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricDeliveryRubPerUnit"))}</div>
+                      <div class="metric-value mono js-delivery-rub-per-unit">${escapeHtml(formatNumber(calc.deliveryRubPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricHistoricalUnitCostRub"))}</div>
+                      <div class="metric-value mono js-unit-cost-rub">${escapeHtml(formatNumber(calc.unitCostRub, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricStockSumRub"))}</div>
+                      <div class="metric-value mono js-stock-sum-rub">${escapeHtml(formatNumber(calc.stockSumRub, 2))}</div>
+                    </div>
+                  </div>
+
+                  <div class="analysis-actions">
+                    <button type="button" class="btn btn-small btn-save js-save-batch">${escapeHtml(t("batches.saveBatchButton"))}</button>
+                    <span class="batch-status ${calc.isFinanceFilled ? "ok" : "missing"} js-batch-status">${calc.isFinanceFilled ? t("batches.statusFilled") : t("batches.statusMissing")}</span>
+                  </div>
+                  ${saveStatusHtml}
+                </div>
+
+                <div class="analysis-block">
+                  <div class="analysis-title">${escapeHtml(t("batches.analysisMarketNowTitle"))}</div>
+                  <div class="metrics">
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricCurrentCnyRate"))}</div>
+                      <div class="metric-value mono js-current-cny-rate">${escapeHtml(formatNumber(compare.currentCnyRate, 4))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricCurrentUsdRate"))}</div>
+                      <div class="metric-value mono js-current-usd-rate">${escapeHtml(formatNumber(compare.currentUsdRate, 4))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricCurrentUnitCostRub"))}</div>
+                      <div class="metric-value mono js-current-unit-cost-rub">${escapeHtml(formatNumber(compare.currentUnitCostRub, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricDiffRubPerUnit"))}</div>
+                      <div class="metric-value mono js-diff-rub-per-unit ${getValueTone(compare.diffRubPerUnit, false)}">${escapeHtml(formatSignedNumber(compare.diffRubPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricDiffPercent"))}</div>
+                      <div class="metric-value mono js-diff-percent ${getValueTone(compare.diffPercent, false)}">${escapeHtml(formatSignedNumber(compare.diffPercent, 2))}%</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricCurrentDeliveryRubPerUnit"))}</div>
+                      <div class="metric-value mono js-current-delivery-rub-per-unit">${escapeHtml(formatNumber(compare.currentDeliveryRubPerUnit, 2))}</div>
+                    </div>
+                  </div>
+
+                  <div class="analysis-help">
+                    ${escapeHtml(t("batches.marketHelp"))}
+                  </div>
+                </div>
+
+                <div class="analysis-block">
+                  <div class="analysis-title">${escapeHtml(t("batches.analysisPriceProfitTitle"))}</div>
+                  <div class="field">
+                    <label>${escapeHtml(t("batches.salePriceLabel"))}</label>
+                    <input class="input-mini js-analysis-sale-price" type="number" min="0" step="0.0001" value="${escapeHtml(formatNumber(row._analysisSalePrice || 0))}" />
+                  </div>
+
+                  <div class="metrics" style="margin-top:12px;">
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricReserveToZeroPerUnit"))}</div>
+                      <div class="metric-value mono js-reserve-to-zero ${getValueTone(compare.reserveToZeroPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.reserveToZeroPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricResultPerUnit"))}</div>
+                      <div class="metric-value mono js-result-per-unit ${getValueTone(compare.resultPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.resultPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricResultRemainingRub"))}</div>
+                      <div class="metric-value mono js-result-remaining ${getValueTone(compare.resultRemainingRub, true)}">${escapeHtml(formatSignedNumber(compare.resultRemainingRub, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricMarginPercent"))}</div>
+                      <div class="metric-value mono js-margin-percent ${getValueTone(compare.marginPercent, true)}">${escapeHtml(formatSignedNumber(compare.marginPercent, 2))}%</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricHistoricalResultPerUnit"))}</div>
+                      <div class="metric-value mono js-historical-result-per-unit ${getValueTone(compare.historicalResultPerUnit, true)}">${escapeHtml(formatSignedNumber(compare.historicalResultPerUnit, 2))}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="metric-label">${escapeHtml(t("batches.metricHistoricalResultRemainingRub"))}</div>
+                      <div class="metric-value mono js-historical-result-remaining ${getValueTone(compare.historicalResultRemainingRub, true)}">${escapeHtml(formatSignedNumber(compare.historicalResultRemainingRub, 2))}</div>
+                    </div>
+                  </div>
+
+                  <div class="analysis-help">
+                    ${escapeHtml(t("batches.profitHelp"))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderBatches() {
+      const search = (els.searchInput.value || "").trim().toLowerCase();
+
+      const rows = batchesData
+        .filter(row => {
+          if (!search) return true;
+          const text = [
+            row.item_name,
+            row.sku,
+            row.barcode,
+            row.batch_date
+          ].join(" ").toLowerCase();
+          return text.includes(search);
+        })
+        .sort((a, b) => {
+          const dateA = new Date(a.batch_date);
+          const dateB = new Date(b.batch_date);
+
+          if (dateA.getTime() !== dateB.getTime()) {
+            return dateB - dateA;
+          }
+
+          return Number(b.id || 0) - Number(a.id || 0);
+        });
+
+      if (!rows.length) {
+        els.batchesTbody.innerHTML = `
+          <tr>
+            <td colspan="11" class="empty">${escapeHtml(t("batches.noData"))}</td>
+          </tr>
+        `;
+        return;
+      }
+
+      let html = "";
+      rows.forEach(row => {
+        html += renderMainRow(row);
+        if (String(expandedBatchId || "") === String(row.id || "")) {
+          html += renderAnalysisRow(row);
+        }
+      });
+
+      els.batchesTbody.innerHTML = html;
+      bindBatchRowEvents();
+    }
+
+    function updateAnalysisMetrics(panel) {
+      const tr = panel.closest('tr.analysis-row');
+      if (!tr) return;
+
+      const batchId = tr.dataset.analysisFor;
+      const row = batchesData.find(item => String(item.id) === String(batchId));
+      if (!row) return;
+
+      const calc = calcBatchFinance(row);
+      const salePriceInput = panel.querySelector('.js-analysis-sale-price');
+      const compare = calcCompareFinance(row, salePriceInput ? salePriceInput.value : "");
+
+      panel.querySelector('.js-purchase-rub-per-unit').textContent = formatNumber(calc.purchaseRubPerUnit, 2);
+      panel.querySelector('.js-delivery-rub-per-unit').textContent = formatNumber(calc.deliveryRubPerUnit, 2);
+      panel.querySelector('.js-unit-cost-rub').textContent = formatNumber(calc.unitCostRub, 2);
+      panel.querySelector('.js-stock-sum-rub').textContent = formatNumber(calc.stockSumRub, 2);
+
+      panel.querySelector('.js-current-cny-rate').textContent = formatNumber(compare.currentCnyRate, 4);
+      panel.querySelector('.js-current-usd-rate').textContent = formatNumber(compare.currentUsdRate, 4);
+      panel.querySelector('.js-current-unit-cost-rub').textContent = formatNumber(compare.currentUnitCostRub, 2);
+      panel.querySelector('.js-current-delivery-rub-per-unit').textContent = formatNumber(compare.currentDeliveryRubPerUnit, 2);
+
+      const diffRubEl = panel.querySelector('.js-diff-rub-per-unit');
+      diffRubEl.textContent = formatSignedNumber(compare.diffRubPerUnit, 2);
+      diffRubEl.className = 'metric-value mono js-diff-rub-per-unit ' + getValueTone(compare.diffRubPerUnit, false);
+
+      const diffPercentEl = panel.querySelector('.js-diff-percent');
+      diffPercentEl.textContent = `${formatSignedNumber(compare.diffPercent, 2)}%`;
+      diffPercentEl.className = 'metric-value mono js-diff-percent ' + getValueTone(compare.diffPercent, false);
+
+      const reserveEl = panel.querySelector('.js-reserve-to-zero');
+      reserveEl.textContent = formatSignedNumber(compare.reserveToZeroPerUnit, 2);
+      reserveEl.className = 'metric-value mono js-reserve-to-zero ' + getValueTone(compare.reserveToZeroPerUnit, true);
+
+      const resultUnitEl = panel.querySelector('.js-result-per-unit');
+      resultUnitEl.textContent = formatSignedNumber(compare.resultPerUnit, 2);
+      resultUnitEl.className = 'metric-value mono js-result-per-unit ' + getValueTone(compare.resultPerUnit, true);
+
+      const resultRemainingEl = panel.querySelector('.js-result-remaining');
+      resultRemainingEl.textContent = formatSignedNumber(compare.resultRemainingRub, 2);
+      resultRemainingEl.className = 'metric-value mono js-result-remaining ' + getValueTone(compare.resultRemainingRub, true);
+
+      const marginEl = panel.querySelector('.js-margin-percent');
+      marginEl.textContent = `${formatSignedNumber(compare.marginPercent, 2)}%`;
+      marginEl.className = 'metric-value mono js-margin-percent ' + getValueTone(compare.marginPercent, true);
+
+      const historicalUnitEl = panel.querySelector('.js-historical-result-per-unit');
+      historicalUnitEl.textContent = formatSignedNumber(compare.historicalResultPerUnit, 2);
+      historicalUnitEl.className = 'metric-value mono js-historical-result-per-unit ' + getValueTone(compare.historicalResultPerUnit, true);
+
+      const historicalRemainingEl = panel.querySelector('.js-historical-result-remaining');
+      historicalRemainingEl.textContent = formatSignedNumber(compare.historicalResultRemainingRub, 2);
+      historicalRemainingEl.className = 'metric-value mono js-historical-result-remaining ' + getValueTone(compare.historicalResultRemainingRub, true);
+
+      const statusEl = panel.querySelector('.js-batch-status');
+      const isFinanceFilled = calc.isFinanceFilled;
+      statusEl.textContent = isFinanceFilled ? t("batches.statusFilled") : t("batches.statusMissing");
+      statusEl.className = 'batch-status js-batch-status ' + (isFinanceFilled ? 'ok' : 'missing');
+    }
+
+    function bindBatchRowEvents() {
+      els.batchesTbody.querySelectorAll('.js-toggle-analysis').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tr = btn.closest('tr[data-batch-id]');
+          if (!tr) return;
+          const batchId = tr.dataset.batchId;
+          expandedBatchId = String(expandedBatchId || '') === String(batchId) ? null : batchId;
+          renderBatches();
+        });
+      });
+
+      els.batchesTbody.querySelectorAll('tr.analysis-row').forEach(tr => {
+        const batchId = tr.dataset.analysisFor;
+        const row = batchesData.find(item => String(item.id) === String(batchId));
+        if (!row) return;
+
+        tr.querySelectorAll('.js-batch-input').forEach(input => {
+          input.addEventListener('input', () => {
+            const field = input.dataset.field;
+            row[field] = toNumber(input.value);
+            row._saveStatusType = '';
+            row._saveStatusText = '';
+            updateAnalysisMetrics(tr);
+            renderBatchesMainOnly(batchId);
+          });
+        });
+
+        const salePriceInput = tr.querySelector('.js-analysis-sale-price');
+        if (salePriceInput) {
+          salePriceInput.addEventListener('input', () => {
+            row._analysisSalePrice = toNumber(salePriceInput.value);
+            updateAnalysisMetrics(tr);
+          });
+        }
+
+        const saveBtn = tr.querySelector('.js-save-batch');
+        const statusEl = tr.querySelector('.batch-save-status');
+
+        saveBtn.addEventListener('click', async () => {
+          try {
+            saveBtn.disabled = true;
+            if (statusEl) {
+              statusEl.textContent = t("batches.savingStatus");
+              statusEl.className = 'batch-save-status info';
+            }
+
+            const result = await ApiBridge.patch(`/stock/batches/${batchId}`, {
+              unit_cost: toNumber(row.unit_cost),
+              cny_rate: toNumber(row.cny_rate),
+              delivery_cost: toNumber(row.delivery_cost),
+              usd_rate: toNumber(row.usd_rate)
+            });
+
+            const updated = result && result.batch ? result.batch : null;
+            if (!updated) {
+              throw new Error('empty_batch_response');
+            }
+
+            const index = batchesData.findIndex(item => String(item.id) === String(batchId));
+            if (index >= 0) {
+              batchesData[index] = {
+                ...batchesData[index],
+                ...updated,
+                _analysisSalePrice: batchesData[index]._analysisSalePrice || 0,
+                _saveStatusType: 'success',
+                _saveStatusText: t("batches.savedStatus")
+              };
+            }
+
+            renderBatches();
+          } catch (err) {
+            if (statusEl) {
+              statusEl.textContent = Ui.translateError(err.message);
+              statusEl.className = 'batch-save-status error';
+            }
+          } finally {
+            saveBtn.disabled = false;
+          }
+        });
+
+        updateAnalysisMetrics(tr);
+      });
+    }
+
+    function renderBatchesMainOnly(batchId) {
+      const mainRow = els.batchesTbody.querySelector(`tr.batch-main-row[data-batch-id="${CSS.escape(String(batchId))}"]`);
+      if (!mainRow) return;
+
+      const row = batchesData.find(item => String(item.id) === String(batchId));
+      if (!row) return;
+
+      const calc = calcBatchFinance(row);
+      const statusClass = calc.isFinanceFilled ? "ok" : "missing";
+      const statusText = calc.isFinanceFilled ? t("batches.statusFilled") : t("batches.statusMissing");
+      const trClass = calc.isFinanceFilled ? "batch-row-finance-ok" : "batch-row-finance-missing";
+
+      mainRow.className = `batch-main-row ${trClass}`;
+      const cells = mainRow.children;
+      if (cells[7]) cells[7].textContent = formatNumber(calc.unitCostRub, 2);
+      if (cells[8]) cells[8].textContent = formatNumber(calc.stockSumRub, 2);
+      if (cells[9]) cells[9].innerHTML = `<span class="batch-status ${statusClass}">${escapeHtml(statusText)}</span>`;
+    }
+
+    async function loadData() {
+      try {
+        setPageStatus("batches.loadingStatus", { tenantId: getTenantId() }, "info");
+
+        const tenantId = getTenantId();
+        const batchesRes = await ApiBridge.get(`/stock/batches?tenant_id=${tenantId}`);
+
+        batchesData = normalize(batchesRes, "batches").map(row => ({
+          ...row,
+          _analysisSalePrice: 0,
+          _saveStatusType: '',
+          _saveStatusText: ''
+        }));
+
+        renderBatches();
+        setPageStatus("batches.loadedStatus", { tenantId: tenantId, count: batchesData.length }, "success");
+      } catch (err) {
+        els.batchesTbody.innerHTML = `
+          <tr>
+            <td colspan="11" class="empty">${escapeHtml(t("batches.loadErrorRow"))}</td>
+          </tr>
+        `;
+        setPageStatus("batches.loadErrorStatus", {
+          error: Ui.translateError(err.message)
+        }, "error");
+      }
+    }
+
+    function bindEvents() {
+      els.searchInput.addEventListener("input", renderBatches);
+      els.refreshBtn.addEventListener("click", loadData);
+
+      els.currentCnyRateInput.addEventListener("input", () => {
+        persistCurrentRates();
+        renderBatches();
+      });
+
+      els.currentUsdRateInput.addEventListener("input", () => {
+        persistCurrentRates();
+        renderBatches();
+      });
+
+      if (els.imageModal) {
+        els.imageModal.addEventListener("click", closeImageModal);
+      }
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeImageModal();
+        }
+      });
+
+      document.addEventListener("app:language-changed", () => {
+        if (window.i18n) {
+          window.i18n.applyTranslations();
+          window.i18n.renderLanguageSwitcher("langSwitcher");
+        }
+        if (pageStatusState) {
+          showStatus(i18n.format(pageStatusState.key, pageStatusState.vars || {}), pageStatusState.type);
+        }
+        renderBatches();
+      });
+    }
+
+    function bootstrap() {
+      parseUser();
+
+      els.currentCnyRateInput.value = getStoredCurrentRate("batches_current_cny_rate");
+      els.currentUsdRateInput.value = getStoredCurrentRate("batches_current_usd_rate");
+
+      if (window.i18n) {
+        window.i18n.applyTranslations();
+        window.i18n.renderLanguageSwitcher("langSwitcher");
+      }
+
+      bindEvents();
+      loadData();
+    }
+
+    bootstrap();
+
+    window.goBack = goBack;
+    window.logout = logout;
+    window.openImageModal = openImageModal;
+    window.closeImageModal = closeImageModal;
+  </script>
+</body>
+</html>

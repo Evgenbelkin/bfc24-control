@@ -29,7 +29,7 @@
     }
 
     .wrap{
-      max-width:1200px;
+      max-width:1400px;
       margin:0 auto;
       padding:24px 16px 48px;
     }
@@ -98,7 +98,10 @@
       background:var(--primary);
       color:#fff;
     }
-    .btn-primary:hover{background:var(--primary-hover)}
+
+    .btn-primary:hover{
+      background:var(--primary-hover);
+    }
 
     .btn-light{
       background:#fff;
@@ -128,7 +131,7 @@
 
     .filters{
       display:grid;
-      grid-template-columns:1.5fr 1fr auto;
+      grid-template-columns:1.5fr 1fr 1fr auto;
       gap:12px;
       align-items:end;
     }
@@ -212,6 +215,20 @@
       font-weight:800;
     }
 
+    .bulk-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .bulk-note{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+    }
+
     .table-wrap{
       overflow:auto;
     }
@@ -221,7 +238,7 @@
       border-collapse:collapse;
       margin-top:10px;
       background:#fff;
-      min-width:900px;
+      min-width:1280px;
     }
 
     th, td{
@@ -253,6 +270,85 @@
       text-align:center;
       color:var(--muted);
       padding:24px 12px;
+    }
+
+    .check-col{
+      width:44px;
+      min-width:44px;
+      text-align:center;
+    }
+
+    .check-col input[type="checkbox"]{
+      width:16px;
+      height:16px;
+      cursor:pointer;
+    }
+
+    .photo-col{
+      width:72px;
+      min-width:72px;
+    }
+
+    .photo-box{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      padding:4px;
+    }
+
+    .photo-box img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background:#fff;
+    }
+
+
+    .photo-box.is-clickable{
+      cursor:zoom-in;
+    }
+
+    .image-modal{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:9999;
+      cursor:zoom-out;
+    }
+
+    .image-modal.show{
+      display:flex;
+    }
+
+    .image-modal-content{
+      max-width:min(92vw, 980px);
+      max-height:88vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .image-modal-content img{
+      max-width:100%;
+      max-height:88vh;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+      display:block;
     }
 
     @media (max-width: 900px){
@@ -312,6 +408,13 @@
         </div>
 
         <div class="field">
+          <label for="categoryFilter" data-i18n="stock.categoryFilterLabel">Категория</label>
+          <select id="categoryFilter">
+            <option value="" data-i18n="stock.categoryFilterAll">Все категории</option>
+          </select>
+        </div>
+
+        <div class="field">
           <label data-i18n="stock.actionsLabel">&nbsp;</label>
           <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="stock.refreshButton">Обновить</button>
         </div>
@@ -341,6 +444,13 @@
       </div>
 
       <div id="pageStatus" class="status info"></div>
+
+      <div class="bulk-actions">
+        <button type="button" class="btn btn-light" id="selectFilteredBtn" data-i18n="stock.selectFilteredButton">Выбрать строки по текущим фильтрам</button>
+        <button type="button" class="btn btn-light" id="clearSelectionBtn" data-i18n="stock.clearSelectionButton">Снять выбор</button>
+        <button type="button" class="btn btn-primary" id="exportSelectedBtn" data-i18n="stock.exportSelectedButton">Выгрузить выбранное</button>
+        <div class="bulk-note" id="selectedCountLabel" data-i18n="stock.selectedCount" data-i18n-vars='{"count":0}'>Выбрано строк: 0</div>
+      </div>
     </div>
 
     <div class="card">
@@ -351,7 +461,12 @@
         <table>
           <thead>
             <tr>
+              <th class="check-col"><input type="checkbox" id="selectAllRows" /></th>
+              <th class="photo-col" data-i18n="stock.tablePhoto">Фото</th>
               <th data-i18n="stock.tableItem">Товар</th>
+              <th data-i18n="stock.tableCategory">Категория</th>
+              <th data-i18n="stock.tableFactory">Фабрика</th>
+              <th data-i18n="stock.tableFactoryArticle">Арт. фабрики</th>
               <th data-i18n="stock.tableSku">Артикул / SKU</th>
               <th data-i18n="stock.tableBarcode">Штрихкод</th>
               <th data-i18n="stock.tableLocation">Место хранения</th>
@@ -360,40 +475,20 @@
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="5" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title" data-i18n="stock.batchesTitle">Партии товаров</h2>
-      <div class="muted" data-i18n="stock.batchesSubtitle">Показываются партии закупки для FIFO, капитализации и контроля себестоимости.</div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th data-i18n="stock.batchTableItem">Товар</th>
-              <th data-i18n="stock.batchTableSku">Артикул / SKU</th>
-              <th data-i18n="stock.batchTableBarcode">Штрихкод</th>
-              <th data-i18n="stock.batchTableDate">Дата партии</th>
-              <th data-i18n="stock.batchTableQtyTotal">Кол-во в партии</th>
-              <th data-i18n="stock.batchTableQtyRemaining">Остаток партии</th>
-              <th data-i18n="stock.batchTableUnitCost">Цена закупки</th>
-              <th data-i18n="stock.batchTableTotalSum">Сумма остатка</th>
-            </tr>
-          </thead>
-          <tbody id="batchesTbody">
-            <tr>
-              <td colspan="8" class="empty" data-i18n="stock.loadingBatches">Загрузка партий...</td>
+              <td colspan="10" class="empty" data-i18n="stock.loadingRows">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
+
+  <div id="imageModal" class="image-modal" aria-hidden="true">
+    <div class="image-modal-content">
+      <img id="imageModalImg" data-i18n-alt="stock.imageAlt" alt="${escapeHtml(i18n.t("stock.imageAlt"))}" />
+    </div>
+  </div>
+
 
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
@@ -423,12 +518,12 @@
     };
 
     async function requestFallback(method, path, body) {
-      const token = localStorage.getItem("token") || "";
+      const tokenLocal = localStorage.getItem("token") || "";
       const response = await fetch(path, {
         method,
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: "Bearer " + token } : {})
+          ...(tokenLocal ? { Authorization: "Bearer " + tokenLocal } : {})
         },
         ...(body !== undefined ? { body: JSON.stringify(body) } : {})
       });
@@ -480,24 +575,6 @@
           return window.API.post(path, body);
         }
         return requestFallback("POST", path, body);
-      },
-      put(path, body) {
-        if (window.API && typeof window.API.put === "function") {
-          return window.API.put(path, body);
-        }
-        return requestFallback("PUT", path, body);
-      },
-      patch(path, body) {
-        if (window.API && typeof window.API.patch === "function") {
-          return window.API.patch(path, body);
-        }
-        return requestFallback("PATCH", path, body);
-      },
-      delete(path) {
-        if (window.API && typeof window.API.delete === "function") {
-          return window.API.delete(path);
-        }
-        return requestFallback("DELETE", path);
       }
     };
 
@@ -505,23 +582,46 @@
     let stockData = [];
     let itemsData = [];
     let locationsData = [];
-    let batchesData = [];
-
     let pageStatusState = null;
+    let selectedRowKeys = new Set();
 
     const els = {
       searchInput: document.getElementById("searchInput"),
       locationFilter: document.getElementById("locationFilter"),
+      categoryFilter: document.getElementById("categoryFilter"),
       refreshBtn: document.getElementById("refreshBtn"),
       tbody: document.getElementById("tbody"),
-      batchesTbody: document.getElementById("batchesTbody"),
       pageStatus: document.getElementById("pageStatus"),
       rowsCount: document.getElementById("rowsCount"),
       itemsCount: document.getElementById("itemsCount"),
       locationsCount: document.getElementById("locationsCount"),
       qtyTotal: document.getElementById("qtyTotal"),
-      qtyGrandTotal: document.getElementById("qtyGrandTotal")
+      qtyGrandTotal: document.getElementById("qtyGrandTotal"),
+      selectAllRows: document.getElementById("selectAllRows"),
+      selectFilteredBtn: document.getElementById("selectFilteredBtn"),
+      clearSelectionBtn: document.getElementById("clearSelectionBtn"),
+      exportSelectedBtn: document.getElementById("exportSelectedBtn"),
+      selectedCountLabel: document.getElementById("selectedCountLabel"),
+      imageModal: document.getElementById("imageModal"),
+      imageModalImg: document.getElementById("imageModalImg")
     };
+
+
+    function openImageModal(src) {
+      if (!src || !els.imageModal || !els.imageModalImg) return;
+      els.imageModalImg.src = src;
+      els.imageModal.classList.add("show");
+      els.imageModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeImageModal() {
+      if (!els.imageModal || !els.imageModalImg) return;
+      els.imageModal.classList.remove("show");
+      els.imageModal.setAttribute("aria-hidden", "true");
+      els.imageModalImg.removeAttribute("src");
+      document.body.style.overflow = "";
+    }
 
     function goBack() {
       window.location.href = "/index.html";
@@ -563,6 +663,7 @@
       if (pageStatusState) {
         showStatus(i18n.format(pageStatusState.key, pageStatusState.vars || {}), pageStatusState.type);
       }
+      updateSelectedCount();
     }
 
     function normalize(data, type = "") {
@@ -590,13 +691,6 @@
         return [];
       }
 
-      if (type === "batches") {
-        if (Array.isArray(data.batches)) return data.batches;
-        if (Array.isArray(data.data)) return data.data;
-        if (Array.isArray(data.rows)) return data.rows;
-        return [];
-      }
-
       if (Array.isArray(data.data)) return data.data;
       if (Array.isArray(data.rows)) return data.rows;
       return [];
@@ -613,12 +707,8 @@
 
     function formatNumber(value, digits = 0) {
       const num = Number(value || 0);
-      if (digits > 0) {
-        return num.toFixed(digits);
-      }
-      if (Number.isInteger(num)) {
-        return String(num);
-      }
+      if (digits > 0) return num.toFixed(digits);
+      if (Number.isInteger(num)) return String(num);
       return num.toFixed(3);
     }
 
@@ -626,9 +716,22 @@
       return ApiBridge.get(path);
     }
 
+    async function apiPost(path, body) {
+      return ApiBridge.post(path, body);
+    }
+
+    function getRowKey(row) {
+      return `${row.item_id || ""}__${row.location_id || ""}`;
+    }
+
+    function updateSelectedCount() {
+      if (els.selectedCountLabel) {
+        els.selectedCountLabel.textContent = i18n.format("stock.selectedCount", { count: selectedRowKeys.size });
+      }
+    }
+
     function renderLocationFilter() {
       const currentValue = els.locationFilter.value;
-
       const options = locationsData
         .slice()
         .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"))
@@ -645,57 +748,52 @@
       }
     }
 
+    function renderCategoryFilter() {
+      const currentValue = els.categoryFilter.value;
+
+      const categories = [...new Set(
+        itemsData
+          .map(item => String(item.category_name || "").trim())
+          .filter(Boolean)
+      )].sort((a, b) => a.localeCompare(b, "ru"));
+
+      const options = categories
+        .map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
+        .join("");
+
+      els.categoryFilter.innerHTML = `<option value="">${escapeHtml(i18n.t("stock.categoryFilterAll"))}</option>` + options;
+
+      if ([...els.categoryFilter.options].some(opt => String(opt.value) === String(currentValue))) {
+        els.categoryFilter.value = currentValue;
+      }
+    }
+
     function buildRows() {
       return stockData
         .map(stockRow => {
-          const itemId =
-            stockRow.item_id ??
-            stockRow.itemId ??
-            stockRow.product_id ??
-            stockRow.productId ??
-            null;
+          const itemId = stockRow.item_id ?? stockRow.itemId ?? stockRow.product_id ?? stockRow.productId ?? null;
+          const locationId = stockRow.location_id ?? stockRow.locationId ?? null;
+          const qty = Number(stockRow.qty ?? stockRow.quantity ?? stockRow.stock_qty ?? 0);
 
-          const locationId =
-            stockRow.location_id ??
-            stockRow.locationId ??
-            null;
-
-          const qty =
-            Number(
-              stockRow.qty ??
-              stockRow.quantity ??
-              stockRow.stock_qty ??
-              0
-            );
-
-          const item =
-            itemsData.find(i => String(i.id) === String(itemId)) || {};
-
-          const location =
-            locationsData.find(l => String(l.id) === String(locationId)) || {};
+          const item = itemsData.find(i => String(i.id) === String(itemId)) || {};
+          const location = locationsData.find(l => String(l.id) === String(locationId)) || {};
 
           const locationName = location.name || stockRow.location_name || "";
           const locationCode = location.code || stockRow.location_code || "";
+          let imageUrl = String(item.image_url || "").trim();
+          if (imageUrl && imageUrl.startsWith("/")) {
+            imageUrl = window.location.origin + imageUrl;
+          }
 
           return {
             item_id: itemId,
-            item_name:
-              item.name ||
-              item.item_name ||
-              stockRow.item_name ||
-              stockRow.name ||
-              "",
-            sku:
-              item.sku ||
-              item.vendor_code ||
-              item.article ||
-              item.code ||
-              stockRow.sku ||
-              "",
-            barcode:
-              item.barcode ||
-              stockRow.barcode ||
-              "",
+            item_name: item.name || item.item_name || stockRow.item_name || stockRow.name || "",
+            category_name: item.category_name || "",
+            factory: item.factory || "",
+            factory_article: item.factory_article || "",
+            sku: item.sku || item.vendor_code || item.article || item.code || stockRow.sku || "",
+            barcode: item.barcode || stockRow.barcode || "",
+            image_url: imageUrl,
             location_id: locationId,
             location_name: locationName,
             location_code: locationCode,
@@ -706,9 +804,10 @@
         .filter(row => Number(row.qty || 0) > 0);
     }
 
-    function renderTable() {
+    function getFilteredRows() {
       const search = (els.searchInput.value || "").trim().toLowerCase();
       const selectedLocationId = els.locationFilter.value;
+      const selectedCategoryName = (els.categoryFilter.value || "").trim();
 
       const allRows = buildRows();
 
@@ -718,26 +817,123 @@
           return String(row.location_id) === String(selectedLocationId);
         })
         .filter(row => {
+          if (!selectedCategoryName) return true;
+          return String(row.category_name || "").trim() === selectedCategoryName;
+        })
+        .filter(row => {
           if (!search) return true;
           const text = [
             row.item_name,
+            row.category_name,
+            row.factory,
+            row.factory_article,
             row.sku,
             row.barcode,
             row.location_name,
             row.location_code
           ].join(" ").toLowerCase();
-
           return text.includes(search);
         })
         .sort((a, b) => {
           const byItem = String(a.item_name || "").localeCompare(String(b.item_name || ""), "ru");
           if (byItem !== 0) return byItem;
-
           const byLocation = String(a.location_display || "").localeCompare(String(b.location_display || ""), "ru");
           if (byLocation !== 0) return byLocation;
-
           return Number(b.qty || 0) - Number(a.qty || 0);
         });
+
+      return { allRows, rows };
+    }
+
+    function syncSelectAllCheckbox(rows) {
+      if (!els.selectAllRows) return;
+      if (!rows.length) {
+        els.selectAllRows.checked = false;
+        els.selectAllRows.indeterminate = false;
+        return;
+      }
+      const visibleKeys = rows.map(getRowKey);
+      const selectedVisibleCount = visibleKeys.filter(key => selectedRowKeys.has(key)).length;
+      els.selectAllRows.checked = selectedVisibleCount === visibleKeys.length;
+      els.selectAllRows.indeterminate = selectedVisibleCount > 0 && selectedVisibleCount < visibleKeys.length;
+    }
+
+    function selectFilteredRows() {
+      const { rows } = getFilteredRows();
+      rows.forEach(row => selectedRowKeys.add(getRowKey(row)));
+      updateSelectedCount();
+      renderTable();
+    }
+
+    function clearSelection() {
+      selectedRowKeys = new Set();
+      updateSelectedCount();
+      renderTable();
+    }
+
+    function toggleSelectAllVisible(checked) {
+      const { rows } = getFilteredRows();
+      rows.forEach(row => {
+        const key = getRowKey(row);
+        if (checked) selectedRowKeys.add(key);
+        else selectedRowKeys.delete(key);
+      });
+      updateSelectedCount();
+      renderTable();
+    }
+
+    async function exportSelectedRows() {
+      const { allRows } = getFilteredRows();
+      const selectedRows = allRows.filter(row => selectedRowKeys.has(getRowKey(row)));
+      if (!selectedRows.length) {
+        showStatus(i18n.t("stock.selectRowsFirstError"), "error");
+        return;
+      }
+
+      const payloadRows = selectedRows.map(row => ({
+        item_name: row.item_name || "",
+        category_name: row.category_name || "",
+        factory: row.factory || "",
+        factory_article: row.factory_article || "",
+        sku: row.sku || "",
+        barcode: row.barcode || "",
+        image_url: row.image_url || "",
+        location_display: row.location_display || "",
+        qty: Number(row.qty || 0)
+      }));
+
+      const result = await apiPost("/stock/export-xlsx", {
+        rows: payloadRows
+      });
+
+      if (!result || !result.file_base64) {
+        throw new Error(i18n.t("stock.exportFileNotGeneratedError"));
+      }
+
+      const byteCharacters = atob(result.file_base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i += 1) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([
+        byteArray
+      ], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = result.filename || `stock_export_${new Date().toISOString().slice(0,19).replace(/[T:]/g, "-")}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showStatus(i18n.format("stock.exportRowsSuccess", { count: selectedRows.length }), "success");
+    }
+
+    function renderTable() {
+      const { allRows, rows } = getFilteredRows();
 
       els.rowsCount.textContent = String(rows.length);
       els.itemsCount.textContent = String(new Set(allRows.map(row => String(row.item_id || ""))).size);
@@ -746,71 +942,54 @@
       els.qtyGrandTotal.textContent = formatNumber(allRows.reduce((sum, row) => sum + Number(row.qty || 0), 0));
 
       if (!rows.length) {
-        els.tbody.innerHTML = `
-          <tr>
-            <td colspan="5" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td>
-          </tr>
-        `;
+        if (els.selectAllRows) {
+          els.selectAllRows.checked = false;
+          els.selectAllRows.indeterminate = false;
+        }
+        els.tbody.innerHTML = `<tr><td colspan="10" class="empty">${escapeHtml(i18n.t("stock.noRows"))}</td></tr>`;
+        updateSelectedCount();
         return;
       }
 
-      els.tbody.innerHTML = rows.map(row => `
-        <tr>
-          <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
-          <td>${escapeHtml(row.sku)}</td>
-          <td>${escapeHtml(row.barcode)}</td>
-          <td>${escapeHtml(row.location_display)}</td>
-          <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
-        </tr>
-      `).join("");
-    }
+      els.tbody.innerHTML = rows.map(row => {
+        const key = getRowKey(row);
+        const checked = selectedRowKeys.has(key) ? "checked" : "";
+        return `
+          <tr>
+            <td class="check-col"><input type="checkbox" class="row-checkbox" data-row-key="${escapeHtml(key)}" ${checked} /></td>
+            <td class="photo-col">
+              <div
+                class="photo-box ${row.image_url ? "is-clickable" : ""}"
+                ${row.image_url ? `onclick="openStockImageModal('${escapeHtml(row.image_url)}')"` : ""}
+              >
+                ${row.image_url ? `<img src="${escapeHtml(row.image_url)}" alt="${escapeHtml(i18n.t("stock.imageAlt"))}" />` : i18n.t("stock.noPhoto")}
+              </div>
+            </td>
+            <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
+            <td>${escapeHtml(row.category_name || "")}</td>
+            <td>${escapeHtml(row.factory || "")}</td>
+            <td>${escapeHtml(row.factory_article || "")}</td>
+            <td>${escapeHtml(row.sku || "")}</td>
+            <td>${escapeHtml(row.barcode || "")}</td>
+            <td>${escapeHtml(row.location_display || "")}</td>
+            <td class="qty">${escapeHtml(formatNumber(row.qty))}</td>
+          </tr>
+        `;
+      }).join("");
 
-    function renderBatches() {
-      const search = (els.searchInput.value || "").trim().toLowerCase();
-
-      const rows = batchesData
-        .filter(row => {
-          if (!search) return true;
-          const text = [
-            row.item_name,
-            row.sku,
-            row.barcode,
-            row.batch_date
-          ].join(" ").toLowerCase();
-
-          return text.includes(search);
-        })
-        .sort((a, b) => {
-          const byItem = String(a.item_name || "").localeCompare(String(b.item_name || ""), "ru");
-          if (byItem !== 0) return byItem;
-
-          const byDate = String(a.batch_date || "").localeCompare(String(b.batch_date || ""), "ru");
-          if (byDate !== 0) return byDate;
-
-          return Number(a.id || 0) - Number(b.id || 0);
+      document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+        checkbox.addEventListener("change", (event) => {
+          const key = String(event.target.dataset.rowKey || "");
+          if (!key) return;
+          if (event.target.checked) selectedRowKeys.add(key);
+          else selectedRowKeys.delete(key);
+          updateSelectedCount();
+          syncSelectAllCheckbox(rows);
         });
+      });
 
-      if (!rows.length) {
-        els.batchesTbody.innerHTML = `
-          <tr>
-            <td colspan="8" class="empty">${escapeHtml(i18n.t("stock.noBatches"))}</td>
-          </tr>
-        `;
-        return;
-      }
-
-      els.batchesTbody.innerHTML = rows.map(row => `
-        <tr>
-          <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
-          <td>${escapeHtml(row.sku || "")}</td>
-          <td>${escapeHtml(row.barcode || "")}</td>
-          <td>${escapeHtml(row.batch_date || "")}</td>
-          <td class="qty">${escapeHtml(formatNumber(row.qty_total))}</td>
-          <td class="qty">${escapeHtml(formatNumber(row.qty_remaining))}</td>
-          <td>${escapeHtml(formatNumber(row.unit_cost, 2))}</td>
-          <td>${escapeHtml(formatNumber(row.total_sum, 2))}</td>
-        </tr>
-      `).join("");
+      updateSelectedCount();
+      syncSelectAllCheckbox(rows);
     }
 
     async function loadData() {
@@ -819,39 +998,28 @@
 
         const tenantId = getTenantId();
 
-        const [stockRes, itemsRes, locationsRes, batchesRes] = await Promise.all([
+        const [stockRes, itemsRes, locationsRes] = await Promise.all([
           apiGet(`/stock?tenant_id=${tenantId}`),
           apiGet(`/items?tenant_id=${tenantId}`),
-          apiGet(`/locations?tenant_id=${tenantId}`),
-          apiGet(`/stock/batches?tenant_id=${tenantId}`)
+          apiGet(`/locations?tenant_id=${tenantId}`)
         ]);
 
         stockData = normalize(stockRes, "stock");
         itemsData = normalize(itemsRes, "items");
         locationsData = normalize(locationsRes, "locations");
-        batchesData = normalize(batchesRes, "batches");
 
         renderLocationFilter();
+        renderCategoryFilter();
         renderTable();
-        renderBatches();
 
         setPageStatus("stock.loadedStatus", {
           stock: buildRows().length,
           items: itemsData.length,
           locations: locationsData.length,
-          batches: batchesData.length
+          batches: 0
         }, "success");
       } catch (err) {
-        els.tbody.innerHTML = `
-          <tr>
-            <td colspan="5" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td>
-          </tr>
-        `;
-        els.batchesTbody.innerHTML = `
-          <tr>
-            <td colspan="8" class="empty">${escapeHtml(i18n.t("stock.batchesLoadError"))}</td>
-          </tr>
-        `;
+        els.tbody.innerHTML = `<tr><td colspan="10" class="empty">${escapeHtml(i18n.t("stock.rowsLoadError"))}</td></tr>`;
         setPageStatus("stock.loadErrorStatus", {
           error: Ui.translateError(err.message)
         }, "error");
@@ -859,18 +1027,39 @@
     }
 
     function bindEvents() {
-      els.searchInput.addEventListener("input", () => {
-        renderTable();
-        renderBatches();
-      });
+      els.searchInput.addEventListener("input", renderTable);
       els.locationFilter.addEventListener("change", renderTable);
+      els.categoryFilter.addEventListener("change", renderTable);
       els.refreshBtn.addEventListener("click", loadData);
+
+      if (els.selectAllRows) {
+        els.selectAllRows.addEventListener("change", (event) => {
+          toggleSelectAllVisible(Boolean(event.target.checked));
+        });
+      }
+      if (els.selectFilteredBtn) {
+        els.selectFilteredBtn.addEventListener("click", selectFilteredRows);
+      }
+      if (els.clearSelectionBtn) {
+        els.clearSelectionBtn.addEventListener("click", clearSelection);
+      }
+      if (els.exportSelectedBtn) {
+        els.exportSelectedBtn.addEventListener("click", exportSelectedRows);
+      }
+      if (els.imageModal) {
+        els.imageModal.addEventListener("click", closeImageModal);
+      }
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && els.imageModal && els.imageModal.classList.contains("show")) {
+          closeImageModal();
+        }
+      });
 
       document.addEventListener("app:language-changed", () => {
         i18n.applyTranslations();
         renderLocationFilter();
+        renderCategoryFilter();
         renderTable();
-        renderBatches();
         restoreStatusesAfterLanguageChange();
       });
     }
@@ -880,6 +1069,7 @@
       i18n.applyTranslations();
       i18n.renderLanguageSwitcher("langSwitcher");
       bindEvents();
+      updateSelectedCount();
       loadData();
     }
 
@@ -887,6 +1077,7 @@
 
     window.goBack = goBack;
     window.logout = logout;
+    window.openStockImageModal = openImageModal;
   </script>
 </body>
 </html>

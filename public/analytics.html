@@ -264,6 +264,27 @@
     .margin-fill  { height:100%; border-radius:4px; transition:width .6s ease; }
     .debt-overdue { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; background:var(--danger-bg); color:#991b1b; }
 
+
+
+    /* ── Problem products ── */
+    .analytics-split { display:grid; grid-template-columns: 1fr 1.15fr; gap:16px; align-items:start; }
+    .mini-card-surface { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:18px; }
+    .mini-card-title { margin:0 0 6px; font-size:15px; font-weight:700; letter-spacing:-.02em; }
+    .mini-card-note { margin:0 0 14px; color:var(--text-muted); font-size:13px; }
+    .top-bars { display:grid; gap:12px; }
+    .top-bar-item { display:grid; gap:6px; }
+    .top-bar-head { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .top-bar-name { font-size:13px; font-weight:600; color:var(--text-main); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .top-bar-value { font-size:13px; font-weight:700; color:var(--text-main); white-space:nowrap; }
+    .top-bar-track { height:10px; background:var(--border); border-radius:999px; overflow:hidden; }
+    .top-bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg, #dc2626 0%, #f59e0b 55%, #fbbf24 100%); }
+    .problem-status-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 9px; border-radius:999px; font-size:11px; font-weight:700; }
+    .problem-status-pill.critical { background:var(--danger-bg); color:#991b1b; }
+    .problem-status-pill.risk { background:#ffedd5; color:#9a3412; }
+    .problem-status-pill.warning { background:var(--warning-bg); color:#92400e; }
+    .problem-status-pill.stale_no_sales { background:#ede9fe; color:#6d28d9; }
+    .problem-status-pill.out_of_stock { background:#e2e8f0; color:#334155; }
+
     /* ── Empty state ── */
     .empty-state { text-align:center; padding:36px 20px; color:var(--text-muted); background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%); border:1px dashed var(--border-strong); border-radius:var(--radius-lg); }
     .empty-state-icon  { font-size:36px; margin-bottom:10px; }
@@ -287,6 +308,7 @@
       .filter-divider { display:none; }
       .pnl-bar-wrap { display:none; }
       .kpi-grid { grid-template-columns:repeat(2,1fr); }
+      .analytics-split { grid-template-columns:1fr; }
     }
     @media (max-width:480px) { .kpi-grid { grid-template-columns:1fr; } }
   </style>
@@ -393,6 +415,16 @@
       <span class="section-note" id="top-note" data-i18n="analytics.topNoteDefault">по выручке</span>
     </div>
     <div id="top-items-wrap"><div class="skeleton sk-table"></div></div>
+  </div>
+
+  <!-- ════ Блок 4 — Проблемные товары ════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-red">⚠️</div>
+      <h2 class="section-title" data-i18n="analytics.problemSectionTitle">Проблемные товары</h2>
+      <span class="section-note" id="problem-note" data-i18n="analytics.problemSectionNote">оборачиваемость и риск</span>
+    </div>
+    <div id="problem-products-wrap"><div class="skeleton sk-table"></div></div>
   </div>
 
   <!-- ════ Блок 4 — Долги ════ -->
@@ -514,6 +546,27 @@ document.querySelectorAll(".preset-btn").forEach(btn=>{
 });
 function clearFilter(){ $from.value=""; $to.value=""; document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active")); loadAll(); }
 
+function inferPeriodDays(){
+  if ($from.value && $to.value){
+    const from = new Date($from.value + "T00:00:00");
+    const to   = new Date($to.value + "T00:00:00");
+    const diff = Math.round((to - from) / 86400000) + 1;
+    if (Number.isFinite(diff) && diff > 0) return diff;
+  }
+  const activePreset = document.querySelector(".preset-btn.active")?.dataset?.preset;
+  if (activePreset === "7" || activePreset === "30" || activePreset === "90") return Number(activePreset);
+  if (activePreset === "month"){
+    const now = new Date();
+    return now.getDate();
+  }
+  if (activePreset === "year"){
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    return Math.max(1, Math.round((now - start) / 86400000) + 1);
+  }
+  return 30;
+}
+
 /* ══════════════════════════════════════════════════════════
    API
    ══════════════════════════════════════════════════════════ */
@@ -554,7 +607,7 @@ function showError(m){ document.getElementById("alert-text").textContent=m; docu
 
 const DATA_BLOCKS = [
   "pnl-kpi-grid","pnl-funnel-wrap","expenses-wrap",
-  "chart-wrap","top-items-wrap",
+  "chart-wrap","top-items-wrap","problem-products-wrap",
   "debts-kpi-grid","debts-table-wrap",
   "stock-kpi-grid","sync-body",
 ];
@@ -583,6 +636,7 @@ function showSkeletons(){
   document.getElementById("expenses-wrap").innerHTML   = "";
   document.getElementById("chart-wrap").innerHTML      = '<div class="skeleton sk-chart"></div>';
   document.getElementById("top-items-wrap").innerHTML  = '<div class="skeleton sk-table"></div>';
+  document.getElementById("problem-products-wrap").innerHTML = '<div class="skeleton sk-table"></div>';
   document.getElementById("debts-kpi-grid").innerHTML  = Array(4).fill('<div class="skeleton sk-kpi"></div>').join("");
   document.getElementById("debts-table-wrap").innerHTML= '<div class="skeleton sk-table" style="height:180px"></div>';
   document.getElementById("stock-kpi-grid").innerHTML  = Array(3).fill('<div class="skeleton sk-kpi"></div>').join("");
@@ -793,11 +847,33 @@ function renderChart(daily){
    РЕНДЕР — ТОП ТОВАРОВ
    ══════════════════════════════════════════════════════════ */
 function renderTopItems(data){
-  const items=data.items||[];
+  const items = data.items || [];
   if (!items.length) return `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">${t("analytics.noSalesForPeriodTitle","Нет продаж за период")}</div><p class="empty-state-text">${t("analytics.expandDateRange","Попробуйте расширить диапазон дат.")}</p></div>`;
 
-  const rows=items.map((it,idx)=>{
-    const m=+(it.margin_pct||0);
+  const sorted = [...items].sort((a,b)=> (+b.revenue||0) - (+a.revenue||0));
+  const maxRevenue = Math.max(1, ...sorted.map(it => +it.revenue || 0));
+
+  const chartHtml = `
+    <div class="mini-card-surface">
+      <h3 class="mini-card-title">${t("analytics.topItemsChartTitle","График top товаров")}</h3>
+      <p class="mini-card-note">${t("analytics.topItemsChartNote","Сравнение товаров по выручке за выбранный период")}</p>
+      <div class="top-bars">
+        ${sorted.slice(0, 8).map((it, idx) => {
+          const width = Math.max(3, ((+it.revenue || 0) / maxRevenue) * 100);
+          return `
+            <div class="top-bar-item">
+              <div class="top-bar-head">
+                <div class="top-bar-name">${idx + 1}. ${esc(it.item_name || "—")}</div>
+                <div class="top-bar-value">${fmtMoney(it.revenue)}</div>
+              </div>
+              <div class="top-bar-track"><div class="top-bar-fill" style="width:${width}%"></div></div>
+            </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+
+  const rows = sorted.map((it,idx)=>{
+    const m = +(it.margin_pct||0);
     const rClass = idx===0?"rank-1":idx===1?"rank-2":idx===2?"rank-3":"rank-n";
     return `<tr>
       <td><span class="rank-badge ${rClass}">${idx+1}</span></td>
@@ -818,9 +894,9 @@ function renderTopItems(data){
     </tr>`;
   }).join("");
 
-  const sum=(k)=>items.reduce((s,x)=>s+(+x[k]||0),0);
+  const sum=(k)=>sorted.reduce((s,x)=>s+(+x[k]||0),0);
 
-  return `<div class="table-wrap"><table>
+  const tableHtml = `<div class="table-wrap"><table>
     <thead><tr>
       <th style="width:36px">#</th><th>${t("analytics.tableItem","Товар")}</th>
       <th class="r">${t("analytics.tableQty","Кол-во")}</th><th class="r">${t("analytics.revenue","Выручка")}</th>
@@ -829,7 +905,7 @@ function renderTopItems(data){
     </tr></thead>
     <tbody>${rows}</tbody>
     <tfoot><tr>
-      <td colspan="2">${tf("analytics.topTotal",{count:items.length},`Итого топ-${items.length}`)}</td>
+      <td colspan="2">${tf("analytics.topTotal",{count:sorted.length},`Итого топ-${sorted.length}`)}</td>
       <td class="r">${fmt(sum("qty_sold"),0)}</td>
       <td class="r">${fmtMoney(sum("revenue"))}</td>
       <td class="r">${fmtMoney(sum("cogs"))}</td>
@@ -837,6 +913,151 @@ function renderTopItems(data){
       <td></td>
     </tr></tfoot>
   </table></div>`;
+
+  return `<div class="analytics-split">${chartHtml}<div>${tableHtml}</div></div>`;
+}
+
+function statusLabel(status) {
+  switch (status) {
+    case 'healthy': return t("analytics.statusHealthy","Норма");
+    case 'warning': return t("analytics.statusWarning","Замедление");
+    case 'risk': return t("analytics.statusRisk","Риск");
+    case 'critical': return t("analytics.statusCritical","Критично");
+    case 'stale_no_sales': return t("analytics.statusStaleNoSales","Без продаж");
+    case 'no_sales': return t("analytics.statusNoSales","Нет продаж");
+    case 'out_of_stock': return t("analytics.statusOutOfStock","Нет остатка");
+    default: return status || '—';
+  }
+}
+
+function statusClass(status) {
+  switch (status) {
+    case 'critical': return 'critical';
+    case 'risk': return 'risk';
+    case 'warning': return 'warning';
+    case 'stale_no_sales': return 'stale_no_sales';
+    case 'out_of_stock': return 'out_of_stock';
+    default: return 'warning';
+  }
+}
+
+function problemPriority(status) {
+  switch (status) {
+    case 'critical': return 5;
+    case 'risk': return 4;
+    case 'warning': return 3;
+    case 'stale_no_sales': return 2;
+    case 'out_of_stock': return 1;
+    default: return 0;
+  }
+}
+
+function formatProblemDays(row) {
+  const rawDays = Number(row?.days_on_hand);
+  const soldQty = Number(row?.sold_qty_period || 0);
+  const status = String(row?.turnover_status || "");
+
+  if (!Number.isFinite(rawDays) || rawDays <= 0) return "—";
+  if (soldQty <= 0 || status === "stale_no_sales" || status === "no_sales") return "—";
+
+  if (rawDays >= 1000) return "999+";
+  if (rawDays >= 180) return fmt(rawDays, 0);
+
+  return fmt(rawDays, 1);
+}
+
+function renderProblemProducts(data) {
+  const items = Array.isArray(data?.items) ? data.items : [];
+  const acceptedStatuses = new Set(["critical", "risk", "warning", "stale_no_sales", "no_sales", "out_of_stock"]);
+
+  const problems = items
+    .filter((row) => row && acceptedStatuses.has(String(row.turnover_status || "")))
+    .sort((a, b) => {
+      const byPriority = problemPriority(String(b.turnover_status || "")) - problemPriority(String(a.turnover_status || ""));
+      if (byPriority !== 0) return byPriority;
+      return (+b?.stock_cost_total || 0) - (+a?.stock_cost_total || 0);
+    });
+
+  if (!problems.length) {
+    return `
+      <div class="empty-state">
+        <div class="empty-state-icon">✅</div>
+        <div class="empty-state-title">${t("analytics.noProblemProductsTitle","Проблемных товаров нет")}</div>
+        <p class="empty-state-text">${t("analytics.noProblemProductsText","По выбранному периоду проблем не найдено")}</p>
+      </div>
+    `;
+  }
+
+  const chartItems = problems.slice(0, 8);
+  const maxCost = Math.max(1, ...chartItems.map((i) => +i?.stock_cost_total || 0));
+
+  const chartHtml = `
+    <div class="mini-card-surface">
+      <h3 class="mini-card-title">${t("analytics.problemProductsTitle","Проблемные товары")}</h3>
+      <p class="mini-card-note">${t("analytics.frozenMoneyTitle","Где заморожены деньги")}</p>
+
+      <div class="top-bars">
+        ${chartItems.map((i, idx) => `
+          <div class="top-bar-item">
+            <div class="top-bar-head">
+              <div class="top-bar-name">${idx + 1}. ${esc(i?.name || i?.item_name || "—")}</div>
+              <div class="top-bar-value">${fmtMoney(i?.stock_cost_total)}</div>
+            </div>
+            <div class="top-bar-track">
+              <div class="top-bar-fill" style="width:${Math.max(3, ((+i?.stock_cost_total || 0) / maxCost) * 100)}%"></div>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+
+  const rowsHtml = problems.map((row) => `
+    <tr>
+      <td>
+        <div style="font-weight:600">${esc(row?.name || row?.item_name || "—")}</div>
+        <div class="cell-muted" style="font-size:12px">${esc(row?.sku || row?.barcode || row?.vendor_code || "")}</div>
+      </td>
+      <td>
+        <span class="problem-status-pill ${statusClass(String(row?.turnover_status || ""))}">
+          ${statusLabel(String(row?.turnover_status || ""))}
+        </span>
+      </td>
+      <td class="r">${fmt(row?.qty_on_hand,0)}</td>
+      <td class="r">${fmtMoney(row?.stock_cost_total)}</td>
+      <td class="r ${+row?.potential_profit >= 0 ? 'cell-success' : 'cell-danger'}">
+        ${fmtMoney(row?.potential_profit)}
+      </td>
+      <td class="r">${formatProblemDays(row)}</td>
+      <td class="r">${fmt(row?.sold_qty_period,0)}</td>
+    </tr>
+  `).join("");
+
+  const tableHtml = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>${t("analytics.tableItem","Товар")}</th>
+            <th>${t("analytics.status","Статус")}</th>
+            <th class="r">${t("analytics.stockShort","Остаток")}</th>
+            <th class="r">${t("analytics.cost","Стоимость")}</th>
+            <th class="r">${t("analytics.profit","Прибыль")}</th>
+            <th class="r">${t("analytics.days","Дней")}</th>
+            <th class="r">${t("analytics.sold","Продано")}</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>
+  `;
+
+  return `
+    <div class="analytics-split">
+      ${chartHtml}
+      <div>${tableHtml}</div>
+    </div>
+  `;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -979,74 +1200,119 @@ async function loadAll(){
   document.getElementById("alert-error").classList.remove("visible");
   document.getElementById("alert-auth").classList.remove("visible");
 
-  const q    = buildQuery();
-  const qTop = buildQuery({limit:10});
-  const qTid = buildTenantOnly();
+  try {
+    const q    = buildQuery();
+    const qTop = buildQuery({limit:10});
+    const qTid = buildTenantOnly();
+    const periodDays = inferPeriodDays();
 
-  const [pnlR, dailyR, topR, debtsR, svR] = await Promise.allSettled([
-    apiFetch(`/reports/pnl?${q}`),
-    apiFetch(`/reports/pnl-daily?${q}`),
-    apiFetch(`/reports/top-items?${qTop}`),
-    apiFetch(`/reports/debts-summary?${qTid}`),
-    apiFetch(`/reports/stock-value?${qTid}`),
-  ]);
+    const [pnlR, dailyR, topR, turnR, debtsR, svR] = await Promise.allSettled([
+      apiFetch(`/reports/pnl?${q}`),
+      apiFetch(`/reports/pnl-daily?${q}`),
+      apiFetch(`/reports/top-items?${qTop}`),
+      apiFetch(`/reports/turnover?tenant_id=${getEffectiveTenantId()}&period_days=${periodDays}`),
+      apiFetch(`/reports/debts-summary?${qTid}`),
+      apiFetch(`/reports/stock-value?${qTid}`),
+    ]);
 
-  /* P&L */
-  if (pnlR.status==="fulfilled"){
-    const pnl=pnlR.value.pnl, per=pnlR.value.period;
-    const from=per?.date_from||$from.value, to=per?.date_to||$to.value;
-    document.getElementById("pnl-period-note").textContent = from&&to?`${from} — ${to}`:from?tf("analytics.fromShort",{date:from},`с ${from}`):"";
-    document.getElementById("pnl-kpi-grid").innerHTML    = renderPnlKpi(pnl);
-    document.getElementById("pnl-funnel-wrap").innerHTML = renderPnlFunnel(pnl);
-    document.getElementById("expenses-wrap").innerHTML   = renderExpenses(pnl);
-  } else if (pnlR.reason?.message!=="unauthorized"){
-    blockError("pnl-kpi-grid",t("analytics.errorPnl","Ошибка P&L"),pnlR.reason?.message||"");
-    document.getElementById("pnl-funnel-wrap").innerHTML="";
+    /* P&L */
+    try {
+      if (pnlR.status==="fulfilled"){
+        const pnl=pnlR.value.pnl, per=pnlR.value.period;
+        const from=per?.date_from||$from.value, to=per?.date_to||$to.value;
+        document.getElementById("pnl-period-note").textContent = from&&to?`${from} — ${to}`:from?tf("analytics.fromShort",{date:from},`с ${from}`):"";
+        document.getElementById("pnl-kpi-grid").innerHTML    = renderPnlKpi(pnl);
+        document.getElementById("pnl-funnel-wrap").innerHTML = renderPnlFunnel(pnl);
+        document.getElementById("expenses-wrap").innerHTML   = renderExpenses(pnl);
+      } else if (pnlR.reason?.message!=="unauthorized"){
+        blockError("pnl-kpi-grid",t("analytics.errorPnl","Ошибка P&L"),pnlR.reason?.message||"");
+        document.getElementById("pnl-funnel-wrap").innerHTML="";
+      }
+    } catch (err) {
+      blockError("pnl-kpi-grid",t("analytics.errorPnl","Ошибка P&L"),err?.message||"render error");
+      document.getElementById("pnl-funnel-wrap").innerHTML="";
+      document.getElementById("expenses-wrap").innerHTML="";
+    }
+
+    /* Динамика */
+    try {
+      if (dailyR.status==="fulfilled"){
+        const d=dailyR.value.daily||[];
+        document.getElementById("chart-note").textContent=tf("analytics.daysShort",{value:d.length},`${d.length} дн.`);
+        document.getElementById("chart-wrap").innerHTML=renderChart(d);
+      } else if (dailyR.reason?.message!=="unauthorized"){
+        document.getElementById("chart-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorDailyTitle","Ошибка динамики")}</div><p class="empty-state-text">${esc(dailyR.reason?.message||"")}</p></div>`;
+      }
+    } catch (err) {
+      document.getElementById("chart-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorDailyTitle","Ошибка динамики")}</div><p class="empty-state-text">${esc(err?.message||"render error")}</p></div>`;
+    }
+
+    /* Топ товаров */
+    try {
+      if (topR.status==="fulfilled"){
+        document.getElementById("top-note").textContent=tf("analytics.topByRevenue",{value:topR.value.limit||10},`топ ${topR.value.limit||10} по выручке`);
+        document.getElementById("top-items-wrap").innerHTML=renderTopItems(topR.value);
+      } else if (topR.reason?.message!=="unauthorized"){
+        document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorTopItemsTitle","Ошибка топ товаров")}</div><p class="empty-state-text">${esc(topR.reason?.message||"")}</p></div>`;
+      }
+    } catch (err) {
+      document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorTopItemsTitle","Ошибка топ товаров")}</div><p class="empty-state-text">${esc(err?.message||"render error")}</p></div>`;
+    }
+
+    /* Проблемные товары */
+    try {
+      if (turnR.status==="fulfilled"){
+        document.getElementById("problem-note").textContent = tf("analytics.problemPeriodDays",{value:fmt(periodDays,0)},`за ${fmt(periodDays,0)} дн. · оборачиваемость и риск`);
+        document.getElementById("problem-products-wrap").innerHTML = renderProblemProducts(turnR.value);
+      } else if (turnR.reason?.message!=="unauthorized"){
+        document.getElementById("problem-products-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.problemProductsErrorTitle","Ошибка проблемных товаров")}</div><p class="empty-state-text">${esc(turnR.reason?.message||"")}</p></div>`;
+      }
+    } catch (err) {
+      document.getElementById("problem-products-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.problemProductsErrorTitle","Ошибка проблемных товаров")}</div><p class="empty-state-text">${esc(err?.message||"render error")}</p></div>`;
+    }
+
+    /* Долги */
+    try {
+      if (debtsR.status==="fulfilled"){
+        const s=debtsR.value.summary||{};
+        document.getElementById("debts-kpi-grid").innerHTML=renderDebtsKpi(s);
+        document.getElementById("debts-table-wrap").innerHTML=
+          `<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">${t("analytics.topOpenDebts","Топ открытых долгов")}</div>`+
+          renderDebtsTable(debtsR.value.top_open_debts||[]);
+      } else if (debtsR.reason?.message!=="unauthorized"){
+        blockError("debts-kpi-grid",t("analytics.errorDebts","Ошибка долгов"),debtsR.reason?.message||"");
+        document.getElementById("debts-table-wrap").innerHTML="";
+      }
+    } catch (err) {
+      blockError("debts-kpi-grid",t("analytics.errorDebts","Ошибка долгов"),err?.message||"render error");
+      document.getElementById("debts-table-wrap").innerHTML="";
+    }
+
+    /* Склад + sync */
+    try {
+      if (svR.status==="fulfilled"){
+        document.getElementById("stock-kpi-grid").innerHTML=renderStockKpi(svR.value);
+        document.getElementById("sync-body").innerHTML=renderSyncCheck(svR.value);
+      } else if (svR.reason?.message!=="unauthorized"){
+        blockError("stock-kpi-grid",t("analytics.errorStock","Ошибка склада"),svR.reason?.message||"");
+        document.getElementById("sync-body").innerHTML="";
+      }
+    } catch (err) {
+      blockError("stock-kpi-grid",t("analytics.errorStock","Ошибка склада"),err?.message||"render error");
+      document.getElementById("sync-body").innerHTML="";
+    }
+
+    /* Общая ошибка */
+    if ([pnlR,dailyR,topR,turnR,debtsR,svR].every(r=>r.status==="rejected")&&pnlR.reason?.message!=="unauthorized") {
+      showError(t("analytics.errorLoadPrefix","Не удалось загрузить данные: ")+(pnlR.reason?.message||t("analytics.serverError","Ошибка сервера")));
+    }
+  } catch (err) {
+    if (err?.message !== "unauthorized") {
+      showError(t("analytics.errorLoadPrefix","Не удалось загрузить данные: ")+(err?.message || t("analytics.serverError","Ошибка сервера")));
+    }
+  } finally {
+    hideLoader();
   }
-
-  /* Динамика */
-  if (dailyR.status==="fulfilled"){
-    const d=dailyR.value.daily||[];
-    document.getElementById("chart-note").textContent=tf("analytics.daysShort",{value:d.length},`${d.length} дн.`);
-    document.getElementById("chart-wrap").innerHTML=renderChart(d);
-  } else if (dailyR.reason?.message!=="unauthorized"){
-    document.getElementById("chart-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorDailyTitle","Ошибка динамики")}</div><p class="empty-state-text">${esc(dailyR.reason?.message||"")}</p></div>`;
-  }
-
-  /* Топ товаров */
-  if (topR.status==="fulfilled"){
-    document.getElementById("top-note").textContent=tf("analytics.topByRevenue",{value:topR.value.limit||10},`топ ${topR.value.limit||10} по выручке`);
-    document.getElementById("top-items-wrap").innerHTML=renderTopItems(topR.value);
-  } else if (topR.reason?.message!=="unauthorized"){
-    document.getElementById("top-items-wrap").innerHTML=`<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-title">${t("analytics.errorTopItemsTitle","Ошибка топ товаров")}</div><p class="empty-state-text">${esc(topR.reason?.message||"")}</p></div>`;
-  }
-
-  /* Долги */
-  if (debtsR.status==="fulfilled"){
-    const s=debtsR.value.summary||{};
-    document.getElementById("debts-kpi-grid").innerHTML=renderDebtsKpi(s);
-    document.getElementById("debts-table-wrap").innerHTML=
-      `<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">${t("analytics.topOpenDebts","Топ открытых долгов")}</div>`+
-      renderDebtsTable(debtsR.value.top_open_debts||[]);
-  } else if (debtsR.reason?.message!=="unauthorized"){
-    blockError("debts-kpi-grid",t("analytics.errorDebts","Ошибка долгов"),debtsR.reason?.message||"");
-    document.getElementById("debts-table-wrap").innerHTML="";
-  }
-
-  /* Склад + sync */
-  if (svR.status==="fulfilled"){
-    document.getElementById("stock-kpi-grid").innerHTML=renderStockKpi(svR.value);
-    document.getElementById("sync-body").innerHTML=renderSyncCheck(svR.value);
-  } else if (svR.reason?.message!=="unauthorized"){
-    blockError("stock-kpi-grid",t("analytics.errorStock","Ошибка склада"),svR.reason?.message||"");
-    document.getElementById("sync-body").innerHTML="";
-  }
-
-  /* Общая ошибка */
-  if ([pnlR,dailyR,topR,debtsR,svR].every(r=>r.status==="rejected")&&pnlR.reason?.message!=="unauthorized")
-    showError(t("analytics.errorLoadPrefix","Не удалось загрузить данные: ")+(pnlR.reason?.message||t("analytics.serverError","Ошибка сервера")));
-
-  hideLoader();
 }
 
 function initI18nPage(){

@@ -88,6 +88,10 @@ router.post('/login', async (req, res) => {
         return res.status(403).json({ ok: false, error: 'subscription_expired' });
       }
 
+      if (user.subscription_status === 'trial' && isSubscriptionExpired(user.subscription_end_at)) {
+        return res.status(403).json({ ok: false, error: 'trial_expired' });
+      }
+
       if (isSubscriptionExpired(user.subscription_end_at)) {
         return res.status(403).json({ ok: false, error: 'subscription_expired' });
       }

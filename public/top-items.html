@@ -1,0 +1,1515 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BFC24 CONTROL — Top Items</title>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --panel: #ffffff;
+      --panel-2: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --brand: #2563eb;
+      --brand-hover: #1d4ed8;
+      --danger: #dc2626;
+      --danger-soft: #fee2e2;
+      --warn: #d97706;
+      --warn-soft: #fef3c7;
+      --ok: #16a34a;
+      --ok-soft: #dcfce7;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --container: 1600px;
+      --font: Inter, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 24%),
+        linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      color: var(--text);
+      min-height: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn,
+    .back-btn,
+    .ghost-btn,
+    .primary-btn,
+    .chip-btn,
+    .lang-select {
+      appearance: none;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .btn,
+    .primary-btn {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .btn:hover,
+    .primary-btn:hover {
+      background: var(--brand-hover);
+      transform: translateY(-1px);
+    }
+
+    .back-btn,
+    .ghost-btn,
+    .lang-select,
+    .chip-btn {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--line);
+      box-shadow: none;
+    }
+
+    .back-btn:hover,
+    .ghost-btn:hover,
+    .lang-select:hover,
+    .chip-btn:hover {
+      background: #f8fafc;
+      transform: translateY(-1px);
+    }
+
+    .chip-btn.active {
+      background: rgba(37, 99, 235, 0.08);
+      border-color: rgba(37, 99, 235, 0.35);
+      color: var(--brand);
+    }
+
+    .lang-select {
+      outline: none;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 22px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 900px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(22, 163, 74, 0.2);
+      background: rgba(22, 163, 74, 0.08);
+      color: var(--ok);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .filters {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(37, 99, 235, 0.45);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+    }
+
+    .col-2 { grid-column: span 2; }
+    .col-3 { grid-column: span 3; }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-12 { grid-column: span 12; }
+
+    .quick-range {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .actions-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .card .label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .card .value {
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      word-break: break-word;
+      color: var(--brand);
+    }
+
+    .card .sub {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 2.4fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .panel-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .panel-body {
+      padding: 16px 18px 18px;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-item {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #f8fafc;
+    }
+
+    .summary-item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .summary-item-name {
+      font-weight: 800;
+      line-height: 1.35;
+      color: var(--text);
+    }
+
+    .summary-item-rank {
+      flex: 0 0 auto;
+      font-size: 12px;
+      color: var(--brand);
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid rgba(37, 99, 235, 0.18);
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-weight: 700;
+    }
+
+    .summary-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .summary-meta div {
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .summary-meta strong {
+      display: block;
+      color: var(--text);
+      font-size: 14px;
+      margin-top: 2px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 980px;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #edf2f7;
+      text-align: left;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 700;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 12px;
+    }
+
+    tbody tr:hover {
+      background: rgba(248, 250, 252, 0.85);
+    }
+
+    .num {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .item-cell {
+      min-width: 280px;
+    }
+
+    .item-name {
+      font-weight: 800;
+      line-height: 1.35;
+      color: var(--text);
+    }
+
+    .item-meta {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .profit-positive {
+      color: var(--ok);
+      font-weight: 800;
+    }
+
+    .profit-negative {
+      color: var(--danger);
+      font-weight: 800;
+    }
+
+    .profit-neutral {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .margin-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 72px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .empty,
+    .loading,
+    .error-box {
+      padding: 18px;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .error-box {
+      border-style: solid;
+      border-color: rgba(220, 38, 38, 0.2);
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1400px) {
+      .filters {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .col-2,
+      .col-3,
+      .col-4,
+      .col-6 {
+        grid-column: span 2;
+      }
+
+      .col-12 {
+        grid-column: span 4;
+      }
+
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .page {
+        padding: 14px;
+      }
+
+      .hero h1 {
+        font-size: 25px;
+      }
+
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .col-2,
+      .col-3,
+      .col-4,
+      .col-6,
+      .col-12 {
+        grid-column: span 1;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .topbar-actions {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="topbar-left"></div>
+      <div class="topbar-actions">
+        <a href="/index.html" class="back-btn" data-i18n="common.backToMenu">← Назад в меню</a>
+        <select id="langSwitcher" class="lang-select" aria-label="Language switcher">
+          <option value="ru">Русский</option>
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+    </div>
+
+    <section class="hero panel">
+      <div class="hero-row">
+        <div>
+          <h1 data-i18n="topItems.title">Top Items</h1>
+          <p data-i18n="topItems.subtitle">
+            Анализ выручки, себестоимости, прибыли и маржи по товарам. Эта страница показывает, на каких позициях бизнес зарабатывает больше всего.
+          </p>
+        </div>
+        <div class="hero-badge" data-i18n="topItems.badge">
+          Аналитика по товарам
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="field col-3">
+          <label for="dateFrom" data-i18n="common.dateFrom">Дата от</label>
+          <input type="date" id="dateFrom" />
+        </div>
+
+        <div class="field col-3">
+          <label for="dateTo" data-i18n="common.dateTo">Дата до</label>
+          <input type="date" id="dateTo" />
+        </div>
+
+        <div class="field col-2">
+          <label for="topLimit" data-i18n="topItems.limitLabel">Показать</label>
+          <select id="topLimit">
+            <option value="10">Top 10</option>
+            <option value="20">Top 20</option>
+            <option value="50">Top 50</option>
+            <option value="100">Top 100</option>
+            <option value="0" data-i18n="topItems.all">Все</option>
+          </select>
+        </div>
+
+        <div class="field col-4">
+          <label for="searchInput" data-i18n="topItems.searchLabel">Поиск по товару</label>
+          <input type="text" id="searchInput" placeholder="Название товара..." data-i18n-placeholder="topItems.searchPlaceholder" />
+        </div>
+
+        <div class="field col-12">
+          <label data-i18n="common.quickPeriods">Быстрые периоды</label>
+          <div class="quick-range">
+            <button type="button" class="chip-btn" data-range="today" data-i18n="common.today">Сегодня</button>
+            <button type="button" class="chip-btn" data-range="7d" data-i18n="common.last7Days">7 дней</button>
+            <button type="button" class="chip-btn active" data-range="30d" data-i18n="common.last30Days">30 дней</button>
+            <button type="button" class="chip-btn" data-range="month" data-i18n="common.thisMonth">Этот месяц</button>
+            <button type="button" class="chip-btn" data-range="all" data-i18n="common.allPeriod">Весь период</button>
+          </div>
+        </div>
+
+        <div class="field col-12">
+          <div class="actions-row">
+            <button type="button" id="applyBtn" class="primary-btn" data-i18n="common.apply">Применить</button>
+            <button type="button" id="resetBtn" class="ghost-btn" data-i18n="common.reset">Сбросить</button>
+            <button type="button" id="refreshBtn" class="ghost-btn" data-i18n="common.refresh">Обновить</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cards">
+      <div class="card">
+        <div class="label" data-i18n="topItems.cards.positions">Позиций в выборке</div>
+        <div class="value" id="cardItemsCount">0</div>
+        <div class="sub" id="cardItemsCountSub" data-i18n="topItems.cards.positionsSub">Товаров с продажами за период</div>
+      </div>
+
+      <div class="card">
+        <div class="label" data-i18n="topItems.cards.revenue">Выручка</div>
+        <div class="value" id="cardRevenue">0</div>
+        <div class="sub" data-i18n="topItems.cards.revenueSub">Суммарная выручка по выбранным товарам</div>
+      </div>
+
+      <div class="card">
+        <div class="label" data-i18n="topItems.cards.cogs">Себестоимость</div>
+        <div class="value" id="cardCogs">0</div>
+        <div class="sub" data-i18n="topItems.cards.cogsSub">Суммарная стоимость проданных товаров</div>
+      </div>
+
+      <div class="card">
+        <div class="label" data-i18n="topItems.cards.profit">Валовая прибыль</div>
+        <div class="value" id="cardProfit">0</div>
+        <div class="sub" id="cardMarginSub" data-i18n="topItems.cards.marginSub">Средняя маржа по выборке: 0%</div>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title" data-i18n="topItems.summary.title">Лидеры периода</div>
+            <div class="panel-subtitle" data-i18n="topItems.summary.subtitle">Краткая выжимка по самым сильным товарам</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div id="summaryLoading" class="loading" data-i18n="common.loading">Загрузка...</div>
+          <div id="summaryError" class="error-box hidden"></div>
+          <div id="summaryEmpty" class="empty hidden" data-i18n="topItems.empty">
+            За выбранный период нет данных по продажам товаров.
+          </div>
+          <div id="summaryList" class="summary-list hidden"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title" data-i18n="topItems.table.title">Таблица top items</div>
+            <div class="panel-subtitle" data-i18n="topItems.table.subtitle">Сортировка по прибыли по убыванию</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div id="tableLoading" class="loading" data-i18n="common.loading">Загрузка...</div>
+          <div id="tableError" class="error-box hidden"></div>
+          <div id="tableEmpty" class="empty hidden" data-i18n="topItems.empty">
+            За выбранный период нет данных по продажам товаров.
+          </div>
+
+          <div id="tableWrap" class="table-wrap hidden">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="topItems.columns.item">Товар</th>
+                  <th class="num" data-i18n="topItems.columns.qty">Кол-во</th>
+                  <th class="num" data-i18n="topItems.columns.avgPrice">Средняя цена</th>
+                  <th class="num" data-i18n="topItems.columns.revenue">Выручка</th>
+                  <th class="num" data-i18n="topItems.columns.cogs">Себестоимость</th>
+                  <th class="num" data-i18n="topItems.columns.profit">Прибыль</th>
+                  <th class="num" data-i18n="topItems.columns.margin">Маржа</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="footer-note" data-i18n="topItems.footerNote">
+            Показатели считаются по продажам за выбранный период. Себестоимость берётся из данных продажи/FIFO-слоя, если он уже записан в sale_items.
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const fallbackTranslations = {
+        ru: {
+          common: {
+            backToMenu: '← Назад в меню',
+            dateFrom: 'Дата от',
+            dateTo: 'Дата до',
+            quickPeriods: 'Быстрые периоды',
+            today: 'Сегодня',
+            last7Days: '7 дней',
+            last30Days: '30 дней',
+            thisMonth: 'Этот месяц',
+            allPeriod: 'Весь период',
+            apply: 'Применить',
+            reset: 'Сбросить',
+            refresh: 'Обновить',
+            loading: 'Загрузка...',
+            error: 'Ошибка'
+          },
+          topItems: {
+            documentTitle: 'BFC24 CONTROL — Top Items',
+            title: 'Top Items',
+            subtitle: 'Анализ выручки, себестоимости, прибыли и маржи по товарам. Эта страница показывает, на каких позициях бизнес зарабатывает больше всего.',
+            badge: 'Аналитика по товарам',
+            limitLabel: 'Показать',
+            all: 'Все',
+            searchLabel: 'Поиск по товару',
+            searchPlaceholder: 'Название товара...',
+            unknownItem: 'Без названия',
+            rank: 'ТОП',
+            empty: 'За выбранный период нет данных по продажам товаров.',
+            footerNote: 'Показатели считаются по продажам за выбранный период. Себестоимость берётся из данных продажи/FIFO-слоя, если он уже записан в sale_items.',
+            cards: {
+              positions: 'Позиций в выборке',
+              positionsSub: 'Товаров с продажами за период',
+              revenue: 'Выручка',
+              revenueSub: 'Суммарная выручка по выбранным товарам',
+              cogs: 'Себестоимость',
+              cogsSub: 'Суммарная стоимость проданных товаров',
+              profit: 'Валовая прибыль',
+              marginSub: 'Средняя маржа по выборке: 0%',
+              marginSubFormatted: 'Средняя маржа по выборке: {margin}'
+            },
+            summary: {
+              title: 'Лидеры периода',
+              subtitle: 'Краткая выжимка по самым сильным товарам'
+            },
+            table: {
+              title: 'Таблица top items',
+              subtitle: 'Сортировка по прибыли по убыванию'
+            },
+            columns: {
+              item: 'Товар',
+              qty: 'Кол-во',
+              avgPrice: 'Средняя цена',
+              revenue: 'Выручка',
+              cogs: 'Себестоимость',
+              profit: 'Прибыль',
+              margin: 'Маржа'
+            }
+          }
+        },
+        en: {
+          common: {
+            backToMenu: '← Back to menu',
+            dateFrom: 'Date from',
+            dateTo: 'Date to',
+            quickPeriods: 'Quick periods',
+            today: 'Today',
+            last7Days: '7 days',
+            last30Days: '30 days',
+            thisMonth: 'This month',
+            allPeriod: 'All period',
+            apply: 'Apply',
+            reset: 'Reset',
+            refresh: 'Refresh',
+            loading: 'Loading...',
+            error: 'Error'
+          },
+          topItems: {
+            documentTitle: 'BFC24 CONTROL — Top Items',
+            title: 'Top Items',
+            subtitle: 'Revenue, COGS, profit and margin analysis by product. This page shows which items generate the most money.',
+            badge: 'Product analytics',
+            limitLabel: 'Show',
+            all: 'All',
+            searchLabel: 'Search item',
+            searchPlaceholder: 'Item name...',
+            unknownItem: 'Untitled item',
+            rank: 'TOP',
+            empty: 'No product sales data for the selected period.',
+            footerNote: 'Metrics are calculated from sales for the selected period. COGS is taken from sale/FIFO data when it is already stored in sale_items.',
+            cards: {
+              positions: 'Items in sample',
+              positionsSub: 'Products with sales in the selected period',
+              revenue: 'Revenue',
+              revenueSub: 'Total revenue for selected items',
+              cogs: 'COGS',
+              cogsSub: 'Total cost of sold products',
+              profit: 'Gross profit',
+              marginSub: 'Average margin in sample: 0%',
+              marginSubFormatted: 'Average margin in sample: {margin}'
+            },
+            summary: {
+              title: 'Period leaders',
+              subtitle: 'Quick view of the strongest products'
+            },
+            table: {
+              title: 'Top items table',
+              subtitle: 'Sorted by profit descending'
+            },
+            columns: {
+              item: 'Item',
+              qty: 'Qty',
+              avgPrice: 'Avg price',
+              revenue: 'Revenue',
+              cogs: 'COGS',
+              profit: 'Profit',
+              margin: 'Margin'
+            }
+          }
+        },
+        zh: {
+          common: {
+            backToMenu: '← 返回菜单',
+            dateFrom: '开始日期',
+            dateTo: '结束日期',
+            quickPeriods: '快捷周期',
+            today: '今天',
+            last7Days: '7天',
+            last30Days: '30天',
+            thisMonth: '本月',
+            allPeriod: '全部期间',
+            apply: '应用',
+            reset: '重置',
+            refresh: '刷新',
+            loading: '加载中...',
+            error: '错误'
+          },
+          topItems: {
+            documentTitle: 'BFC24 CONTROL — Top Items',
+            title: 'Top Items',
+            subtitle: '按商品分析收入、成本、利润和利润率。这个页面显示哪些商品最赚钱。',
+            badge: '商品分析',
+            limitLabel: '显示',
+            all: '全部',
+            searchLabel: '搜索商品',
+            searchPlaceholder: '商品名称...',
+            unknownItem: '未命名商品',
+            rank: 'TOP',
+            empty: '所选期间内没有商品销售数据。',
+            footerNote: '指标基于所选期间的销售数据计算。商品成本取自 sale_items 中已写入的销售/FIFO 数据。',
+            cards: {
+              positions: '样本商品数',
+              positionsSub: '所选期间内有销售的商品',
+              revenue: '收入',
+              revenueSub: '所选商品总收入',
+              cogs: '销售成本',
+              cogsSub: '已售商品总成本',
+              profit: '毛利润',
+              marginSub: '样本平均利润率：0%',
+              marginSubFormatted: '样本平均利润率：{margin}'
+            },
+            summary: {
+              title: '期间领先商品',
+              subtitle: '最强商品的快速摘要'
+            },
+            table: {
+              title: 'Top items 表',
+              subtitle: '按利润从高到低排序'
+            },
+            columns: {
+              item: '商品',
+              qty: '数量',
+              avgPrice: '平均售价',
+              revenue: '收入',
+              cogs: '成本',
+              profit: '利润',
+              margin: '利润率'
+            }
+          }
+        }
+      };
+
+      const state = {
+        rows: [],
+        filteredRows: [],
+        loading: false,
+        currentRange: '30d'
+      };
+
+      const els = {
+        langSwitcher: document.getElementById('langSwitcher'),
+        dateFrom: document.getElementById('dateFrom'),
+        dateTo: document.getElementById('dateTo'),
+        topLimit: document.getElementById('topLimit'),
+        searchInput: document.getElementById('searchInput'),
+        applyBtn: document.getElementById('applyBtn'),
+        resetBtn: document.getElementById('resetBtn'),
+        refreshBtn: document.getElementById('refreshBtn'),
+
+        cardItemsCount: document.getElementById('cardItemsCount'),
+        cardRevenue: document.getElementById('cardRevenue'),
+        cardCogs: document.getElementById('cardCogs'),
+        cardProfit: document.getElementById('cardProfit'),
+        cardMarginSub: document.getElementById('cardMarginSub'),
+
+        summaryLoading: document.getElementById('summaryLoading'),
+        summaryError: document.getElementById('summaryError'),
+        summaryEmpty: document.getElementById('summaryEmpty'),
+        summaryList: document.getElementById('summaryList'),
+
+        tableLoading: document.getElementById('tableLoading'),
+        tableError: document.getElementById('tableError'),
+        tableEmpty: document.getElementById('tableEmpty'),
+        tableWrap: document.getElementById('tableWrap'),
+        tableBody: document.getElementById('tableBody')
+      };
+
+      function getCurrentLang() {
+        if (window.i18n && typeof window.i18n.getLang === 'function') {
+          return window.i18n.getLang();
+        }
+        try {
+          return localStorage.getItem('lang') || 'ru';
+        } catch (e) {
+          return 'ru';
+        }
+      }
+
+      function deepGet(obj, path) {
+        return String(path || '')
+          .split('.')
+          .reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
+      }
+
+      function t(key, fallback) {
+        if (window.i18n && typeof window.i18n.t === 'function') {
+          const value = window.i18n.t(key);
+          if (value && value !== key) return value;
+        }
+
+        const lang = getCurrentLang();
+        const fallbackValue =
+          deepGet(fallbackTranslations[lang], key) ??
+          deepGet(fallbackTranslations.ru, key);
+
+        return fallbackValue || fallback || key;
+      }
+
+      function applyFallbackTranslations() {
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+          const key = el.getAttribute('data-i18n');
+          const value = t(key, el.textContent);
+          if (value) el.textContent = value;
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+          const key = el.getAttribute('data-i18n-placeholder');
+          const value = t(key, el.getAttribute('placeholder') || '');
+          if (value) el.setAttribute('placeholder', value);
+        });
+
+        const allOption = els.topLimit.querySelector('option[value="0"]');
+        if (allOption) {
+          allOption.textContent = t('topItems.all', 'Все');
+        }
+      }
+
+      function applyTranslations() {
+        if (window.i18n && typeof window.i18n.apply === 'function') {
+          try {
+            window.i18n.apply();
+          } catch (e) {
+            console.error('[top-items] i18n.apply error:', e);
+          }
+        }
+
+        applyFallbackTranslations();
+        document.title = t('topItems.documentTitle', 'BFC24 CONTROL — Top Items');
+        updateCards(state.filteredRows);
+        renderSummary(state.filteredRows);
+        renderTable(state.filteredRows);
+      }
+
+      function setLangSwitcher() {
+        els.langSwitcher.value = getCurrentLang();
+      }
+
+      function escapeHtml(value) {
+        if (window.appUI && typeof window.appUI.escapeHtml === 'function') {
+          return window.appUI.escapeHtml(value);
+        }
+        return String(value ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function translateErrorMessage(message) {
+        if (window.appUI && typeof window.appUI.translateError === 'function') {
+          return window.appUI.translateError(message);
+        }
+        return message;
+      }
+
+      function getLocale() {
+        const lang = getCurrentLang();
+        if (lang === 'ru') return 'ru-RU';
+        if (lang === 'zh') return 'zh-CN';
+        return 'en-US';
+      }
+
+      function formatNumber(value, fractionDigits = 0) {
+        const num = Number(value || 0);
+        return new Intl.NumberFormat(getLocale(), {
+          minimumFractionDigits: fractionDigits,
+          maximumFractionDigits: fractionDigits
+        }).format(num);
+      }
+
+      function formatMoney(value) {
+        const num = Number(value || 0);
+        return new Intl.NumberFormat(getLocale(), {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        }).format(num);
+      }
+
+      function formatPercent(value) {
+        const num = Number(value || 0);
+        return new Intl.NumberFormat(getLocale(), {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        }).format(num) + '%';
+      }
+
+      function toDateInputValue(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+
+      function setDateRange(range) {
+        state.currentRange = range;
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        let from = '';
+        let to = toDateInputValue(today);
+
+        if (range === 'today') {
+          from = toDateInputValue(today);
+        } else if (range === '7d') {
+          const d = new Date(today);
+          d.setDate(d.getDate() - 6);
+          from = toDateInputValue(d);
+        } else if (range === '30d') {
+          const d = new Date(today);
+          d.setDate(d.getDate() - 29);
+          from = toDateInputValue(d);
+        } else if (range === 'month') {
+          const d = new Date(today.getFullYear(), today.getMonth(), 1);
+          from = toDateInputValue(d);
+        } else if (range === 'all') {
+          from = '';
+          to = '';
+        }
+
+        els.dateFrom.value = from;
+        els.dateTo.value = to;
+
+        document.querySelectorAll('[data-range]').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-range') === range);
+        });
+      }
+
+      function getQueryParams() {
+        const params = new URLSearchParams();
+
+        if (els.dateFrom.value) params.set('date_from', els.dateFrom.value);
+        if (els.dateTo.value) params.set('date_to', els.dateTo.value);
+
+        const limit = Number(els.topLimit.value || 0);
+        if (limit > 0) params.set('limit', String(limit));
+
+        return params;
+      }
+
+      function pickValue(obj, keys, fallback = null) {
+        for (const key of keys) {
+          if (obj && obj[key] !== undefined && obj[key] !== null) return obj[key];
+        }
+        return fallback;
+      }
+
+      function normalizeRow(row, index) {
+        const qty = Number(pickValue(row, ['qty_sold', 'qty', 'quantity', 'sold_qty'], 0));
+        const revenue = Number(pickValue(row, ['revenue', 'sales_amount', 'total_sales', 'amount'], 0));
+        const cogs = Number(pickValue(row, ['cogs', 'cost_of_goods_sold', 'cost', 'total_cost'], 0));
+
+        let profit = pickValue(row, ['profit', 'gross_profit', 'margin_value'], null);
+        if (profit === null) {
+          profit = revenue - cogs;
+        }
+        profit = Number(profit || 0);
+
+        let marginPercent = pickValue(row, ['margin_percent', 'profit_margin', 'marginPct'], null);
+        if (marginPercent === null) {
+          marginPercent = revenue > 0 ? (profit / revenue) * 100 : 0;
+        }
+        marginPercent = Number(marginPercent || 0);
+
+        let avgPrice = pickValue(row, ['avg_price', 'average_price', 'avg_sale_price'], null);
+        if (avgPrice === null) {
+          avgPrice = qty > 0 ? revenue / qty : 0;
+        }
+        avgPrice = Number(avgPrice || 0);
+
+        return {
+          index: index + 1,
+          item_id: pickValue(row, ['item_id', 'id', 'product_id'], ''),
+          item_name: String(
+            pickValue(
+              row,
+              ['item_name', 'name', 'product_name', 'title'],
+              t('topItems.unknownItem', 'Без названия')
+            ) || t('topItems.unknownItem', 'Без названия')
+          ),
+          qty_sold: qty,
+          avg_price: avgPrice,
+          revenue,
+          cogs,
+          profit,
+          margin_percent: marginPercent
+        };
+      }
+
+      function extractRows(response) {
+        if (!response) return [];
+
+        const candidates = [
+          response.items,
+          response.rows,
+          response.data,
+          response.result,
+          response.top_items,
+          response.report
+        ];
+
+        for (const candidate of candidates) {
+          if (Array.isArray(candidate)) {
+            return candidate;
+          }
+        }
+
+        if (Array.isArray(response)) {
+          return response;
+        }
+
+        return [];
+      }
+
+      function sortRows(rows) {
+        return [...rows].sort((a, b) => {
+          if (b.profit !== a.profit) return b.profit - a.profit;
+          if (b.revenue !== a.revenue) return b.revenue - a.revenue;
+          return b.qty_sold - a.qty_sold;
+        });
+      }
+
+      function applyClientSideFilters() {
+        const term = (els.searchInput.value || '').trim().toLowerCase();
+        let rows = [...state.rows];
+
+        if (term) {
+          rows = rows.filter(row =>
+            String(row.item_name || '').toLowerCase().includes(term)
+          );
+        }
+
+        state.filteredRows = sortRows(rows);
+      }
+
+      function setLoading(isLoading) {
+        state.loading = isLoading;
+        els.summaryLoading.classList.toggle('hidden', !isLoading);
+        els.tableLoading.classList.toggle('hidden', !isLoading);
+
+        if (isLoading) {
+          els.summaryError.classList.add('hidden');
+          els.summaryEmpty.classList.add('hidden');
+          els.summaryList.classList.add('hidden');
+
+          els.tableError.classList.add('hidden');
+          els.tableEmpty.classList.add('hidden');
+          els.tableWrap.classList.add('hidden');
+        }
+      }
+
+      function setError(message) {
+        const text = message || t('common.error', 'Ошибка');
+        els.summaryError.textContent = text;
+        els.tableError.textContent = text;
+        els.summaryError.classList.remove('hidden');
+        els.tableError.classList.remove('hidden');
+        els.summaryEmpty.classList.add('hidden');
+        els.tableEmpty.classList.add('hidden');
+        els.summaryList.classList.add('hidden');
+        els.tableWrap.classList.add('hidden');
+      }
+
+      function clearError() {
+        els.summaryError.classList.add('hidden');
+        els.tableError.classList.add('hidden');
+        els.summaryError.textContent = '';
+        els.tableError.textContent = '';
+      }
+
+      function updateCards(rows) {
+        const count = rows.length;
+        const revenue = rows.reduce((sum, row) => sum + Number(row.revenue || 0), 0);
+        const cogs = rows.reduce((sum, row) => sum + Number(row.cogs || 0), 0);
+        const profit = rows.reduce((sum, row) => sum + Number(row.profit || 0), 0);
+        const margin = revenue > 0 ? (profit / revenue) * 100 : 0;
+
+        els.cardItemsCount.textContent = formatNumber(count, 0);
+        els.cardRevenue.textContent = formatMoney(revenue);
+        els.cardCogs.textContent = formatMoney(cogs);
+        els.cardProfit.textContent = formatMoney(profit);
+        els.cardMarginSub.textContent = t('topItems.cards.marginSubFormatted', 'Средняя маржа по выборке: {margin}')
+          .replace('{margin}', formatPercent(margin));
+      }
+
+      function profitClass(value) {
+        if (value > 0) return 'profit-positive';
+        if (value < 0) return 'profit-negative';
+        return 'profit-neutral';
+      }
+
+      function renderSummary(rows) {
+        if (state.loading) return;
+
+        els.summaryList.innerHTML = '';
+
+        if (!rows.length) {
+          els.summaryEmpty.classList.remove('hidden');
+          els.summaryList.classList.add('hidden');
+          return;
+        }
+
+        els.summaryEmpty.classList.add('hidden');
+        els.summaryList.classList.remove('hidden');
+
+        const topRows = rows.slice(0, 5);
+
+        els.summaryList.innerHTML = topRows.map((row, idx) => `
+          <div class="summary-item">
+            <div class="summary-item-top">
+              <div>
+                <div class="summary-item-name">${escapeHtml(row.item_name)}</div>
+              </div>
+              <div class="summary-item-rank">${t('topItems.rank', 'ТОП')} ${idx + 1}</div>
+            </div>
+            <div class="summary-meta">
+              <div>
+                ${escapeHtml(t('topItems.columns.revenue', 'Выручка'))}
+                <strong>${formatMoney(row.revenue)}</strong>
+              </div>
+              <div>
+                ${escapeHtml(t('topItems.columns.profit', 'Прибыль'))}
+                <strong class="${profitClass(row.profit)}">${formatMoney(row.profit)}</strong>
+              </div>
+              <div>
+                ${escapeHtml(t('topItems.columns.qty', 'Кол-во'))}
+                <strong>${formatNumber(row.qty_sold, 0)}</strong>
+              </div>
+              <div>
+                ${escapeHtml(t('topItems.columns.margin', 'Маржа'))}
+                <strong>${formatPercent(row.margin_percent)}</strong>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderTable(rows) {
+        if (state.loading) return;
+
+        els.tableBody.innerHTML = '';
+
+        if (!rows.length) {
+          els.tableEmpty.classList.remove('hidden');
+          els.tableWrap.classList.add('hidden');
+          return;
+        }
+
+        els.tableEmpty.classList.add('hidden');
+        els.tableWrap.classList.remove('hidden');
+
+        els.tableBody.innerHTML = rows.map((row, idx) => `
+          <tr>
+            <td class="item-cell">
+              <div class="item-name">${escapeHtml(row.item_name)}</div>
+              <div class="item-meta">#${idx + 1}${row.item_id ? ' · ID ' + escapeHtml(String(row.item_id)) : ''}</div>
+            </td>
+            <td class="num">${formatNumber(row.qty_sold, 0)}</td>
+            <td class="num">${formatMoney(row.avg_price)}</td>
+            <td class="num">${formatMoney(row.revenue)}</td>
+            <td class="num">${formatMoney(row.cogs)}</td>
+            <td class="num"><span class="${profitClass(row.profit)}">${formatMoney(row.profit)}</span></td>
+            <td class="num"><span class="margin-badge">${formatPercent(row.margin_percent)}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      function getToken() {
+        try {
+          return (
+            localStorage.getItem('token') ||
+            sessionStorage.getItem('token') ||
+            ''
+          );
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function getApiBase() {
+        if (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) {
+          return window.APP_CONFIG.API_BASE_URL;
+        }
+        return '';
+      }
+
+      async function apiGet(path) {
+        if (window.api && typeof window.api.get === 'function') {
+          return window.api.get(path);
+        }
+
+        if (typeof window.apiGet === 'function') {
+          return window.apiGet(path);
+        }
+
+        if (typeof window.apiFetch === 'function') {
+          return window.apiFetch(path, { method: 'GET' });
+        }
+
+        const token = getToken();
+        const res = await fetch(getApiBase() + path, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: 'Bearer ' + token } : {})
+          }
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const err = new Error(data.error || 'request_failed');
+          err.payload = data;
+          throw err;
+        }
+        return data;
+      }
+
+      async function loadTopItems() {
+        setLoading(true);
+        clearError();
+
+        try {
+          const params = getQueryParams();
+          const endpoint = '/reports/top-items' + (params.toString() ? `?${params.toString()}` : '');
+
+          const response = await apiGet(endpoint);
+          const rawRows = extractRows(response);
+          const normalized = rawRows.map(normalizeRow);
+          state.rows = sortRows(normalized);
+          applyClientSideFilters();
+          updateCards(state.filteredRows);
+
+          setLoading(false);
+          renderSummary(state.filteredRows);
+          renderTable(state.filteredRows);
+        } catch (error) {
+          console.error('[top-items] load error:', error);
+          setLoading(false);
+
+          let message =
+            (error && error.payload && error.payload.error) ||
+            (error && error.message) ||
+            t('common.error', 'Ошибка');
+
+          message = translateErrorMessage(message);
+
+          setError(message);
+          updateCards([]);
+        }
+      }
+
+      function onSearchInput() {
+        applyClientSideFilters();
+        updateCards(state.filteredRows);
+        renderSummary(state.filteredRows);
+        renderTable(state.filteredRows);
+      }
+
+      function resetFilters() {
+        els.searchInput.value = '';
+        els.topLimit.value = '10';
+        setDateRange('30d');
+      }
+
+      function bindEvents() {
+        els.applyBtn.addEventListener('click', loadTopItems);
+        els.refreshBtn.addEventListener('click', loadTopItems);
+        els.resetBtn.addEventListener('click', () => {
+          resetFilters();
+          loadTopItems();
+        });
+
+        els.searchInput.addEventListener('input', onSearchInput);
+
+        els.langSwitcher.addEventListener('change', (e) => {
+          const lang = e.target.value;
+          localStorage.setItem('lang', lang);
+
+          if (window.i18n && typeof window.i18n.setLang === 'function') {
+            window.i18n.setLang(lang);
+          }
+
+          applyTranslations();
+        });
+
+        document.querySelectorAll('[data-range]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const range = btn.getAttribute('data-range');
+            setDateRange(range);
+          });
+        });
+      }
+
+      function extendI18n() {
+        if (window.i18n && typeof window.i18n.add === 'function') {
+          window.i18n.add(fallbackTranslations);
+        }
+      }
+
+      async function init() {
+        try {
+          if (window.api && typeof window.api.authGuard === 'function') {
+            await window.api.authGuard();
+          } else if (!getToken()) {
+            window.location.href = '/login.html';
+            return;
+          }
+
+          extendI18n();
+          setLangSwitcher();
+
+          if (window.i18n && typeof window.i18n.setLang === 'function') {
+            window.i18n.setLang(getCurrentLang());
+          }
+
+          setDateRange('30d');
+          bindEvents();
+          applyTranslations();
+          await loadTopItems();
+        } catch (error) {
+          console.error('[top-items] init error:', error);
+
+          let message =
+            (error && error.payload && error.payload.error) ||
+            (error && error.message) ||
+            t('common.error', 'Ошибка');
+
+          message = translateErrorMessage(message);
+
+          setLoading(false);
+          setError(message);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', init);
+    })();
+  </script>
+</body>
+</html>

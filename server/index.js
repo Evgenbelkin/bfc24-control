@@ -7,12 +7,14 @@ if (!process.env.JWT_SECRET || !String(process.env.JWT_SECRET).trim()) {
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 
 const pool = require("./db");
 const { authRequired, requireRole } = require("./middleware/auth");
 
 // routes
 const authRoutes = require("./routes/auth");
+const selfRegistrationRoutes = require("./routes/self-registration");
 const itemRoutes = require("./routes/items");
 const locationRoutes = require("./routes/locations");
 const clientRoutes = require("./routes/clients");
@@ -25,11 +27,21 @@ const expensesRoutes = require("./routes/expenses");
 const ownerAdminRoutes = require("./routes/owner-admin");
 const ownerActivityRoutes = require("./routes/owner-activity");
 const reportsRoutes = require("./routes/reports");
+const reportsTurnoverRoutes = require("./routes/reports-turnover");
+const usersRoutes = require("./routes/users");
+
+// 🔥 ДОБАВЛЕНО
+const subscriptionRequestsRoutes = require("./routes/subscription-requests");
 
 const app = express();
 
 const PORT = Number(process.env.PORT || 3003);
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
+const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
+
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
 
 const ALLOWED_ORIGINS = new Set([
   "https://dev.app.bfc-24.ru",
@@ -51,10 +63,11 @@ app.use(
   })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // статика
+app.use("/uploads", express.static(UPLOADS_DIR));
 app.use(express.static(PUBLIC_DIR));
 
 // health check
@@ -81,9 +94,11 @@ app.get("/ping", async (req, res) => {
 
 // API routes
 app.use("/auth", authRoutes);
+app.use("/self-registration", selfRegistrationRoutes);
 app.use("/items", itemRoutes);
 app.use("/locations", locationRoutes);
 app.use("/clients", clientRoutes);
+app.use("/users", usersRoutes);
 app.use("/stock", stockRoutes);
 app.use("/sales", salesRoutes);
 app.use("/writeoff", writeoffRoutes);
@@ -92,6 +107,10 @@ app.use("/cash", cashRoutes);
 app.use("/expenses", expensesRoutes);
 app.use("/owner-admin", ownerAdminRoutes);
 app.use("/reports", reportsRoutes);
+app.use("/reports", reportsTurnoverRoutes);
+
+// 🔥 ДОБАВЛЕНО (ВАЖНО — ДО owner-activity можно, это норм)
+app.use("/", subscriptionRequestsRoutes);
 
 // owner only
 app.use("/owner-activity", authRequired, requireRole("owner"), ownerActivityRoutes);
