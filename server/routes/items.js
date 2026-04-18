@@ -37,6 +37,7 @@ const ALLOWED_IMAGE_MIME_TYPES = {
 
 const IMPORT_REQUIRED_COLUMNS = ["MARK"];
 const IMPORT_PREVIEW_LIMIT = 500;
+const IMPORT_ROWS_LIMIT = 1500;
 
 function normalizeOptionalText(value) {
   if (value === null || value === undefined) return null;
@@ -413,6 +414,14 @@ async function loadExistingSkusMap(tenantId) {
 async function buildImportPreview({ tenantId, fileBase64 }) {
   const workbook = getWorkbookFromBase64(fileBase64);
   const parsed = parseImportRowsFromWorkbook(workbook);
+
+  if (parsed.rows.length > IMPORT_ROWS_LIMIT) {
+    const err = new Error("import_rows_limit_exceeded");
+    err.rowsLimit = IMPORT_ROWS_LIMIT;
+    err.totalRows = parsed.rows.length;
+    throw err;
+  }
+
   const existingSkusMap = await loadExistingSkusMap(tenantId);
   const fileSeenSkus = new Set();
 
@@ -747,9 +756,17 @@ router.post(
       });
     } catch (err) {
       console.error("[POST /items/import/preview] error:", err);
-      return res.status(500).json({
+      const statusCode = err.message === "import_rows_limit_exceeded" ? 400 : 500;
+
+      return res.status(statusCode).json({
         ok: false,
         error: err.message || "items_import_preview_failed",
+        message:
+          err.message === "import_rows_limit_exceeded"
+            ? `Максимум ${err.rowsLimit || IMPORT_ROWS_LIMIT} строк в одном Excel-файле`
+            : undefined,
+        rows_limit: err.rowsLimit || IMPORT_ROWS_LIMIT,
+        total_rows: err.totalRows || null,
         missing_columns: err.missingColumns || [],
       });
     }
@@ -777,6 +794,17 @@ router.post(
       }
 
       const preview = await buildImportPreview({ tenantId, fileBase64 });
+
+      if (preview.total_rows > IMPORT_ROWS_LIMIT) {
+        return res.status(400).json({
+          ok: false,
+          error: "import_rows_limit_exceeded",
+          message: `Максимум ${IMPORT_ROWS_LIMIT} строк в одном Excel-файле`,
+          rows_limit: IMPORT_ROWS_LIMIT,
+          total_rows: preview.total_rows,
+        });
+      }
+
       const importImagesByRow = await extractImportImagesByRow(fileBase64);
       const rowsToCreate = preview.rows.filter((row) => row.status === "new");
 
@@ -913,9 +941,17 @@ router.post(
         await Promise.all(createdImageUrls.map((imageUrl) => deleteUploadedFileByUrl(imageUrl)));
       }
       console.error("[POST /items/import] error:", err);
-      return res.status(500).json({
+      const statusCode = err.message === "import_rows_limit_exceeded" ? 400 : 500;
+
+      return res.status(statusCode).json({
         ok: false,
         error: err.message || "items_import_failed",
+        message:
+          err.message === "import_rows_limit_exceeded"
+            ? `Максимум ${err.rowsLimit || IMPORT_ROWS_LIMIT} строк в одном Excel-файле`
+            : undefined,
+        rows_limit: err.rowsLimit || IMPORT_ROWS_LIMIT,
+        total_rows: err.totalRows || null,
         missing_columns: err.missingColumns || [],
       });
     } finally {
