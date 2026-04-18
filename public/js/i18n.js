@@ -452,7 +452,7 @@
         savingUpdate: "Сохраняю изменения товара #{id}...",
         createdSuccess: "Товар успешно создан",
         updatedSuccess: "Товар #{id} успешно обновлён",
-        saveErrorStatus: "Ошибка сохранения: {error}"
+        saveErrorStatus: "Ошибка сохранения: {error}",
         categoryNameLabel: "Категория",
         categoryNamePlaceholder: "Например: Игрушки",
         boxQtyLabel: "Штук в коробке",
@@ -1734,7 +1734,7 @@
         savingUpdate: "Saving changes for item #{id}...",
         createdSuccess: "Item created successfully",
         updatedSuccess: "Item #{id} updated successfully",
-        saveErrorStatus: "Save error: {error}"
+        saveErrorStatus: "Save error: {error}",
         categoryNameLabel: "Category",
         categoryNamePlaceholder: "For example: Toys",
         boxQtyLabel: "Units per box",
