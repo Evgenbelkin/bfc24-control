@@ -359,48 +359,48 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <div class="title">PnL / Экономика</div>
-        <div class="subtitle">Выручка, себестоимость, расходы и чистая прибыль по выбранному периоду</div>
+        <div class="title" data-i18n="pnl.heading">PnL / Экономика</div>
+        <div class="subtitle" data-i18n="pnl.subtitle">Выручка, себестоимость, расходы и чистая прибыль по выбранному периоду</div>
       </div>
 
       <div class="top-actions">
         <div id="langSwitcher"></div>
-        <button class="btn btn-light" onclick="goBack()">Назад</button>
-        <button class="btn btn-light" onclick="logout()">Выйти</button>
+        <button class="btn btn-light" onclick="goBack()" data-i18n="pnl.backButton">Назад</button>
+        <button class="btn btn-light" onclick="logout()" data-i18n="pnl.logoutButton">Выйти</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Фильтры</h2>
+      <h2 class="card-title" data-i18n="pnl.filtersTitle">Фильтры</h2>
 
       <div class="filters">
         <div class="field">
-          <label for="dateFrom">Дата от</label>
+          <label for="dateFrom" data-i18n="pnl.dateFromLabel">Дата от</label>
           <input id="dateFrom" type="date" />
         </div>
 
         <div class="field">
-          <label for="dateTo">Дата до</label>
+          <label for="dateTo" data-i18n="pnl.dateToLabel">Дата до</label>
           <input id="dateTo" type="date" />
         </div>
 
         <div class="field">
-          <label>Быстрый период</label>
+          <label data-i18n="pnl.quickPeriodLabel">Быстрый период</label>
           <div class="period-buttons">
-            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn">Сегодня</button>
-            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn">Неделя</button>
-            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn">Месяц</button>
+            <button type="button" class="btn btn-light btn-period" id="periodTodayBtn" data-i18n="pnl.periodToday">Сегодня</button>
+            <button type="button" class="btn btn-light btn-period" id="periodWeekBtn" data-i18n="pnl.periodWeek">Неделя</button>
+            <button type="button" class="btn btn-light btn-period" id="periodMonthBtn" data-i18n="pnl.periodMonth">Месяц</button>
           </div>
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-primary" id="refreshBtn">Обновить</button>
+          <button type="button" class="btn btn-primary" id="refreshBtn" data-i18n="pnl.refreshButton">Обновить</button>
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button type="button" class="btn btn-light" id="resetBtn">Сбросить</button>
+          <button type="button" class="btn btn-light" id="resetBtn" data-i18n="pnl.resetButton">Сбросить</button>
         </div>
       </div>
 
@@ -409,150 +409,150 @@
 
     <div class="stats">
       <div class="stat">
-        <div class="stat-label">Выручка</div>
+        <div class="stat-label" data-i18n="pnl.revenueLabel">Выручка</div>
         <div class="stat-value" id="revenueValue">0</div>
       </div>
 
       <div class="stat">
-        <div class="stat-label">Себестоимость</div>
+        <div class="stat-label" data-i18n="pnl.cogsLabel">Себестоимость</div>
         <div class="stat-value warning" id="cogsValue">0</div>
       </div>
 
       <div class="stat">
-        <div class="stat-label">Валовая прибыль</div>
+        <div class="stat-label" data-i18n="pnl.grossProfitLabel">Валовая прибыль</div>
         <div class="stat-value" id="grossProfitValue">0</div>
       </div>
 
       <div class="stat">
-        <div class="stat-label">Операционные расходы</div>
+        <div class="stat-label" data-i18n="pnl.operatingExpensesLabel">Операционные расходы</div>
         <div class="stat-value danger" id="expensesValue">0</div>
       </div>
 
       <div class="stat">
-        <div class="stat-label">Чистая прибыль</div>
+        <div class="stat-label" data-i18n="pnl.netProfitLabel">Чистая прибыль</div>
         <div class="stat-value" id="netProfitValue">0</div>
       </div>
     </div>
 
     <div class="two-col">
       <div class="card">
-        <h2 class="card-title">Сводка</h2>
+        <h2 class="card-title" data-i18n="pnl.summaryTitle">Сводка</h2>
 
         <div class="summary-grid">
           <div class="summary-item">
-            <div class="label">Скидки</div>
+            <div class="label" data-i18n="pnl.discountLabel">Скидки</div>
             <div class="value" id="discountValue">0</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Продаж</div>
+            <div class="label" data-i18n="pnl.salesCountLabel">Продаж</div>
             <div class="value" id="salesCountValue">0</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Строк продаж</div>
+            <div class="label" data-i18n="pnl.lineItemsCountLabel">Строк продаж</div>
             <div class="value" id="lineItemsCountValue">0</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Продано единиц</div>
+            <div class="label" data-i18n="pnl.soldQtyLabel">Продано единиц</div>
             <div class="value" id="soldQtyValue">0</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Валовая маржа</div>
+            <div class="label" data-i18n="pnl.grossMarginLabel">Валовая маржа</div>
             <div class="value" id="grossMarginValue">0%</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Чистая маржа</div>
+            <div class="label" data-i18n="pnl.netMarginLabel">Чистая маржа</div>
             <div class="value" id="netMarginValue">0%</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Выручка наличными</div>
+            <div class="label" data-i18n="pnl.cashRevenueLabel">Выручка наличными</div>
             <div class="value" id="cashRevenueValue">0</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Выручка по карте</div>
+            <div class="label" data-i18n="pnl.cardRevenueLabel">Выручка по карте</div>
             <div class="value" id="cardRevenueValue">0</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Выручка переводом</div>
+            <div class="label" data-i18n="pnl.transferRevenueLabel">Выручка переводом</div>
             <div class="value" id="transferRevenueValue">0</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Реализация</div>
+            <div class="label" data-i18n="pnl.consignmentRevenueLabel">Реализация</div>
             <div class="value" id="consignmentRevenueValue">0</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Оплачено из реализации</div>
+            <div class="label" data-i18n="pnl.consignmentPaidLabel">Оплачено из реализации</div>
             <div class="value" id="consignmentPaidValue">0</div>
           </div>
 
           <div class="summary-item">
-            <div class="label">Период</div>
-            <div class="value" id="periodValue">Весь период</div>
+            <div class="label" data-i18n="pnl.periodLabel">Период</div>
+            <div class="value" id="periodValue" data-i18n="pnl.allPeriod">Весь период</div>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <h2 class="card-title">Расходы по категориям</h2>
+        <h2 class="card-title" data-i18n="pnl.expensesByCategoryTitle">Расходы по категориям</h2>
 
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Категория</th>
-                <th>Сумма</th>
+                <th data-i18n="pnl.expensesTableCategory">Категория</th>
+                <th data-i18n="pnl.expensesTableAmount">Сумма</th>
               </tr>
             </thead>
             <tbody id="expensesBreakdownBody">
               <tr>
-                <td colspan="2" class="empty">Загрузка...</td>
+                <td colspan="2" class="empty" data-i18n="pnl.loading">Загрузка...</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <div class="muted" style="margin-top:12px;">
-          Источник расходов: core.expenses
+          <span data-i18n="pnl.expensesSource">Источник расходов: core.expenses</span>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Дневная динамика PnL</h2>
+      <h2 class="card-title" data-i18n="pnl.dailyTitle">Дневная динамика PnL</h2>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Дата</th>
-              <th>Выручка</th>
-              <th>Себестоимость</th>
-              <th>Валовая прибыль</th>
-              <th>Расходы</th>
-              <th>Чистая прибыль</th>
-              <th>Продаж</th>
-              <th>Валовая маржа %</th>
+              <th data-i18n="pnl.dailyTableDate">Дата</th>
+              <th data-i18n="pnl.dailyTableRevenue">Выручка</th>
+              <th data-i18n="pnl.dailyTableCogs">Себестоимость</th>
+              <th data-i18n="pnl.dailyTableGrossProfit">Валовая прибыль</th>
+              <th data-i18n="pnl.dailyTableExpenses">Расходы</th>
+              <th data-i18n="pnl.dailyTableNetProfit">Чистая прибыль</th>
+              <th data-i18n="pnl.dailyTableSalesCount">Продаж</th>
+              <th data-i18n="pnl.dailyTableGrossMargin">Валовая маржа %</th>
             </tr>
           </thead>
           <tbody id="dailyPnlBody">
             <tr>
-              <td colspan="8" class="empty">Загрузка...</td>
+              <td colspan="8" class="empty" data-i18n="pnl.loading">Загрузка...</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <div class="muted" style="margin-top:12px;">
-        Источник: /reports/pnl-daily
+        <span data-i18n="pnl.dailySource">Источник: /reports/pnl-daily</span>
       </div>
     </div>
   </div>
@@ -571,7 +571,7 @@
     }
 
     const Ui = window.AppUI || {
-      translateError: (value) => String(value || "Ошибка"),
+      translateError: (value) => String(value || i18n.t("common.error")),
     };
 
     async function requestFallback(method, path, body) {
@@ -629,16 +629,9 @@
       }
     };
 
-    const CATEGORY_LABELS = {
-      rent: "Аренда",
-      salary: "Зарплата",
-      purchase: "Закупка",
-      delivery: "Доставка",
-      ads: "Реклама",
-      utilities: "Коммунальные",
-      other: "Прочее",
-      uncategorized: "Без категории"
-    };
+    function getCategoryLabel(key) {
+      return i18n.t(`pnl.category.${key}`) || key;
+    }
 
     let activePeriod = "";
 
@@ -804,7 +797,7 @@
       const rows = orderedKeys
         .map((key) => ({
           key,
-          label: CATEGORY_LABELS[key] || key,
+          label: getCategoryLabel(key),
           value: Number((breakdown && breakdown[key]) || 0)
         }))
         .filter((row) => row.value !== 0);
@@ -812,7 +805,7 @@
       if (!rows.length) {
         els.expensesBreakdownBody.innerHTML = `
           <tr>
-            <td colspan="2" class="empty">Расходов по категориям нет</td>
+            <td colspan="2" class="empty">${escapeHtml(i18n.t("pnl.noExpensesByCategory"))}</td>
           </tr>
         `;
         return;
@@ -830,7 +823,7 @@
       if (!Array.isArray(rows) || !rows.length) {
         els.dailyPnlBody.innerHTML = `
           <tr>
-            <td colspan="8" class="empty">Нет данных по дням</td>
+            <td colspan="8" class="empty">${escapeHtml(i18n.t("pnl.noDailyData"))}</td>
           </tr>
         `;
         return;
@@ -854,7 +847,7 @@
             <td class="${expensesClass}">${escapeHtml(formatMoney(row.expenses))}</td>
             <td class="${netClass}">${escapeHtml(formatMoney(row.net_profit))}</td>
             <td>${escapeHtml(String(Number(row.sales_count || 0)))}</td>
-            <td>${row.gross_margin_pct === null ? "—" : escapeHtml(formatPercent(row.gross_margin_pct))}</td>
+            <td>${row.gross_margin_pct === null ? escapeHtml(i18n.t("pnl.dash")) : escapeHtml(formatPercent(row.gross_margin_pct))}</td>
           </tr>
         `;
       }).join("");
@@ -890,7 +883,7 @@
       if (period.date_from || period.date_to) {
         els.periodValue.textContent = `${period.date_from || "..."} — ${period.date_to || "..."}`;
       } else {
-        els.periodValue.textContent = "Весь период";
+        els.periodValue.textContent = i18n.t("pnl.allPeriod");
       }
 
       renderBreakdown(pnl.expenses_breakdown || {});
@@ -898,7 +891,7 @@
 
     async function loadAll() {
       try {
-        showStatus("Загрузка PnL...", "info");
+        showStatus(i18n.t("pnl.loadingPnl"), "info");
 
         const query = buildQuery();
 
@@ -910,7 +903,7 @@
         renderPnl(pnlData);
         renderDailyTable(dailyData.daily || []);
 
-        showStatus("PnL успешно загружен", "success");
+        showStatus(i18n.t("pnl.loadedPnl"), "success");
       } catch (err) {
         showStatus(Ui.translateError(err.message), "error");
       }
@@ -950,6 +943,16 @@
     }
 
     bootstrap();
+
+
+
+
+
+
+
+
+
+
   </script>
 </body>
 </html>
