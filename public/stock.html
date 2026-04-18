@@ -408,9 +408,9 @@
         </div>
 
         <div class="field">
-          <label for="categoryFilter">Категория</label>
+          <label for="categoryFilter" data-i18n="stock.categoryFilterLabel">Категория</label>
           <select id="categoryFilter">
-            <option value="">Все категории</option>
+            <option value="" data-i18n="stock.categoryFilterAll">Все категории</option>
           </select>
         </div>
 
@@ -446,10 +446,10 @@
       <div id="pageStatus" class="status info"></div>
 
       <div class="bulk-actions">
-        <button type="button" class="btn btn-light" id="selectFilteredBtn">Выбрать строки по текущим фильтрам</button>
-        <button type="button" class="btn btn-light" id="clearSelectionBtn">Снять выбор</button>
-        <button type="button" class="btn btn-primary" id="exportSelectedBtn">Выгрузить выбранное</button>
-        <div class="bulk-note" id="selectedCountLabel">Выбрано строк: 0</div>
+        <button type="button" class="btn btn-light" id="selectFilteredBtn" data-i18n="stock.selectFilteredButton">Выбрать строки по текущим фильтрам</button>
+        <button type="button" class="btn btn-light" id="clearSelectionBtn" data-i18n="stock.clearSelectionButton">Снять выбор</button>
+        <button type="button" class="btn btn-primary" id="exportSelectedBtn" data-i18n="stock.exportSelectedButton">Выгрузить выбранное</button>
+        <div class="bulk-note" id="selectedCountLabel" data-i18n="stock.selectedCount" data-i18n-vars='{"count":0}'>Выбрано строк: 0</div>
       </div>
     </div>
 
@@ -462,11 +462,11 @@
           <thead>
             <tr>
               <th class="check-col"><input type="checkbox" id="selectAllRows" /></th>
-              <th class="photo-col">Фото</th>
+              <th class="photo-col" data-i18n="stock.tablePhoto">Фото</th>
               <th data-i18n="stock.tableItem">Товар</th>
-              <th>Категория</th>
-              <th>Фабрика</th>
-              <th>Арт. фабрики</th>
+              <th data-i18n="stock.tableCategory">Категория</th>
+              <th data-i18n="stock.tableFactory">Фабрика</th>
+              <th data-i18n="stock.tableFactoryArticle">Арт. фабрики</th>
               <th data-i18n="stock.tableSku">Артикул / SKU</th>
               <th data-i18n="stock.tableBarcode">Штрихкод</th>
               <th data-i18n="stock.tableLocation">Место хранения</th>
@@ -485,7 +485,7 @@
 
   <div id="imageModal" class="image-modal" aria-hidden="true">
     <div class="image-modal-content">
-      <img id="imageModalImg" alt="Фото товара" />
+      <img id="imageModalImg" data-i18n-alt="stock.imageAlt" alt="${escapeHtml(i18n.t("stock.imageAlt"))}" />
     </div>
   </div>
 
@@ -726,7 +726,7 @@
 
     function updateSelectedCount() {
       if (els.selectedCountLabel) {
-        els.selectedCountLabel.textContent = `Выбрано строк: ${selectedRowKeys.size}`;
+        els.selectedCountLabel.textContent = i18n.format("stock.selectedCount", { count: selectedRowKeys.size });
       }
     }
 
@@ -761,7 +761,7 @@
         .map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
         .join("");
 
-      els.categoryFilter.innerHTML = `<option value="">Все категории</option>` + options;
+      els.categoryFilter.innerHTML = `<option value="">${escapeHtml(i18n.t("stock.categoryFilterAll"))}</option>` + options;
 
       if ([...els.categoryFilter.options].some(opt => String(opt.value) === String(currentValue))) {
         els.categoryFilter.value = currentValue;
@@ -886,7 +886,7 @@
       const { allRows } = getFilteredRows();
       const selectedRows = allRows.filter(row => selectedRowKeys.has(getRowKey(row)));
       if (!selectedRows.length) {
-        showStatus("Сначала выбери строки для выгрузки", "error");
+        showStatus(i18n.t("stock.selectRowsFirstError"), "error");
         return;
       }
 
@@ -907,7 +907,7 @@
       });
 
       if (!result || !result.file_base64) {
-        throw new Error("Файл экспорта не сформирован");
+        throw new Error(i18n.t("stock.exportFileNotGeneratedError"));
       }
 
       const byteCharacters = atob(result.file_base64);
@@ -929,7 +929,7 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      showStatus(`Выгружено строк: ${selectedRows.length}`, "success");
+      showStatus(i18n.format("stock.exportRowsSuccess", { count: selectedRows.length }), "success");
     }
 
     function renderTable() {
@@ -962,7 +962,7 @@
                 class="photo-box ${row.image_url ? "is-clickable" : ""}"
                 ${row.image_url ? `onclick="openStockImageModal('${escapeHtml(row.image_url)}')"` : ""}
               >
-                ${row.image_url ? `<img src="${escapeHtml(row.image_url)}" alt="Фото товара" />` : "Нет фото"}
+                ${row.image_url ? `<img src="${escapeHtml(row.image_url)}" alt="${escapeHtml(i18n.t("stock.imageAlt"))}" />` : i18n.t("stock.noPhoto")}
               </div>
             </td>
             <td>${escapeHtml(row.item_name || i18n.t("stock.noName"))}</td>
