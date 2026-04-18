@@ -454,6 +454,18 @@
         createdSuccess: "Товар успешно создан",
         updatedSuccess: "Товар #{id} успешно обновлён",
         saveErrorStatus: "Ошибка сохранения: {error}"
+        photoLabel: "Фото товара",
+photoNotUploaded: "Фото не загружено",
+removePhotoButton: "Удалить фото",
+photoHelpHtml: "Поддерживаются JPG, PNG. Рекомендуемый размер до 2MB.",
+
+importExcelButton: "Импорт Excel",
+
+tablePhoto: "Фото",
+tableCategoryName: "Категория",
+tableFactory: "Фабрика",
+tableFactoryArticle: "Арт. фабрики",
+tableBoxQty: "Шт/кор"
       },
 
       sales: {
@@ -1663,6 +1675,18 @@
         createdSuccess: "Item created successfully",
         updatedSuccess: "Item #{id} updated successfully",
         saveErrorStatus: "Save error: {error}"
+        photoLabel: "Item photo",
+photoNotUploaded: "No photo uploaded",
+removePhotoButton: "Remove photo",
+photoHelpHtml: "Supported: JPG, PNG. Recommended size up to 2MB.",
+
+importExcelButton: "Import Excel",
+
+tablePhoto: "Photo",
+tableCategoryName: "Category",
+tableFactory: "Factory",
+tableFactoryArticle: "Factory article",
+tableBoxQty: "Qty/box"
       },
 
       sales: {
