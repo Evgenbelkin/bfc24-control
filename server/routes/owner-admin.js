@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const pool = require('../db');
 const { authRequired } = require('../middleware/auth');
 const { requirePermission, checkTenantUserLimit } = require('../middleware/permissions');
@@ -1653,6 +1654,86 @@ router.post(
         ok: false,
         error: 'owner_user_reset_password_failed',
         message: 'Не удалось сбросить пароль',
+      });
+    }
+  }
+);
+
+
+router.post(
+  '/tenants/:id/impersonate',
+  requirePermission('owner.tenants.read'),
+  async (req, res) => {
+    try {
+      const tenantId = parseIntOrNull(req.params.id);
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: 'tenant_id_invalid',
+          message: 'Некорректный tenant_id',
+        });
+      }
+
+      const tenant = await getTenantById(tenantId);
+      if (!tenant) {
+        return res.status(404).json({
+          ok: false,
+          error: 'tenant_not_found',
+          message: 'Клиент не найден',
+        });
+      }
+
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        return res.status(500).json({
+          ok: false,
+          error: 'jwt_secret_missing',
+          message: 'Не настроен JWT_SECRET',
+        });
+      }
+
+      const token = jwt.sign(
+        {
+          id: String(req.user.id),
+          username: req.user.username,
+          role: 'owner',
+          tenant_id: String(tenant.id),
+          impersonation: true,
+          impersonated_tenant_id: String(tenant.id),
+          impersonated_tenant_name: tenant.name,
+        },
+        jwtSecret,
+        { expiresIn: '8h' }
+      );
+
+      await logOwnerAction({
+        req,
+        actionCode: 'owner.tenant.impersonation_start',
+        entityType: 'tenant',
+        entityId: tenant.id,
+        entityLabel: tenant.name,
+        details: {
+          owner_id: req.user.id,
+          impersonated_tenant_id: tenant.id,
+          impersonated_tenant_name: tenant.name,
+        },
+        tenantId: tenant.id,
+      });
+
+      return res.json({
+        ok: true,
+        token,
+        tenant: {
+          id: tenant.id,
+          name: tenant.name,
+        },
+      });
+    } catch (error) {
+      console.error('[owner-admin.POST /tenants/:id/impersonate] error:', error);
+      return res.status(500).json({
+        ok: false,
+        error: 'impersonation_failed',
+        message: 'Не удалось войти в кабинет клиента',
       });
     }
   }

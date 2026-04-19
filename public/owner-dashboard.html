@@ -1510,6 +1510,37 @@ function renderActivityTable() {
 /* ══════════════════════════════════════════════════════════
    EVENTS MODAL
    ══════════════════════════════════════════════════════════ */
+
+async function impersonateTenant(id) {
+  try {
+    const row = state.tenants.find(t => String(t.id) === String(id));
+    const tenantName = row?.name || `#${id}`;
+    const ok = confirm(`Войти в кабинет клиента ${tenantName}?`);
+    if (!ok) return;
+
+    const data = await apiPost(`/owner-admin/tenants/${id}/impersonate`, {});
+
+    if (!data || data.ok === false || !data.token) {
+      throw new Error(data?.error || data?.message || 'impersonation_failed');
+    }
+
+    if (window.API && typeof window.API.backupOwnerToken === 'function') {
+      window.API.backupOwnerToken();
+    }
+
+    if (window.API && typeof window.API.setToken === 'function') {
+      window.API.setToken(data.token);
+    } else {
+      localStorage.setItem('token', data.token);
+    }
+
+    localStorage.removeItem('user');
+    window.location.href = '/index.html';
+  } catch (error) {
+    alert('Ошибка входа в кабинет клиента: ' + (error?.message || error || 'impersonation_failed'));
+  }
+}
+
 async function openTenantEvents(id, name) {
   el.eventsModalTitle.textContent = `События клиента: ${name} (#${id})`;
   el.eventsModalContent.innerHTML = `<div class="muted">Загрузка...</div>`;
@@ -1725,6 +1756,7 @@ function renderTenantsTable() {
             <button class="row-btn row-btn-warning" onclick="toggleTenantActive('${safe(t.id)}')">${t.is_active===false ? "✅ Вкл" : "⏸ Выкл"}</button>
             <button class="row-btn ${t.is_blocked ? "row-btn-success" : "row-btn-danger"}" onclick="toggleTenantBlock('${safe(t.id)}')">${t.is_blocked ? "🔓 Разблок." : "🔒 Блок."}</button>
             <button class="row-btn row-btn-accent" onclick="editTenant('${safe(t.id)}')">✏ Ред.</button>
+            <button class="row-btn row-btn-accent" onclick="impersonateTenant('${safe(t.id)}')">↪ Войти</button>
             <button class="row-btn" onclick="openTenantEvents('${safe(t.id)}','${safe(t.name)}')">📋 События</button>
           </div>
         </td>
