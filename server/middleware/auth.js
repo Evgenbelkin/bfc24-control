@@ -214,6 +214,10 @@ async function loadUserForAuth(userId) {
 function getEffectiveTenantId(req) {
   if (!req || !req.user) return null;
 
+  if (req.user.impersonation && req.user.impersonated_tenant_id) {
+    return Number(req.user.impersonated_tenant_id);
+  }
+
   // client / tenant user
   if (req.user.tenant_id) {
     return Number(req.user.tenant_id);
@@ -352,20 +356,30 @@ function authRequired(req, res, next) {
       }
 
       const access = await loadUserAccess(user.id);
+      const impersonation = payload.impersonation === true;
+      const impersonatedTenantId = impersonation
+        ? Number(payload.impersonated_tenant_id || payload.tenant_id || 0) || null
+        : null;
+      const impersonatedTenantName = impersonation
+        ? String(payload.impersonated_tenant_name || '').trim() || null
+        : null;
 
       req.user = {
         id: user.id,
         username: user.username,
         full_name: user.full_name,
         role: user.role, // legacy compatibility
-        tenant_id: user.tenant_id,
-        tenant_name: user.tenant_name || null,
+        tenant_id: impersonation && impersonatedTenantId ? impersonatedTenantId : user.tenant_id,
+        tenant_name: impersonation && impersonatedTenantName ? impersonatedTenantName : (user.tenant_name || null),
         is_active: user.is_active,
         is_blocked: user.is_blocked,
         last_login_at: user.last_login_at,
         email: user.email || null,
         phone: user.phone || null,
         modules: deriveModulesFromAccess(user, access),
+        impersonation,
+        impersonated_tenant_id: impersonatedTenantId,
+        impersonated_tenant_name: impersonatedTenantName,
         subscription_status: user.subscription_status || null,
         subscription_start_at: user.subscription_start_at || null,
         subscription_end_at: user.subscription_end_at || null,

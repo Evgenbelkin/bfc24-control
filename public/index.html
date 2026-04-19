@@ -265,6 +265,63 @@
       fill: #4f9cf9;
     }
 
+
+    .impersonation-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid #facc15;
+      background: linear-gradient(180deg, #fff8db 0%, #fff1b8 100%);
+      box-shadow: var(--shadow-sm);
+      color: #713f12;
+    }
+
+    .impersonation-banner.open {
+      display: flex;
+    }
+
+    .impersonation-banner__title {
+      font-size: 15px;
+      font-weight: 800;
+      margin: 0 0 2px;
+      color: #713f12;
+    }
+
+    .impersonation-banner__text {
+      font-size: 13px;
+      color: #854d0e;
+    }
+
+    .impersonation-banner__actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .impersonation-btn {
+      border: 1px solid #ca8a04;
+      background: #fff;
+      color: #713f12;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.18s ease;
+    }
+
+    .impersonation-btn:hover {
+      transform: translateY(-1px);
+      background: #fffbeb;
+    }
+
     .owner-redirect {
       max-width: 700px;
       margin: 80px auto 0;
@@ -588,6 +645,16 @@
         <button type="button" class="lang-btn" data-lang="ru" data-i18n="common.languageRu">RU</button>
         <button type="button" class="lang-btn" data-lang="en" data-i18n="common.languageEn">EN</button>
         <button type="button" class="lang-btn" data-lang="zh" data-i18n="common.languageZh">中文</button>
+      </div>
+    </div>
+
+    <div id="impersonationBanner" class="impersonation-banner">
+      <div>
+        <div class="impersonation-banner__title">Режим поддержки владельца</div>
+        <div class="impersonation-banner__text">Вы вошли в кабинет клиента: <span id="impersonationTenantName">—</span></div>
+      </div>
+      <div class="impersonation-banner__actions">
+        <button type="button" class="impersonation-btn" id="impersonationBackBtn">Вернуться в кабинет владельца</button>
       </div>
     </div>
 
@@ -1140,8 +1207,17 @@
 
     function normalizeUserPayload(payload) {
       if (!payload || typeof payload !== "object") return null;
-      if (payload.user && typeof payload.user === "object") return payload.user;
-      return payload;
+      const user = payload.user && typeof payload.user === "object" ? payload.user : payload;
+      if (!user || typeof user !== "object") return null;
+      return {
+        ...user,
+        tenant_id: user.tenant_id ?? null,
+        tenant_name: user.tenant_name || null,
+        company_name: user.company_name || user.tenant_name || null,
+        impersonation: user.impersonation === true,
+        impersonated_tenant_id: user.impersonated_tenant_id ?? null,
+        impersonated_tenant_name: user.impersonated_tenant_name || null,
+      };
     }
 
     function bindLanguageButtons() {
@@ -1152,7 +1228,7 @@
           if (savedUserRaw) {
             try {
               const savedUser = normalizeUserPayload(JSON.parse(savedUserRaw));
-              if (savedUser?.role !== "owner" && savedUser) {
+              if ((savedUser?.role !== "owner" || savedUser?.impersonation) && savedUser) {
                 renderUserBox(savedUser);
               }
             } catch (_) {}
@@ -1165,7 +1241,7 @@
         if (savedUserRaw) {
           try {
             const savedUser = normalizeUserPayload(JSON.parse(savedUserRaw));
-            if (savedUser?.role !== "owner" && savedUser) {
+            if ((savedUser?.role !== "owner" || savedUser?.impersonation) && savedUser) {
               renderUserBox(savedUser);
             }
           } catch (_) {}
@@ -1292,16 +1368,52 @@ if (card.id === "subscriptionCard") {
           ? i18n.t("common.ownerMode")
           : (user?.tenant_id ?? "-");
 
-      const companyText = user?.company_name
-        ? `<div style="margin-top:6px;"><b>${Ui.escapeHtml(i18n.t("common.companyLabel"))}:</b> ${Ui.escapeHtml(user.company_name)}</div>`
+      const companyName = user?.company_name || user?.tenant_name || user?.impersonated_tenant_name || "";
+      const companyText = companyName
+        ? `<div style="margin-top:6px;"><b>${Ui.escapeHtml(i18n.t("common.companyLabel"))}:</b> ${Ui.escapeHtml(companyName)}</div>`
+        : "";
+
+      const impersonationText = user?.impersonation
+        ? `<div style="margin-top:6px;"><b>Режим:</b> поддержка владельца</div>`
         : "";
 
       userBox.innerHTML = `
         <div><b>${Ui.escapeHtml(i18n.t("common.userLabel"))}:</b> ${Ui.escapeHtml(user?.username || "-")}</div>
         <div style="margin-top:6px;"><b>${Ui.escapeHtml(i18n.t("common.roleLabel"))}:</b> ${Ui.escapeHtml(user?.role || "-")}</div>
         ${companyText}
+        ${impersonationText}
         <div style="margin-top:6px;"><b>${Ui.escapeHtml(i18n.t("common.tenantLabel"))}:</b> ${Ui.escapeHtml(tenantText)}</div>
       `;
+    }
+
+
+    function showImpersonationBanner(user) {
+      const banner = document.getElementById("impersonationBanner");
+      const tenantNameEl = document.getElementById("impersonationTenantName");
+      const backBtn = document.getElementById("impersonationBackBtn");
+
+      if (!banner || !tenantNameEl || !backBtn) return;
+
+      if (user?.impersonation) {
+        tenantNameEl.textContent = user.impersonated_tenant_name || user.company_name || user.tenant_name || (`#${user.tenant_id || "-"}`);
+        banner.classList.add("open");
+      } else {
+        banner.classList.remove("open");
+      }
+    }
+
+    function exitImpersonation() {
+      if (window.API && typeof window.API.restoreOwnerToken === "function") {
+        window.API.restoreOwnerToken();
+      } else {
+        const backupToken = localStorage.getItem("owner_token_backup");
+        if (backupToken) {
+          localStorage.setItem("token", backupToken);
+          localStorage.removeItem("owner_token_backup");
+        }
+      }
+      localStorage.removeItem("user");
+      window.location.href = "/owner-dashboard.html";
     }
 
     async function loadMe() {
@@ -1310,11 +1422,12 @@ if (card.id === "subscriptionCard") {
         if (savedUserRaw) {
           try {
             const savedUser = normalizeUserPayload(JSON.parse(savedUserRaw));
-            if (savedUser?.role === "owner") {
+            if (savedUser?.role === "owner" && !savedUser?.impersonation) {
               renderOwnerRedirect(savedUser);
               return;
             }
             if (savedUser) {
+              showImpersonationBanner(savedUser);
               renderUserBox(savedUser);
               applyModuleAccess(savedUser);
             }
@@ -1335,11 +1448,12 @@ if (card.id === "subscriptionCard") {
         const user = normalizeUserPayload(data);
         localStorage.setItem("user", JSON.stringify(user));
 
-        if (user?.role === "owner") {
+        if (user?.role === "owner" && !user?.impersonation) {
           renderOwnerRedirect(user);
           return;
         }
 
+        showImpersonationBanner(user);
         renderUserBox(user);
         applyModuleAccess(user);
       } catch (e) {
@@ -1474,8 +1588,18 @@ if (card.id === "subscriptionCard") {
     document.getElementById("logoutCard").addEventListener("click", () => {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      if (window.API && typeof window.API.clearOwnerTokenBackup === "function") {
+        window.API.clearOwnerTokenBackup();
+      } else {
+        localStorage.removeItem("owner_token_backup");
+      }
       window.location.href = "/login.html";
     });
+
+    const impersonationBackBtn = document.getElementById("impersonationBackBtn");
+    if (impersonationBackBtn) {
+      impersonationBackBtn.addEventListener("click", exitImpersonation);
+    }
 
     bindLanguageButtons();
     i18n.applyTranslations();
