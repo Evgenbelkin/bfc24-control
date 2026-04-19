@@ -357,6 +357,250 @@
     .b-muted{ background: rgba(255,255,255,.06); border-color: var(--line-2);          color: var(--muted); }
     .b-vio  { background: rgba(123,104,255,.14); border-color: rgba(123,104,255,.28); color: #d8d0ff; }
 
+
+/* ══════════════════════════════════════════════════════════
+   TENANT CARDS
+   ══════════════════════════════════════════════════════════ */
+.tenants-meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.tenants-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+.tenant-card {
+  position: relative;
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(circle at top right, rgba(90,168,255,0.10) 0%, transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.03) 100%);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+}
+
+.tenant-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 4px 0 0 4px;
+  background: rgba(90,168,255,0.7);
+}
+
+.tenant-card.is-warning::before { background: rgba(245,185,66,0.9); }
+.tenant-card.is-expired::before,
+.tenant-card.is-blocked::before { background: rgba(255,95,115,0.95); }
+.tenant-card.has-request::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(90,168,255,0.35);
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.tenant-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tenant-card-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.tenant-card-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--text);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.tenant-card-name:hover {
+  color: #bfe0ff;
+  text-decoration: underline;
+}
+
+.tenant-card-sub {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.tenant-card-sub .mono { color: #b8c9e9; }
+
+.tenant-card-top-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.tenant-card-badges,
+.tenant-card-actions,
+.tenant-card-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tenant-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tenant-stat {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 11px 12px;
+  background: rgba(255,255,255,0.03);
+  min-width: 0;
+}
+
+.tenant-stat-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 6px;
+}
+
+.tenant-stat-main {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.tenant-stat-sub {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.tenant-progress {
+  margin-top: 8px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+
+.tenant-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(25,195,125,0.9) 0%, rgba(90,168,255,0.95) 100%);
+}
+
+.tenant-details {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  overflow: hidden;
+}
+
+.tenant-details summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #d7e3f8;
+  user-select: none;
+}
+
+.tenant-details summary::-webkit-details-marker { display: none; }
+
+.tenant-details summary:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.tenant-details-arrow {
+  color: var(--muted);
+  transition: transform .16s ease;
+}
+
+.tenant-details[open] .tenant-details-arrow {
+  transform: rotate(180deg);
+}
+
+.tenant-details-body {
+  padding: 0 12px 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.tenant-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tenant-mini {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 9px 10px;
+  background: rgba(255,255,255,0.02);
+}
+
+.tenant-mini-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+.tenant-mini-value {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.tenant-empty-card {
+  grid-column: 1 / -1;
+}
+
     /* ══════════════════════════════════════════════════════════
        HELPERS
        ══════════════════════════════════════════════════════════ */
@@ -541,10 +785,13 @@
       .grid-kpi    { grid-template-columns: repeat(4, 1fr); }
       .forms-grid  { grid-template-columns: 1fr; }
       .modules-box { grid-template-columns: repeat(3, 1fr); }
+      .tenants-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 1024px) {
       .grid-kpi    { grid-template-columns: repeat(3, 1fr); }
       .activity-grid { grid-template-columns: repeat(2, 1fr); }
+      .tenant-card-grid,
+      .tenant-mini-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 720px) {
       .page        { padding: 12px; }
@@ -556,6 +803,9 @@
     }
     @media (max-width: 480px) {
       .grid-kpi, .activity-grid, .modules-box { grid-template-columns: 1fr; }
+      .tenants-cards-grid,
+      .tenant-card-grid,
+      .tenant-mini-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -661,7 +911,7 @@
     <div class="panel-header">
       <div>
         <h2 class="panel-title">Клиенты SaaS</h2>
-        <div class="panel-subtitle">Полный список с подписками, лимитами и быстрыми действиями</div>
+        <div class="panel-subtitle">Компактные карточки клиентов с быстрым входом, статусами и ключевыми действиями</div>
       </div>
       <input class="input search-input" id="tenantSearch" placeholder="Поиск: имя, slug, email, телефон..." />
     </div>
@@ -678,23 +928,13 @@
         <span class="fc" data-f="days5">⚠ ≤ 5 дней</span>
         <span class="fc" data-f="days3">🔴 ≤ 3 дней</span>
       </div>
-      <div class="table-wrap">
-        <table style="min-width:1380px;">
-          <thead>
-            <tr>
-              <th style="width:180px;">ID / Клиент</th>
-              <th style="width:190px;">Статусы</th>
-              <th style="width:160px;">Контакты</th>
-              <th style="width:230px;">Подписка / лимиты</th>
-              <th style="width:160px;">Активность</th>
-              <th style="width:140px;">Польз. / Модули</th>
-              <th>Действия</th>
-            </tr>
-          </thead>
-          <tbody id="tenantsTableBody">
-            <tr><td colspan="7" class="muted">Загрузка...</td></tr>
-          </tbody>
-        </table>
+
+      <div class="tenants-meta-line" id="tenantsMetaLine">
+        <span class="chip">Загрузка...</span>
+      </div>
+
+      <div class="tenants-cards-grid" id="tenantsCardsGrid">
+        <div class="empty">Загрузка...</div>
       </div>
     </div>
   </section>
@@ -1080,7 +1320,8 @@ const el = {
   attentionBadge:                document.getElementById("attentionBadge"),
   attentionBody:                 document.getElementById("attentionBody"),
   activityTableBody:             document.getElementById("activityTableBody"),
-  tenantsTableBody:              document.getElementById("tenantsTableBody"),
+  tenantsCardsGrid:              document.getElementById("tenantsCardsGrid"),
+  tenantsMetaLine:               document.getElementById("tenantsMetaLine"),
   usersTableBody:                document.getElementById("usersTableBody"),
   subscriptionRequestsSummary:   document.getElementById("subscriptionRequestsSummary"),
   subscriptionRequestsTableBody: document.getElementById("subscriptionRequestsTableBody"),
@@ -1638,14 +1879,14 @@ function renderTenantsTable() {
   const reqIds  = openRequestTenantIds();
 
   const rows = tenants.filter(t => {
-    const sub = String(t.subscription_status||"").toLowerCase();
+    const sub = String(t.subscription_status || "").toLowerCase();
     if (filter === "active"   && sub !== "active")  return false;
     if (filter === "trial"    && sub !== "trial")   return false;
     if (filter === "expired"  && sub !== "expired") return false;
     if (filter === "blocked"  && !t.is_blocked && sub !== "blocked") return false;
     if (filter === "requests" && !reqIds.has(String(t.id))) return false;
     if (filter === "days7" || filter === "days5" || filter === "days3") {
-      const sub2 = String(t.subscription_status||"").toLowerCase();
+      const sub2 = String(t.subscription_status || "").toLowerCase();
       if (sub2 === "expired") return false;
       const days2 = daysLeft(t.subscription_end_at);
       if (days2 === null) return false;
@@ -1653,114 +1894,193 @@ function renderTenantsTable() {
       if (days2 > limit) return false;
     }
     if (!q) return true;
-    return [t.id, t.name, t.slug, t.contact_name, t.contact_phone, t.contact_email,
-            t.phone, t.email, t.code, t.tariff_name, t.subscription_status]
-      .map(v => String(v||"").toLowerCase()).join(" ").includes(q);
+    return [
+      t.id, t.name, t.slug, t.contact_name, t.contact_phone, t.contact_email,
+      t.phone, t.email, t.code, t.tariff_name, t.subscription_status
+    ]
+      .map(v => String(v || "").toLowerCase())
+      .join(" ")
+      .includes(q);
   });
 
+  const total = tenants.length;
+  const visible = rows.length;
+  const reqCount = rows.filter(t => reqIds.has(String(t.id))).length;
+  el.tenantsMetaLine.innerHTML = [
+    `<span class="chip">Показано: ${safe(visible)} / ${safe(total)}</span>`,
+    `<span class="chip">С заявками: ${safe(reqCount)}</span>`,
+    filter !== "all" ? `<span class="chip">Фильтр: ${safe(filter)}</span>` : "",
+    q ? `<span class="chip">Поиск: ${safe(state.tenantSearch)}</span>` : ""
+  ].filter(Boolean).join("");
+
   if (!rows.length) {
-    el.tenantsTableBody.innerHTML = `<tr><td colspan="7"><div class="empty">Клиенты не найдены</div></td></tr>`;
+    el.tenantsCardsGrid.innerHTML = `<div class="empty tenant-empty-card">Клиенты не найдены</div>`;
     return;
   }
 
-  const usersCount = state.users.reduce((m,u) => {
-    const k = String(u.tenant_id||"");
-    m.set(k, (m.get(k)||0) + 1);
+  const usersCount = state.users.reduce((m, u) => {
+    const k = String(u.tenant_id || "");
+    m.set(k, (m.get(k) || 0) + 1);
     return m;
   }, new Map());
 
-  el.tenantsTableBody.innerHTML = rows.map(t => {
-    const a    = t.activity || {};
+  el.tenantsCardsGrid.innerHTML = rows.map(t => {
+    const a = t.activity || {};
     const mods = parseMods(t.enabled_modules);
     const days = daysLeft(t.subscription_end_at);
-    const uc   = usersCount.get(String(t.id)) || 0;
+    const uc = usersCount.get(String(t.id)) || 0;
     const hasReq = reqIds.has(String(t.id));
-    const sub  = String(t.subscription_status||"").toLowerCase();
+    const sub = String(t.subscription_status || "").toLowerCase();
 
-    const daysLine = days === null ? "" :
-      days < 0  ? `<div class="small" style="color:var(--danger);">Истекла ${Math.abs(days)} дн. назад</div>` :
-      days <= 3 ? `<div class="small" style="color:var(--danger);font-weight:800;">⚠ Осталось: ${days} дн.</div>` :
-      days <= 5 ? `<div class="small" style="color:#ff8c00;font-weight:700;">Осталось: ${days} дн.</div>` :
-      days <= 7 ? `<div class="small" style="color:var(--warning);">Осталось: ${days} дн.</div>` :
-                  `<div class="small muted">Осталось: ${days} дн.</div>`;
+    const cardClasses = [
+      "tenant-card",
+      (t.is_blocked || sub === "blocked") ? "is-blocked" : "",
+      (sub === "expired" || (days !== null && days < 0)) ? "is-expired" : "",
+      (days !== null && days >= 0 && days <= 7) ? "is-warning" : "",
+      hasReq ? "has-request" : ""
+    ].filter(Boolean).join(" ");
 
-    const contact = [
-      t.contact_name  ? `<div>${safe(t.contact_name)}</div>` : "",
-      t.contact_phone ? `<div class="muted small">${safe(t.contact_phone)}</div>` : "",
-      t.contact_email ? `<div class="muted small">${safe(t.contact_email)}</div>` : ""
-    ].filter(Boolean).join("") || `<span class="muted">—</span>`;
+    const daysLine = days === null ? `<span class="muted">Без даты окончания</span>` :
+      days < 0  ? `<span style="color:var(--danger);font-weight:800;">Истекла ${Math.abs(days)} дн. назад</span>` :
+      days <= 3 ? `<span style="color:var(--danger);font-weight:800;">До конца ${days} дн.</span>` :
+      days <= 5 ? `<span style="color:#ff8c00;font-weight:800;">До конца ${days} дн.</span>` :
+      days <= 7 ? `<span style="color:var(--warning);font-weight:800;">До конца ${days} дн.</span>` :
+                  `<span class="muted">Осталось ${days} дн.</span>`;
 
-    const modsHtml = renderCompactModules(mods);
-    const rowClass = getTenantRowClass(t, hasReq);
+    const progressPct = Math.max(0, Math.min(100, (Number(t.max_users || 0) > 0 ? (uc / Number(t.max_users || 0)) * 100 : 0)));
+    const topModules = mods.slice(0, 4)
+      .map(m => `<span class="badge b-muted" style="padding:2px 7px;font-size:10px;">${safe(m)}</span>`)
+      .join("");
+    const topModulesRest = mods.length > 4
+      ? `<span class="badge module-chip-more" style="padding:2px 7px;font-size:10px;">+${mods.length - 4}</span>`
+      : "";
+
+    const contactsHtml = [
+      t.contact_name ? `<div>${safe(t.contact_name)}</div>` : "",
+      t.contact_phone ? `<div>${safe(t.contact_phone)}</div>` : "",
+      t.contact_email ? `<div>${safe(t.contact_email)}</div>` : "",
+      t.phone ? `<div>${safe(t.phone)}</div>` : "",
+      t.email ? `<div>${safe(t.email)}</div>` : ""
+    ].filter(Boolean).join("") || `<span class="muted">Не заполнены</span>`;
 
     return `
-      <tr class="${rowClass}">
-        <td>
-          <div class="stack">
-            <button class="tenant-name-btn" type="button" onclick="editTenant('${safe(t.id)}')">#${safe(t.id)} — ${safe(t.name)}</button>
-            <div class="muted small mono">slug: ${safe(t.slug||"—")}</div>
-            ${t.code ? `<div class="muted small mono">code: ${safe(t.code)}</div>` : ""}
-            ${hasReq ? `<span class="badge b-info" style="margin-top:3px;font-size:10px;">📋 есть заявка</span>` : ""}
-          </div>
-        </td>
-        <td>
-          <div class="inline-badges">
-            ${subBadge(t.subscription_status)}
-            ${t.is_active === false ? `<span class="badge b-muted">⏸ выключен</span>` : ""}
-            ${t.is_blocked ? `<span class="badge b-red">⛔ блок</span>` : ""}
-            ${sub === "expired" || (days !== null && days < 0) ? `<span class="badge b-red">🔴 Истекла</span>` :
-              days !== null && days <= 3 ? `<span class="badge b-red">🔴 До конца ${days} дн.</span>` :
-              days !== null && days <= 5 ? `<span class="badge b-orange">🟠 До конца ${days} дн.</span>` :
-              days !== null && days <= 7 ? `<span class="badge b-warn">⚠ До конца ${days} дн.</span>` : ""}
-          </div>
-        </td>
-        <td>${contact}</td>
-        <td>
-          <div class="stack small">
-            <div><span class="muted">Тариф:</span> ${safe(t.tariff_name||"—")}</div>
-            <div><span class="muted">Начало:</span> ${d(t.subscription_start_at)}</div>
-            <div><span class="muted">Конец:</span>  ${d(t.subscription_end_at)}</div>
-            ${daysLine}
-            <div class="muted">SKU: ${safe(t.max_sku??"—")} · МХ: ${safe(t.max_locations??"—")} · Польз.: ${safe(t.max_users??"—")}</div>
-          </div>
-        </td>
-        <td>
-          <div class="stack">
-            ${actBadge(a.activity_status||"inactive")}
-            <div class="muted small">Вход: ${safe(dt(a.last_login_at))}</div>
-            <div class="tenant-main-stat">7/30: ${safe(a.activity_7d??0)}/${safe(a.activity_30d??0)}</div>
-          </div>
-        </td>
-        <td>
-          <div class="stack">
-            <div class="tenant-main-stat">👤 ${safe(uc)} / ${safe(t.max_users ?? 0)}</div>
-            <div class="muted small">пользователей / лимит</div>
-            <div class="row-act" style="margin-top:4px;">
-              <button class="row-btn row-btn-success" onclick="increaseUsersLimit('${safe(t.id)}', 1)">+1 польз.</button>
-              <button class="row-btn row-btn-warning" onclick="increaseUsersLimit('${safe(t.id)}', 2)">+2 польз.</button>
+      <article class="${cardClasses}">
+        <div class="tenant-card-head">
+          <div class="tenant-card-title">
+            <button class="tenant-card-name" type="button" onclick="editTenant('${safe(t.id)}')">
+              <span>#${safe(t.id)}</span>
+              <span>${safe(t.name)}</span>
+            </button>
+            <div class="tenant-card-sub">
+              <div class="mono">slug: ${safe(t.slug || "—")}</div>
+              ${t.code ? `<div class="mono">code: ${safe(t.code)}</div>` : ""}
             </div>
-            <div class="tenant-main-stat">📦 ${safe(t.max_sku ?? 0)} SKU</div>
-            <div class="row-act" style="margin-top:4px;">
-              <button class="row-btn row-btn-accent" onclick="increaseSkuLimit('${safe(t.id)}', 500)">+500 SKU</button>
-            </div>
-            <div class="tenant-main-stat">🗂 ${safe(t.max_locations ?? 0)} МХ</div>
-            <div class="row-act" style="margin-top:4px;">
-              <button class="row-btn row-btn-accent" onclick="increaseLocationsLimit('${safe(t.id)}', 1)">+1 МХ</button>
-            </div>
-            <div class="inline-badges" style="margin-top:4px;">${modsHtml}</div>
           </div>
-        </td>
-        <td>
-          <div class="row-act">
-            <button class="row-btn row-btn-success" onclick="quickRenewTenant('${safe(t.id)}')">💳 +30д</button>
-            <button class="row-btn row-btn-warning" onclick="toggleTenantActive('${safe(t.id)}')">${t.is_active===false ? "✅ Вкл" : "⏸ Выкл"}</button>
-            <button class="row-btn ${t.is_blocked ? "row-btn-success" : "row-btn-danger"}" onclick="toggleTenantBlock('${safe(t.id)}')">${t.is_blocked ? "🔓 Разблок." : "🔒 Блок."}</button>
-            <button class="row-btn row-btn-accent" onclick="editTenant('${safe(t.id)}')">✏ Ред.</button>
+
+          <div class="tenant-card-top-actions">
             <button class="row-btn row-btn-accent" onclick="impersonateTenant('${safe(t.id)}')">↪ Войти</button>
-            <button class="row-btn" onclick="openTenantEvents('${safe(t.id)}','${safe(t.name)}')">📋 События</button>
+            <button class="row-btn row-btn-accent" onclick="editTenant('${safe(t.id)}')">✏ Ред.</button>
           </div>
-        </td>
-      </tr>`;
+        </div>
+
+        <div class="tenant-card-badges">
+          ${subBadge(t.subscription_status)}
+          ${actBadge(a.activity_status || "inactive")}
+          ${t.is_active === false ? `<span class="badge b-muted">⏸ Выкл</span>` : ""}
+          ${t.is_blocked ? `<span class="badge b-red">⛔ Блок</span>` : ""}
+          ${hasReq ? `<span class="badge b-info">📋 Есть заявка</span>` : ""}
+          ${sub === "expired" || (days !== null && days < 0) ? `<span class="badge b-red">🔴 Истекла</span>` :
+            days !== null && days <= 3 ? `<span class="badge b-red">🔴 ≤ 3 дн</span>` :
+            days !== null && days <= 5 ? `<span class="badge b-orange">🟠 ≤ 5 дн</span>` :
+            days !== null && days <= 7 ? `<span class="badge b-warn">⚠ ≤ 7 дн</span>` : ""}
+        </div>
+
+        <div class="tenant-card-grid">
+          <div class="tenant-stat">
+            <div class="tenant-stat-label">Подписка</div>
+            <div class="tenant-stat-main">${safe(t.tariff_name || "—")}</div>
+            <div class="tenant-stat-sub">
+              <div>Начало: ${d(t.subscription_start_at)}</div>
+              <div>Конец: ${d(t.subscription_end_at)}</div>
+              <div>${daysLine}</div>
+            </div>
+          </div>
+
+          <div class="tenant-stat">
+            <div class="tenant-stat-label">Активность</div>
+            <div class="tenant-stat-main">${safe(dt(a.last_login_at))}</div>
+            <div class="tenant-stat-sub">
+              <div>Статус: ${safe(a.activity_status || "inactive")}</div>
+              <div>7/30: ${safe(a.activity_7d ?? 0)} / ${safe(a.activity_30d ?? 0)}</div>
+            </div>
+          </div>
+
+          <div class="tenant-stat">
+            <div class="tenant-stat-label">Пользователи</div>
+            <div class="tenant-stat-main">${safe(uc)} / ${safe(t.max_users ?? 0)}</div>
+            <div class="tenant-progress">
+              <div class="tenant-progress-fill" style="width:${progressPct.toFixed(2)}%;"></div>
+            </div>
+            <div class="tenant-stat-sub">использовано / лимит</div>
+          </div>
+
+          <div class="tenant-stat">
+            <div class="tenant-stat-label">Лимиты</div>
+            <div class="tenant-stat-main">${safe(t.max_sku ?? 0)} SKU</div>
+            <div class="tenant-stat-sub">
+              <div>МХ: ${safe(t.max_locations ?? 0)}</div>
+              <div>Модули: ${safe(mods.length)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tenant-card-actions">
+          <button class="row-btn row-btn-success" onclick="quickRenewTenant('${safe(t.id)}')">💳 +30д</button>
+          <button class="row-btn row-btn-warning" onclick="toggleTenantActive('${safe(t.id)}')">${t.is_active === false ? "✅ Вкл" : "⏸ Выкл"}</button>
+          <button class="row-btn ${t.is_blocked ? "row-btn-success" : "row-btn-danger"}" onclick="toggleTenantBlock('${safe(t.id)}')">${t.is_blocked ? "🔓 Разблок." : "🔒 Блок."}</button>
+          <button class="row-btn" onclick="openTenantEvents('${safe(t.id)}','${safe(t.name)}')">📋 События</button>
+        </div>
+
+        <details class="tenant-details">
+          <summary>
+            <span>Подробнее: контакты, модули и быстрые лимиты</span>
+            <span class="tenant-details-arrow">⌄</span>
+          </summary>
+
+          <div class="tenant-details-body">
+            <div class="tenant-mini-grid">
+              <div class="tenant-mini">
+                <div class="tenant-mini-label">Контакты</div>
+                <div class="tenant-mini-value">${contactsHtml}</div>
+              </div>
+
+              <div class="tenant-mini">
+                <div class="tenant-mini-label">Модули</div>
+                <div class="tenant-card-inline">
+                  ${topModules || `<span class="muted small">нет модулей</span>`}
+                  ${topModulesRest}
+                </div>
+              </div>
+
+              <div class="tenant-mini">
+                <div class="tenant-mini-label">Лимит пользователей</div>
+                <div class="tenant-card-inline">
+                  <button class="row-btn row-btn-success" onclick="increaseUsersLimit('${safe(t.id)}', 1)">+1 польз.</button>
+                  <button class="row-btn row-btn-warning" onclick="increaseUsersLimit('${safe(t.id)}', 2)">+2 польз.</button>
+                </div>
+              </div>
+
+              <div class="tenant-mini">
+                <div class="tenant-mini-label">Лимит SKU и МХ</div>
+                <div class="tenant-card-inline">
+                  <button class="row-btn row-btn-accent" onclick="increaseSkuLimit('${safe(t.id)}', 500)">+500 SKU</button>
+                  <button class="row-btn row-btn-accent" onclick="increaseLocationsLimit('${safe(t.id)}', 1)">+1 МХ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </article>`;
   }).join("");
 }
 
