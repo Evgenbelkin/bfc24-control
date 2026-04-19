@@ -203,6 +203,19 @@ function getWorkbookFromBase64(fileBase64) {
   }
 }
 
+function getImportFileBase64FromRequest(req) {
+  const bodyFileBase64 = normalizeOptionalText(req?.body?.file_base64);
+  if (bodyFileBase64) {
+    return bodyFileBase64;
+  }
+
+  if (Buffer.isBuffer(req?.body) && req.body.length) {
+    return req.body.toString("base64");
+  }
+
+  return null;
+}
+
 function getExcelImageRowNumber(image) {
   const candidates = [
     image?.range?.tl?.nativeRow,
@@ -736,6 +749,7 @@ router.post(
   authRequired,
   requireActiveWriteSubscription(),
   requireRole("owner", "admin", "client_owner", "client_manager", "client"),
+  express.raw({ type: "application/octet-stream", limit: "20mb" }),
   async (req, res) => {
     try {
       const tenantId = getEffectiveTenantId(req);
@@ -743,7 +757,7 @@ router.post(
         return res.status(400).json({ ok: false, error: "tenant_not_defined" });
       }
 
-      const fileBase64 = normalizeOptionalText(req.body.file_base64);
+      const fileBase64 = getImportFileBase64FromRequest(req);
       if (!fileBase64) {
         return res.status(400).json({ ok: false, error: "file_data_required" });
       }
@@ -778,6 +792,7 @@ router.post(
   authRequired,
   requireActiveWriteSubscription(),
   requireRole("owner", "admin", "client_owner", "client_manager", "client"),
+  express.raw({ type: "application/octet-stream", limit: "20mb" }),
   async (req, res) => {
     const client = await pool.connect();
     let createdImageUrls = [];
@@ -788,7 +803,7 @@ router.post(
         return res.status(400).json({ ok: false, error: "tenant_not_defined" });
       }
 
-      const fileBase64 = normalizeOptionalText(req.body.file_base64);
+      const fileBase64 = getImportFileBase64FromRequest(req);
       if (!fileBase64) {
         return res.status(400).json({ ok: false, error: "file_data_required" });
       }

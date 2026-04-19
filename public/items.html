@@ -1683,6 +1683,42 @@
       });
     }
 
+    async function postImportFile(path, file) {
+      if (!file) {
+        throw new Error(i18n.t("items.importSelectFileFirst"));
+      }
+
+      const tenantId = getTenantId();
+      const arrayBuffer = await file.arrayBuffer();
+      const query = authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== ''
+        ? ''
+        : `?tenant_id=${encodeURIComponent(tenantId)}`;
+
+      const response = await fetch((window.AppConfig ? AppConfig.API_BASE : "") + path + query, {
+        method: "POST",
+        headers: {
+          ...(token ? { Authorization: "Bearer " + token } : {}),
+          "Content-Type": "application/octet-stream",
+          "X-Filename": encodeURIComponent(file.name || "import.xlsx")
+        },
+        body: arrayBuffer
+      });
+
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+
+      return data;
+    }
+
     function resetImportPreviewUi() {
       importPreviewData = null;
       hideStatus(els.importStatus);
@@ -1754,12 +1790,24 @@
         }
 
         showStatus(els.importStatus, i18n.t("items.importBuildingPreview"), "info");
-        const fileBase64 = await readFileAsBase64(importFileObject);
 
-        const data = await apiPost("/items/import/preview", {
-          tenant_id: getTenantId(),
-          file_base64: fileBase64
-        });
+        let data;
+        try {
+          data = await postImportFile("/items/import/preview", importFileObject);
+        } catch (rawErr) {
+          const fallbackErrors = ["HTTP 413", "Payload Too Large", "Content Too Large", "file_data_required", "invalid_json_response"];
+          const shouldFallback = fallbackErrors.some((part) => String(rawErr.message || "").includes(part));
+
+          if (!shouldFallback) {
+            throw rawErr;
+          }
+
+          const fileBase64 = await readFileAsBase64(importFileObject);
+          data = await apiPost("/items/import/preview", {
+            tenant_id: getTenantId(),
+            file_base64: fileBase64
+          });
+        }
 
         renderImportPreview(data);
         showStatus(
@@ -1793,12 +1841,24 @@
         }
 
         showStatus(els.importStatus, i18n.t("items.importRunning"), "info");
-        const fileBase64 = await readFileAsBase64(importFileObject);
 
-        const result = await apiPost("/items/import", {
-          tenant_id: getTenantId(),
-          file_base64: fileBase64
-        });
+        let result;
+        try {
+          result = await postImportFile("/items/import", importFileObject);
+        } catch (rawErr) {
+          const fallbackErrors = ["HTTP 413", "Payload Too Large", "Content Too Large", "file_data_required", "invalid_json_response"];
+          const shouldFallback = fallbackErrors.some((part) => String(rawErr.message || "").includes(part));
+
+          if (!shouldFallback) {
+            throw rawErr;
+          }
+
+          const fileBase64 = await readFileAsBase64(importFileObject);
+          result = await apiPost("/items/import", {
+            tenant_id: getTenantId(),
+            file_base64: fileBase64
+          });
+        }
 
         showStatus(
           els.importStatus,
