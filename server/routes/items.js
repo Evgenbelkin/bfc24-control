@@ -18,6 +18,7 @@ const {
 const router = express.Router();
 const UPLOADS_DIR = path.join(__dirname, "..", "..", "uploads");
 const ITEMS_UPLOADS_DIR = path.join(UPLOADS_DIR, "items");
+const IMPORT_CACHE_DIR = path.join(UPLOADS_DIR, "items-import-cache");
 
 if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
@@ -25,6 +26,10 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 
 if (!fs.existsSync(ITEMS_UPLOADS_DIR)) {
   fs.mkdirSync(ITEMS_UPLOADS_DIR, { recursive: true });
+}
+
+if (!fs.existsSync(IMPORT_CACHE_DIR)) {
+  fs.mkdirSync(IMPORT_CACHE_DIR, { recursive: true });
 }
 
 const ALLOWED_IMAGE_MIME_TYPES = {
@@ -38,6 +43,7 @@ const ALLOWED_IMAGE_MIME_TYPES = {
 const IMPORT_REQUIRED_COLUMNS = ["MARK"];
 const IMPORT_PREVIEW_LIMIT = 500;
 const IMPORT_ROWS_LIMIT = 1500;
+const IMPORT_CACHE_TTL_MS = 1000 * 60 * 60;
 
 function normalizeOptionalText(value) {
   if (value === null || value === undefined) return null;
@@ -108,8 +114,14 @@ function normalizeImageUrl(value) {
 async function deleteUploadedFileByUrl(imageUrl) {
   if (!imageUrl || !String(imageUrl).startsWith("/uploads/")) return;
 
-  const filename = path.basename(imageUrl);
-  const fullPath = path.join(UPLOADS_DIR, filename);
+  const relativePath = String(imageUrl).replace(/^\/uploads\//, "");
+  const normalizedRelativePath = path.normalize(relativePath);
+
+  if (!normalizedRelativePath || normalizedRelativePath.startsWith("..") || path.isAbsolute(normalizedRelativePath)) {
+    return;
+  }
+
+  const fullPath = path.join(UPLOADS_DIR, normalizedRelativePath);
 
   try {
     await fs.promises.unlink(fullPath);
@@ -119,6 +131,7 @@ async function deleteUploadedFileByUrl(imageUrl) {
     }
   }
 }
+
 
 async function saveBase64ImageToUploads({ originalName, mimeType, base64Data }) {
   const extension = getImageExtensionByMimeType(mimeType);
@@ -193,14 +206,17 @@ function getWorkbookBufferFromBase64(fileBase64) {
   return buffer;
 }
 
-function getWorkbookFromBase64(fileBase64) {
-  const buffer = getWorkbookBufferFromBase64(fileBase64);
-
+function getWorkbookFromBuffer(buffer) {
   try {
     return XLSX.read(buffer, { type: "buffer" });
   } catch (err) {
     throw new Error("invalid_excel_file");
   }
+}
+
+function getWorkbookFromBase64(fileBase64) {
+  const buffer = getWorkbookBufferFromBase64(fileBase64);
+  return getWorkbookFromBuffer(buffer);
 }
 
 function getExcelImageRowNumber(image) {
@@ -230,8 +246,7 @@ function getExcelImageMedia(workbook, imageId) {
   );
 }
 
-async function extractImportImagesByRow(fileBase64) {
-  const buffer = getWorkbookBufferFromBase64(fileBase64);
+async function extractImportImagesByRowFromBuffer(buffer) {
   const workbook = new ExcelJS.Workbook();
 
   try {
@@ -280,6 +295,112 @@ async function extractImportImagesByRow(fileBase64) {
   }
 
   return imageMap;
+}
+
+function getImportCachePath(uploadId) {
+  return path.join(IMPORT_CACHE_DIR, `${uploadId}.json`);
+}
+
+async function cleanupExpiredImportCaches() {
+  try {
+    const entries = await fs.promises.readdir(IMPORT_CACHE_DIR, { withFileTypes: true });
+    const now = Date.now();
+
+    await Promise.all(
+      entries
+        .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+        .map(async (entry) => {
+          const fullPath = path.join(IMPORT_CACHE_DIR, entry.name);
+          try {
+            const stat = await fs.promises.stat(fullPath);
+            if (now - stat.mtimeMs > IMPORT_CACHE_TTL_MS) {
+              await fs.promises.unlink(fullPath);
+            }
+          } catch (err) {
+            if (err && err.code !== "ENOENT") {
+              console.error("[items/import] failed to cleanup cache file:", err);
+            }
+          }
+        })
+    );
+  } catch (err) {
+    console.error("[items/import] failed to scan cache dir:", err);
+  }
+}
+
+async function saveImportCache(payload) {
+  const uploadId = `${Date.now()}-${crypto.randomBytes(10).toString("hex")}`;
+  const fullPath = getImportCachePath(uploadId);
+
+  await fs.promises.writeFile(fullPath, JSON.stringify(payload), "utf8");
+
+  return uploadId;
+}
+
+async function readImportCache(uploadId) {
+  const normalizedUploadId = normalizeOptionalText(uploadId);
+  if (!normalizedUploadId) {
+    throw new Error("import_upload_id_required");
+  }
+
+  const fullPath = getImportCachePath(normalizedUploadId);
+
+  let raw;
+  try {
+    raw = await fs.promises.readFile(fullPath, "utf8");
+  } catch (err) {
+    if (err && err.code === "ENOENT") {
+      throw new Error("import_preview_not_found");
+    }
+    throw err;
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    throw new Error("import_preview_corrupted");
+  }
+
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("import_preview_corrupted");
+  }
+
+  const createdAt = Number(parsed.created_at || 0);
+  if (!Number.isFinite(createdAt) || createdAt <= 0) {
+    throw new Error("import_preview_corrupted");
+  }
+
+  if (Date.now() - createdAt > IMPORT_CACHE_TTL_MS) {
+    try {
+      await fs.promises.unlink(fullPath);
+    } catch (err) {
+      if (err && err.code !== "ENOENT") {
+        console.error("[items/import] failed to delete expired cache:", err);
+      }
+    }
+    throw new Error("import_preview_expired");
+  }
+
+  return {
+    uploadId: normalizedUploadId,
+    fullPath,
+    payload: parsed,
+  };
+}
+
+async function deleteImportCache(uploadId) {
+  const normalizedUploadId = normalizeOptionalText(uploadId);
+  if (!normalizedUploadId) return;
+
+  const fullPath = getImportCachePath(normalizedUploadId);
+  try {
+    await fs.promises.unlink(fullPath);
+  } catch (err) {
+    if (err && err.code !== "ENOENT") {
+      console.error("[items/import] failed to delete cache:", err);
+    }
+  }
 }
 
 async function saveImportedItemImageBySku({ sku, buffer, extension }) {
@@ -390,41 +511,37 @@ function mapImportRow(record) {
   };
 }
 
-async function loadExistingSkusMap(tenantId) {
+async function loadExistingImportKeysMap(tenantId) {
   const { rows } = await pool.query(
     `
-      SELECT id, sku
+      SELECT id, sku, barcode
       FROM core.items
       WHERE tenant_id = $1
-        AND sku IS NOT NULL
-        AND TRIM(sku) <> ''
     `,
     [tenantId]
   );
 
-  const map = new Map();
+  const skuMap = new Map();
+  const barcodeMap = new Map();
+
   for (const row of rows) {
     const sku = String(row.sku || "").trim().toLowerCase();
-    if (!sku) continue;
-    map.set(sku, Number(row.id));
+    const barcode = String(row.barcode || "").trim();
+
+    if (sku) {
+      skuMap.set(sku, Number(row.id));
+    }
+
+    if (barcode) {
+      barcodeMap.set(barcode, Number(row.id));
+    }
   }
-  return map;
+
+  return { skuMap, barcodeMap };
 }
 
-async function buildImportPreview({ tenantId, fileBase64 }) {
-  const workbook = getWorkbookFromBase64(fileBase64);
-  const parsed = parseImportRowsFromWorkbook(workbook);
-
-  if (parsed.rows.length > IMPORT_ROWS_LIMIT) {
-    const err = new Error("import_rows_limit_exceeded");
-    err.rowsLimit = IMPORT_ROWS_LIMIT;
-    err.totalRows = parsed.rows.length;
-    throw err;
-  }
-
-  const existingSkusMap = await loadExistingSkusMap(tenantId);
+function buildImportPreviewFromRows({ parsedRows, sheetName, headers, existingSkuMap }) {
   const fileSeenSkus = new Set();
-
   const previewRows = [];
   let newCount = 0;
   let skippedCount = 0;
@@ -432,7 +549,7 @@ async function buildImportPreview({ tenantId, fileBase64 }) {
   let duplicateFileCount = 0;
   let noSkuCount = 0;
 
-  for (const row of parsed.rows) {
+  for (const row of parsedRows) {
     const mapped = mapImportRow(row.raw);
     let status = "new";
     let reason = null;
@@ -449,7 +566,7 @@ async function buildImportPreview({ tenantId, fileBase64 }) {
       reason = "duplicate_sku_in_file";
       duplicateFileCount += 1;
       skippedCount += 1;
-    } else if (existingSkusMap.has(normalizedSku)) {
+    } else if (existingSkuMap.has(normalizedSku)) {
       status = "skip";
       reason = "duplicate_sku_in_system";
       duplicateSystemCount += 1;
@@ -471,15 +588,20 @@ async function buildImportPreview({ tenantId, fileBase64 }) {
       unit: mapped.unit,
       box_qty: mapped.box_qty,
       sale_price: mapped.sale_price,
+      weight_kg: mapped.weight_kg,
+      length_cm: mapped.length_cm,
+      width_cm: mapped.width_cm,
+      height_cm: mapped.height_cm,
+      description: mapped.description,
       status,
       reason,
     });
   }
 
   return {
-    sheet_name: parsed.sheet_name,
-    headers: parsed.headers,
-    total_rows: parsed.rows.length,
+    sheet_name: sheetName,
+    headers,
+    total_rows: parsedRows.length,
     new_count: newCount,
     skipped_count: skippedCount,
     duplicate_sku_in_system_count: duplicateSystemCount,
@@ -487,6 +609,65 @@ async function buildImportPreview({ tenantId, fileBase64 }) {
     no_sku_count: noSkuCount,
     preview_rows: previewRows.slice(0, IMPORT_PREVIEW_LIMIT),
     rows: previewRows,
+  };
+}
+
+async function parseImportWorkbookPayload(fileBase64) {
+  const buffer = getWorkbookBufferFromBase64(fileBase64);
+  const workbook = getWorkbookFromBuffer(buffer);
+  const parsed = parseImportRowsFromWorkbook(workbook);
+
+  if (parsed.rows.length > IMPORT_ROWS_LIMIT) {
+    const err = new Error("import_rows_limit_exceeded");
+    err.rowsLimit = IMPORT_ROWS_LIMIT;
+    err.totalRows = parsed.rows.length;
+    throw err;
+  }
+
+  const importImagesByRow = await extractImportImagesByRowFromBuffer(buffer);
+  const serializedImages = [];
+
+  for (const [rowNumber, image] of importImagesByRow.entries()) {
+    if (!image || !image.buffer || !image.buffer.length) continue;
+    serializedImages.push({
+      row_number: rowNumber,
+      extension: image.extension || "png",
+      base64: Buffer.from(image.buffer).toString("base64"),
+    });
+  }
+
+  return {
+    sheet_name: parsed.sheet_name,
+    headers: parsed.headers,
+    parsed_rows: parsed.rows,
+    images: serializedImages,
+  };
+}
+
+async function buildImportPreviewAndCache({ tenantId, fileBase64 }) {
+  await cleanupExpiredImportCaches();
+
+  const parsedPayload = await parseImportWorkbookPayload(fileBase64);
+  const existingKeys = await loadExistingImportKeysMap(tenantId);
+  const preview = buildImportPreviewFromRows({
+    parsedRows: parsedPayload.parsed_rows,
+    sheetName: parsedPayload.sheet_name,
+    headers: parsedPayload.headers,
+    existingSkuMap: existingKeys.skuMap,
+  });
+
+  const uploadId = await saveImportCache({
+    created_at: Date.now(),
+    tenant_id: Number(tenantId),
+    sheet_name: parsedPayload.sheet_name,
+    headers: parsedPayload.headers,
+    rows: preview.rows,
+    images: parsedPayload.images,
+  });
+
+  return {
+    upload_id: uploadId,
+    ...preview,
   };
 }
 
@@ -748,7 +929,7 @@ router.post(
         return res.status(400).json({ ok: false, error: "file_data_required" });
       }
 
-      const preview = await buildImportPreview({ tenantId, fileBase64 });
+      const preview = await buildImportPreviewAndCache({ tenantId, fileBase64 });
 
       return res.json({
         ok: true,
@@ -788,12 +969,30 @@ router.post(
         return res.status(400).json({ ok: false, error: "tenant_not_defined" });
       }
 
-      const fileBase64 = normalizeOptionalText(req.body.file_base64);
-      if (!fileBase64) {
-        return res.status(400).json({ ok: false, error: "file_data_required" });
+      const uploadId = normalizeOptionalText(req.body.upload_id);
+      if (!uploadId) {
+        return res.status(400).json({ ok: false, error: "import_upload_id_required" });
       }
 
-      const preview = await buildImportPreview({ tenantId, fileBase64 });
+      const cachedImport = await readImportCache(uploadId);
+      const cachedPayload = cachedImport.payload || {};
+
+      if (Number(cachedPayload.tenant_id) !== Number(tenantId)) {
+        return res.status(403).json({ ok: false, error: "import_preview_tenant_mismatch" });
+      }
+
+      const preview = {
+        sheet_name: cachedPayload.sheet_name || null,
+        headers: Array.isArray(cachedPayload.headers) ? cachedPayload.headers : [],
+        rows: Array.isArray(cachedPayload.rows) ? cachedPayload.rows : [],
+      };
+
+      preview.total_rows = preview.rows.length;
+      preview.new_count = preview.rows.filter((row) => row.status === "new").length;
+      preview.skipped_count = preview.rows.filter((row) => row.status !== "new").length;
+      preview.duplicate_sku_in_system_count = preview.rows.filter((row) => row.reason === "duplicate_sku_in_system").length;
+      preview.duplicate_sku_in_file_count = preview.rows.filter((row) => row.reason === "duplicate_sku_in_file").length;
+      preview.no_sku_count = preview.rows.filter((row) => row.reason === "no_sku").length;
 
       if (preview.total_rows > IMPORT_ROWS_LIMIT) {
         return res.status(400).json({
@@ -805,51 +1004,93 @@ router.post(
         });
       }
 
-      const importImagesByRow = await extractImportImagesByRow(fileBase64);
       const rowsToCreate = preview.rows.filter((row) => row.status === "new");
+      const imageRows = Array.isArray(cachedPayload.images) ? cachedPayload.images : [];
+      const importImagesByRow = new Map();
 
-      const projectedTotal = (await pool.query(`SELECT COUNT(*)::int AS count FROM core.items WHERE tenant_id = $1`, [tenantId])).rows[0].count + rowsToCreate.length;
+      for (const imageRow of imageRows) {
+        const rowNumber = Number(imageRow && imageRow.row_number);
+        const base64 = normalizeOptionalText(imageRow && imageRow.base64);
+        if (!Number.isInteger(rowNumber) || rowNumber <= 0 || !base64) continue;
+
+        try {
+          importImagesByRow.set(rowNumber, {
+            extension: normalizeOptionalText(imageRow.extension) || "png",
+            buffer: Buffer.from(base64, "base64"),
+          });
+        } catch (err) {
+          console.error("[items/import] failed to restore cached image:", err);
+        }
+      }
+
       const limitCheck = await checkTenantItemLimit(tenantId);
       if (!limitCheck.ok) {
         return res.status(403).json(limitCheck);
       }
-      // no stronger batch-limit method available; rely on per-item uniqueness + existing limit guard
 
+      const existingKeys = await loadExistingImportKeysMap(tenantId);
+      const existingSkuMap = existingKeys.skuMap;
+      const existingBarcodeMap = existingKeys.barcodeMap;
+      const categoryCache = new Map();
       const created = [];
-      const skipped = preview.rows.filter((row) => row.status !== "new");
+      const skipped = preview.rows.filter((row) => row.status !== "new").map((row) => ({ ...row }));
       createdImageUrls = [];
 
       await client.query("BEGIN");
 
       for (const row of rowsToCreate) {
-        const categoryRecord = row.category_name
-          ? await findOrCreateCategory({ tenantId, name: row.category_name })
-          : null;
-        const categoryId = categoryRecord ? Number(categoryRecord.id) : null;
+        const normalizedSku = String(row.sku || "").trim().toLowerCase();
+        const normalizedBarcode = String(row.barcode || "").trim();
 
-        const duplicateCheck = await checkItemDuplicates({
-          tenantId,
-          sku: row.sku,
-          barcode: row.barcode,
-        });
-
-        if (!duplicateCheck.ok) {
+        if (!normalizedSku) {
           skipped.push({
             row_number: row.row_number,
             sku: row.sku,
             name: row.name,
-            reason: duplicateCheck.error === "sku_already_exists" ? "duplicate_sku_in_system" : duplicateCheck.error,
+            reason: "no_sku",
           });
           continue;
         }
 
-        const lengthCm = row.length_cm > 0 ? row.length_cm : null;
-        const widthCm = row.width_cm > 0 ? row.width_cm : null;
-        const heightCm = row.height_cm > 0 ? row.height_cm : null;
-        const weightKg = row.weight_kg > 0 ? row.weight_kg : null;
+        if (existingSkuMap.has(normalizedSku)) {
+          skipped.push({
+            row_number: row.row_number,
+            sku: row.sku,
+            name: row.name,
+            reason: "duplicate_sku_in_system",
+          });
+          continue;
+        }
+
+        if (normalizedBarcode && existingBarcodeMap.has(normalizedBarcode)) {
+          skipped.push({
+            row_number: row.row_number,
+            sku: row.sku,
+            name: row.name,
+            reason: "barcode_already_exists",
+          });
+          continue;
+        }
+
+        const categoryName = normalizeOptionalText(row.category_name);
+        let categoryId = null;
+
+        if (categoryName) {
+          const categoryCacheKey = categoryName.toLowerCase();
+          if (!categoryCache.has(categoryCacheKey)) {
+            const categoryRecord = await findOrCreateCategory({ tenantId, name: categoryName });
+            categoryCache.set(categoryCacheKey, categoryRecord ? Number(categoryRecord.id) : null);
+          }
+          categoryId = categoryCache.get(categoryCacheKey);
+        }
+
+        const lengthCm = Number(row.length_cm) > 0 ? Number(row.length_cm) : null;
+        const widthCm = Number(row.width_cm) > 0 ? Number(row.width_cm) : null;
+        const heightCm = Number(row.height_cm) > 0 ? Number(row.height_cm) : null;
+        const weightKg = Number(row.weight_kg) > 0 ? Number(row.weight_kg) : null;
         const volumeCm3 = computeVolumeCm3FromDimensions(lengthCm, widthCm, heightCm);
         const weightGrams = weightKg === null ? null : Number(weightKg) * 1000;
-        const rowImage = importImagesByRow.get(row.row_number) || null;
+        const rowImage = importImagesByRow.get(Number(row.row_number)) || null;
         const imageUrl = rowImage
           ? await saveImportedItemImageBySku({
               sku: row.sku,
@@ -862,67 +1103,91 @@ router.post(
           createdImageUrls.push(imageUrl);
         }
 
-        const { rows: insertedRows } = await client.query(
-          `
-            INSERT INTO core.items (
-              tenant_id,
-              name,
-              factory,
-              factory_article,
-              category_id,
-              sku,
-              barcode,
-              unit,
-              box_qty,
-              purchase_price,
-              sale_price,
-              description,
-              image_url,
-              weight_grams,
-              volume_ml,
-              length_cm,
-              width_cm,
-              height_cm,
-              is_active
-            )
-            VALUES (
-              $1, $2, $3, $4, $5, $6, $7, $8, $9,
-              $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
-            )
-            RETURNING id, sku, name
-          `,
-          [
-            tenantId,
-            row.name || row.sku,
-            row.factory,
-            row.factory_article,
-            categoryId,
-            row.sku,
-            row.barcode,
-            row.unit || "pcs",
-            row.box_qty > 0 ? row.box_qty : 0,
-            0,
-            row.sale_price >= 0 ? row.sale_price : 0,
-            row.description || null,
-            imageUrl,
-            weightGrams,
-            volumeCm3,
-            lengthCm,
-            widthCm,
-            heightCm,
-            true,
-          ]
-        );
+        try {
+          const { rows: insertedRows } = await client.query(
+            `
+              INSERT INTO core.items (
+                tenant_id,
+                name,
+                factory,
+                factory_article,
+                category_id,
+                sku,
+                barcode,
+                unit,
+                box_qty,
+                purchase_price,
+                sale_price,
+                description,
+                image_url,
+                weight_grams,
+                volume_ml,
+                length_cm,
+                width_cm,
+                height_cm,
+                is_active
+              )
+              VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9,
+                $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+              )
+              RETURNING id, sku, name
+            `,
+            [
+              tenantId,
+              row.name || row.sku,
+              row.factory,
+              row.factory_article,
+              categoryId,
+              row.sku,
+              row.barcode,
+              row.unit || "pcs",
+              Number(row.box_qty) > 0 ? Number(row.box_qty) : 0,
+              0,
+              Number(row.sale_price) >= 0 ? Number(row.sale_price) : 0,
+              row.description || null,
+              imageUrl,
+              weightGrams,
+              volumeCm3,
+              lengthCm,
+              widthCm,
+              heightCm,
+              true,
+            ]
+          );
 
-        created.push({
-          row_number: row.row_number,
-          id: insertedRows[0].id,
-          sku: insertedRows[0].sku,
-          name: insertedRows[0].name,
-        });
+          existingSkuMap.set(normalizedSku, Number(insertedRows[0].id));
+          if (normalizedBarcode) {
+            existingBarcodeMap.set(normalizedBarcode, Number(insertedRows[0].id));
+          }
+
+          created.push({
+            row_number: row.row_number,
+            id: insertedRows[0].id,
+            sku: insertedRows[0].sku,
+            name: insertedRows[0].name,
+          });
+        } catch (err) {
+          const duplicate = err && (err.code === "23505" || /duplicate key/i.test(String(err.message || "")));
+          if (duplicate) {
+            skipped.push({
+              row_number: row.row_number,
+              sku: row.sku,
+              name: row.name,
+              reason: normalizedBarcode ? "duplicate_sku_or_barcode_in_system" : "duplicate_sku_in_system",
+            });
+            if (imageUrl) {
+              await deleteUploadedFileByUrl(imageUrl);
+              createdImageUrls = createdImageUrls.filter((value) => value !== imageUrl);
+            }
+            continue;
+          }
+          throw err;
+        }
       }
 
       await client.query("COMMIT");
+      await deleteImportCache(uploadId);
 
       return res.json({
         ok: true,

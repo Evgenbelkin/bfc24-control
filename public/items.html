@@ -991,6 +991,7 @@
     let pendingImagePreviewUrl = null;
     let importFileObject = null;
     let importPreviewData = null;
+    let importPreviewUploadId = null;
 
     let pageStatusState = null;
     let submitStatusState = null;
@@ -1685,6 +1686,7 @@
 
     function resetImportPreviewUi() {
       importPreviewData = null;
+      importPreviewUploadId = null;
       hideStatus(els.importStatus);
       els.importSummary.style.display = "none";
       els.importPreviewWrap.style.display = "none";
@@ -1761,6 +1763,7 @@
           file_base64: fileBase64
         });
 
+        importPreviewUploadId = data && data.upload_id ? String(data.upload_id) : null;
         renderImportPreview(data);
         showStatus(
           els.importStatus,
@@ -1783,6 +1786,10 @@
           throw new Error(i18n.t("items.importBuildPreviewFirst"));
         }
 
+        if (!importPreviewUploadId) {
+          throw new Error("Сессия preview не найдена. Построй preview заново.");
+        }
+
         if (!(Number(importPreviewData.new_count || 0) > 0)) {
           throw new Error(i18n.t("items.importNoNewSku"));
         }
@@ -1793,11 +1800,10 @@
         }
 
         showStatus(els.importStatus, i18n.t("items.importRunning"), "info");
-        const fileBase64 = await readFileAsBase64(importFileObject);
 
         const result = await apiPost("/items/import", {
           tenant_id: getTenantId(),
-          file_base64: fileBase64
+          upload_id: importPreviewUploadId
         });
 
         showStatus(
@@ -1809,6 +1815,7 @@
         els.importFile.value = "";
         els.importFileName.value = "";
         importFileObject = null;
+        importPreviewUploadId = null;
         await loadData();
         if (typeof loadCategories === "function") {
           await loadCategories();
