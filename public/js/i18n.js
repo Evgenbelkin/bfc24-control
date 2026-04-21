@@ -22,9 +22,19 @@
       login: {
         pageTitle: "BFC24 CONTROL — Вход",
         heading: "BFC24 CONTROL",
+        tabLogin: "Вход",
+        tabRegister: "Регистрация",
         usernamePlaceholder: "Логин",
         passwordPlaceholder: "Пароль",
-        submit: "Войти"
+        submit: "Войти",
+        registerSubmit: "Зарегистрироваться",
+        companyPlaceholder: "Название компании",
+        namePlaceholder: "Имя",
+        phonePlaceholder: "Телефон",
+        emailPlaceholder: "Email",
+        registerUsernamePlaceholder: "Логин",
+        registerPasswordPlaceholder: "Пароль",
+        registerSuccess: "Регистрация успешна. Теперь войдите."
       },
 
       index: {
@@ -1540,9 +1550,19 @@ sales: {
       login: {
         pageTitle: "BFC24 CONTROL — Login",
         heading: "BFC24 CONTROL",
+        tabLogin: "Login",
+        tabRegister: "Register",
         usernamePlaceholder: "Username",
         passwordPlaceholder: "Password",
-        submit: "Sign in"
+        submit: "Sign in",
+        registerSubmit: "Register",
+        companyPlaceholder: "Company name",
+        namePlaceholder: "Name",
+        phonePlaceholder: "Phone",
+        emailPlaceholder: "Email",
+        registerUsernamePlaceholder: "Username",
+        registerPasswordPlaceholder: "Password",
+        registerSuccess: "Registration completed. Now sign in."
       },
 
       index: {
@@ -3061,9 +3081,19 @@ sales: {
       login: {
         pageTitle: "BFC24 CONTROL — 登录",
         heading: "BFC24 CONTROL",
+        tabLogin: "登录",
+        tabRegister: "注册",
         usernamePlaceholder: "用户名",
         passwordPlaceholder: "密码",
-        submit: "登录"
+        submit: "登录",
+        registerSubmit: "注册",
+        companyPlaceholder: "公司名称",
+        namePlaceholder: "姓名",
+        phonePlaceholder: "电话",
+        emailPlaceholder: "邮箱",
+        registerUsernamePlaceholder: "用户名",
+        registerPasswordPlaceholder: "密码",
+        registerSuccess: "注册成功。现在请登录。"
       },
 
       index: {

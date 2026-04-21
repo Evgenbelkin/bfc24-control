@@ -81,6 +81,7 @@
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 14px;
+      box-sizing: border-box;
     }
 
     .submit-btn {
@@ -103,6 +104,7 @@
       font-size: 13px;
       text-align: center;
       margin-bottom: 10px;
+      min-height: 16px;
     }
 
     .success {
@@ -110,6 +112,7 @@
       font-size: 13px;
       text-align: center;
       margin-bottom: 10px;
+      min-height: 16px;
     }
 
     .hidden {
@@ -122,62 +125,72 @@
 
 <div class="card">
 
-  <!-- ЯЗЫК -->
   <div class="lang-switch">
     <button type="button" class="lang-btn" data-lang="ru">RU</button>
     <button type="button" class="lang-btn" data-lang="en">EN</button>
     <button type="button" class="lang-btn" data-lang="zh">中文</button>
   </div>
 
-  <!-- РЕЖИМ -->
   <div class="mode-switch">
-    <button class="mode-btn active" onclick="setMode('login')">Вход</button>
-    <button class="mode-btn" onclick="setMode('register')">Регистрация</button>
+    <button id="modeLoginBtn" type="button" class="mode-btn active" data-i18n="login.tabLogin">Вход</button>
+    <button id="modeRegisterBtn" type="button" class="mode-btn" data-i18n="login.tabRegister">Регистрация</button>
   </div>
 
-  <h2>BFC24 CONTROL</h2>
+  <h2 data-i18n="login.heading">BFC24 CONTROL</h2>
 
   <div id="error" class="error"></div>
   <div id="success" class="success"></div>
 
-  <!-- LOGIN -->
   <div id="loginForm">
-    <input id="login_username" placeholder="Логин" />
-    <input id="login_password" type="password" placeholder="Пароль" />
+    <input id="login_username" data-i18n-placeholder="login.usernamePlaceholder" placeholder="Логин" />
+    <input id="login_password" type="password" data-i18n-placeholder="login.passwordPlaceholder" placeholder="Пароль" />
 
-    <button class="submit-btn" onclick="login()">Войти</button>
+    <button class="submit-btn" type="button" onclick="login()" data-i18n="login.submit">Войти</button>
   </div>
 
-  <!-- REGISTER -->
   <div id="registerForm" class="hidden">
-    <input id="reg_company" placeholder="Название компании" />
-    <input id="reg_name" placeholder="Имя" />
-    <input id="reg_phone" placeholder="Телефон" />
-    <input id="reg_email" placeholder="Email" />
-    <input id="reg_username" placeholder="Логин" />
-    <input id="reg_password" type="password" placeholder="Пароль" />
+    <input id="reg_company" data-i18n-placeholder="login.companyPlaceholder" placeholder="Название компании" />
+    <input id="reg_name" data-i18n-placeholder="login.namePlaceholder" placeholder="Имя" />
+    <input id="reg_phone" data-i18n-placeholder="login.phonePlaceholder" placeholder="Телефон" />
+    <input id="reg_email" data-i18n-placeholder="login.emailPlaceholder" placeholder="Email" />
+    <input id="reg_username" data-i18n-placeholder="login.registerUsernamePlaceholder" placeholder="Логин" />
+    <input id="reg_password" type="password" data-i18n-placeholder="login.registerPasswordPlaceholder" placeholder="Пароль" />
 
-    <button class="submit-btn" onclick="register()">Зарегистрироваться</button>
+    <button class="submit-btn" type="button" onclick="register()" data-i18n="login.registerSubmit">Зарегистрироваться</button>
   </div>
 
 </div>
 
+<script src="/js/i18n.js"></script>
 <script>
-  function setMode(mode) {
+  let currentMode = "login";
+
+  function applyModeState() {
+    const isLogin = currentMode === "login";
+
+    document.getElementById("loginForm").classList.toggle("hidden", !isLogin);
+    document.getElementById("registerForm").classList.toggle("hidden", isLogin);
+    document.getElementById("modeLoginBtn").classList.toggle("active", isLogin);
+    document.getElementById("modeRegisterBtn").classList.toggle("active", !isLogin);
+  }
+
+  function clearMessages() {
     document.getElementById("error").textContent = "";
     document.getElementById("success").textContent = "";
+  }
 
-    document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+  function setMode(mode) {
+    currentMode = mode === "register" ? "register" : "login";
+    clearMessages();
+    applyModeState();
+  }
 
-    if (mode === "login") {
-      document.getElementById("loginForm").classList.remove("hidden");
-      document.getElementById("registerForm").classList.add("hidden");
-      document.querySelectorAll(".mode-btn")[0].classList.add("active");
-    } else {
-      document.getElementById("loginForm").classList.add("hidden");
-      document.getElementById("registerForm").classList.remove("hidden");
-      document.querySelectorAll(".mode-btn")[1].classList.add("active");
+  function translateServerError(errorText) {
+    if (!errorText) return "";
+    if (window.i18n && typeof window.i18n.t === "function") {
+      return window.i18n.t(errorText, errorText);
     }
+    return errorText;
   }
 
   async function login() {
@@ -185,30 +198,34 @@
     const password = document.getElementById("login_password").value.trim();
 
     const errorBox = document.getElementById("error");
-    errorBox.textContent = "";
+    clearMessages();
 
-    const res = await fetch("/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ username, password })
-    });
+    try {
+      const res = await fetch("/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!data.ok) {
-      errorBox.textContent = data.error;
-      return;
-    }
+      if (!data.ok) {
+        errorBox.textContent = translateServerError(data.error);
+        return;
+      }
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-    if (data.user.role === "owner") {
-      window.location.href = "/owner-dashboard.html";
-    } else {
-      window.location.href = "/index.html";
+      if (data.user.role === "owner") {
+        window.location.href = "/owner-dashboard.html";
+      } else {
+        window.location.href = "/index.html";
+      }
+    } catch (error) {
+      errorBox.textContent = window.i18n ? window.i18n.t("common.loginConnectionError") : "Ошибка подключения к серверу";
     }
   }
 
@@ -216,8 +233,7 @@
     const errorBox = document.getElementById("error");
     const successBox = document.getElementById("success");
 
-    errorBox.textContent = "";
-    successBox.textContent = "";
+    clearMessages();
 
     const payload = {
       company_name: document.getElementById("reg_company").value.trim(),
@@ -229,28 +245,53 @@
       full_name: document.getElementById("reg_name").value.trim()
     };
 
-    const res = await fetch("/self-registration", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
+    try {
+      const res = await fetch("/self-registration", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (!data.ok) {
+        errorBox.textContent = translateServerError(data.error);
+        return;
+      }
+
+      successBox.textContent = window.i18n ? window.i18n.t("login.registerSuccess") : "Регистрация успешна. Теперь войдите.";
+      document.getElementById("login_username").value = payload.username;
+      setMode("login");
+    } catch (error) {
+      errorBox.textContent = window.i18n ? window.i18n.t("common.loginConnectionError") : "Ошибка подключения к серверу";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("modeLoginBtn").addEventListener("click", function () {
+      setMode("login");
     });
 
-    const data = await res.json();
+    document.getElementById("modeRegisterBtn").addEventListener("click", function () {
+      setMode("register");
+    });
 
-    if (!data.ok) {
-      errorBox.textContent = data.error;
-      return;
+    document.querySelectorAll("[data-lang]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        if (window.i18n && typeof window.i18n.setLang === "function") {
+          window.i18n.setLang(button.getAttribute("data-lang"));
+        }
+      });
+    });
+
+    if (window.i18n && typeof window.i18n.applyTranslations === "function") {
+      window.i18n.applyTranslations();
     }
 
-    successBox.textContent = "Регистрация успешна. Теперь войдите.";
-
-    // автоподстановка логина
-    document.getElementById("login_username").value = payload.username;
-
-    setMode("login");
-  }
+    applyModeState();
+  });
 </script>
 
 </body>
