@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ru" translate="no">
+<head>
+  <meta charset="UTF-8" />
+  <title>BFC24 CONTROL — Перемещение товара</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:#dfe3eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+      --danger-bg:#fef2f2;
+      --danger-line:#fecaca;
+      --danger-text:#991b1b;
+      --ok-bg:#f0fdf4;
+      --ok-line:#bbf7d0;
+      --ok-text:#166534;
+      --info-bg:#eff6ff;
+      --info-line:#bfdbfe;
+      --info-text:#1d4ed8;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1600px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+      transition:.15s ease;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .btn-primary:hover{background:var(--primary-hover)}
+
+    .btn-light{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-light:hover{
+      background:#f8fafc;
+      border-color:#cbd5e1;
+    }
+
+    .btn:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid #eef1f5;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:16px;
+    }
+
+    .card-title{
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 14px;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+      align-items:end;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      min-width:0;
+    }
+
+    .field.full{
+      grid-column:1 / -1;
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+      font-family:inherit;
+    }
+
+    textarea{
+      resize:vertical;
+      min-height:92px;
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+
+    .status.show{display:block}
+    .status.error{
+      background:var(--danger-bg);
+      color:var(--danger-text);
+      border:1px solid var(--danger-line);
+    }
+    .status.success{
+      background:var(--ok-bg);
+      color:var(--ok-text);
+      border:1px solid var(--ok-line);
+    }
+    .status.info{
+      background:var(--info-bg);
+      color:var(--info-text);
+      border:1px solid var(--info-line);
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid var(--info-line);
+      background:var(--info-bg);
+      color:var(--info-text);
+    }
+
+    .summary{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .stock-table-wrap,
+    .history-table-wrap{
+      overflow:auto;
+      max-height:62vh;
+      border:1px solid #eef1f5;
+      border-radius:14px;
+      background:#fff;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      min-width:720px;
+    }
+
+    th, td{
+      border-bottom:1px solid #eef1f5;
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    th{
+      background:#f8fafc;
+      font-weight:700;
+      color:#111827;
+      position:sticky;
+      top:0;
+      z-index:5;
+      white-space:nowrap;
+    }
+
+    tr:hover td{
+      background:#fbfdff;
+    }
+
+    .mono{
+      font-variant-numeric:tabular-nums;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:24px 12px;
+    }
+
+    .item-box{
+      border:1px solid #e8eef7;
+      border-radius:14px;
+      background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+      padding:14px;
+      margin-top:14px;
+    }
+
+    .item-box-title{
+      font-size:16px;
+      font-weight:700;
+      margin:0 0 8px;
+    }
+
+    .item-lines{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px 16px;
+    }
+
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:8px;
+      line-height:1.45;
+    }
+
+    @media (max-width: 1100px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 860px){
+      .form-grid,
+      .item-lines{
+        grid-template-columns:1fr;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .wrap{
+        padding:16px 12px 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">Перемещение товара</div>
+
+      <div class="top-actions">
+        <button class="btn btn-light" onclick="goBack()">Назад</button>
+        <button class="btn btn-light" onclick="logout()">Выйти</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2 class="card-title">Форма перемещения</h2>
+
+          <div class="form-grid">
+            <div class="field full">
+              <label for="itemSearchInput">Поиск товара</label>
+              <input id="itemSearchInput" type="text" placeholder="Введите название, SKU или штрихкод" />
+            </div>
+
+            <div class="field full">
+              <label for="itemSelect">Товар</label>
+              <select id="itemSelect">
+                <option value="">Сначала выберите товар</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="fromLocationSelect">Откуда</label>
+              <select id="fromLocationSelect" disabled>
+                <option value="">Выберите источник</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="toLocationSelect">Куда</label>
+              <select id="toLocationSelect" disabled>
+                <option value="">Выберите назначение</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="qtyInput">Количество</label>
+              <input id="qtyInput" type="number" min="0.001" step="0.001" placeholder="Например: 1" />
+            </div>
+
+            <div class="field">
+              <label for="availableQtyInput">Доступно в источнике</label>
+              <input id="availableQtyInput" type="text" readonly placeholder="Будет показано после выбора источника" />
+            </div>
+
+            <div class="field full">
+              <label for="commentInput">Комментарий</label>
+              <textarea id="commentInput" placeholder="Необязательно. Например: перенос между контейнерами"></textarea>
+            </div>
+
+            <div class="field full">
+              <button id="submitBtn" class="btn btn-primary" type="button">Переместить</button>
+            </div>
+          </div>
+
+          <div class="summary">
+            <div class="pill" id="summaryItems">Товаров: 0</div>
+            <div class="pill" id="summaryTransfers">Последних перемещений: 0</div>
+          </div>
+
+          <div id="pageStatus" class="status info"></div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Информация по выбранному товару</h2>
+          <div id="selectedItemBox" class="item-box">
+            <div class="item-box-title">Товар не выбран</div>
+            <div class="muted">Выбери товар, и здесь появятся его данные и доступные остатки по локациям.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Остатки по выбранному товару</h2>
+          <div class="muted">Для поля «Откуда» используются только те локации, где остаток по выбранному товару больше нуля.</div>
+
+          <div class="stock-table-wrap" style="margin-top:12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Локация</th>
+                  <th>Код</th>
+                  <th>Количество</th>
+                </tr>
+              </thead>
+              <tbody id="stockTbody">
+                <tr>
+                  <td colspan="3" class="empty">Выберите товар</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2 class="card-title">Последние перемещения</h2>
+          <div class="muted">Показываются последние операции перемещения по текущему tenant.</div>
+
+          <div class="history-table-wrap" style="margin-top:12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Товар</th>
+                  <th>SKU</th>
+                  <th>Откуда</th>
+                  <th>Куда</th>
+                  <th>Кол-во</th>
+                  <th>Комментарий</th>
+                </tr>
+              </thead>
+              <tbody id="historyTbody">
+                <tr>
+                  <td colspan="7" class="empty">Загрузка истории...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="hint">
+            После успешного перемещения форма обновляет остатки по товару и историю операций автоматически.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/login.html";
+    }
+
+    async function requestFallback(method, path, body) {
+      const token = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
+
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+
+      return data;
+    }
+
+    function getTenantIdFromStorage(fallback = 1) {
+      try {
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
+      } catch {}
+      return fallback;
+    }
+
+    const ApiBridge = {
+      getTenantId(fallback = 1) {
+        if (window.API && typeof window.API.getTenantId === "function") {
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
+        }
+        return getTenantIdFromStorage(fallback);
+      },
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      },
+      post(path, body) {
+        if (window.API && typeof window.API.post === "function") {
+          return window.API.post(path, body);
+        }
+        return requestFallback("POST", path, body);
+      }
+    };
+
+    let authUser = null;
+    let itemsData = [];
+    let locationsData = [];
+    let stockData = [];
+    let transfersData = [];
+    let filteredItems = [];
+
+    const els = {
+      itemSearchInput: document.getElementById("itemSearchInput"),
+      itemSelect: document.getElementById("itemSelect"),
+      fromLocationSelect: document.getElementById("fromLocationSelect"),
+      toLocationSelect: document.getElementById("toLocationSelect"),
+      qtyInput: document.getElementById("qtyInput"),
+      availableQtyInput: document.getElementById("availableQtyInput"),
+      commentInput: document.getElementById("commentInput"),
+      submitBtn: document.getElementById("submitBtn"),
+      pageStatus: document.getElementById("pageStatus"),
+      stockTbody: document.getElementById("stockTbody"),
+      historyTbody: document.getElementById("historyTbody"),
+      selectedItemBox: document.getElementById("selectedItemBox"),
+      summaryItems: document.getElementById("summaryItems"),
+      summaryTransfers: document.getElementById("summaryTransfers")
+    };
+
+    function goBack() {
+      window.location.href = "/index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
+
+    function parseUser() {
+      try {
+        const raw = localStorage.getItem("user");
+        authUser = raw ? JSON.parse(raw) : null;
+      } catch {
+        authUser = null;
+      }
+    }
+
+    function getTenantId() {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
+        return Number(authUser.tenant_id);
+      }
+      return ApiBridge.getTenantId(1);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatNumber(value, digits = 0) {
+      const num = Number(value || 0);
+      if (!Number.isFinite(num)) return digits > 0 ? Number(0).toFixed(digits) : "0";
+      if (digits > 0) return num.toFixed(digits);
+      if (Number.isInteger(num)) return String(num);
+      return num.toFixed(3);
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value);
+      return d.toLocaleString("ru-RU");
+    }
+
+    function showStatus(text, type = "info") {
+      els.pageStatus.className = "status show " + type;
+      els.pageStatus.textContent = text;
+    }
+
+    function clearStatus() {
+      els.pageStatus.className = "status info";
+      els.pageStatus.textContent = "";
+    }
+
+    function normalizeList(data, key) {
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data[key])) return data[key];
+      return [];
+    }
+
+    function getSelectedItemId() {
+      return Number(els.itemSelect.value || 0);
+    }
+
+    function getSelectedItem() {
+      const itemId = getSelectedItemId();
+      return itemsData.find(item => Number(item.id) === itemId) || null;
+    }
+
+    function getItemStockRows(itemId) {
+      return stockData
+        .filter(row => Number(row.item_id) === Number(itemId) && Number(row.qty || 0) > 0)
+        .map(row => {
+          const location = locationsData.find(loc => Number(loc.id) === Number(row.location_id));
+          return {
+            ...row,
+            location_name: location ? location.name : (row.location_name || ""),
+            location_code: location ? location.code : ""
+          };
+        })
+        .sort((a, b) => String(a.location_name || "").localeCompare(String(b.location_name || ""), "ru"));
+    }
+
+    function renderItemOptions() {
+      const currentValue = String(els.itemSelect.value || "");
+      const search = String(els.itemSearchInput.value || "").trim().toLowerCase();
+
+      filteredItems = itemsData
+        .filter(item => {
+          if (!search) return true;
+          const text = [item.name, item.sku, item.barcode].join(" ").toLowerCase();
+          return text.includes(search);
+        })
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"));
+
+      let html = '<option value="">Выберите товар</option>';
+      filteredItems.forEach(item => {
+        const label = `${item.name || ""}${item.sku ? " — " + item.sku : ""}`;
+        html += `<option value="${escapeHtml(String(item.id))}">${escapeHtml(label)}</option>`;
+      });
+
+      els.itemSelect.innerHTML = html;
+
+      if (filteredItems.some(item => String(item.id) === currentValue)) {
+        els.itemSelect.value = currentValue;
+      }
+
+      els.summaryItems.textContent = `Товаров: ${filteredItems.length}`;
+    }
+
+    function renderSelectedItemInfo() {
+      const item = getSelectedItem();
+
+      if (!item) {
+        els.selectedItemBox.innerHTML = `
+          <div class="item-box-title">Товар не выбран</div>
+          <div class="muted">Выбери товар, и здесь появятся его данные и доступные остатки по локациям.</div>
+        `;
+        return;
+      }
+
+      const stockRows = getItemStockRows(item.id);
+      const totalQty = stockRows.reduce((sum, row) => sum + Number(row.qty || 0), 0);
+
+      els.selectedItemBox.innerHTML = `
+        <div class="item-box-title">${escapeHtml(item.name || "")}</div>
+        <div class="item-lines">
+          <div><strong>SKU:</strong> ${escapeHtml(item.sku || "—")}</div>
+          <div><strong>Штрихкод:</strong> ${escapeHtml(item.barcode || "—")}</div>
+          <div><strong>Ед. изм.:</strong> ${escapeHtml(item.unit || "—")}</div>
+          <div><strong>Суммарный остаток:</strong> <span class="mono">${escapeHtml(formatNumber(totalQty))}</span></div>
+        </div>
+      `;
+    }
+
+    function renderStockTable() {
+      const item = getSelectedItem();
+
+      if (!item) {
+        els.stockTbody.innerHTML = '<tr><td colspan="3" class="empty">Выберите товар</td></tr>';
+        return;
+      }
+
+      const rows = getItemStockRows(item.id);
+
+      if (!rows.length) {
+        els.stockTbody.innerHTML = '<tr><td colspan="3" class="empty">По выбранному товару нет доступного остатка по локациям</td></tr>';
+        return;
+      }
+
+      let html = "";
+      rows.forEach(row => {
+        html += `
+          <tr>
+            <td>${escapeHtml(row.location_name || "")}</td>
+            <td>${escapeHtml(row.location_code || "")}</td>
+            <td class="mono">${escapeHtml(formatNumber(row.qty))}</td>
+          </tr>
+        `;
+      });
+
+      els.stockTbody.innerHTML = html;
+    }
+
+    function renderFromLocationOptions() {
+      const item = getSelectedItem();
+      const prevValue = String(els.fromLocationSelect.value || "");
+
+      if (!item) {
+        els.fromLocationSelect.innerHTML = '<option value="">Выберите источник</option>';
+        els.fromLocationSelect.disabled = true;
+        return;
+      }
+
+      const rows = getItemStockRows(item.id);
+
+      let html = '<option value="">Выберите источник</option>';
+      rows.forEach(row => {
+        const label = `${row.location_name || ""}${row.location_code ? " (" + row.location_code + ")" : ""} — ${formatNumber(row.qty)}`;
+        html += `<option value="${escapeHtml(String(row.location_id))}">${escapeHtml(label)}</option>`;
+      });
+
+      els.fromLocationSelect.innerHTML = html;
+      els.fromLocationSelect.disabled = rows.length === 0;
+
+      if (rows.some(row => String(row.location_id) === prevValue)) {
+        els.fromLocationSelect.value = prevValue;
+      }
+    }
+
+    function renderToLocationOptions() {
+      const fromLocationId = Number(els.fromLocationSelect.value || 0);
+      const prevValue = String(els.toLocationSelect.value || "");
+
+      let html = '<option value="">Выберите назначение</option>';
+
+      const rows = locationsData
+        .filter(loc => Number(loc.id) !== fromLocationId && loc.is_active !== false)
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"));
+
+      rows.forEach(loc => {
+        const label = `${loc.name || ""}${loc.code ? " (" + loc.code + ")" : ""}`;
+        html += `<option value="${escapeHtml(String(loc.id))}">${escapeHtml(label)}</option>`;
+      });
+
+      els.toLocationSelect.innerHTML = html;
+      els.toLocationSelect.disabled = !fromLocationId || rows.length === 0;
+
+      if (rows.some(row => String(row.id) === prevValue)) {
+        els.toLocationSelect.value = prevValue;
+      }
+    }
+
+    function syncAvailableQty() {
+      const item = getSelectedItem();
+      const fromLocationId = Number(els.fromLocationSelect.value || 0);
+
+      if (!item || !fromLocationId) {
+        els.availableQtyInput.value = "";
+        return;
+      }
+
+      const row = getItemStockRows(item.id).find(r => Number(r.location_id) === fromLocationId);
+      els.availableQtyInput.value = row ? formatNumber(row.qty) : "";
+    }
+
+    function renderHistory() {
+      els.summaryTransfers.textContent = `Последних перемещений: ${transfersData.length}`;
+
+      if (!transfersData.length) {
+        els.historyTbody.innerHTML = '<tr><td colspan="7" class="empty">История перемещений пока пустая</td></tr>';
+        return;
+      }
+
+      let html = "";
+      transfersData.forEach(row => {
+        const fromLabel = [row.from_location_name, row.from_location_code ? `(${row.from_location_code})` : ""].filter(Boolean).join(" ");
+        const toLabel = [row.to_location_name, row.to_location_code ? `(${row.to_location_code})` : ""].filter(Boolean).join(" ");
+
+        html += `
+          <tr>
+            <td>${escapeHtml(formatDateTime(row.created_at))}</td>
+            <td>${escapeHtml(row.item_name || "")}</td>
+            <td>${escapeHtml(row.sku || "")}</td>
+            <td>${escapeHtml(fromLabel)}</td>
+            <td>${escapeHtml(toLabel)}</td>
+            <td class="mono">${escapeHtml(formatNumber(row.qty))}</td>
+            <td>${escapeHtml(row.comment || "")}</td>
+          </tr>
+        `;
+      });
+
+      els.historyTbody.innerHTML = html;
+    }
+
+    function updateUIBySelection() {
+      renderSelectedItemInfo();
+      renderStockTable();
+      renderFromLocationOptions();
+      renderToLocationOptions();
+      syncAvailableQty();
+    }
+
+    async function loadItems() {
+      const tenantId = getTenantId();
+      const data = await ApiBridge.get(`/items?tenant_id=${tenantId}`);
+      itemsData = normalizeList(data, "items");
+      renderItemOptions();
+    }
+
+    async function loadLocations() {
+      const tenantId = getTenantId();
+      const data = await ApiBridge.get(`/locations?tenant_id=${tenantId}`);
+      locationsData = normalizeList(data, "locations");
+    }
+
+    async function loadStock() {
+      const tenantId = getTenantId();
+      const data = await ApiBridge.get(`/stock?tenant_id=${tenantId}`);
+      stockData = normalizeList(data, "stock");
+    }
+
+    async function loadTransfers() {
+      const tenantId = getTenantId();
+      const data = await ApiBridge.get(`/stock/transfers?tenant_id=${tenantId}&limit=20`);
+      transfersData = normalizeList(data, "transfers");
+      renderHistory();
+    }
+
+    async function loadPage() {
+      try {
+        clearStatus();
+        showStatus("Загрузка данных...", "info");
+
+        await Promise.all([
+          loadItems(),
+          loadLocations(),
+          loadStock(),
+          loadTransfers()
+        ]);
+
+        updateUIBySelection();
+
+        showStatus("Данные загружены", "success");
+        setTimeout(clearStatus, 1200);
+      } catch (e) {
+        console.error("[transfer] loadPage error:", e);
+        showStatus("Не удалось загрузить данные: " + (e.message || e), "error");
+      }
+    }
+
+    async function submitTransfer() {
+      const item = getSelectedItem();
+      const fromLocationId = Number(els.fromLocationSelect.value || 0);
+      const toLocationId = Number(els.toLocationSelect.value || 0);
+      const qty = Number(String(els.qtyInput.value || "").replace(",", "."));
+      const comment = String(els.commentInput.value || "").trim();
+      const tenantId = getTenantId();
+
+      if (!item) {
+        showStatus("Сначала выберите товар", "error");
+        return;
+      }
+
+      if (!fromLocationId) {
+        showStatus("Выберите источник перемещения", "error");
+        return;
+      }
+
+      if (!toLocationId) {
+        showStatus("Выберите назначение перемещения", "error");
+        return;
+      }
+
+      if (!Number.isFinite(qty) || qty <= 0) {
+        showStatus("Укажите корректное количество", "error");
+        return;
+      }
+
+      els.submitBtn.disabled = true;
+      els.submitBtn.textContent = "Перемещаем...";
+
+      try {
+        await ApiBridge.post("/stock/transfer", {
+          tenant_id: tenantId,
+          item_id: Number(item.id),
+          from_location_id: fromLocationId,
+          to_location_id: toLocationId,
+          qty,
+          comment
+        });
+
+        showStatus("Перемещение успешно выполнено", "success");
+
+        els.qtyInput.value = "";
+        els.commentInput.value = "";
+
+        await Promise.all([
+          loadStock(),
+          loadTransfers()
+        ]);
+
+        updateUIBySelection();
+      } catch (e) {
+        console.error("[transfer] submitTransfer error:", e);
+        showStatus("Не удалось выполнить перемещение: " + (e.message || e), "error");
+      } finally {
+        els.submitBtn.disabled = false;
+        els.submitBtn.textContent = "Переместить";
+      }
+    }
+
+    function bindEvents() {
+      els.itemSearchInput.addEventListener("input", () => {
+        renderItemOptions();
+      });
+
+      els.itemSelect.addEventListener("change", () => {
+        updateUIBySelection();
+      });
+
+      els.fromLocationSelect.addEventListener("change", () => {
+        renderToLocationOptions();
+        syncAvailableQty();
+      });
+
+      els.toLocationSelect.addEventListener("change", () => {
+        syncAvailableQty();
+      });
+
+      els.submitBtn.addEventListener("click", submitTransfer);
+    }
+
+    parseUser();
+    bindEvents();
+    loadPage();
+  </script>
+</body>
+</html>
