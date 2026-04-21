@@ -924,16 +924,22 @@
 
     function bindEvents() {
       els.itemSearchInput.addEventListener("input", () => {
+        const previousSelectedValue = els.itemSelect.value;
         renderItemOptions();
-        els.itemSelect.focus();
-        els.itemSelect.size = Math.min(filteredItems.length + 1, 8);
-        if (filteredItems.length === 0) {
-          els.itemSelect.size = 1;
-        }
-      });
 
-      els.itemSelect.addEventListener("blur", () => {
-        els.itemSelect.size = 1;
+        if (previousSelectedValue && filteredItems.some(item => String(item.id) === String(previousSelectedValue))) {
+          els.itemSelect.value = previousSelectedValue;
+        } else if (filteredItems.length === 1) {
+          els.itemSelect.value = String(filteredItems[0].id);
+          updateUIBySelection();
+        } else {
+          els.itemSelect.value = "";
+          renderSelectedItemInfo();
+          renderStockTable();
+          renderFromLocationOptions();
+          renderToLocationOptions();
+          syncAvailableQty();
+        }
       });
 
       els.itemSelect.addEventListener("change", () => {
