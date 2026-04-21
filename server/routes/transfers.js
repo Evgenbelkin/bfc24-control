@@ -19,6 +19,80 @@ function normalizeText(value) {
   return s.length ? s : null;
 }
 
+router.get(
+  "/transfers",
+  authRequired,
+  async (req, res) => {
+    try {
+      const tenantId = getEffectiveTenantId(req);
+
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: "tenant_not_defined"
+        });
+      }
+
+      const limitRaw = toNumber(req.query.limit);
+      const limit = limitRaw && limitRaw > 0 ? Math.min(limitRaw, 100) : 20;
+
+      const sql = `
+        SELECT
+          t.id,
+          t.tenant_id,
+          t.item_id,
+          t.from_location_id,
+          t.to_location_id,
+          t.qty,
+          t.comment,
+          t.created_by,
+          t.created_at,
+
+          i.name AS item_name,
+          i.sku,
+          i.barcode,
+
+          lf.name AS from_location_name,
+          lf.code AS from_location_code,
+
+          lt.name AS to_location_name,
+          lt.code AS to_location_code,
+
+          u.username AS created_by_username,
+          u.full_name AS created_by_full_name
+        FROM core.transfers t
+        JOIN core.items i
+          ON i.id = t.item_id
+         AND i.tenant_id = t.tenant_id
+        JOIN core.locations lf
+          ON lf.id = t.from_location_id
+         AND lf.tenant_id = t.tenant_id
+        JOIN core.locations lt
+          ON lt.id = t.to_location_id
+         AND lt.tenant_id = t.tenant_id
+        LEFT JOIN saas.users u
+          ON u.id = t.created_by
+        WHERE t.tenant_id = $1
+        ORDER BY t.created_at DESC, t.id DESC
+        LIMIT $2
+      `;
+
+      const { rows } = await pool.query(sql, [tenantId, limit]);
+
+      return res.json({
+        ok: true,
+        transfers: rows
+      });
+    } catch (e) {
+      console.error("[GET /stock/transfers] error:", e);
+      return res.status(500).json({
+        ok: false,
+        error: "transfers_list_failed"
+      });
+    }
+  }
+);
+
 router.post(
   "/transfer",
   authRequired,
@@ -43,41 +117,146 @@ router.post(
       const comment = normalizeText(req.body.comment);
 
       if (!itemId || itemId <= 0) {
-        return res.status(400).json({ ok: false, error: "invalid_item_id" });
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_item_id"
+        });
       }
 
       if (!fromLocationId || fromLocationId <= 0) {
-        return res.status(400).json({ ok: false, error: "invalid_from_location" });
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_from_location"
+        });
       }
 
       if (!toLocationId || toLocationId <= 0) {
-        return res.status(400).json({ ok: false, error: "invalid_to_location" });
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_to_location"
+        });
       }
 
       if (fromLocationId === toLocationId) {
-        return res.status(400).json({ ok: false, error: "same_location" });
+        return res.status(400).json({
+          ok: false,
+          error: "same_location"
+        });
       }
 
       if (!qty || qty <= 0) {
-        return res.status(400).json({ ok: false, error: "invalid_qty" });
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_qty"
+        });
       }
 
       await client.query("BEGIN");
 
-      // Проверка остатка
+      const { rows: itemRows } = await client.query(
+        `
+          SELECT id, is_active
+          FROM core.items
+          WHERE tenant_id = $1
+            AND id = $2
+          LIMIT 1
+        `,
+        [tenantId, itemId]
+      );
+
+      if (!itemRows.length) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({
+          ok: false,
+          error: "item_not_found"
+        });
+      }
+
+      if (itemRows[0].is_active === false) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          ok: false,
+          error: "item_inactive"
+        });
+      }
+
+      const { rows: fromLocationRows } = await client.query(
+        `
+          SELECT id, is_active
+          FROM core.locations
+          WHERE tenant_id = $1
+            AND id = $2
+          LIMIT 1
+        `,
+        [tenantId, fromLocationId]
+      );
+
+      if (!fromLocationRows.length) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({
+          ok: false,
+          error: "from_location_not_found"
+        });
+      }
+
+      if (fromLocationRows[0].is_active === false) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          ok: false,
+          error: "from_location_inactive"
+        });
+      }
+
+      const { rows: toLocationRows } = await client.query(
+        `
+          SELECT id, is_active
+          FROM core.locations
+          WHERE tenant_id = $1
+            AND id = $2
+          LIMIT 1
+        `,
+        [tenantId, toLocationId]
+      );
+
+      if (!toLocationRows.length) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({
+          ok: false,
+          error: "to_location_not_found"
+        });
+      }
+
+      if (toLocationRows[0].is_active === false) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          ok: false,
+          error: "to_location_inactive"
+        });
+      }
+
       const { rows: stockRows } = await client.query(
         `
-        SELECT qty
-        FROM core.stock
-        WHERE tenant_id = $1
-          AND item_id = $2
-          AND location_id = $3
-        LIMIT 1
+          SELECT qty
+          FROM core.stock
+          WHERE tenant_id = $1
+            AND item_id = $2
+            AND location_id = $3
+          LIMIT 1
         `,
         [tenantId, itemId, fromLocationId]
       );
 
-      if (!stockRows.length || Number(stockRows[0].qty) < qty) {
+      if (!stockRows.length) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          ok: false,
+          error: "source_stock_not_found"
+        });
+      }
+
+      const sourceQty = Number(stockRows[0].qty || 0);
+
+      if (sourceQty < qty) {
         await client.query("ROLLBACK");
         return res.status(400).json({
           ok: false,
@@ -85,47 +264,20 @@ router.post(
         });
       }
 
-      // Списание
-      await client.query(
-        `
-        UPDATE core.stock
-        SET qty = qty - $4,
-            updated_at = NOW()
-        WHERE tenant_id = $1
-          AND item_id = $2
-          AND location_id = $3
-        `,
-        [tenantId, itemId, fromLocationId, qty]
-      );
-
-      // Приход
-      await client.query(
-        `
-        INSERT INTO core.stock (tenant_id, item_id, location_id, qty)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT ON CONSTRAINT stock_tenant_item_location_uk
-        DO UPDATE SET
-          qty = core.stock.qty + EXCLUDED.qty,
-          updated_at = NOW()
-        `,
-        [tenantId, itemId, toLocationId, qty]
-      );
-
-      // Запись transfer
       const { rows: transferRows } = await client.query(
         `
-        INSERT INTO core.transfers
-        (
-          tenant_id,
-          item_id,
-          from_location_id,
-          to_location_id,
-          qty,
-          comment,
-          created_by
-        )
-        VALUES ($1,$2,$3,$4,$5,$6,$7)
-        RETURNING *
+          INSERT INTO core.transfers
+          (
+            tenant_id,
+            item_id,
+            from_location_id,
+            to_location_id,
+            qty,
+            comment,
+            created_by
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          RETURNING *
         `,
         [
           tenantId,
@@ -140,22 +292,58 @@ router.post(
 
       const transfer = transferRows[0];
 
-      // Движение OUT
-      await client.query(
+      const { rows: sourceUpdateRows } = await client.query(
         `
-        INSERT INTO core.movements
-        (
-          tenant_id,
-          item_id,
-          location_id,
-          movement_type,
-          qty,
-          ref_type,
-          ref_id,
-          comment,
-          created_by
-        )
-        VALUES ($1,$2,$3,'transfer_out',$4,'transfer',$5,$6,$7)
+          UPDATE core.stock
+          SET qty = qty - $4,
+              updated_at = NOW()
+          WHERE tenant_id = $1
+            AND item_id = $2
+            AND location_id = $3
+          RETURNING *
+        `,
+        [tenantId, itemId, fromLocationId, qty]
+      );
+
+      const sourceStock = sourceUpdateRows[0];
+
+      const { rows: targetUpdateRows } = await client.query(
+        `
+          INSERT INTO core.stock
+          (
+            tenant_id,
+            item_id,
+            location_id,
+            qty
+          )
+          VALUES ($1, $2, $3, $4)
+          ON CONFLICT ON CONSTRAINT stock_tenant_item_location_uk
+          DO UPDATE SET
+            qty = core.stock.qty + EXCLUDED.qty,
+            updated_at = NOW()
+          RETURNING *
+        `,
+        [tenantId, itemId, toLocationId, qty]
+      );
+
+      const targetStock = targetUpdateRows[0];
+
+      const { rows: movementOutRows } = await client.query(
+        `
+          INSERT INTO core.movements
+          (
+            tenant_id,
+            item_id,
+            location_id,
+            movement_type,
+            qty,
+            ref_type,
+            ref_id,
+            comment,
+            created_by
+          )
+          VALUES ($1, $2, $3, 'transfer_out', $4, 'transfer', $5, $6, $7)
+          RETURNING *
         `,
         [
           tenantId,
@@ -168,22 +356,24 @@ router.post(
         ]
       );
 
-      // Движение IN
-      await client.query(
+      const movementOut = movementOutRows[0];
+
+      const { rows: movementInRows } = await client.query(
         `
-        INSERT INTO core.movements
-        (
-          tenant_id,
-          item_id,
-          location_id,
-          movement_type,
-          qty,
-          ref_type,
-          ref_id,
-          comment,
-          created_by
-        )
-        VALUES ($1,$2,$3,'transfer_in',$4,'transfer',$5,$6,$7)
+          INSERT INTO core.movements
+          (
+            tenant_id,
+            item_id,
+            location_id,
+            movement_type,
+            qty,
+            ref_type,
+            ref_id,
+            comment,
+            created_by
+          )
+          VALUES ($1, $2, $3, 'transfer_in', $4, 'transfer', $5, $6, $7)
+          RETURNING *
         `,
         [
           tenantId,
@@ -196,13 +386,18 @@ router.post(
         ]
       );
 
+      const movementIn = movementInRows[0];
+
       await client.query("COMMIT");
 
       return res.json({
         ok: true,
-        transfer
+        transfer,
+        source_stock: sourceStock,
+        target_stock: targetStock,
+        movement_out: movementOut,
+        movement_in: movementIn
       });
-
     } catch (e) {
       await client.query("ROLLBACK");
       console.error("[POST /stock/transfer] error:", e);
