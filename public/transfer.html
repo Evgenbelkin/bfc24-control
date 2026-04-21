@@ -925,6 +925,15 @@
     function bindEvents() {
       els.itemSearchInput.addEventListener("input", () => {
         renderItemOptions();
+        els.itemSelect.focus();
+        els.itemSelect.size = Math.min(filteredItems.length + 1, 8);
+        if (filteredItems.length === 0) {
+          els.itemSelect.size = 1;
+        }
+      });
+
+      els.itemSelect.addEventListener("blur", () => {
+        els.itemSelect.size = 1;
       });
 
       els.itemSelect.addEventListener("change", () => {
