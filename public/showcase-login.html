@@ -1,71 +1,232 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Вход покупателя</title>
-<style>
-body{
-  font-family:Arial;
-  background:#f5f7fb;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-}
-.box{
-  background:#fff;
-  padding:30px;
-  border-radius:12px;
-  width:320px;
-}
-input{
-  width:100%;
-  margin-bottom:10px;
-  height:40px;
-}
-button{
-  width:100%;
-  height:40px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вход покупателя — BFC24 CONTROL</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --line:#e6ebf2;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-2:#1d4ed8;
+      --danger:#dc2626;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--bg);
+      font-family:Arial,Helvetica,sans-serif;
+      color:var(--text);
+      padding:20px;
+    }
+    .card{
+      width:100%;
+      max-width:380px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:28px;
+    }
+    h1{
+      margin:0 0 8px 0;
+      font-size:28px;
+    }
+    p{
+      margin:0 0 18px 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
+    .field{
+      margin-bottom:12px;
+    }
+    .field label{
+      display:block;
+      margin-bottom:6px;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .field input{
+      width:100%;
+      height:44px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:0 14px;
+      font-size:14px;
+      color:var(--text);
+      outline:none;
+      background:#fff;
+    }
+    .field input:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.10);
+    }
+    .btn{
+      width:100%;
+      height:46px;
+      border:none;
+      border-radius:12px;
+      background:var(--primary);
+      color:#fff;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      transition:.15s ease;
+      margin-top:6px;
+    }
+    .btn:hover{background:var(--primary-2)}
+    .btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+    .message{
+      display:none;
+      margin-bottom:14px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+    }
+    .message.show{display:block}
+    .message.error{
+      background:#fee2e2;
+      color:#b91c1c;
+    }
+    .message.success{
+      background:#dcfce7;
+      color:#15803d;
+    }
+    .hint{
+      margin-top:12px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+    }
+  </style>
 </head>
 <body>
+  <div class="card">
+    <h1>Вход</h1>
+    <p>Вход для покупателей витрины. После входа откроется каталог товаров.</p>
 
-<div class="box">
-  <h2>Вход</h2>
-  <input id="tenant" placeholder="tenant_id" value="1"/>
-  <input id="login" placeholder="логин"/>
-  <input id="password" type="password" placeholder="пароль"/>
-  <button onclick="login()">Войти</button>
-</div>
+    <div class="message error" id="messageBox"></div>
 
-<script src="/js/config.js"></script>
-<script src="/js/api.js"></script>
+    <div class="field">
+      <label for="tenantInput">Tenant ID</label>
+      <input id="tenantInput" type="number" value="1" />
+    </div>
 
-<script>
-async function login(){
-  const tenant_id = Number(document.getElementById('tenant').value);
-  const login = document.getElementById('login').value;
-  const password = document.getElementById('password').value;
+    <div class="field">
+      <label for="loginInput">Логин</label>
+      <input id="loginInput" type="text" value="buyer1" />
+    </div>
 
-  const res = await fetch(API_BASE + '/showcase/auth/login',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({tenant_id, login, password})
-  });
+    <div class="field">
+      <label for="passwordInput">Пароль</label>
+      <input id="passwordInput" type="password" value="123456" />
+    </div>
 
-  const data = await res.json();
+    <button class="btn" id="loginBtn" type="button">Войти</button>
 
-  if(!data.ok){
-    alert('Ошибка');
-    return;
-  }
+    <div class="hint">Тестовый вход: tenant_id = 1, login = buyer1, password = 123456</div>
+  </div>
 
-  localStorage.setItem('showcase_buyer', JSON.stringify(data.buyer));
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script>
+    (function () {
+      const tenantInput = document.getElementById('tenantInput');
+      const loginInput = document.getElementById('loginInput');
+      const passwordInput = document.getElementById('passwordInput');
+      const loginBtn = document.getElementById('loginBtn');
+      const messageBox = document.getElementById('messageBox');
 
-  location.href = '/showcase.html';
-}
-</script>
+      function showError(text) {
+        messageBox.textContent = text;
+        messageBox.className = 'message error show';
+      }
 
+      function hideError() {
+        messageBox.textContent = '';
+        messageBox.className = 'message error';
+      }
+
+      async function login() {
+        hideError();
+
+        const tenant_id = Number(tenantInput.value || 0);
+        const login = String(loginInput.value || '').trim();
+        const password = String(passwordInput.value || '');
+
+        if (!tenant_id || !login || !password) {
+          showError('Заполни tenant_id, логин и пароль');
+          return;
+        }
+
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Входим...';
+
+        try {
+          const result = await API.post('/showcase/auth/login', {
+            tenant_id,
+            login,
+            password
+          });
+
+          if (!result || !result.ok || !result.buyer) {
+            showError('Не удалось выполнить вход');
+            return;
+          }
+
+          localStorage.setItem('showcase_buyer', JSON.stringify(result.buyer));
+          localStorage.setItem('showcase_tenant_id', String(tenant_id));
+
+          location.href = '/showcase.html';
+        } catch (error) {
+          console.error('[showcase-login] login error:', error);
+
+          let text = 'Ошибка входа';
+          if (error && error.error === 'invalid_credentials') {
+            text = 'Неверный логин или пароль';
+          } else if (error && error.error === 'login_password_tenant_required') {
+            text = 'Нужно заполнить tenant_id, логин и пароль';
+          } else if (error && error.message) {
+            text = error.message;
+          }
+
+          showError(text);
+        } finally {
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Войти';
+        }
+      }
+
+      loginBtn.addEventListener('click', login);
+
+      passwordInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') login();
+      });
+
+      loginInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') login();
+      });
+    })();
+  </script>
 </body>
 </html>
