@@ -266,6 +266,18 @@
       font-size:13px;
       line-height:1.45;
     }
+    .stock-warning{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--danger-line);
+      background:var(--danger-bg);
+      color:var(--danger-text);
+      font-size:13px;
+      line-height:1.45;
+      display:none;
+    }
+    .stock-warning.show{ display:block; }
     @media (max-width: 1100px){ .grid{ grid-template-columns:1fr; } }
     @media (max-width: 860px){
       .form-grid, .item-lines, .mode-grid{ grid-template-columns:1fr; }
@@ -346,6 +358,10 @@
 
             <div class="field full">
               <div id="qtyCalcBox" class="calc-box" data-i18n="transfer.qtyCalcSelectItem">Выбери товар, чтобы увидеть пересчёт коробок в штуки.</div>
+            </div>
+
+            <div class="field full">
+              <div id="stockWarningBox" class="stock-warning"></div>
             </div>
 
             <div class="field full">
@@ -472,7 +488,9 @@
       }
 
       if (!response.ok || data.ok === false) {
-        throw new Error(data.error || data.message || ("HTTP " + response.status));
+        const err = new Error(data.message || data.error || ("HTTP " + response.status));
+        err.payload = data;
+        throw err;
       }
       return data;
     }
@@ -532,6 +550,7 @@
       qtyInput: document.getElementById("qtyInput"),
       availableQtyInput: document.getElementById("availableQtyInput"),
       qtyCalcBox: document.getElementById("qtyCalcBox"),
+      stockWarningBox: document.getElementById("stockWarningBox"),
       commentInput: document.getElementById("commentInput"),
       submitBtn: document.getElementById("submitBtn"),
       pageStatus: document.getElementById("pageStatus"),
@@ -609,6 +628,16 @@
       els.pageStatus.textContent = "";
     }
 
+    function setStockWarning(text) {
+      if (!text) {
+        els.stockWarningBox.classList.remove("show");
+        els.stockWarningBox.textContent = "";
+        return;
+      }
+      els.stockWarningBox.classList.add("show");
+      els.stockWarningBox.textContent = text;
+    }
+
     function normalizeList(data, key) {
       if (Array.isArray(data)) return data;
       if (data && Array.isArray(data[key])) return data[key];
@@ -648,6 +677,12 @@
           };
         })
         .sort((a, b) => String(a.location_name || "").localeCompare(String(b.location_name || ""), "ru"));
+    }
+
+    function updateSubmitAvailability() {
+      const item = getSelectedItem();
+      const hasStock = item ? getItemStockRows(item.id).length > 0 : false;
+      els.submitBtn.disabled = !item || !hasStock;
     }
 
     function renderItemOptions() {
@@ -791,6 +826,13 @@
       }
 
       const rows = getItemStockRows(item.id);
+
+      if (!rows.length) {
+        els.fromLocationSelect.innerHTML = `<option value="">${escapeHtml(t("transfer.stockNoAvailableOption"))}</option>`;
+        els.fromLocationSelect.disabled = true;
+        return;
+      }
+
       let html = `<option value="">${escapeHtml(t("transfer.fromPlaceholder"))}</option>`;
 
       rows.forEach(row => {
@@ -799,7 +841,7 @@
       });
 
       els.fromLocationSelect.innerHTML = html;
-      els.fromLocationSelect.disabled = rows.length === 0;
+      els.fromLocationSelect.disabled = false;
 
       if (rows.some(row => String(row.location_id) === prevValue)) {
         els.fromLocationSelect.value = prevValue;
@@ -874,6 +916,23 @@
         : t("transfer.qtyCalcBoxesIdle", { boxQty: formatNumber(boxQty) });
     }
 
+    function updateNoStockState() {
+      const item = getSelectedItem();
+
+      if (!item) {
+        setStockWarning("");
+        return;
+      }
+
+      const rows = getItemStockRows(item.id);
+      if (!rows.length) {
+        setStockWarning(t("transfer.noStockWarning"));
+        return;
+      }
+
+      setStockWarning("");
+    }
+
     function renderHistory() {
       els.summaryTransfers.textContent = t("transfer.summaryTransfers", { count: transfersData.length });
 
@@ -910,6 +969,8 @@
       renderToLocationOptions();
       syncAvailableQty();
       updateQtyCalcBox();
+      updateNoStockState();
+      updateSubmitAvailability();
     }
 
     async function loadItems() {
@@ -989,9 +1050,19 @@
         updateUIBySelection();
       } catch (e) {
         console.error("[transfer] submitTransfer error:", e);
-        showStatus(t("transfer.submitError", { error: e.message || e }), "error");
+        const payload = e.payload || {};
+        if (payload.error === "not_enough_stock" || payload.error === "source_stock_empty" || payload.error === "source_stock_not_found") {
+          const availableQty = formatNumber(payload.available_qty || 0);
+          const requestedQty = formatNumber(payload.requested_qty || 0);
+          showStatus(t("transfer.notEnoughStockDetailed", {
+            availableQty,
+            requestedQty
+          }), "error");
+        } else {
+          showStatus(t("transfer.submitError", { error: e.message || e }), "error");
+        }
       } finally {
-        els.submitBtn.disabled = false;
+        updateSubmitAvailability();
         els.submitBtn.textContent = t("transfer.submitButton");
       }
     }
@@ -1007,6 +1078,8 @@
         renderToLocationOptions();
         syncAvailableQty();
         updateQtyCalcBox();
+        updateNoStockState();
+        updateSubmitAvailability();
       });
 
       els.itemSearchInput.addEventListener("keydown", (e) => {
@@ -1056,10 +1129,12 @@
       els.fromLocationSelect.addEventListener("change", () => {
         renderToLocationOptions();
         syncAvailableQty();
+        updateSubmitAvailability();
       });
 
       els.toLocationSelect.addEventListener("change", () => {
         syncAvailableQty();
+        updateSubmitAvailability();
       });
 
       els.qtyInput.addEventListener("input", () => {

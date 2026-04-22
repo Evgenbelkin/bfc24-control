@@ -316,17 +316,34 @@ router.post(
         await client.query("ROLLBACK");
         return res.status(400).json({
           ok: false,
-          error: "source_stock_not_found"
+          error: "source_stock_not_found",
+          message: "Товар отсутствует в выбранной исходной локации",
+          available_qty: 0,
+          requested_qty: finalQty
         });
       }
 
       const sourceQty = Number(stockRows[0].qty || 0);
 
+      if (sourceQty <= 0) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          ok: false,
+          error: "source_stock_empty",
+          message: "Товар отсутствует в наличии в выбранной исходной локации",
+          available_qty: sourceQty,
+          requested_qty: finalQty
+        });
+      }
+
       if (sourceQty < finalQty) {
         await client.query("ROLLBACK");
         return res.status(400).json({
           ok: false,
-          error: "not_enough_stock"
+          error: "not_enough_stock",
+          message: "Недостаточно остатка для перемещения",
+          available_qty: sourceQty,
+          requested_qty: finalQty
         });
       }
 
