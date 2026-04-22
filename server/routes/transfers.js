@@ -19,6 +19,32 @@ function normalizeText(value) {
   return s.length ? s : null;
 }
 
+function normalizeQtyMode(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  if (raw === "units") return "units";
+  if (raw === "boxes") return "boxes";
+  return "boxes";
+}
+
+function formatQtyLabel(row) {
+  const qtyMode = normalizeQtyMode(row.qty_mode);
+  const qtyInput = Number(row.qty_input || 0);
+  const qty = Number(row.qty || 0);
+  const boxQtySnapshot = Number(row.box_qty_snapshot || 0);
+
+  if (qtyMode === "boxes") {
+    const boxWord = qtyInput === 1 ? "коробка" : "коробки";
+    const left = `${qtyInput} ${boxWord}`;
+    const right = `${qty} шт`;
+    if (boxQtySnapshot > 0) {
+      return `${left} / ${right}`;
+    }
+    return `${left} / ${right}`;
+  }
+
+  return `${qtyInput || qty} шт`;
+}
+
 router.get(
   "/transfers",
   authRequired,
@@ -44,6 +70,9 @@ router.get(
           t.from_location_id,
           t.to_location_id,
           t.qty,
+          t.qty_mode,
+          t.qty_input,
+          t.box_qty_snapshot,
           t.comment,
           t.created_by,
           t.created_at,
@@ -51,6 +80,7 @@ router.get(
           i.name AS item_name,
           i.sku,
           i.barcode,
+          i.box_qty,
 
           lf.name AS from_location_name,
           lf.code AS from_location_code,
@@ -79,9 +109,14 @@ router.get(
 
       const { rows } = await pool.query(sql, [tenantId, limit]);
 
+      const transfers = rows.map((row) => ({
+        ...row,
+        qty_display: formatQtyLabel(row)
+      }));
+
       return res.json({
         ok: true,
-        transfers: rows
+        transfers
       });
     } catch (e) {
       console.error("[GET /stock/transfers] error:", e);
@@ -113,7 +148,8 @@ router.post(
       const itemId = toNumber(req.body.item_id);
       const fromLocationId = toNumber(req.body.from_location_id);
       const toLocationId = toNumber(req.body.to_location_id);
-      const qty = toNumber(req.body.qty);
+      const qtyInput = toNumber(req.body.qty_input ?? req.body.qty);
+      const qtyMode = normalizeQtyMode(req.body.qty_mode);
       const comment = normalizeText(req.body.comment);
 
       if (!itemId || itemId <= 0) {
@@ -144,7 +180,7 @@ router.post(
         });
       }
 
-      if (!qty || qty <= 0) {
+      if (!qtyInput || qtyInput <= 0) {
         return res.status(400).json({
           ok: false,
           error: "invalid_qty"
@@ -155,7 +191,10 @@ router.post(
 
       const { rows: itemRows } = await client.query(
         `
-          SELECT id, is_active
+          SELECT
+            id,
+            is_active,
+            box_qty
           FROM core.items
           WHERE tenant_id = $1
             AND id = $2
@@ -172,7 +211,9 @@ router.post(
         });
       }
 
-      if (itemRows[0].is_active === false) {
+      const item = itemRows[0];
+
+      if (item.is_active === false) {
         await client.query("ROLLBACK");
         return res.status(400).json({
           ok: false,
@@ -234,6 +275,31 @@ router.post(
         });
       }
 
+      const itemBoxQty = toNumber(item.box_qty);
+      let boxQtySnapshot = null;
+      let finalQty = qtyInput;
+
+      if (qtyMode === "boxes") {
+        if (!itemBoxQty || itemBoxQty <= 0) {
+          await client.query("ROLLBACK");
+          return res.status(400).json({
+            ok: false,
+            error: "invalid_box_qty_for_item"
+          });
+        }
+
+        boxQtySnapshot = itemBoxQty;
+        finalQty = qtyInput * itemBoxQty;
+      }
+
+      if (!finalQty || finalQty <= 0) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_final_qty"
+        });
+      }
+
       const { rows: stockRows } = await client.query(
         `
           SELECT qty
@@ -256,7 +322,7 @@ router.post(
 
       const sourceQty = Number(stockRows[0].qty || 0);
 
-      if (sourceQty < qty) {
+      if (sourceQty < finalQty) {
         await client.query("ROLLBACK");
         return res.status(400).json({
           ok: false,
@@ -273,10 +339,13 @@ router.post(
             from_location_id,
             to_location_id,
             qty,
+            qty_mode,
+            qty_input,
+            box_qty_snapshot,
             comment,
             created_by
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
           RETURNING *
         `,
         [
@@ -284,7 +353,10 @@ router.post(
           itemId,
           fromLocationId,
           toLocationId,
-          qty,
+          finalQty,
+          qtyMode,
+          qtyInput,
+          boxQtySnapshot,
           comment,
           userId
         ]
@@ -302,7 +374,7 @@ router.post(
             AND location_id = $3
           RETURNING *
         `,
-        [tenantId, itemId, fromLocationId, qty]
+        [tenantId, itemId, fromLocationId, finalQty]
       );
 
       const sourceStock = sourceUpdateRows[0];
@@ -323,10 +395,20 @@ router.post(
             updated_at = NOW()
           RETURNING *
         `,
-        [tenantId, itemId, toLocationId, qty]
+        [tenantId, itemId, toLocationId, finalQty]
       );
 
       const targetStock = targetUpdateRows[0];
+
+      const movementCommentBase = comment ? `${comment} | ` : "";
+      const qtyDisplay = formatQtyLabel({
+        qty_mode: qtyMode,
+        qty_input: qtyInput,
+        qty: finalQty,
+        box_qty_snapshot: boxQtySnapshot
+      });
+
+      const movementComment = `${movementCommentBase}${qtyDisplay}`;
 
       const { rows: movementOutRows } = await client.query(
         `
@@ -349,9 +431,9 @@ router.post(
           tenantId,
           itemId,
           fromLocationId,
-          qty,
+          finalQty,
           transfer.id,
-          comment,
+          movementComment,
           userId
         ]
       );
@@ -379,9 +461,9 @@ router.post(
           tenantId,
           itemId,
           toLocationId,
-          qty,
+          finalQty,
           transfer.id,
-          comment,
+          movementComment,
           userId
         ]
       );
@@ -392,7 +474,10 @@ router.post(
 
       return res.json({
         ok: true,
-        transfer,
+        transfer: {
+          ...transfer,
+          qty_display: qtyDisplay
+        },
         source_stock: sourceStock,
         target_stock: targetStock,
         movement_out: movementOut,
