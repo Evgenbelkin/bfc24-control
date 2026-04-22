@@ -1,32 +1,635 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Карточка заказа</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Карточка заказа — BFC24 CONTROL</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --line:#e6ebf2;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-2:#1d4ed8;
+      --success:#16a34a;
+      --warning:#d97706;
+      --danger:#dc2626;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:1500px;
+      margin:0 auto;
+      padding:24px;
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+    }
+    .title h1{
+      margin:0 0 6px 0;
+      font-size:28px;
+      line-height:1.2;
+    }
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:11px 16px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:14px;
+      transition:.15s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-2)}
+    .btn-success{background:var(--success);color:#fff}
+    .btn-warning{background:var(--warning);color:#fff}
+    .btn-danger{background:var(--danger);color:#fff}
+    .btn-light{background:#fff;color:var(--text);border:1px solid var(--line)}
+    .btn-light:hover{background:#f8fafc}
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none!important;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .section{
+      padding:18px;
+      margin-bottom:18px;
+    }
+    .meta-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+    }
+    .meta-item{
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      min-height:88px;
+    }
+    .meta-item .label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .meta-item .value{
+      font-size:15px;
+      font-weight:700;
+      word-break:break-word;
+    }
+    .status{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:118px;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .s-new{background:#eef2f7;color:#475569}
+    .s-in_progress{background:#dbeafe;color:#1d4ed8}
+    .s-partially_picked{background:#fef3c7;color:#b45309}
+    .s-ready{background:#dcfce7;color:#15803d}
+    .s-completed{background:#d1fae5;color:#047857}
+    .s-cancelled{background:#fee2e2;color:#b91c1c}
+    .row-new{background:#fff}
+    .row-approved{background:#eff6ff}
+    .row-picked{background:#f0fdf4}
+    .row-partial{background:#fff7ed}
+    .row-cancelled{background:#fef2f2}
+    .message{
+      margin:0 0 16px 0;
+      padding:12px 14px;
+      border-radius:12px;
+      display:none;
+      font-size:14px;
+      font-weight:700;
+    }
+    .message.show{display:block}
+    .message.info{background:#dbeafe;color:#1d4ed8}
+    .message.error{background:#fee2e2;color:#b91c1c}
+    .message.success{background:#dcfce7;color:#15803d}
+    .toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+    .table-wrap{
+      overflow:auto;
+      padding:0;
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width:1450px;
+    }
+    thead th{
+      position:sticky;
+      top:0;
+      z-index:2;
+      background:#f8fafc;
+      color:var(--muted);
+      text-align:left;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      padding:14px 12px;
+      border-bottom:1px solid var(--line);
+    }
+    tbody td{
+      padding:12px;
+      border-bottom:1px solid var(--line);
+      font-size:14px;
+      vertical-align:middle;
+    }
+    .thumb{
+      width:52px;
+      height:52px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      object-fit:cover;
+      display:block;
+    }
+    .thumb.empty{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--muted);
+      font-size:11px;
+      background:#f8fafc;
+    }
+    .mono{font-family:Consolas,Menlo,monospace}
+    .muted{color:var(--muted)}
+    .field-input,
+    .field-select{
+      width:100%;
+      min-width:90px;
+      height:38px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+      padding:0 10px;
+      font-size:14px;
+      color:var(--text);
+      outline:none;
+    }
+    .field-input:focus,
+    .field-select:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.10);
+    }
+    .empty{
+      padding:36px 20px;
+      text-align:center;
+      color:var(--muted);
+    }
+    @media (max-width: 1100px){
+      .meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (max-width: 700px){
+      .wrap{padding:14px}
+      .meta-grid{grid-template-columns:1fr}
+      .title h1{font-size:22px}
+    }
+  </style>
 </head>
 <body>
-<h1>Карточка заказа (MVP)</h1>
-<p>Этот экран будет доработан дальше. Сейчас главное — подключение к API.</p>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1 id="pageTitle">Карточка заказа</h1>
+        <p>Рабочий экран продавца для обработки заказа, редактирования строк и завершения продажи.</p>
+      </div>
+      <div class="actions">
+        <a class="btn btn-light" href="/showcase-orders.html">← К списку заказов</a>
+        <button class="btn btn-primary" id="btnRefresh" type="button">Обновить</button>
+      </div>
+    </div>
 
-<script src="/js/config.js"></script>
-<script src="/js/api.js"></script>
+    <div class="message info" id="messageBox"></div>
 
-<script>
-(async function(){
-  const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  const tenantId = user && user.tenant_id ? Number(user.tenant_id) : 1;
+    <div class="card section">
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="label">Номер заказа</div>
+          <div class="value mono" id="metaOrderNo">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Клиент</div>
+          <div class="value" id="metaBuyer">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Телефон</div>
+          <div class="value" id="metaPhone">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Статус</div>
+          <div class="value"><span class="status s-new" id="metaStatus">—</span></div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Комментарий</div>
+          <div class="value" id="metaComment">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Кто взял</div>
+          <div class="value" id="metaTakenBy">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Дата создания</div>
+          <div class="value" id="metaCreatedAt">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Продажа</div>
+          <div class="value" id="metaSaleId">—</div>
+        </div>
+      </div>
 
-  const params = new URLSearchParams(location.search);
-  const orderId = params.get('id');
+      <div class="toolbar">
+        <button class="btn btn-primary" id="btnTake" type="button">Взять в работу</button>
+        <button class="btn btn-success" id="btnReady" type="button">Готов</button>
+        <button class="btn btn-warning" id="btnCreateSale" type="button">Создать продажу</button>
+        <button class="btn btn-danger" id="btnCancelOrder" type="button">Отменить заказ</button>
+      </div>
+    </div>
 
-  const res = await API.get('/showcase-admin/orders/' + orderId + '?tenant_id=' + tenantId);
+    <div class="card table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Фото</th>
+            <th>Товар</th>
+            <th>SKU / ШК</th>
+            <th>Остаток</th>
+            <th>Запрос</th>
+            <th>Резерв</th>
+            <th>Подтверждено</th>
+            <th>Собрано</th>
+            <th>Цена</th>
+            <th>Статус строки</th>
+            <th>Сохранить</th>
+          </tr>
+        </thead>
+        <tbody id="itemsTbody">
+          <tr><td colspan="11" class="empty">Загрузка...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-  console.log(res);
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script>
+    (function () {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
 
-  document.body.innerHTML += '<pre>' + JSON.stringify(res, null, 2) + '</pre>';
-})();
-</script>
+      if (!token || !user) {
+        location.href = '/login.html';
+        return;
+      }
 
+      const tenantId = user && user.tenant_id ? Number(user.tenant_id) : 1;
+      const params = new URLSearchParams(location.search);
+      const orderId = Number(params.get('id') || 0);
+
+      if (!orderId) {
+        alert('Не передан id заказа');
+        location.href = '/showcase-orders.html';
+        return;
+      }
+
+      const state = {
+        order: null
+      };
+
+      const messageBox = document.getElementById('messageBox');
+      const itemsTbody = document.getElementById('itemsTbody');
+
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function showMessage(text, variant = 'info') {
+        messageBox.textContent = text;
+        messageBox.className = 'message show ' + variant;
+      }
+
+      function hideMessage() {
+        messageBox.className = 'message info';
+        messageBox.textContent = '';
+      }
+
+      function statusLabel(status) {
+        const map = {
+          new: 'Новый',
+          in_progress: 'В работе',
+          partially_picked: 'Частично собран',
+          ready: 'Готов',
+          completed: 'Завершён',
+          cancelled: 'Отменён',
+          approved: 'Подтверждено',
+          picked: 'Собрано',
+          partial: 'Частично',
+          new_line: 'Новая строка'
+        };
+        return map[status] || status || '—';
+      }
+
+      function statusClass(status) {
+        return 'status s-' + (status || 'new');
+      }
+
+      function rowClass(status) {
+        if (status === 'approved') return 'row-approved';
+        if (status === 'picked') return 'row-picked';
+        if (status === 'partial') return 'row-partial';
+        if (status === 'cancelled') return 'row-cancelled';
+        return 'row-new';
+      }
+
+      function displayDateTimeSafe(value) {
+        try {
+          if (typeof displayDateTime === 'function') {
+            return displayDateTime(value);
+          }
+        } catch (e) {}
+        if (!value) return '—';
+        const dt = new Date(value);
+        if (Number.isNaN(dt.getTime())) return String(value);
+        return dt.toLocaleString('ru-RU');
+      }
+
+      function setText(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = value || '—';
+      }
+
+      function renderMeta() {
+        const order = state.order;
+        if (!order) return;
+
+        document.getElementById('pageTitle').textContent = 'Заказ ' + (order.order_no || '');
+        setText('metaOrderNo', order.order_no || '—');
+        setText('metaBuyer', order.buyer_name || '—');
+        setText('metaPhone', order.buyer_phone || '—');
+        setText('metaComment', order.comment || '—');
+        setText('metaTakenBy', order.taken_by_name || '—');
+        setText('metaCreatedAt', displayDateTimeSafe(order.created_at));
+        setText('metaSaleId', order.sale_id || '—');
+
+        const statusEl = document.getElementById('metaStatus');
+        statusEl.className = statusClass(order.status);
+        statusEl.textContent = statusLabel(order.status);
+
+        const isNew = order.status === 'new';
+        const isEditable = ['in_progress', 'partially_picked', 'ready'].includes(order.status);
+        const isReady = order.status === 'ready';
+        const isCompleted = order.status === 'completed';
+        const isCancelled = order.status === 'cancelled';
+
+        document.getElementById('btnTake').disabled = !isNew;
+        document.getElementById('btnReady').disabled = !isEditable || isCompleted || isCancelled;
+        document.getElementById('btnCreateSale').disabled = !isReady;
+        document.getElementById('btnCancelOrder').disabled = isCompleted || isCancelled;
+      }
+
+      function imageHtml(url) {
+        if (!url) return '<div class="thumb empty">нет фото</div>';
+        return '<img class="thumb" src="' + escapeHtml(url) + '" alt="">';
+      }
+
+      function renderItems() {
+        const order = state.order;
+        if (!order || !Array.isArray(order.items) || !order.items.length) {
+          itemsTbody.innerHTML = '<tr><td colspan="11" class="empty">Строк заказа нет</td></tr>';
+          return;
+        }
+
+        const editable = ['in_progress', 'partially_picked', 'ready'].includes(order.status);
+
+        itemsTbody.innerHTML = order.items.map((item) => `
+          <tr class="${rowClass(item.line_status)}">
+            <td>${imageHtml(item.image_url)}</td>
+            <td>
+              <div><strong>${escapeHtml(item.item_name || '—')}</strong></div>
+            </td>
+            <td>
+              <div class="mono">${escapeHtml(item.sku || '—')}</div>
+              <div class="muted">${escapeHtml(item.barcode || '')}</div>
+            </td>
+            <td>${escapeHtml(item.available_qty || '0')}</td>
+            <td>${escapeHtml(item.requested_qty || '0')}</td>
+            <td>${escapeHtml(item.reserved_qty || '0')}</td>
+            <td>
+              <input class="field-input js-approved-qty" type="number" step="0.001" value="${escapeHtml(item.approved_qty ?? item.reserved_qty ?? 0)}" ${editable ? '' : 'disabled'} />
+            </td>
+            <td>
+              <input class="field-input js-picked-qty" type="number" step="0.001" value="${escapeHtml(item.picked_qty ?? 0)}" ${editable ? '' : 'disabled'} />
+            </td>
+            <td>
+              <input class="field-input js-final-price" type="number" step="0.01" value="${escapeHtml(item.final_price ?? 0)}" ${editable ? '' : 'disabled'} />
+            </td>
+            <td>
+              <select class="field-select js-line-status" ${editable ? '' : 'disabled'}>
+                <option value="new" ${item.line_status === 'new' ? 'selected' : ''}>Новая</option>
+                <option value="approved" ${item.line_status === 'approved' ? 'selected' : ''}>Подтверждено</option>
+                <option value="picked" ${item.line_status === 'picked' ? 'selected' : ''}>Собрано</option>
+                <option value="partial" ${item.line_status === 'partial' ? 'selected' : ''}>Частично</option>
+                <option value="cancelled" ${item.line_status === 'cancelled' ? 'selected' : ''}>Отменено</option>
+              </select>
+            </td>
+            <td>
+              <button class="btn btn-light btn-sm js-save-line" data-item-row-id="${item.id}" ${editable ? '' : 'disabled'}>Сохранить</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      async function loadOrder() {
+        hideMessage();
+        itemsTbody.innerHTML = '<tr><td colspan="11" class="empty">Загрузка...</td></tr>';
+
+        try {
+          const result = await API.get('/showcase-admin/orders/' + orderId + '?tenant_id=' + tenantId);
+          state.order = result.order;
+          renderMeta();
+          renderItems();
+        } catch (error) {
+          console.error('[showcase-order-view] loadOrder error:', error);
+          const text = (typeof translateError === 'function')
+            ? translateError(error?.error || error?.message || 'server_error')
+            : (error?.error || error?.message || 'Ошибка загрузки заказа');
+
+          itemsTbody.innerHTML = '<tr><td colspan="11" class="empty">Ошибка загрузки</td></tr>';
+          showMessage(text, 'error');
+        }
+      }
+
+      async function takeOrder() {
+        try {
+          showMessage('Берём заказ в работу...', 'info');
+          await API.post('/showcase-admin/orders/' + orderId + '/take?tenant_id=' + tenantId, {});
+          showMessage('Заказ взят в работу', 'success');
+          await loadOrder();
+        } catch (error) {
+          console.error('[showcase-order-view] takeOrder error:', error);
+          const text = (typeof translateError === 'function')
+            ? translateError(error?.error || error?.message || 'server_error')
+            : (error?.error || error?.message || 'Ошибка взятия заказа в работу');
+          showMessage(text, 'error');
+        }
+      }
+
+      async function saveLine(button) {
+        const row = button.closest('tr');
+        const itemRowId = Number(button.getAttribute('data-item-row-id'));
+        if (!row || !itemRowId) return;
+
+        const approvedQty = row.querySelector('.js-approved-qty').value;
+        const pickedQty = row.querySelector('.js-picked-qty').value;
+        const finalPrice = row.querySelector('.js-final-price').value;
+        const lineStatus = row.querySelector('.js-line-status').value;
+
+        try {
+          button.disabled = true;
+          showMessage('Сохраняем строку...', 'info');
+
+          await API.patch('/showcase-admin/orders/' + orderId + '/items/' + itemRowId + '?tenant_id=' + tenantId, {
+            approved_qty: approvedQty,
+            picked_qty: pickedQty,
+            final_price: finalPrice,
+            line_status: lineStatus
+          });
+
+          showMessage('Строка сохранена', 'success');
+          await loadOrder();
+        } catch (error) {
+          console.error('[showcase-order-view] saveLine error:', error);
+          const text = (typeof translateError === 'function')
+            ? translateError(error?.error || error?.message || 'server_error')
+            : (error?.error || error?.message || 'Ошибка сохранения строки');
+          showMessage(text, 'error');
+        } finally {
+          button.disabled = false;
+        }
+      }
+
+      async function setReady() {
+        try {
+          showMessage('Переводим заказ в готовность...', 'info');
+          await API.post('/showcase-admin/orders/' + orderId + '/ready?tenant_id=' + tenantId, {});
+          showMessage('Заказ переведён в статус "Готов"', 'success');
+          await loadOrder();
+        } catch (error) {
+          console.error('[showcase-order-view] setReady error:', error);
+          const text = (typeof translateError === 'function')
+            ? translateError(error?.error || error?.message || 'server_error')
+            : (error?.error || error?.message || 'Ошибка перевода заказа в готовность');
+          showMessage(text, 'error');
+        }
+      }
+
+      async function createSale() {
+        if (!confirm('Создать продажу из этого заказа?')) return;
+
+        try {
+          showMessage('Создаём продажу...', 'info');
+          const result = await API.post('/showcase-admin/orders/' + orderId + '/create-sale?tenant_id=' + tenantId, {});
+          showMessage('Продажа создана. ID: ' + (result.sale_id || '—'), 'success');
+          await loadOrder();
+        } catch (error) {
+          console.error('[showcase-order-view] createSale error:', error);
+          const text = (typeof translateError === 'function')
+            ? translateError(error?.error || error?.message || 'server_error')
+            : (error?.error || error?.message || 'Ошибка создания продажи');
+          showMessage(text, 'error');
+        }
+      }
+
+      async function cancelOrder() {
+        if (!confirm('Отменить заказ?')) return;
+
+        try {
+          showMessage('Отменяем заказ...', 'info');
+          await API.post('/showcase-admin/orders/' + orderId + '/cancel?tenant_id=' + tenantId, {});
+          showMessage('Заказ отменён', 'success');
+          await loadOrder();
+        } catch (error) {
+          console.error('[showcase-order-view] cancelOrder error:', error);
+          const text = (typeof translateError === 'function')
+            ? translateError(error?.error || error?.message || 'server_error')
+            : (error?.error || error?.message || 'Ошибка отмены заказа');
+          showMessage(text, 'error');
+        }
+      }
+
+      document.getElementById('btnRefresh').addEventListener('click', loadOrder);
+      document.getElementById('btnTake').addEventListener('click', takeOrder);
+      document.getElementById('btnReady').addEventListener('click', setReady);
+      document.getElementById('btnCreateSale').addEventListener('click', createSale);
+      document.getElementById('btnCancelOrder').addEventListener('click', cancelOrder);
+
+      itemsTbody.addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-save-line');
+        if (!btn) return;
+        saveLine(btn);
+      });
+
+      loadOrder();
+    })();
+  </script>
 </body>
 </html>
