@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="ru" translate="no" data-page-title-i18n="transfer.pageTitle">
+<head>
+  <meta charset="UTF-8" />
+  <title>BFC24 CONTROL — Перемещение товара</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:#dfe3eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+      --danger-bg:#fef2f2;
+      --danger-line:#fecaca;
+      --danger-text:#991b1b;
+      --ok-bg:#f0fdf4;
+      --ok-line:#bbf7d0;
+      --ok-text:#166534;
+      --info-bg:#eff6ff;
+      --info-line:#bfdbfe;
+      --info-text:#1d4ed8;
+      --warn-bg:#fff7ed;
+      --warn-line:#fed7aa;
+      --warn-text:#9a3412;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:1600px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .title{ font-size:28px; font-weight:700; }
+    .top-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .lang-switcher{ display:flex; gap:8px; flex-wrap:wrap; }
+    .lang-switcher button{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+      min-width:56px;
+    }
+    .lang-switcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+      transition:.15s ease;
+    }
+    .btn-primary{ background:var(--primary); color:#fff; }
+    .btn-primary:hover{ background:var(--primary-hover); }
+    .btn-light{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+    .btn-light:hover{
+      background:#f8fafc;
+      border-color:#cbd5e1;
+    }
+    .btn:disabled{ opacity:.65; cursor:not-allowed; }
+    .card{
+      background:var(--card);
+      border:1px solid #eef1f5;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:16px;
+    }
+    .card-title{ font-size:18px; font-weight:700; margin:0 0 14px; }
+    .muted{ color:var(--muted); font-size:13px; line-height:1.45; }
+    .grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:16px;
+      align-items:start;
+    }
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+      align-items:end;
+    }
+    .field{ display:flex; flex-direction:column; gap:7px; min-width:0; }
+    .field.full{ grid-column:1 / -1; }
+    label{ font-size:14px; font-weight:700; }
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:15px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+      font-family:inherit;
+    }
+    textarea{ resize:vertical; min-height:92px; }
+    input:focus, select:focus, textarea:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+    .autocomplete{ position:relative; }
+    .autocomplete-menu{
+      position:absolute;
+      top:calc(100% + 6px);
+      left:0;
+      right:0;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      box-shadow:0 14px 32px rgba(15,23,42,.12);
+      max-height:320px;
+      overflow:auto;
+      z-index:30;
+      display:none;
+    }
+    .autocomplete-menu.show{ display:block; }
+    .autocomplete-item{
+      padding:12px 14px;
+      border-bottom:1px solid #eef1f5;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .autocomplete-item:last-child{ border-bottom:none; }
+    .autocomplete-item:hover, .autocomplete-item.active{ background:#f8fbff; }
+    .autocomplete-title{ font-size:14px; font-weight:700; color:#111827; line-height:1.35; }
+    .autocomplete-sub{ font-size:12px; color:var(--muted); line-height:1.4; }
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+      white-space:pre-wrap;
+    }
+    .status.show{display:block}
+    .status.error{ background:var(--danger-bg); color:var(--danger-text); border:1px solid var(--danger-line); }
+    .status.success{ background:var(--ok-bg); color:var(--ok-text); border:1px solid var(--ok-line); }
+    .status.info{ background:var(--info-bg); color:var(--info-text); border:1px solid var(--info-line); }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid var(--info-line);
+      background:var(--info-bg);
+      color:var(--info-text);
+    }
+    .summary{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+    .stock-table-wrap, .history-table-wrap{
+      overflow:auto;
+      max-height:62vh;
+      border:1px solid #eef1f5;
+      border-radius:14px;
+      background:#fff;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      min-width:720px;
+    }
+    th, td{
+      border-bottom:1px solid #eef1f5;
+      padding:12px 10px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+    th{
+      background:#f8fafc;
+      font-weight:700;
+      color:#111827;
+      position:sticky;
+      top:0;
+      z-index:5;
+      white-space:nowrap;
+    }
+    tr:hover td{ background:#fbfdff; }
+    .mono{ font-variant-numeric:tabular-nums; }
+    .empty{ text-align:center; color:var(--muted); padding:24px 12px; }
+    .item-box{
+      border:1px solid #e8eef7;
+      border-radius:14px;
+      background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+      padding:14px;
+      margin-top:14px;
+    }
+    .item-box-title{ font-size:16px; font-weight:700; margin:0 0 8px; }
+    .item-lines{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px 16px;
+    }
+    .hint{ font-size:12px; color:var(--muted); margin-top:8px; line-height:1.45; }
+    .mode-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .mode-card{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      background:#fff;
+      cursor:pointer;
+      user-select:none;
+      transition:.15s ease;
+    }
+    .mode-card.active{
+      border-color:var(--primary);
+      background:#f8fbff;
+      box-shadow:0 0 0 3px rgba(37,99,235,.08);
+    }
+    .mode-card-title{ font-size:14px; font-weight:700; margin-bottom:4px; }
+    .mode-card-sub{ font-size:12px; color:var(--muted); line-height:1.4; }
+    .calc-box{
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--warn-line);
+      background:var(--warn-bg);
+      color:var(--warn-text);
+      font-size:13px;
+      line-height:1.45;
+    }
+    @media (max-width: 1100px){ .grid{ grid-template-columns:1fr; } }
+    @media (max-width: 860px){
+      .form-grid, .item-lines, .mode-grid{ grid-template-columns:1fr; }
+      .title{ font-size:24px; }
+      .wrap{ padding:16px 12px 32px; }
+      .topbar{ align-items:flex-start; }
+      .topbar-right{ width:100%; justify-content:space-between; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title" data-i18n="transfer.heading">Перемещение товара</div>
+      <div class="topbar-right">
+        <div id="langSwitcher" class="lang-switcher"></div>
+        <div class="top-actions">
+          <button class="btn btn-light" onclick="goBack()" data-i18n="common.backButton">Назад</button>
+          <button class="btn btn-light" onclick="logout()" data-i18n="common.logoutButton">Выйти</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2 class="card-title" data-i18n="transfer.formTitle">Форма перемещения</h2>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="itemSearchInput" data-i18n="transfer.searchLabel">Товар</label>
+              <div class="autocomplete">
+                <input id="itemSearchInput" type="text" placeholder="Введите название, SKU или штрихкод" autocomplete="off" data-i18n-placeholder="transfer.searchPlaceholder" />
+                <div id="itemAutocompleteMenu" class="autocomplete-menu"></div>
+              </div>
+              <select id="itemSelect" style="display:none;">
+                <option value="">Сначала выберите товар</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label data-i18n="transfer.modeLabel">Единица перемещения</label>
+              <div class="mode-grid">
+                <div id="modeBoxesCard" class="mode-card active" data-mode="boxes">
+                  <div class="mode-card-title" data-i18n="transfer.modeBoxesTitle">Коробки</div>
+                  <div class="mode-card-sub" data-i18n="transfer.modeBoxesSub">По умолчанию. Пересчёт в штуки выполняется автоматически.</div>
+                </div>
+                <div id="modeUnitsCard" class="mode-card" data-mode="units">
+                  <div class="mode-card-title" data-i18n="transfer.modeUnitsTitle">Штуки</div>
+                  <div class="mode-card-sub" data-i18n="transfer.modeUnitsSub">Ручной ввод точного количества в штуках.</div>
+                </div>
+              </div>
+              <input id="qtyModeInput" type="hidden" value="boxes" />
+            </div>
+
+            <div class="field">
+              <label for="fromLocationSelect" data-i18n="transfer.fromLabel">Откуда</label>
+              <select id="fromLocationSelect" disabled>
+                <option value="" data-i18n="transfer.fromPlaceholder">Выберите источник</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="toLocationSelect" data-i18n="transfer.toLabel">Куда</label>
+              <select id="toLocationSelect" disabled>
+                <option value="" data-i18n="transfer.toPlaceholder">Выберите назначение</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="qtyInput" data-i18n="transfer.qtyLabel">Количество</label>
+              <input id="qtyInput" type="number" min="0.001" step="0.001" placeholder="Например: 1" data-i18n-placeholder="transfer.qtyPlaceholder" />
+            </div>
+
+            <div class="field">
+              <label for="availableQtyInput" data-i18n="transfer.availableQtyLabel">Доступно в источнике</label>
+              <input id="availableQtyInput" type="text" readonly placeholder="Будет показано после выбора источника" data-i18n-placeholder="transfer.availableQtyPlaceholder" />
+            </div>
+
+            <div class="field full">
+              <div id="qtyCalcBox" class="calc-box" data-i18n="transfer.qtyCalcSelectItem">Выбери товар, чтобы увидеть пересчёт коробок в штуки.</div>
+            </div>
+
+            <div class="field full">
+              <label for="commentInput" data-i18n="transfer.commentLabel">Комментарий</label>
+              <textarea id="commentInput" placeholder="Необязательно. Например: перенос между контейнерами" data-i18n-placeholder="transfer.commentPlaceholder"></textarea>
+            </div>
+
+            <div class="field full">
+              <button id="submitBtn" class="btn btn-primary" type="button" data-i18n="transfer.submitButton">Переместить</button>
+            </div>
+          </div>
+
+          <div class="summary">
+            <div class="pill" id="summaryItems">Товаров: 0</div>
+            <div class="pill" id="summaryTransfers">Последних перемещений: 0</div>
+          </div>
+
+          <div id="pageStatus" class="status info"></div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title" data-i18n="transfer.infoTitle">Информация по выбранному товару</h2>
+          <div id="selectedItemBox" class="item-box">
+            <div class="item-box-title" data-i18n="transfer.selectedTitleEmpty">Товар не выбран</div>
+            <div class="muted" data-i18n="transfer.selectedTextEmpty">Выбери товар, и здесь появятся его данные, box_qty и доступные остатки по локациям.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title" data-i18n="transfer.stockTitle">Остатки по выбранному товару</h2>
+          <div class="muted" data-i18n="transfer.stockSubtitle">Для поля «Откуда» используются только те локации, где остаток по выбранному товару больше нуля.</div>
+
+          <div class="stock-table-wrap" style="margin-top:12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="transfer.tableLocation">Локация</th>
+                  <th data-i18n="transfer.tableCode">Код</th>
+                  <th data-i18n="transfer.tableQty">Количество</th>
+                </tr>
+              </thead>
+              <tbody id="stockTbody">
+                <tr>
+                  <td colspan="3" class="empty" data-i18n="transfer.stockEmptySelect">Выберите товар</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2 class="card-title" data-i18n="transfer.historyTitle">Последние перемещения</h2>
+          <div class="muted" data-i18n="transfer.historySubtitle">Показываются последние операции перемещения по текущему tenant.</div>
+
+          <div class="history-table-wrap" style="margin-top:12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="transfer.historyDate">Дата</th>
+                  <th data-i18n="transfer.historyItem">Товар</th>
+                  <th data-i18n="transfer.historySku">SKU</th>
+                  <th data-i18n="transfer.historyFrom">Откуда</th>
+                  <th data-i18n="transfer.historyTo">Куда</th>
+                  <th data-i18n="transfer.historyQty">Кол-во</th>
+                  <th data-i18n="transfer.historyComment">Комментарий</th>
+                </tr>
+              </thead>
+              <tbody id="historyTbody">
+                <tr>
+                  <td colspan="7" class="empty" data-i18n="transfer.historyLoading">Загрузка истории...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="hint" data-i18n-html="transfer.historyHintHtml">
+            История показывает формат вроде: <strong>1 коробка / 72 шт</strong> или <strong>5 шт</strong>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/login.html";
+    }
+
+    function t(key, vars = {}) {
+      if (window.i18n && typeof window.i18n.format === "function") {
+        return window.i18n.format(key, vars);
+      }
+      if (window.i18n && typeof window.i18n.t === "function") {
+        return window.i18n.t(key);
+      }
+      return key;
+    }
+
+    async function requestFallback(method, path, body) {
+      const token = localStorage.getItem("token") || "";
+      const response = await fetch(path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
+
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+      return data;
+    }
+
+    function getTenantIdFromStorage(fallback = 1) {
+      try {
+        const raw = localStorage.getItem("user");
+        const user = raw ? JSON.parse(raw) : null;
+        if (user && user.tenant_id !== null && user.tenant_id !== undefined && user.tenant_id !== "") {
+          return Number(user.tenant_id);
+        }
+      } catch {}
+      return fallback;
+    }
+
+    const ApiBridge = {
+      getTenantId(fallback = 1) {
+        if (window.API && typeof window.API.getTenantId === "function") {
+          const tenantId = window.API.getTenantId();
+          if (tenantId !== null && tenantId !== undefined && tenantId !== "") {
+            return Number(tenantId);
+          }
+        }
+        return getTenantIdFromStorage(fallback);
+      },
+      get(path) {
+        if (window.API && typeof window.API.get === "function") {
+          return window.API.get(path);
+        }
+        return requestFallback("GET", path);
+      },
+      post(path, body) {
+        if (window.API && typeof window.API.post === "function") {
+          return window.API.post(path, body);
+        }
+        return requestFallback("POST", path, body);
+      }
+    };
+
+    let authUser = null;
+    let itemsData = [];
+    let locationsData = [];
+    let stockData = [];
+    let transfersData = [];
+    let filteredItems = [];
+    let activeAutocompleteIndex = -1;
+
+    const els = {
+      itemSearchInput: document.getElementById("itemSearchInput"),
+      itemAutocompleteMenu: document.getElementById("itemAutocompleteMenu"),
+      itemSelect: document.getElementById("itemSelect"),
+      modeBoxesCard: document.getElementById("modeBoxesCard"),
+      modeUnitsCard: document.getElementById("modeUnitsCard"),
+      qtyModeInput: document.getElementById("qtyModeInput"),
+      fromLocationSelect: document.getElementById("fromLocationSelect"),
+      toLocationSelect: document.getElementById("toLocationSelect"),
+      qtyInput: document.getElementById("qtyInput"),
+      availableQtyInput: document.getElementById("availableQtyInput"),
+      qtyCalcBox: document.getElementById("qtyCalcBox"),
+      commentInput: document.getElementById("commentInput"),
+      submitBtn: document.getElementById("submitBtn"),
+      pageStatus: document.getElementById("pageStatus"),
+      stockTbody: document.getElementById("stockTbody"),
+      historyTbody: document.getElementById("historyTbody"),
+      selectedItemBox: document.getElementById("selectedItemBox"),
+      summaryItems: document.getElementById("summaryItems"),
+      summaryTransfers: document.getElementById("summaryTransfers"),
+      langSwitcher: document.getElementById("langSwitcher")
+    };
+
+    function goBack() { window.location.href = "/index.html"; }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
+
+    function parseUser() {
+      try {
+        const raw = localStorage.getItem("user");
+        authUser = raw ? JSON.parse(raw) : null;
+      } catch {
+        authUser = null;
+      }
+    }
+
+    function getTenantId() {
+      if (authUser && authUser.tenant_id !== null && authUser.tenant_id !== undefined && authUser.tenant_id !== "") {
+        return Number(authUser.tenant_id);
+      }
+      return ApiBridge.getTenantId(1);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatNumber(value, digits = 0) {
+      const num = Number(value || 0);
+      if (!Number.isFinite(num)) return digits > 0 ? Number(0).toFixed(digits) : "0";
+      if (digits > 0) return num.toFixed(digits);
+      if (Number.isInteger(num)) return String(num);
+      return num.toFixed(3);
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value);
+      const lang = window.i18n && typeof window.i18n.getLang === "function" ? window.i18n.getLang() : "ru";
+      const locale = lang === "zh" ? "zh-CN" : (lang === "en" ? "en-US" : "ru-RU");
+      return d.toLocaleString(locale);
+    }
+
+    function toNumber(value) {
+      if (value === null || value === undefined || value === "") return 0;
+      const num = Number(String(value).replace(",", "."));
+      return Number.isFinite(num) ? num : 0;
+    }
+
+    function showStatus(text, type = "info") {
+      els.pageStatus.className = "status show " + type;
+      els.pageStatus.textContent = text;
+    }
+
+    function clearStatus() {
+      els.pageStatus.className = "status info";
+      els.pageStatus.textContent = "";
+    }
+
+    function normalizeList(data, key) {
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data[key])) return data[key];
+      return [];
+    }
+
+    function getSelectedItemId() {
+      return Number(els.itemSelect.value || 0);
+    }
+
+    function getSelectedItem() {
+      const itemId = getSelectedItemId();
+      return itemsData.find(item => Number(item.id) === itemId) || null;
+    }
+
+    function getQtyMode() {
+      return String(els.qtyModeInput.value || "boxes");
+    }
+
+    function setQtyMode(mode) {
+      const value = mode === "units" ? "units" : "boxes";
+      els.qtyModeInput.value = value;
+      els.modeBoxesCard.classList.toggle("active", value === "boxes");
+      els.modeUnitsCard.classList.toggle("active", value === "units");
+      updateQtyCalcBox();
+    }
+
+    function getItemStockRows(itemId) {
+      return stockData
+        .filter(row => Number(row.item_id) === Number(itemId) && Number(row.qty || 0) > 0)
+        .map(row => {
+          const location = locationsData.find(loc => Number(loc.id) === Number(row.location_id));
+          return {
+            ...row,
+            location_name: location ? location.name : (row.location_name || ""),
+            location_code: location ? location.code : ""
+          };
+        })
+        .sort((a, b) => String(a.location_name || "").localeCompare(String(b.location_name || ""), "ru"));
+    }
+
+    function renderItemOptions() {
+      const currentValue = String(els.itemSelect.value || "");
+      const search = String(els.itemSearchInput.value || "").trim().toLowerCase();
+
+      filteredItems = itemsData
+        .filter(item => {
+          if (!search) return true;
+          const text = [item.name, item.sku, item.barcode].join(" ").toLowerCase();
+          return text.includes(search);
+        })
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"));
+
+      let html = `<option value="">${escapeHtml(t("transfer.searchLabel"))}</option>`;
+      filteredItems.forEach(item => {
+        const label = `${item.name || ""}${item.sku ? " — " + item.sku : ""}`;
+        html += `<option value="${escapeHtml(String(item.id))}">${escapeHtml(label)}</option>`;
+      });
+
+      els.itemSelect.innerHTML = html;
+
+      if (filteredItems.some(item => String(item.id) === currentValue)) {
+        els.itemSelect.value = currentValue;
+      }
+
+      renderAutocompleteMenu(search);
+      els.summaryItems.textContent = t("transfer.summaryItems", { count: filteredItems.length });
+    }
+
+    function renderAutocompleteMenu(searchValue) {
+      if (!searchValue) {
+        els.itemAutocompleteMenu.classList.remove("show");
+        els.itemAutocompleteMenu.innerHTML = "";
+        activeAutocompleteIndex = -1;
+        return;
+      }
+
+      if (!filteredItems.length) {
+        els.itemAutocompleteMenu.innerHTML = `<div class="autocomplete-item"><div class="autocomplete-title">${escapeHtml(t("transfer.autocompleteNoResults"))}</div></div>`;
+        els.itemAutocompleteMenu.classList.add("show");
+        activeAutocompleteIndex = -1;
+        return;
+      }
+
+      const limited = filteredItems.slice(0, 30);
+      let html = "";
+
+      limited.forEach((item, index) => {
+        const isActive = index === activeAutocompleteIndex ? " active" : "";
+        html += `
+          <div class="autocomplete-item${isActive}" data-item-id="${escapeHtml(String(item.id))}" data-index="${index}">
+            <div class="autocomplete-title">${escapeHtml(item.name || "")}</div>
+            <div class="autocomplete-sub">${escapeHtml(t("transfer.autocompleteSubTemplate", {
+              sku: item.sku || "—",
+              barcode: item.barcode || "—",
+              boxQty: formatNumber(item.box_qty || 0)
+            }))}</div>
+          </div>
+        `;
+      });
+
+      els.itemAutocompleteMenu.innerHTML = html;
+      els.itemAutocompleteMenu.classList.add("show");
+    }
+
+    function selectItem(itemId) {
+      const item = itemsData.find(row => String(row.id) === String(itemId));
+      if (!item) return;
+
+      els.itemSelect.value = String(item.id);
+      els.itemSearchInput.value = item.sku || item.barcode || item.name || "";
+      els.itemAutocompleteMenu.classList.remove("show");
+      els.itemAutocompleteMenu.innerHTML = "";
+      activeAutocompleteIndex = -1;
+      updateUIBySelection();
+    }
+
+    function renderSelectedItemInfo() {
+      const item = getSelectedItem();
+
+      if (!item) {
+        els.selectedItemBox.innerHTML = `<div class="item-box-title">${escapeHtml(t("transfer.selectedTitleEmpty"))}</div><div class="muted">${escapeHtml(t("transfer.selectedTextEmpty"))}</div>`;
+        return;
+      }
+
+      const stockRows = getItemStockRows(item.id);
+      const totalQty = stockRows.reduce((sum, row) => sum + Number(row.qty || 0), 0);
+      const boxQty = toNumber(item.box_qty);
+
+      els.selectedItemBox.innerHTML = `
+        <div class="item-box-title">${escapeHtml(item.name || "")}</div>
+        <div class="item-lines">
+          <div><strong>${escapeHtml(t("transfer.selectedSku"))}:</strong> ${escapeHtml(item.sku || "—")}</div>
+          <div><strong>${escapeHtml(t("transfer.selectedBarcode"))}:</strong> ${escapeHtml(item.barcode || "—")}</div>
+          <div><strong>${escapeHtml(t("transfer.selectedUnit"))}:</strong> ${escapeHtml(item.unit || "—")}</div>
+          <div><strong>${escapeHtml(t("transfer.selectedTotalQty"))}:</strong> <span class="mono">${escapeHtml(formatNumber(totalQty))}</span></div>
+          <div><strong>${escapeHtml(t("transfer.selectedBoxQty"))}:</strong> <span class="mono">${escapeHtml(formatNumber(boxQty))}</span></div>
+          <div><strong>${escapeHtml(t("transfer.selectedDefaultMode"))}:</strong> ${escapeHtml(t("transfer.selectedDefaultModeBoxes"))}</div>
+        </div>
+      `;
+    }
+
+    function renderStockTable() {
+      const item = getSelectedItem();
+
+      if (!item) {
+        els.stockTbody.innerHTML = `<tr><td colspan="3" class="empty">${escapeHtml(t("transfer.stockEmptySelect"))}</td></tr>`;
+        return;
+      }
+
+      const rows = getItemStockRows(item.id);
+
+      if (!rows.length) {
+        els.stockTbody.innerHTML = `<tr><td colspan="3" class="empty">${escapeHtml(t("transfer.stockEmptyNoRows"))}</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      rows.forEach(row => {
+        html += `
+          <tr>
+            <td>${escapeHtml(row.location_name || "")}</td>
+            <td>${escapeHtml(row.location_code || "")}</td>
+            <td class="mono">${escapeHtml(formatNumber(row.qty))}</td>
+          </tr>
+        `;
+      });
+
+      els.stockTbody.innerHTML = html;
+    }
+
+    function renderFromLocationOptions() {
+      const item = getSelectedItem();
+      const prevValue = String(els.fromLocationSelect.value || "");
+
+      if (!item) {
+        els.fromLocationSelect.innerHTML = `<option value="">${escapeHtml(t("transfer.fromPlaceholder"))}</option>`;
+        els.fromLocationSelect.disabled = true;
+        return;
+      }
+
+      const rows = getItemStockRows(item.id);
+      let html = `<option value="">${escapeHtml(t("transfer.fromPlaceholder"))}</option>`;
+
+      rows.forEach(row => {
+        const label = `${row.location_name || ""}${row.location_code ? " (" + row.location_code + ")" : ""} — ${formatNumber(row.qty)}`;
+        html += `<option value="${escapeHtml(String(row.location_id))}">${escapeHtml(label)}</option>`;
+      });
+
+      els.fromLocationSelect.innerHTML = html;
+      els.fromLocationSelect.disabled = rows.length === 0;
+
+      if (rows.some(row => String(row.location_id) === prevValue)) {
+        els.fromLocationSelect.value = prevValue;
+      }
+    }
+
+    function renderToLocationOptions() {
+      const fromLocationId = Number(els.fromLocationSelect.value || 0);
+      const prevValue = String(els.toLocationSelect.value || "");
+
+      let html = `<option value="">${escapeHtml(t("transfer.toPlaceholder"))}</option>`;
+      const rows = locationsData
+        .filter(loc => Number(loc.id) !== fromLocationId && loc.is_active !== false)
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"));
+
+      rows.forEach(loc => {
+        const label = `${loc.name || ""}${loc.code ? " (" + loc.code + ")" : ""}`;
+        html += `<option value="${escapeHtml(String(loc.id))}">${escapeHtml(label)}</option>`;
+      });
+
+      els.toLocationSelect.innerHTML = html;
+      els.toLocationSelect.disabled = !fromLocationId || rows.length === 0;
+
+      if (rows.some(row => String(row.id) === prevValue)) {
+        els.toLocationSelect.value = prevValue;
+      }
+    }
+
+    function syncAvailableQty() {
+      const item = getSelectedItem();
+      const fromLocationId = Number(els.fromLocationSelect.value || 0);
+
+      if (!item || !fromLocationId) {
+        els.availableQtyInput.value = "";
+        return;
+      }
+
+      const row = getItemStockRows(item.id).find(r => Number(r.location_id) === fromLocationId);
+      els.availableQtyInput.value = row ? formatNumber(row.qty) : "";
+    }
+
+    function updateQtyCalcBox() {
+      const item = getSelectedItem();
+      const qtyMode = getQtyMode();
+      const qtyInput = toNumber(els.qtyInput.value);
+
+      if (!item) {
+        els.qtyCalcBox.textContent = t("transfer.qtyCalcSelectItem");
+        return;
+      }
+
+      const boxQty = toNumber(item.box_qty);
+
+      if (qtyMode === "units") {
+        els.qtyCalcBox.textContent = qtyInput > 0
+          ? t("transfer.qtyCalcUnitsReady", { qty: formatNumber(qtyInput) })
+          : t("transfer.qtyCalcUnitsIdle");
+        return;
+      }
+
+      if (!boxQty || boxQty <= 0) {
+        els.qtyCalcBox.textContent = t("transfer.qtyCalcBoxesUnavailable");
+        return;
+      }
+
+      els.qtyCalcBox.textContent = qtyInput > 0
+        ? t("transfer.qtyCalcBoxesReady", {
+            boxQty: formatNumber(boxQty),
+            inputQty: formatNumber(qtyInput),
+            finalQty: formatNumber(qtyInput * boxQty)
+          })
+        : t("transfer.qtyCalcBoxesIdle", { boxQty: formatNumber(boxQty) });
+    }
+
+    function renderHistory() {
+      els.summaryTransfers.textContent = t("transfer.summaryTransfers", { count: transfersData.length });
+
+      if (!transfersData.length) {
+        els.historyTbody.innerHTML = `<tr><td colspan="7" class="empty">${escapeHtml(t("transfer.historyEmpty"))}</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      transfersData.forEach(row => {
+        const fromLabel = [row.from_location_name, row.from_location_code ? `(${row.from_location_code})` : ""].filter(Boolean).join(" ");
+        const toLabel = [row.to_location_name, row.to_location_code ? `(${row.to_location_code})` : ""].filter(Boolean).join(" ");
+
+        html += `
+          <tr>
+            <td>${escapeHtml(formatDateTime(row.created_at))}</td>
+            <td>${escapeHtml(row.item_name || "")}</td>
+            <td>${escapeHtml(row.sku || "")}</td>
+            <td>${escapeHtml(fromLabel)}</td>
+            <td>${escapeHtml(toLabel)}</td>
+            <td class="mono">${escapeHtml(row.qty_display || formatNumber(row.qty))}</td>
+            <td>${escapeHtml(row.comment || "")}</td>
+          </tr>
+        `;
+      });
+
+      els.historyTbody.innerHTML = html;
+    }
+
+    function updateUIBySelection() {
+      renderSelectedItemInfo();
+      renderStockTable();
+      renderFromLocationOptions();
+      renderToLocationOptions();
+      syncAvailableQty();
+      updateQtyCalcBox();
+    }
+
+    async function loadItems() {
+      const tenantId = getTenantId();
+      const data = await ApiBridge.get(`/items?tenant_id=${tenantId}`);
+      itemsData = normalizeList(data, "items");
+      renderItemOptions();
+    }
+
+    async function loadLocations() {
+      const tenantId = getTenantId();
+      const data = await ApiBridge.get(`/locations?tenant_id=${tenantId}`);
+      locationsData = normalizeList(data, "locations");
+    }
+
+    async function loadStock() {
+      const tenantId = getTenantId();
+      const data = await ApiBridge.get(`/stock?tenant_id=${tenantId}`);
+      stockData = normalizeList(data, "stock");
+    }
+
+    async function loadTransfers() {
+      const tenantId = getTenantId();
+      const data = await ApiBridge.get(`/stock/transfers?tenant_id=${tenantId}&limit=20`);
+      transfersData = normalizeList(data, "transfers");
+      renderHistory();
+    }
+
+    async function loadPage() {
+      try {
+        clearStatus();
+        showStatus(t("transfer.loadingData"), "info");
+        await Promise.all([loadItems(), loadLocations(), loadStock(), loadTransfers()]);
+        updateUIBySelection();
+        showStatus(t("transfer.loadedData"), "success");
+        setTimeout(clearStatus, 1200);
+      } catch (e) {
+        console.error("[transfer] loadPage error:", e);
+        showStatus(t("transfer.loadError", { error: e.message || e }), "error");
+      }
+    }
+
+    async function submitTransfer() {
+      const item = getSelectedItem();
+      const fromLocationId = Number(els.fromLocationSelect.value || 0);
+      const toLocationId = Number(els.toLocationSelect.value || 0);
+      const qtyInput = Number(String(els.qtyInput.value || "").replace(",", "."));
+      const qtyMode = getQtyMode();
+      const comment = String(els.commentInput.value || "").trim();
+      const tenantId = getTenantId();
+
+      if (!item) return showStatus(t("transfer.validationSelectItem"), "error");
+      if (!fromLocationId) return showStatus(t("transfer.validationSelectFrom"), "error");
+      if (!toLocationId) return showStatus(t("transfer.validationSelectTo"), "error");
+      if (!Number.isFinite(qtyInput) || qtyInput <= 0) return showStatus(t("transfer.validationQty"), "error");
+      if (qtyMode === "boxes" && toNumber(item.box_qty) <= 0) return showStatus(t("transfer.validationBoxQty"), "error");
+
+      els.submitBtn.disabled = true;
+      els.submitBtn.textContent = t("transfer.submitLoading");
+
+      try {
+        await ApiBridge.post("/stock/transfer", {
+          tenant_id: tenantId,
+          item_id: Number(item.id),
+          from_location_id: fromLocationId,
+          to_location_id: toLocationId,
+          qty_mode: qtyMode,
+          qty_input: qtyInput,
+          comment
+        });
+
+        showStatus(t("transfer.submitSuccess"), "success");
+        els.qtyInput.value = "";
+        els.commentInput.value = "";
+
+        await Promise.all([loadStock(), loadTransfers()]);
+        updateUIBySelection();
+      } catch (e) {
+        console.error("[transfer] submitTransfer error:", e);
+        showStatus(t("transfer.submitError", { error: e.message || e }), "error");
+      } finally {
+        els.submitBtn.disabled = false;
+        els.submitBtn.textContent = t("transfer.submitButton");
+      }
+    }
+
+    function bindEvents() {
+      els.itemSearchInput.addEventListener("input", () => {
+        els.itemSelect.value = "";
+        activeAutocompleteIndex = -1;
+        renderItemOptions();
+        renderSelectedItemInfo();
+        renderStockTable();
+        renderFromLocationOptions();
+        renderToLocationOptions();
+        syncAvailableQty();
+        updateQtyCalcBox();
+      });
+
+      els.itemSearchInput.addEventListener("keydown", (e) => {
+        const visibleItems = filteredItems.slice(0, 30);
+        if (!els.itemAutocompleteMenu.classList.contains("show") || !visibleItems.length) return;
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          activeAutocompleteIndex = Math.min(activeAutocompleteIndex + 1, visibleItems.length - 1);
+          renderAutocompleteMenu(String(els.itemSearchInput.value || "").trim().toLowerCase());
+          return;
+        }
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          activeAutocompleteIndex = Math.max(activeAutocompleteIndex - 1, 0);
+          renderAutocompleteMenu(String(els.itemSearchInput.value || "").trim().toLowerCase());
+          return;
+        }
+        if (e.key === "Enter" && activeAutocompleteIndex >= 0 && visibleItems[activeAutocompleteIndex]) {
+          e.preventDefault();
+          selectItem(visibleItems[activeAutocompleteIndex].id);
+          return;
+        }
+        if (e.key === "Escape") {
+          els.itemAutocompleteMenu.classList.remove("show");
+          activeAutocompleteIndex = -1;
+        }
+      });
+
+      els.itemAutocompleteMenu.addEventListener("mousedown", (e) => {
+        const itemEl = e.target.closest(".autocomplete-item[data-item-id]");
+        if (!itemEl) return;
+        e.preventDefault();
+        selectItem(itemEl.dataset.itemId);
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".autocomplete")) {
+          els.itemAutocompleteMenu.classList.remove("show");
+          activeAutocompleteIndex = -1;
+        }
+      });
+
+      els.modeBoxesCard.addEventListener("click", () => setQtyMode("boxes"));
+      els.modeUnitsCard.addEventListener("click", () => setQtyMode("units"));
+
+      els.fromLocationSelect.addEventListener("change", () => {
+        renderToLocationOptions();
+        syncAvailableQty();
+      });
+
+      els.toLocationSelect.addEventListener("change", () => {
+        syncAvailableQty();
+      });
+
+      els.qtyInput.addEventListener("input", () => {
+        updateQtyCalcBox();
+      });
+
+      els.submitBtn.addEventListener("click", submitTransfer);
+    }
+
+    function initI18n() {
+      if (window.i18n && typeof window.i18n.renderLanguageSwitcher === "function") {
+        window.i18n.renderLanguageSwitcher(els.langSwitcher);
+      }
+      if (window.i18n && typeof window.i18n.applyTranslations === "function") {
+        window.i18n.applyTranslations(document);
+      }
+    }
+
+    parseUser();
+    bindEvents();
+    setQtyMode("boxes");
+    initI18n();
+    loadPage();
+  </script>
+</body>
+</html>
