@@ -1,102 +1,752 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Витрина</title>
-<style>
-body{font-family:Arial;background:#f5f7fb;margin:0}
-.wrap{padding:20px}
-.card{
-  background:#fff;
-  padding:10px;
-  margin-bottom:10px;
-  display:flex;
-  gap:10px;
-}
-img{width:80px;height:80px}
-.cart{
-  position:fixed;
-  right:10px;
-  top:10px;
-  background:#fff;
-  padding:10px;
-  width:200px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Витрина — BFC24 CONTROL</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --line:#e6ebf2;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-2:#1d4ed8;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --warning:#d97706;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:1600px;
+      margin:0 auto;
+      padding:22px;
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .title h1{
+      margin:0 0 6px 0;
+      font-size:28px;
+      line-height:1.2;
+    }
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:11px 16px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:14px;
+      transition:.15s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-2)}
+    .btn-light{background:#fff;color:var(--text);border:1px solid var(--line)}
+    .btn-light:hover{background:#f8fafc}
+    .btn-success{background:var(--success);color:#fff}
+    .btn-danger{background:var(--danger);color:#fff}
+    .btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      transform:none!important;
+    }
+
+    .message{
+      margin:0 0 16px 0;
+      padding:12px 14px;
+      border-radius:12px;
+      display:none;
+      font-size:14px;
+      font-weight:700;
+    }
+    .message.show{display:block}
+    .message.info{background:#dbeafe;color:#1d4ed8}
+    .message.error{background:#fee2e2;color:#b91c1c}
+    .message.success{background:#dcfce7;color:#15803d}
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 360px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .filters{
+      padding:18px;
+      margin-bottom:18px;
+    }
+    .filters-row{
+      display:grid;
+      grid-template-columns:1.5fr .7fr .6fr;
+      gap:12px;
+    }
+    .field label{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .field input,
+    .field select,
+    .field textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:0 14px;
+      font-size:14px;
+      color:var(--text);
+      outline:none;
+    }
+    .field input,
+    .field select{height:44px}
+    .field textarea{
+      min-height:86px;
+      padding:12px 14px;
+      resize:vertical;
+    }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.10);
+    }
+
+    .products-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+    }
+    .product{
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      min-height:100%;
+    }
+    .product-media{
+      width:100%;
+      aspect-ratio:1/1;
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .product-media img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .product-empty{
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+      padding:10px;
+    }
+    .product-title{
+      font-size:16px;
+      font-weight:800;
+      line-height:1.35;
+      min-height:44px;
+    }
+    .product-meta{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .price{
+      font-size:18px;
+      font-weight:800;
+      color:var(--text);
+      margin-top:2px;
+    }
+    .product-actions{
+      display:grid;
+      grid-template-columns:110px 1fr;
+      gap:10px;
+      margin-top:auto;
+    }
+    .qty-input{
+      width:100%;
+      height:42px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:0 12px;
+      font-size:14px;
+      outline:none;
+    }
+    .qty-input:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.10);
+    }
+
+    .sidebar{
+      position:sticky;
+      top:16px;
+      padding:18px;
+    }
+    .sidebar h2{
+      margin:0 0 12px 0;
+      font-size:22px;
+    }
+    .sidebar-sub{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:16px;
+    }
+    .cart-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .cart-item{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      background:#f8fafc;
+    }
+    .cart-item-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .cart-item-name{
+      font-weight:700;
+      line-height:1.35;
+      font-size:14px;
+    }
+    .cart-item-remove{
+      border:none;
+      background:transparent;
+      color:var(--danger);
+      cursor:pointer;
+      font-weight:800;
+      font-size:12px;
+      padding:0;
+    }
+    .cart-item-meta{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .cart-item-controls{
+      display:grid;
+      grid-template-columns:100px 1fr;
+      gap:10px;
+      align-items:center;
+    }
+    .cart-total{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:14px 0;
+      padding-top:12px;
+      border-top:1px solid var(--line);
+      font-size:15px;
+      font-weight:800;
+    }
+    .empty{
+      padding:24px 10px;
+      color:var(--muted);
+      text-align:center;
+      font-size:14px;
+    }
+
+    .bottom-actions{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .pagination{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:18px;
+      padding:14px 18px;
+    }
+    .muted{color:var(--muted)}
+    .mono{font-family:Consolas,Menlo,monospace}
+
+    @media (max-width: 1300px){
+      .products-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (max-width: 1000px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:static}
+    }
+    @media (max-width: 700px){
+      .wrap{padding:14px}
+      .filters-row{grid-template-columns:1fr}
+      .products-grid{grid-template-columns:1fr}
+      .product-actions{grid-template-columns:1fr}
+      .cart-item-controls{grid-template-columns:1fr}
+      .title h1{font-size:22px}
+    }
+  </style>
 </head>
 <body>
-
-<div class="cart">
-  <h3>Корзина</h3>
-  <div id="cart"></div>
-  <button onclick="sendOrder()">Оформить</button>
-</div>
-
-<div class="wrap" id="list"></div>
-
-<script src="/js/config.js"></script>
-
-<script>
-const buyer = JSON.parse(localStorage.getItem('showcase_buyer'));
-const tenant_id = 1;
-
-let cart = [];
-
-async function load(){
-  const res = await fetch(API_BASE + '/showcase/catalog?tenant_id=1&page=1&limit=100');
-  const data = await res.json();
-
-  const html = data.items.map(i => `
-    <div class="card">
-      <img src="${i.image_url || ''}">
-      <div>
-        <div>${i.name}</div>
-        <div>Остаток: ${i.available_qty}</div>
-        <input type="number" id="q_${i.id}" value="1">
-        <button onclick="add(${i.id}, '${i.name}')">Добавить</button>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>Витрина</h1>
+        <p>Каталог товаров с остатками, корзиной и созданием заказа.</p>
+      </div>
+      <div class="actions">
+        <a class="btn btn-light" href="/showcase-login.html">Сменить покупателя</a>
+        <button class="btn btn-light" id="btnMyOrders" type="button">Мои заказы</button>
+        <button class="btn btn-primary" id="btnRefresh" type="button">Обновить</button>
       </div>
     </div>
-  `).join('');
 
-  document.getElementById('list').innerHTML = html;
-}
+    <div class="message info" id="messageBox"></div>
 
-function add(id,name){
-  const qty = Number(document.getElementById('q_'+id).value);
+    <div class="layout">
+      <div class="main">
+        <div class="card filters">
+          <div class="filters-row">
+            <div class="field">
+              <label for="searchInput">Поиск</label>
+              <input id="searchInput" type="text" placeholder="Название, SKU, штрихкод" />
+            </div>
+            <div class="field">
+              <label for="limitSelect">На странице</label>
+              <select id="limitSelect">
+                <option value="12" selected>12</option>
+                <option value="24">24</option>
+                <option value="48">48</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;height:44px;">Показать</button>
+            </div>
+          </div>
+        </div>
 
-  cart.push({item_id:id, qty, name});
-  renderCart();
-}
+        <div class="products-grid" id="productsGrid">
+          <div class="empty card" style="padding:32px;">Загрузка...</div>
+        </div>
 
-function renderCart(){
-  document.getElementById('cart').innerHTML =
-    cart.map(c => c.name + ' x ' + c.qty).join('<br>');
-}
+        <div class="card pagination">
+          <div class="muted" id="summaryText">Пока нет данных</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-light" id="btnPrevPage" type="button">← Назад</button>
+            <div class="muted" id="pageInfo">Страница 1</div>
+            <button class="btn btn-light" id="btnNextPage" type="button">Вперёд →</button>
+          </div>
+        </div>
+      </div>
 
-async function sendOrder(){
-  const res = await fetch(API_BASE + '/showcase/orders',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      tenant_id,
-      buyer_id: buyer.id,
-      items: cart
-    })
-  });
+      <div class="card sidebar">
+        <h2>Корзина</h2>
+        <div class="sidebar-sub" id="buyerInfo">Покупатель: —</div>
 
-  const data = await res.json();
+        <div class="cart-list" id="cartList">
+          <div class="empty">Корзина пуста</div>
+        </div>
 
-  if(data.ok){
-    alert('Заказ создан');
-    cart = [];
-    renderCart();
-  } else {
-    alert('Ошибка');
-  }
-}
+        <div class="field">
+          <label for="orderComment">Комментарий к заказу</label>
+          <textarea id="orderComment" placeholder="Например: собрать срочно, позвонить перед отправкой"></textarea>
+        </div>
 
-load();
-</script>
+        <div class="cart-total">
+          <span>Всего позиций</span>
+          <span id="cartTotalQty">0</span>
+        </div>
 
+        <div class="bottom-actions">
+          <button class="btn btn-success" id="btnCreateOrder" type="button">Оформить заказ</button>
+          <button class="btn btn-danger" id="btnClearCart" type="button">Очистить корзину</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script>
+    (function () {
+      const buyer = JSON.parse(localStorage.getItem('showcase_buyer') || 'null');
+      const tenantId = Number(localStorage.getItem('showcase_tenant_id') || 1);
+
+      if (!buyer || !buyer.id) {
+        location.href = '/showcase-login.html';
+        return;
+      }
+
+      const state = {
+        page: 1,
+        limit: 12,
+        total: 0,
+        items: [],
+        showPrices: false,
+        cart: []
+      };
+
+      const messageBox = document.getElementById('messageBox');
+      const productsGrid = document.getElementById('productsGrid');
+      const searchInput = document.getElementById('searchInput');
+      const limitSelect = document.getElementById('limitSelect');
+      const pageInfo = document.getElementById('pageInfo');
+      const summaryText = document.getElementById('summaryText');
+      const cartList = document.getElementById('cartList');
+      const cartTotalQty = document.getElementById('cartTotalQty');
+      const orderComment = document.getElementById('orderComment');
+      const buyerInfo = document.getElementById('buyerInfo');
+
+      buyerInfo.textContent = 'Покупатель: ' + (buyer.name || buyer.login || '—');
+
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function showMessage(text, variant = 'info') {
+        messageBox.textContent = text;
+        messageBox.className = 'message show ' + variant;
+      }
+
+      function hideMessage() {
+        messageBox.textContent = '';
+        messageBox.className = 'message info';
+      }
+
+      function priceText(item) {
+        if (!state.showPrices) return 'Цена скрыта';
+        return Number(item.price || 0).toFixed(2);
+      }
+
+      function getCartQty(itemId) {
+        const found = state.cart.find((x) => Number(x.item_id) === Number(itemId));
+        return found ? Number(found.qty) : 0;
+      }
+
+      function addToCart(item) {
+        const qtyInput = document.getElementById('qty_' + item.id);
+        const qty = Number(qtyInput ? qtyInput.value : 1);
+
+        if (!Number.isFinite(qty) || qty <= 0) {
+          showMessage('Количество должно быть больше нуля', 'error');
+          return;
+        }
+
+        const availableQty = Number(item.available_qty || 0);
+        const alreadyInCart = getCartQty(item.id);
+
+        if (qty + alreadyInCart > availableQty) {
+          showMessage('Нельзя добавить больше доступного остатка', 'error');
+          return;
+        }
+
+        const existing = state.cart.find((x) => Number(x.item_id) === Number(item.id));
+        if (existing) {
+          existing.qty = Number(existing.qty) + qty;
+        } else {
+          state.cart.push({
+            item_id: Number(item.id),
+            name: item.name,
+            sku: item.sku,
+            image_url: item.image_url,
+            available_qty: Number(item.available_qty || 0),
+            qty: qty
+          });
+        }
+
+        renderCart();
+        showMessage('Товар добавлен в корзину', 'success');
+      }
+
+      function updateCartQty(itemId, newQty) {
+        const item = state.cart.find((x) => Number(x.item_id) === Number(itemId));
+        if (!item) return;
+
+        const qty = Number(newQty);
+
+        if (!Number.isFinite(qty) || qty <= 0) {
+          state.cart = state.cart.filter((x) => Number(x.item_id) !== Number(itemId));
+          renderCart();
+          return;
+        }
+
+        if (qty > Number(item.available_qty || 0)) {
+          showMessage('Количество в корзине не может превышать доступный остаток', 'error');
+          renderCart();
+          return;
+        }
+
+        item.qty = qty;
+        renderCart();
+      }
+
+      function removeFromCart(itemId) {
+        state.cart = state.cart.filter((x) => Number(x.item_id) !== Number(itemId));
+        renderCart();
+      }
+
+      function clearCart() {
+        state.cart = [];
+        renderCart();
+      }
+
+      function renderCart() {
+        if (!state.cart.length) {
+          cartList.innerHTML = '<div class="empty">Корзина пуста</div>';
+          cartTotalQty.textContent = '0';
+          return;
+        }
+
+        cartList.innerHTML = state.cart.map((item) => `
+          <div class="cart-item">
+            <div class="cart-item-top">
+              <div class="cart-item-name">${escapeHtml(item.name || '—')}</div>
+              <button class="cart-item-remove" data-remove-id="${item.item_id}" type="button">Удалить</button>
+            </div>
+            <div class="cart-item-meta">
+              SKU: ${escapeHtml(item.sku || '—')}<br>
+              Доступно: ${escapeHtml(item.available_qty)}
+            </div>
+            <div class="cart-item-controls">
+              <input class="qty-input js-cart-qty" data-cart-id="${item.item_id}" type="number" step="0.001" value="${escapeHtml(item.qty)}">
+              <div class="muted">Изменить количество</div>
+            </div>
+          </div>
+        `).join('');
+
+        const totalQty = state.cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+        cartTotalQty.textContent = String(totalQty);
+      }
+
+      function productCardHtml(item) {
+        return `
+          <div class="card product">
+            <div class="product-media">
+              ${item.image_url
+                ? `<img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.name || '')}">`
+                : `<div class="product-empty">нет фото</div>`
+              }
+            </div>
+
+            <div class="product-title">${escapeHtml(item.name || '—')}</div>
+
+            <div class="product-meta">
+              <div>SKU: <span class="mono">${escapeHtml(item.sku || '—')}</span></div>
+              <div>ШК: <span class="mono">${escapeHtml(item.barcode || '—')}</span></div>
+              <div>Остаток: <strong>${escapeHtml(item.available_qty || '0')}</strong></div>
+            </div>
+
+            <div class="price">${escapeHtml(priceText(item))}</div>
+
+            <div class="product-actions">
+              <input id="qty_${item.id}" class="qty-input" type="number" step="0.001" value="1">
+              <button class="btn btn-primary js-add-btn" data-item-id="${item.id}" type="button">В корзину</button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderProducts() {
+        if (!state.items.length) {
+          productsGrid.innerHTML = '<div class="empty card" style="padding:32px;">Товары не найдены</div>';
+          summaryText.textContent = 'Ничего не найдено';
+          pageInfo.textContent = 'Страница ' + state.page;
+          return;
+        }
+
+        productsGrid.innerHTML = state.items.map(productCardHtml).join('');
+
+        const from = (state.page - 1) * state.limit + 1;
+        const to = Math.min(state.total, state.page * state.limit);
+        summaryText.textContent = `Показано ${from}-${to} из ${state.total}`;
+        pageInfo.textContent = 'Страница ' + state.page;
+      }
+
+      async function loadProducts() {
+        hideMessage();
+        productsGrid.innerHTML = '<div class="empty card" style="padding:32px;">Загрузка...</div>';
+
+        try {
+          const params = new URLSearchParams();
+          params.set('tenant_id', String(tenantId));
+          params.set('page', String(state.page));
+          params.set('limit', String(state.limit));
+
+          if (searchInput.value.trim()) {
+            params.set('search', searchInput.value.trim());
+          }
+
+          const result = await API.get('/showcase/catalog?' + params.toString());
+
+          state.total = Number(result.total || 0);
+          state.items = Array.isArray(result.items) ? result.items : [];
+          state.showPrices = !!result.show_prices;
+
+          renderProducts();
+        } catch (error) {
+          console.error('[showcase] loadProducts error:', error);
+          productsGrid.innerHTML = '<div class="empty card" style="padding:32px;">Ошибка загрузки витрины</div>';
+          showMessage(error?.message || error?.error || 'Ошибка загрузки каталога', 'error');
+        }
+      }
+
+      async function createOrder() {
+        if (!state.cart.length) {
+          showMessage('Корзина пуста', 'error');
+          return;
+        }
+
+        const payload = {
+          tenant_id: tenantId,
+          buyer_id: Number(buyer.id),
+          comment: orderComment.value.trim(),
+          items: state.cart.map((item) => ({
+            item_id: Number(item.item_id),
+            qty: Number(item.qty)
+          }))
+        };
+
+        try {
+          showMessage('Создаём заказ...', 'info');
+
+          const result = await API.post('/showcase/orders', payload);
+
+          if (!result || !result.ok) {
+            showMessage('Не удалось создать заказ', 'error');
+            return;
+          }
+
+          showMessage('Заказ создан: ' + (result.order_no || ''), 'success');
+          clearCart();
+          orderComment.value = '';
+          await loadProducts();
+        } catch (error) {
+          console.error('[showcase] createOrder error:', error);
+          showMessage(error?.message || error?.error || 'Ошибка создания заказа', 'error');
+        }
+      }
+
+      document.getElementById('btnRefresh').addEventListener('click', loadProducts);
+
+      document.getElementById('btnApplyFilters').addEventListener('click', function () {
+        state.page = 1;
+        state.limit = Number(limitSelect.value || 12);
+        loadProducts();
+      });
+
+      document.getElementById('btnPrevPage').addEventListener('click', function () {
+        if (state.page <= 1) return;
+        state.page -= 1;
+        loadProducts();
+      });
+
+      document.getElementById('btnNextPage').addEventListener('click', function () {
+        const maxPage = Math.max(1, Math.ceil(state.total / state.limit));
+        if (state.page >= maxPage) return;
+        state.page += 1;
+        loadProducts();
+      });
+
+      document.getElementById('btnCreateOrder').addEventListener('click', createOrder);
+      document.getElementById('btnClearCart').addEventListener('click', clearCart);
+
+      document.getElementById('btnMyOrders').addEventListener('click', function () {
+        showMessage('Экран "Мои заказы" сделаем следующим шагом', 'info');
+      });
+
+      productsGrid.addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-add-btn');
+        if (!btn) return;
+
+        const itemId = Number(btn.getAttribute('data-item-id'));
+        const item = state.items.find((x) => Number(x.id) === itemId);
+        if (!item) return;
+
+        addToCart(item);
+      });
+
+      cartList.addEventListener('click', function (e) {
+        const removeBtn = e.target.closest('[data-remove-id]');
+        if (!removeBtn) return;
+        removeFromCart(Number(removeBtn.getAttribute('data-remove-id')));
+      });
+
+      cartList.addEventListener('change', function (e) {
+        const qtyInput = e.target.closest('.js-cart-qty');
+        if (!qtyInput) return;
+        updateCartQty(Number(qtyInput.getAttribute('data-cart-id')), qtyInput.value);
+      });
+
+      searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          state.page = 1;
+          state.limit = Number(limitSelect.value || 12);
+          loadProducts();
+        }
+      });
+
+      renderCart();
+      loadProducts();
+    })();
+  </script>
 </body>
 </html>
