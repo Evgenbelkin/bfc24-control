@@ -1012,6 +1012,7 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             if (hasColumn(saleItemsColumns, 'total_amount')) saleItemData.total_amount = lineTotal;
             if (hasColumn(saleItemsColumns, 'total')) saleItemData.total = lineTotal;
             if (hasColumn(saleItemsColumns, 'line_total')) saleItemData.line_total = lineTotal;
+            if (hasColumn(saleItemsColumns, 'line_amount')) saleItemData.line_amount = lineTotal;
             if (hasColumn(saleItemsColumns, 'name')) saleItemData.name = item.item_name;
             if (hasColumn(saleItemsColumns, 'sku')) saleItemData.sku = item.sku;
             if (hasColumn(saleItemsColumns, 'barcode')) saleItemData.barcode = item.barcode;
