@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Карточка заказа</title>
+</head>
+<body>
+<h1>Карточка заказа (MVP)</h1>
+<p>Этот экран будет доработан дальше. Сейчас главное — подключение к API.</p>
+
+<script src="/js/config.js"></script>
+<script src="/js/api.js"></script>
+
+<script>
+(async function(){
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const tenantId = user && user.tenant_id ? Number(user.tenant_id) : 1;
+
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get('id');
+
+  const res = await API.get('/showcase-admin/orders/' + orderId + '?tenant_id=' + tenantId);
+
+  console.log(res);
+
+  document.body.innerHTML += '<pre>' + JSON.stringify(res, null, 2) + '</pre>';
+})();
+</script>
+
+</body>
+</html>
