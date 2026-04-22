@@ -5,7 +5,6 @@
   <title>BFC24 CONTROL — Перемещение товара</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="google" content="notranslate" />
-
   <style>
     :root{
       --bg:#f6f7fb;
@@ -26,23 +25,22 @@
       --info-bg:#eff6ff;
       --info-line:#bfdbfe;
       --info-text:#1d4ed8;
+      --warn-bg:#fff7ed;
+      --warn-line:#fed7aa;
+      --warn-text:#9a3412;
     }
-
     *{box-sizing:border-box}
-
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
       background:var(--bg);
       color:var(--text);
     }
-
     .wrap{
       max-width:1600px;
       margin:0 auto;
       padding:24px 16px 48px;
     }
-
     .topbar{
       display:flex;
       justify-content:space-between;
@@ -51,18 +49,15 @@
       margin-bottom:20px;
       flex-wrap:wrap;
     }
-
     .title{
       font-size:28px;
       font-weight:700;
     }
-
     .top-actions{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
     }
-
     .btn{
       border:none;
       border-radius:12px;
@@ -72,30 +67,24 @@
       font-weight:700;
       transition:.15s ease;
     }
-
     .btn-primary{
       background:var(--primary);
       color:#fff;
     }
-
     .btn-primary:hover{background:var(--primary-hover)}
-
     .btn-light{
       background:#fff;
       color:var(--text);
       border:1px solid var(--line);
     }
-
     .btn-light:hover{
       background:#f8fafc;
       border-color:#cbd5e1;
     }
-
     .btn:disabled{
       opacity:.65;
       cursor:not-allowed;
     }
-
     .card{
       background:var(--card);
       border:1px solid #eef1f5;
@@ -104,49 +93,41 @@
       padding:18px;
       margin-bottom:16px;
     }
-
     .card-title{
       font-size:18px;
       font-weight:700;
       margin:0 0 14px;
     }
-
     .muted{
       color:var(--muted);
       font-size:13px;
       line-height:1.45;
     }
-
     .grid{
       display:grid;
       grid-template-columns:1.1fr .9fr;
       gap:16px;
       align-items:start;
     }
-
     .form-grid{
       display:grid;
       grid-template-columns:repeat(2, minmax(0,1fr));
       gap:12px;
       align-items:end;
     }
-
     .field{
       display:flex;
       flex-direction:column;
       gap:7px;
       min-width:0;
     }
-
     .field.full{
       grid-column:1 / -1;
     }
-
     label{
       font-size:14px;
       font-weight:700;
     }
-
     input, select, textarea{
       width:100%;
       border:1px solid var(--line);
@@ -158,11 +139,15 @@
       outline:none;
       font-family:inherit;
     }
-
-    .autocomplete{
-      position:relative;
+    textarea{
+      resize:vertical;
+      min-height:92px;
     }
-
+    input:focus, select:focus, textarea:focus{
+      border-color:#9db8ff;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+    .autocomplete{ position:relative; }
     .autocomplete-menu{
       position:absolute;
       top:calc(100% + 6px);
@@ -177,11 +162,7 @@
       z-index:30;
       display:none;
     }
-
-    .autocomplete-menu.show{
-      display:block;
-    }
-
+    .autocomplete-menu.show{ display:block; }
     .autocomplete-item{
       padding:12px 14px;
       border-bottom:1px solid #eef1f5;
@@ -190,39 +171,20 @@
       flex-direction:column;
       gap:4px;
     }
-
-    .autocomplete-item:last-child{
-      border-bottom:none;
-    }
-
+    .autocomplete-item:last-child{ border-bottom:none; }
     .autocomplete-item:hover,
-    .autocomplete-item.active{
-      background:#f8fbff;
-    }
-
+    .autocomplete-item.active{ background:#f8fbff; }
     .autocomplete-title{
       font-size:14px;
       font-weight:700;
       color:#111827;
       line-height:1.35;
     }
-
     .autocomplete-sub{
       font-size:12px;
       color:var(--muted);
       line-height:1.4;
     }
-
-    textarea{
-      resize:vertical;
-      min-height:92px;
-    }
-
-    input:focus, select:focus, textarea:focus{
-      border-color:#9db8ff;
-      box-shadow:0 0 0 4px rgba(37,99,235,.10);
-    }
-
     .status{
       margin-top:12px;
       padding:12px 14px;
@@ -231,7 +193,6 @@
       display:none;
       white-space:pre-wrap;
     }
-
     .status.show{display:block}
     .status.error{
       background:var(--danger-bg);
@@ -248,7 +209,6 @@
       color:var(--info-text);
       border:1px solid var(--info-line);
     }
-
     .pill{
       display:inline-flex;
       align-items:center;
@@ -261,14 +221,12 @@
       background:var(--info-bg);
       color:var(--info-text);
     }
-
     .summary{
       display:flex;
       flex-wrap:wrap;
       gap:10px;
       margin-top:10px;
     }
-
     .stock-table-wrap,
     .history-table-wrap{
       overflow:auto;
@@ -277,14 +235,12 @@
       border-radius:14px;
       background:#fff;
     }
-
     table{
       width:100%;
       border-collapse:collapse;
       background:#fff;
       min-width:720px;
     }
-
     th, td{
       border-bottom:1px solid #eef1f5;
       padding:12px 10px;
@@ -292,7 +248,6 @@
       vertical-align:top;
       font-size:14px;
     }
-
     th{
       background:#f8fafc;
       font-weight:700;
@@ -302,21 +257,13 @@
       z-index:5;
       white-space:nowrap;
     }
-
-    tr:hover td{
-      background:#fbfdff;
-    }
-
-    .mono{
-      font-variant-numeric:tabular-nums;
-    }
-
+    tr:hover td{ background:#fbfdff; }
+    .mono{ font-variant-numeric:tabular-nums; }
     .empty{
       text-align:center;
       color:var(--muted);
       padding:24px 12px;
     }
-
     .item-box{
       border:1px solid #e8eef7;
       border-radius:14px;
@@ -324,45 +271,68 @@
       padding:14px;
       margin-top:14px;
     }
-
     .item-box-title{
       font-size:16px;
       font-weight:700;
       margin:0 0 8px;
     }
-
     .item-lines{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
       gap:8px 16px;
     }
-
     .hint{
       font-size:12px;
       color:var(--muted);
       margin-top:8px;
       line-height:1.45;
     }
-
-    @media (max-width: 1100px){
-      .grid{
-        grid-template-columns:1fr;
-      }
+    .mode-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
     }
-
+    .mode-card{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      background:#fff;
+      cursor:pointer;
+      user-select:none;
+      transition:.15s ease;
+    }
+    .mode-card.active{
+      border-color:var(--primary);
+      background:#f8fbff;
+      box-shadow:0 0 0 3px rgba(37,99,235,.08);
+    }
+    .mode-card-title{
+      font-size:14px;
+      font-weight:700;
+      margin-bottom:4px;
+    }
+    .mode-card-sub{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.4;
+    }
+    .calc-box{
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--warn-line);
+      background:var(--warn-bg);
+      color:var(--warn-text);
+      font-size:13px;
+      line-height:1.45;
+    }
+    @media (max-width: 1100px){
+      .grid{ grid-template-columns:1fr; }
+    }
     @media (max-width: 860px){
-      .form-grid,
-      .item-lines{
-        grid-template-columns:1fr;
-      }
-
-      .title{
-        font-size:24px;
-      }
-
-      .wrap{
-        padding:16px 12px 32px;
-      }
+      .form-grid, .item-lines, .mode-grid{ grid-template-columns:1fr; }
+      .title{ font-size:24px; }
+      .wrap{ padding:16px 12px 32px; }
     }
   </style>
 </head>
@@ -370,7 +340,6 @@
   <div class="wrap">
     <div class="topbar">
       <div class="title">Перемещение товара</div>
-
       <div class="top-actions">
         <button class="btn btn-light" onclick="goBack()">Назад</button>
         <button class="btn btn-light" onclick="logout()">Выйти</button>
@@ -392,6 +361,21 @@
               <select id="itemSelect" style="display:none;">
                 <option value="">Сначала выберите товар</option>
               </select>
+            </div>
+
+            <div class="field full">
+              <label>Единица перемещения</label>
+              <div class="mode-grid">
+                <div id="modeBoxesCard" class="mode-card active" data-mode="boxes">
+                  <div class="mode-card-title">Коробки</div>
+                  <div class="mode-card-sub">По умолчанию. Пересчёт в штуки выполняется автоматически.</div>
+                </div>
+                <div id="modeUnitsCard" class="mode-card" data-mode="units">
+                  <div class="mode-card-title">Штуки</div>
+                  <div class="mode-card-sub">Ручной ввод точного количества в штуках.</div>
+                </div>
+              </div>
+              <input id="qtyModeInput" type="hidden" value="boxes" />
             </div>
 
             <div class="field">
@@ -419,6 +403,12 @@
             </div>
 
             <div class="field full">
+              <div id="qtyCalcBox" class="calc-box">
+                Выбери товар, чтобы увидеть пересчёт коробок в штуки.
+              </div>
+            </div>
+
+            <div class="field full">
               <label for="commentInput">Комментарий</label>
               <textarea id="commentInput" placeholder="Необязательно. Например: перенос между контейнерами"></textarea>
             </div>
@@ -440,7 +430,7 @@
           <h2 class="card-title">Информация по выбранному товару</h2>
           <div id="selectedItemBox" class="item-box">
             <div class="item-box-title">Товар не выбран</div>
-            <div class="muted">Выбери товар, и здесь появятся его данные и доступные остатки по локациям.</div>
+            <div class="muted">Выбери товар, и здесь появятся его данные, box_qty и доступные остатки по локациям.</div>
           </div>
         </div>
 
@@ -494,7 +484,7 @@
           </div>
 
           <div class="hint">
-            После успешного перемещения форма обновляет остатки по товару и историю операций автоматически.
+            История показывает формат вроде: <strong>1 коробка / 72 шт</strong> или <strong>5 шт</strong>.
           </div>
         </div>
       </div>
@@ -585,10 +575,14 @@
       itemSearchInput: document.getElementById("itemSearchInput"),
       itemAutocompleteMenu: document.getElementById("itemAutocompleteMenu"),
       itemSelect: document.getElementById("itemSelect"),
+      modeBoxesCard: document.getElementById("modeBoxesCard"),
+      modeUnitsCard: document.getElementById("modeUnitsCard"),
+      qtyModeInput: document.getElementById("qtyModeInput"),
       fromLocationSelect: document.getElementById("fromLocationSelect"),
       toLocationSelect: document.getElementById("toLocationSelect"),
       qtyInput: document.getElementById("qtyInput"),
       availableQtyInput: document.getElementById("availableQtyInput"),
+      qtyCalcBox: document.getElementById("qtyCalcBox"),
       commentInput: document.getElementById("commentInput"),
       submitBtn: document.getElementById("submitBtn"),
       pageStatus: document.getElementById("pageStatus"),
@@ -599,10 +593,7 @@
       summaryTransfers: document.getElementById("summaryTransfers")
     };
 
-    function goBack() {
-      window.location.href = "/index.html";
-    }
-
+    function goBack() { window.location.href = "/index.html"; }
     function logout() {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -649,6 +640,12 @@
       return d.toLocaleString("ru-RU");
     }
 
+    function toNumber(value) {
+      if (value === null || value === undefined || value === "") return 0;
+      const num = Number(String(value).replace(",", "."));
+      return Number.isFinite(num) ? num : 0;
+    }
+
     function showStatus(text, type = "info") {
       els.pageStatus.className = "status show " + type;
       els.pageStatus.textContent = text;
@@ -672,6 +669,18 @@
     function getSelectedItem() {
       const itemId = getSelectedItemId();
       return itemsData.find(item => Number(item.id) === itemId) || null;
+    }
+
+    function getQtyMode() {
+      return String(els.qtyModeInput.value || "boxes");
+    }
+
+    function setQtyMode(mode) {
+      const value = mode === "units" ? "units" : "boxes";
+      els.qtyModeInput.value = value;
+      els.modeBoxesCard.classList.toggle("active", value === "boxes");
+      els.modeUnitsCard.classList.toggle("active", value === "units");
+      updateQtyCalcBox();
     }
 
     function getItemStockRows(itemId) {
@@ -725,7 +734,7 @@
       }
 
       if (!filteredItems.length) {
-        els.itemAutocompleteMenu.innerHTML = `<div class="autocomplete-item"><div class="autocomplete-title">Ничего не найдено</div></div>`;
+        els.itemAutocompleteMenu.innerHTML = '<div class="autocomplete-item"><div class="autocomplete-title">Ничего не найдено</div></div>';
         els.itemAutocompleteMenu.classList.add("show");
         activeAutocompleteIndex = -1;
         return;
@@ -739,7 +748,7 @@
         html += `
           <div class="autocomplete-item${isActive}" data-item-id="${escapeHtml(String(item.id))}" data-index="${index}">
             <div class="autocomplete-title">${escapeHtml(item.name || "")}</div>
-            <div class="autocomplete-sub">SKU: ${escapeHtml(item.sku || "—")} · ШК: ${escapeHtml(item.barcode || "—")}</div>
+            <div class="autocomplete-sub">SKU: ${escapeHtml(item.sku || "—")} · ШК: ${escapeHtml(item.barcode || "—")} · Коробка: ${escapeHtml(formatNumber(item.box_qty || 0))} шт</div>
           </div>
         `;
       });
@@ -764,15 +773,13 @@
       const item = getSelectedItem();
 
       if (!item) {
-        els.selectedItemBox.innerHTML = `
-          <div class="item-box-title">Товар не выбран</div>
-          <div class="muted">Выбери товар, и здесь появятся его данные и доступные остатки по локациям.</div>
-        `;
+        els.selectedItemBox.innerHTML = '<div class="item-box-title">Товар не выбран</div><div class="muted">Выбери товар, и здесь появятся его данные, box_qty и доступные остатки по локациям.</div>';
         return;
       }
 
       const stockRows = getItemStockRows(item.id);
       const totalQty = stockRows.reduce((sum, row) => sum + Number(row.qty || 0), 0);
+      const boxQty = toNumber(item.box_qty);
 
       els.selectedItemBox.innerHTML = `
         <div class="item-box-title">${escapeHtml(item.name || "")}</div>
@@ -781,6 +788,8 @@
           <div><strong>Штрихкод:</strong> ${escapeHtml(item.barcode || "—")}</div>
           <div><strong>Ед. изм.:</strong> ${escapeHtml(item.unit || "—")}</div>
           <div><strong>Суммарный остаток:</strong> <span class="mono">${escapeHtml(formatNumber(totalQty))}</span></div>
+          <div><strong>Штук в коробке:</strong> <span class="mono">${escapeHtml(formatNumber(boxQty))}</span></div>
+          <div><strong>Режим по умолчанию:</strong> коробки</div>
         </div>
       `;
     }
@@ -825,8 +834,8 @@
       }
 
       const rows = getItemStockRows(item.id);
-
       let html = '<option value="">Выберите источник</option>';
+
       rows.forEach(row => {
         const label = `${row.location_name || ""}${row.location_code ? " (" + row.location_code + ")" : ""} — ${formatNumber(row.qty)}`;
         html += `<option value="${escapeHtml(String(row.location_id))}">${escapeHtml(label)}</option>`;
@@ -845,7 +854,6 @@
       const prevValue = String(els.toLocationSelect.value || "");
 
       let html = '<option value="">Выберите назначение</option>';
-
       const rows = locationsData
         .filter(loc => Number(loc.id) !== fromLocationId && loc.is_active !== false)
         .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ru"));
@@ -876,6 +884,35 @@
       els.availableQtyInput.value = row ? formatNumber(row.qty) : "";
     }
 
+    function updateQtyCalcBox() {
+      const item = getSelectedItem();
+      const qtyMode = getQtyMode();
+      const qtyInput = toNumber(els.qtyInput.value);
+
+      if (!item) {
+        els.qtyCalcBox.textContent = "Выбери товар, чтобы увидеть пересчёт коробок в штуки.";
+        return;
+      }
+
+      const boxQty = toNumber(item.box_qty);
+
+      if (qtyMode === "units") {
+        els.qtyCalcBox.textContent = qtyInput > 0
+          ? `Будет перемещено ${formatNumber(qtyInput)} шт.`
+          : "Режим: штуки. Введи количество в штуках.";
+        return;
+      }
+
+      if (!boxQty || boxQty <= 0) {
+        els.qtyCalcBox.textContent = "У выбранного товара не заполнено количество штук в коробке. Режим коробок недоступен для корректного расчёта.";
+        return;
+      }
+
+      els.qtyCalcBox.textContent = qtyInput > 0
+        ? `1 коробка = ${formatNumber(boxQty)} шт. Сейчас будет перемещено: ${formatNumber(qtyInput)} коробки / ${formatNumber(qtyInput * boxQty)} шт.`
+        : `1 коробка = ${formatNumber(boxQty)} шт. Введи количество коробок для автоматического пересчёта.`;
+    }
+
     function renderHistory() {
       els.summaryTransfers.textContent = `Последних перемещений: ${transfersData.length}`;
 
@@ -896,7 +933,7 @@
             <td>${escapeHtml(row.sku || "")}</td>
             <td>${escapeHtml(fromLabel)}</td>
             <td>${escapeHtml(toLabel)}</td>
-            <td class="mono">${escapeHtml(formatNumber(row.qty))}</td>
+            <td class="mono">${escapeHtml(row.qty_display || formatNumber(row.qty))}</td>
             <td>${escapeHtml(row.comment || "")}</td>
           </tr>
         `;
@@ -911,6 +948,7 @@
       renderFromLocationOptions();
       renderToLocationOptions();
       syncAvailableQty();
+      updateQtyCalcBox();
     }
 
     async function loadItems() {
@@ -944,13 +982,7 @@
         clearStatus();
         showStatus("Загрузка данных...", "info");
 
-        await Promise.all([
-          loadItems(),
-          loadLocations(),
-          loadStock(),
-          loadTransfers()
-        ]);
-
+        await Promise.all([loadItems(), loadLocations(), loadStock(), loadTransfers()]);
         updateUIBySelection();
 
         showStatus("Данные загружены", "success");
@@ -965,7 +997,8 @@
       const item = getSelectedItem();
       const fromLocationId = Number(els.fromLocationSelect.value || 0);
       const toLocationId = Number(els.toLocationSelect.value || 0);
-      const qty = Number(String(els.qtyInput.value || "").replace(",", "."));
+      const qtyInput = Number(String(els.qtyInput.value || "").replace(",", "."));
+      const qtyMode = getQtyMode();
       const comment = String(els.commentInput.value || "").trim();
       const tenantId = getTenantId();
 
@@ -973,19 +1006,20 @@
         showStatus("Сначала выберите товар", "error");
         return;
       }
-
       if (!fromLocationId) {
         showStatus("Выберите источник перемещения", "error");
         return;
       }
-
       if (!toLocationId) {
         showStatus("Выберите назначение перемещения", "error");
         return;
       }
-
-      if (!Number.isFinite(qty) || qty <= 0) {
+      if (!Number.isFinite(qtyInput) || qtyInput <= 0) {
         showStatus("Укажите корректное количество", "error");
+        return;
+      }
+      if (qtyMode === "boxes" && toNumber(item.box_qty) <= 0) {
+        showStatus("Для режима коробок у товара должно быть заполнено количество штук в коробке", "error");
         return;
       }
 
@@ -998,20 +1032,16 @@
           item_id: Number(item.id),
           from_location_id: fromLocationId,
           to_location_id: toLocationId,
-          qty,
+          qty_mode: qtyMode,
+          qty_input: qtyInput,
           comment
         });
 
         showStatus("Перемещение успешно выполнено", "success");
-
         els.qtyInput.value = "";
         els.commentInput.value = "";
 
-        await Promise.all([
-          loadStock(),
-          loadTransfers()
-        ]);
-
+        await Promise.all([loadStock(), loadTransfers()]);
         updateUIBySelection();
       } catch (e) {
         console.error("[transfer] submitTransfer error:", e);
@@ -1032,14 +1062,13 @@
         renderFromLocationOptions();
         renderToLocationOptions();
         syncAvailableQty();
+        updateQtyCalcBox();
       });
 
       els.itemSearchInput.addEventListener("keydown", (e) => {
         const visibleItems = filteredItems.slice(0, 30);
 
-        if (!els.itemAutocompleteMenu.classList.contains("show") || !visibleItems.length) {
-          return;
-        }
+        if (!els.itemAutocompleteMenu.classList.contains("show") || !visibleItems.length) return;
 
         if (e.key === "ArrowDown") {
           e.preventDefault();
@@ -1055,11 +1084,9 @@
           return;
         }
 
-        if (e.key === "Enter") {
-          if (activeAutocompleteIndex >= 0 && visibleItems[activeAutocompleteIndex]) {
-            e.preventDefault();
-            selectItem(visibleItems[activeAutocompleteIndex].id);
-          }
+        if (e.key === "Enter" && activeAutocompleteIndex >= 0 && visibleItems[activeAutocompleteIndex]) {
+          e.preventDefault();
+          selectItem(visibleItems[activeAutocompleteIndex].id);
           return;
         }
 
@@ -1083,9 +1110,8 @@
         }
       });
 
-      els.itemSelect.addEventListener("change", () => {
-        updateUIBySelection();
-      });
+      els.modeBoxesCard.addEventListener("click", () => setQtyMode("boxes"));
+      els.modeUnitsCard.addEventListener("click", () => setQtyMode("units"));
 
       els.fromLocationSelect.addEventListener("change", () => {
         renderToLocationOptions();
@@ -1096,11 +1122,16 @@
         syncAvailableQty();
       });
 
+      els.qtyInput.addEventListener("input", () => {
+        updateQtyCalcBox();
+      });
+
       els.submitBtn.addEventListener("click", submitTransfer);
     }
 
     parseUser();
     bindEvents();
+    setQtyMode("boxes");
     loadPage();
   </script>
 </body>
