@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Вход покупателя</title>
+<style>
+body{
+  font-family:Arial;
+  background:#f5f7fb;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+.box{
+  background:#fff;
+  padding:30px;
+  border-radius:12px;
+  width:320px;
+}
+input{
+  width:100%;
+  margin-bottom:10px;
+  height:40px;
+}
+button{
+  width:100%;
+  height:40px;
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Вход</h2>
+  <input id="tenant" placeholder="tenant_id" value="1"/>
+  <input id="login" placeholder="логин"/>
+  <input id="password" type="password" placeholder="пароль"/>
+  <button onclick="login()">Войти</button>
+</div>
+
+<script src="/js/config.js"></script>
+<script src="/js/api.js"></script>
+
+<script>
+async function login(){
+  const tenant_id = Number(document.getElementById('tenant').value);
+  const login = document.getElementById('login').value;
+  const password = document.getElementById('password').value;
+
+  const res = await fetch(API_BASE + '/showcase/auth/login',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({tenant_id, login, password})
+  });
+
+  const data = await res.json();
+
+  if(!data.ok){
+    alert('Ошибка');
+    return;
+  }
+
+  localStorage.setItem('showcase_buyer', JSON.stringify(data.buyer));
+
+  location.href = '/showcase.html';
+}
+</script>
+
+</body>
+</html>

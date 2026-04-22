@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Витрина</title>
+<style>
+body{font-family:Arial;background:#f5f7fb;margin:0}
+.wrap{padding:20px}
+.card{
+  background:#fff;
+  padding:10px;
+  margin-bottom:10px;
+  display:flex;
+  gap:10px;
+}
+img{width:80px;height:80px}
+.cart{
+  position:fixed;
+  right:10px;
+  top:10px;
+  background:#fff;
+  padding:10px;
+  width:200px;
+}
+</style>
+</head>
+<body>
+
+<div class="cart">
+  <h3>Корзина</h3>
+  <div id="cart"></div>
+  <button onclick="sendOrder()">Оформить</button>
+</div>
+
+<div class="wrap" id="list"></div>
+
+<script src="/js/config.js"></script>
+
+<script>
+const buyer = JSON.parse(localStorage.getItem('showcase_buyer'));
+const tenant_id = 1;
+
+let cart = [];
+
+async function load(){
+  const res = await fetch(API_BASE + '/showcase/catalog?tenant_id=1&page=1&limit=100');
+  const data = await res.json();
+
+  const html = data.items.map(i => `
+    <div class="card">
+      <img src="${i.image_url || ''}">
+      <div>
+        <div>${i.name}</div>
+        <div>Остаток: ${i.available_qty}</div>
+        <input type="number" id="q_${i.id}" value="1">
+        <button onclick="add(${i.id}, '${i.name}')">Добавить</button>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('list').innerHTML = html;
+}
+
+function add(id,name){
+  const qty = Number(document.getElementById('q_'+id).value);
+
+  cart.push({item_id:id, qty, name});
+  renderCart();
+}
+
+function renderCart(){
+  document.getElementById('cart').innerHTML =
+    cart.map(c => c.name + ' x ' + c.qty).join('<br>');
+}
+
+async function sendOrder(){
+  const res = await fetch(API_BASE + '/showcase/orders',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      tenant_id,
+      buyer_id: buyer.id,
+      items: cart
+    })
+  });
+
+  const data = await res.json();
+
+  if(data.ok){
+    alert('Заказ создан');
+    cart = [];
+    renderCart();
+  } else {
+    alert('Ошибка');
+  }
+}
+
+load();
+</script>
+
+</body>
+</html>
