@@ -13,6 +13,37 @@ function buildLikeSearch(search) {
     return `%${String(search || '').trim()}%`;
 }
 
+async function getTableColumns(client, schemaName, tableName) {
+    const result = await client.query(
+        `
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = $1
+          AND table_name = $2
+        ORDER BY ordinal_position
+        `,
+        [schemaName, tableName]
+    );
+
+    return result.rows.map((row) => row.column_name);
+}
+
+function hasColumn(columns, name) {
+    return columns.includes(name);
+}
+
+function buildDynamicInsert(schemaName, tableName, rowData) {
+    const keys = Object.keys(rowData);
+    const columnsSql = keys.map((key) => `"${key}"`).join(', ');
+    const valuesSql = keys.map((_, idx) => `$${idx + 1}`).join(', ');
+    const values = keys.map((key) => rowData[key]);
+
+    return {
+        sql: `INSERT INTO ${schemaName}.${tableName} (${columnsSql}) VALUES (${valuesSql}) RETURNING *`,
+        values
+    };
+}
+
 async function getOrderWithItems(client, tenantId, orderId) {
     const orderResult = await client.query(
         `
@@ -484,7 +515,6 @@ router.post('/orders/:id/take', authRequired, async (req, res) => {
 // =========================================
 // ОБНОВЛЕНИЕ СТРОКИ ЗАКАЗА
 // PATCH /showcase-admin/orders/:orderId/items/:itemRowId
-// body: approved_qty, picked_qty, final_price, comment, line_status
 // =========================================
 router.patch('/orders/:orderId/items/:itemRowId', authRequired, async (req, res) => {
     const client = await pool.connect();
@@ -827,6 +857,240 @@ router.post('/orders/:id/ready', authRequired, async (req, res) => {
         await client.query('ROLLBACK');
         console.error('[showcase-admin/orders/:id/ready]', e);
         res.status(500).json({ error: 'server_error' });
+    } finally {
+        client.release();
+    }
+});
+
+// =========================================
+// СОЗДАТЬ ПРОДАЖУ ИЗ ЗАКАЗА
+// POST /showcase-admin/orders/:id/create-sale
+// =========================================
+router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+        const tenantId = getEffectiveTenantId(req);
+        const orderId = toNumber(req.params.id);
+        const userId = req.user && req.user.id ? req.user.id : null;
+
+        await client.query('BEGIN');
+
+        const orderResult = await client.query(
+            `
+            SELECT *
+            FROM core.showcase_orders
+            WHERE tenant_id = $1
+              AND id = $2
+            FOR UPDATE
+            `,
+            [tenantId, orderId]
+        );
+
+        if (!orderResult.rows.length) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ error: 'order_not_found' });
+        }
+
+        const order = orderResult.rows[0];
+
+        if (order.status !== 'ready') {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ error: 'order_not_ready_for_sale' });
+        }
+
+        if (order.sale_id) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ error: 'sale_already_created' });
+        }
+
+        const itemsResult = await client.query(
+            `
+            SELECT
+                oi.*,
+                i.name AS item_name,
+                i.sku,
+                i.barcode
+            FROM core.showcase_order_items oi
+            JOIN core.items i
+              ON i.id = oi.item_id
+             AND i.tenant_id = oi.tenant_id
+            WHERE oi.tenant_id = $1
+              AND oi.order_id = $2
+              AND COALESCE(oi.picked_qty, 0) > 0
+            ORDER BY oi.id
+            `,
+            [tenantId, orderId]
+        );
+
+        if (!itemsResult.rows.length) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ error: 'no_picked_items_for_sale' });
+        }
+
+        // Проверка остатков перед списанием
+        for (const item of itemsResult.rows) {
+            const stockResult = await client.query(
+                `
+                SELECT COALESCE(qty, 0) AS qty
+                FROM core.stock
+                WHERE tenant_id = $1
+                  AND item_id = $2
+                FOR UPDATE
+                `,
+                [tenantId, item.item_id]
+            );
+
+            const physicalQty = stockResult.rows.length ? toNumber(stockResult.rows[0].qty) : 0;
+            const pickedQty = toNumber(item.picked_qty);
+
+            if (pickedQty > physicalQty) {
+                await client.query('ROLLBACK');
+                return res.status(400).json({
+                    error: 'not_enough_stock_for_sale',
+                    item_id: item.item_id,
+                    physical_qty: physicalQty,
+                    picked_qty: pickedQty
+                });
+            }
+        }
+
+        const salesColumns = await getTableColumns(client, 'core', 'sales');
+        const saleItemsColumns = await getTableColumns(client, 'core', 'sale_items');
+
+        let totalAmount = 0;
+        for (const item of itemsResult.rows) {
+            const linePrice = toNumber(item.final_price, toNumber(item.base_price, 0));
+            const lineQty = toNumber(item.picked_qty, 0);
+            totalAmount += linePrice * lineQty;
+        }
+
+        const saleData = {};
+
+        if (hasColumn(salesColumns, 'tenant_id')) saleData.tenant_id = tenantId;
+        if (hasColumn(salesColumns, 'sale_date')) saleData.sale_date = new Date().toISOString();
+        if (hasColumn(salesColumns, 'comment')) saleData.comment = `Создано из showcase order #${order.order_no}`;
+        if (hasColumn(salesColumns, 'sale_type')) saleData.sale_type = 'retail';
+        if (hasColumn(salesColumns, 'payment_status')) saleData.payment_status = 'unpaid';
+        if (hasColumn(salesColumns, 'payment_method')) saleData.payment_method = 'cash';
+        if (hasColumn(salesColumns, 'total_amount')) saleData.total_amount = totalAmount;
+        if (hasColumn(salesColumns, 'total')) saleData.total = totalAmount;
+        if (hasColumn(salesColumns, 'revenue')) saleData.revenue = totalAmount;
+        if (hasColumn(salesColumns, 'created_at')) saleData.created_at = new Date().toISOString();
+        if (hasColumn(salesColumns, 'updated_at')) saleData.updated_at = new Date().toISOString();
+        if (hasColumn(salesColumns, 'created_by')) saleData.created_by = userId;
+
+        if (Object.keys(saleData).length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(500).json({ error: 'sales_schema_not_supported' });
+        }
+
+        const saleInsert = buildDynamicInsert('core', 'sales', saleData);
+        const saleResult = await client.query(saleInsert.sql, saleInsert.values);
+
+        if (!saleResult.rows.length || !saleResult.rows[0].id) {
+            await client.query('ROLLBACK');
+            return res.status(500).json({ error: 'sale_not_created' });
+        }
+
+        const saleId = saleResult.rows[0].id;
+
+        for (const item of itemsResult.rows) {
+            const lineQty = toNumber(item.picked_qty, 0);
+            const linePrice = toNumber(item.final_price, toNumber(item.base_price, 0));
+            const lineTotal = lineQty * linePrice;
+
+            const saleItemData = {};
+
+            if (hasColumn(saleItemsColumns, 'sale_id')) saleItemData.sale_id = saleId;
+            if (hasColumn(saleItemsColumns, 'tenant_id')) saleItemData.tenant_id = tenantId;
+            if (hasColumn(saleItemsColumns, 'item_id')) saleItemData.item_id = item.item_id;
+            if (hasColumn(saleItemsColumns, 'qty')) saleItemData.qty = lineQty;
+            if (hasColumn(saleItemsColumns, 'quantity')) saleItemData.quantity = lineQty;
+            if (hasColumn(saleItemsColumns, 'price')) saleItemData.price = linePrice;
+            if (hasColumn(saleItemsColumns, 'unit_price')) saleItemData.unit_price = linePrice;
+            if (hasColumn(saleItemsColumns, 'total_amount')) saleItemData.total_amount = lineTotal;
+            if (hasColumn(saleItemsColumns, 'total')) saleItemData.total = lineTotal;
+            if (hasColumn(saleItemsColumns, 'line_total')) saleItemData.line_total = lineTotal;
+            if (hasColumn(saleItemsColumns, 'name')) saleItemData.name = item.item_name;
+            if (hasColumn(saleItemsColumns, 'sku')) saleItemData.sku = item.sku;
+            if (hasColumn(saleItemsColumns, 'barcode')) saleItemData.barcode = item.barcode;
+            if (hasColumn(saleItemsColumns, 'created_at')) saleItemData.created_at = new Date().toISOString();
+            if (hasColumn(saleItemsColumns, 'updated_at')) saleItemData.updated_at = new Date().toISOString();
+
+            const saleItemInsert = buildDynamicInsert('core', 'sale_items', saleItemData);
+            await client.query(saleItemInsert.sql, saleItemInsert.values);
+
+            await client.query(
+                `
+                UPDATE core.stock
+                SET
+                    qty = qty - $3,
+                    updated_at = CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM information_schema.columns
+                            WHERE table_schema = 'core'
+                              AND table_name = 'stock'
+                              AND column_name = 'updated_at'
+                        )
+                        THEN NOW()
+                        ELSE updated_at
+                    END
+                WHERE tenant_id = $1
+                  AND item_id = $2
+                `,
+                [tenantId, item.item_id, lineQty]
+            );
+        }
+
+        await client.query(
+            `
+            UPDATE core.stock_reservations
+            SET
+                status = 'consumed',
+                consumed_at = NOW(),
+                updated_at = NOW()
+            WHERE tenant_id = $1
+              AND order_id = $2
+              AND status = 'active'
+            `,
+            [tenantId, orderId]
+        );
+
+        await client.query(
+            `
+            UPDATE core.showcase_orders
+            SET
+                status = 'completed',
+                completed_at = NOW(),
+                sale_id = $3,
+                updated_at = NOW()
+            WHERE tenant_id = $1
+              AND id = $2
+            `,
+            [tenantId, orderId, saleId]
+        );
+
+        await createEvent(client, tenantId, orderId, 'sale_created', userId, null, {
+            sale_id: saleId,
+            total_amount: totalAmount
+        });
+
+        await client.query('COMMIT');
+
+        const freshOrder = await getOrderWithItems(client, tenantId, orderId);
+
+        res.json({
+            ok: true,
+            sale_id: saleId,
+            total_amount: totalAmount,
+            order: freshOrder
+        });
+    } catch (e) {
+        await client.query('ROLLBACK');
+        console.error('[showcase-admin/orders/:id/create-sale]', e);
+        res.status(500).json({ error: 'server_error', message: e.message });
     } finally {
         client.release();
     }
