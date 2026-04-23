@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Настройки витрины — BFC24 CONTROL</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --line:#e6ebf2;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-2:#1d4ed8;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --warning:#d97706;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+
+    .wrap{
+      max-width:1400px;
+      margin:0 auto;
+      padding:24px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .title h1{
+      margin:0 0 6px 0;
+      font-size:28px;
+      line-height:1.2;
+    }
+
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:11px 16px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:14px;
+      transition:.15s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-2)}
+    .btn-light{background:#fff;color:var(--text);border:1px solid var(--line)}
+    .btn-light:hover{background:#f8fafc}
+    .btn-success{background:var(--success);color:#fff}
+    .btn-danger{background:var(--danger);color:#fff}
+    .btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      transform:none!important;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .message{
+      margin:0 0 16px 0;
+      padding:12px 14px;
+      border-radius:12px;
+      display:none;
+      font-size:14px;
+      font-weight:700;
+    }
+    .message.show{display:block}
+    .message.info{background:#dbeafe;color:#1d4ed8}
+    .message.error{background:#fee2e2;color:#b91c1c}
+    .message.success{background:#dcfce7;color:#15803d}
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 420px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .section{
+      padding:18px;
+      margin-bottom:18px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .field.full{
+      grid-column:1 / -1;
+    }
+
+    .field label{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:0 14px;
+      font-size:14px;
+      color:var(--text);
+      outline:none;
+    }
+
+    .field input,
+    .field select{
+      height:44px;
+    }
+
+    .field textarea{
+      min-height:120px;
+      padding:12px 14px;
+      resize:vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.10);
+    }
+
+    .hint{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .switch-row{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+
+    .switch-card{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#f8fafc;
+    }
+
+    .switch-card h3{
+      margin:0 0 6px 0;
+      font-size:15px;
+    }
+
+    .switch-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    .switch-card input[type="checkbox"]{
+      width:20px;
+      height:20px;
+      margin-top:2px;
+    }
+
+    .preview-wrap{
+      padding:18px;
+      position:sticky;
+      top:16px;
+    }
+
+    .preview-title{
+      margin:0 0 14px 0;
+      font-size:22px;
+    }
+
+    .preview-hero{
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      background:#fff;
+      margin-bottom:14px;
+    }
+
+    .preview-banner{
+      min-height:170px;
+      background:#eef2ff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      border-bottom:1px solid var(--line);
+    }
+
+    .preview-banner img{
+      width:100%;
+      height:170px;
+      object-fit:cover;
+      display:block;
+    }
+
+    .preview-banner-empty{
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+      padding:20px;
+    }
+
+    .preview-body{
+      padding:16px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+
+    .preview-logo{
+      width:74px;
+      height:74px;
+      min-width:74px;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .preview-logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .preview-logo-empty{
+      font-size:11px;
+      color:var(--muted);
+      text-align:center;
+      padding:8px;
+    }
+
+    .preview-text h3{
+      margin:0 0 8px 0;
+      font-size:22px;
+      line-height:1.2;
+    }
+
+    .preview-text p{
+      margin:0 0 8px 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .preview-badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:34px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .status-list{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .status-item{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      background:#f8fafc;
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .status-item strong{
+      display:block;
+      margin-bottom:4px;
+      font-size:14px;
+    }
+
+    @media (max-width: 1100px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+      .preview-wrap{
+        position:static;
+      }
+    }
+
+    @media (max-width: 800px){
+      .wrap{padding:14px}
+      .form-grid{grid-template-columns:1fr}
+      .preview-body{flex-direction:column}
+      .title h1{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>Настройки витрины</h1>
+        <p>Управление магазином, его контактами, отображением цен и доступностью витрины для покупателей.</p>
+      </div>
+      <div class="actions">
+        <a class="btn btn-light" href="/showcase.html">Открыть витрину</a>
+        <button class="btn btn-light" id="btnReload" type="button">Обновить</button>
+        <button class="btn btn-success" id="btnSaveTop" type="button">Сохранить</button>
+      </div>
+    </div>
+
+    <div class="message info" id="messageBox"></div>
+
+    <div class="layout">
+      <div class="main">
+        <div class="card section">
+          <div class="form-grid">
+            <div class="field">
+              <label for="titleInput">Название магазина</label>
+              <input id="titleInput" type="text" placeholder="Например: Оптовый магазин Иванова" />
+            </div>
+
+            <div class="field">
+              <label for="phoneInput">Телефон</label>
+              <input id="phoneInput" type="text" placeholder="+79991234567" />
+            </div>
+
+            <div class="field full">
+              <label for="descriptionInput">Описание магазина</label>
+              <textarea id="descriptionInput" placeholder="Короткое описание магазина, условий работы, ассортимента и т.д."></textarea>
+            </div>
+
+            <div class="field full">
+              <label for="logoInput">URL логотипа</label>
+              <input id="logoInput" type="text" placeholder="/uploads/logo.png или https://..." />
+              <div class="hint">Пока используем URL. Позже можно сделать отдельную загрузку файла.</div>
+            </div>
+
+            <div class="field full">
+              <label for="bannerInput">URL баннера</label>
+              <input id="bannerInput" type="text" placeholder="/uploads/banner.jpg или https://..." />
+              <div class="hint">Баннер показывается в верхней части витрины.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card section">
+          <div class="switch-row">
+            <label class="switch-card">
+              <div>
+                <h3>Витрина включена</h3>
+                <p>Если выключить, покупатели не смогут открыть каталог товаров и оформить заказ.</p>
+              </div>
+              <input id="enabledInput" type="checkbox" />
+            </label>
+
+            <label class="switch-card">
+              <div>
+                <h3>Показывать цены</h3>
+                <p>Если выключить, на витрине будет надпись "Цена скрыта" вместо цены товара.</p>
+              </div>
+              <input id="showPricesInput" type="checkbox" />
+            </label>
+
+            <label class="switch-card">
+              <div>
+                <h3>Показывать только товары в наличии</h3>
+                <p>Если включить, витрина будет скрывать позиции, где доступный остаток меньше или равен нулю.</p>
+              </div>
+              <input id="onlyInStockInput" type="checkbox" />
+            </label>
+          </div>
+        </div>
+
+        <div class="card section">
+          <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-light" id="btnReset" type="button">Сбросить</button>
+            <button class="btn btn-success" id="btnSaveBottom" type="button">Сохранить настройки</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card preview-wrap">
+        <h2 class="preview-title">Предпросмотр витрины</h2>
+
+        <div class="preview-hero">
+          <div class="preview-banner" id="previewBanner"></div>
+          <div class="preview-body">
+            <div class="preview-logo" id="previewLogo"></div>
+            <div class="preview-text">
+              <h3 id="previewTitle">Витрина</h3>
+              <p id="previewDescription">Описание магазина пока не заполнено.</p>
+              <div class="preview-badges">
+                <div class="badge" id="previewPhone">Телефон не указан</div>
+                <div class="badge" id="previewEnabled">Витрина выключена</div>
+                <div class="badge" id="previewPrices">Цены скрыты</div>
+                <div class="badge" id="previewStockMode">Показывать все товары</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-list">
+          <div class="status-item">
+            <strong>Что увидит покупатель</strong>
+            Название магазина, телефон, описание, баннер и логотип будут показаны на витрине сверху.
+          </div>
+          <div class="status-item">
+            <strong>Показ цен</strong>
+            Если включено, покупатели увидят цены товаров. Если выключено — только сами товары и остатки.
+          </div>
+          <div class="status-item">
+            <strong>Показ остатков</strong>
+            Если включить режим "Только в наличии", витрина автоматически скроет отсутствующие товары.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script>
+    (function () {
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      const tenantId = user && user.tenant_id ? Number(user.tenant_id) : 1;
+
+      const state = {
+        settings: null
+      };
+
+      const messageBox = document.getElementById('messageBox');
+
+      const titleInput = document.getElementById('titleInput');
+      const phoneInput = document.getElementById('phoneInput');
+      const descriptionInput = document.getElementById('descriptionInput');
+      const logoInput = document.getElementById('logoInput');
+      const bannerInput = document.getElementById('bannerInput');
+      const enabledInput = document.getElementById('enabledInput');
+      const showPricesInput = document.getElementById('showPricesInput');
+      const onlyInStockInput = document.getElementById('onlyInStockInput');
+
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function showMessage(text, variant = 'info') {
+        messageBox.textContent = text;
+        messageBox.className = 'message show ' + variant;
+      }
+
+      function hideMessage() {
+        messageBox.textContent = '';
+        messageBox.className = 'message info';
+      }
+
+      function currentPayload() {
+        return {
+          is_enabled: !!enabledInput.checked,
+          show_prices: !!showPricesInput.checked,
+          show_only_in_stock: !!onlyInStockInput.checked,
+          title: String(titleInput.value || '').trim(),
+          phone: String(phoneInput.value || '').trim(),
+          description: String(descriptionInput.value || '').trim(),
+          logo_url: String(logoInput.value || '').trim(),
+          banner_url: String(bannerInput.value || '').trim()
+        };
+      }
+
+      function fillForm(settings) {
+        titleInput.value = settings.title || '';
+        phoneInput.value = settings.phone || '';
+        descriptionInput.value = settings.description || '';
+        logoInput.value = settings.logo_url || '';
+        bannerInput.value = settings.banner_url || '';
+        enabledInput.checked = !!settings.is_enabled;
+        showPricesInput.checked = !!settings.show_prices;
+        onlyInStockInput.checked = !!settings.show_only_in_stock;
+      }
+
+      function renderPreview() {
+        const settings = currentPayload();
+
+        document.getElementById('previewTitle').textContent = settings.title || 'Витрина';
+        document.getElementById('previewDescription').textContent = settings.description || 'Описание магазина пока не заполнено.';
+        document.getElementById('previewPhone').textContent = settings.phone || 'Телефон не указан';
+        document.getElementById('previewEnabled').textContent = settings.is_enabled ? 'Витрина включена' : 'Витрина выключена';
+        document.getElementById('previewPrices').textContent = settings.show_prices ? 'Цены показаны' : 'Цены скрыты';
+        document.getElementById('previewStockMode').textContent = settings.show_only_in_stock ? 'Только в наличии' : 'Показывать все товары';
+
+        const previewLogo = document.getElementById('previewLogo');
+        previewLogo.innerHTML = settings.logo_url
+          ? '<img src="' + escapeHtml(settings.logo_url) + '" alt="">'
+          : '<div class="preview-logo-empty">логотип<br>не задан</div>';
+
+        const previewBanner = document.getElementById('previewBanner');
+        previewBanner.innerHTML = settings.banner_url
+          ? '<img src="' + escapeHtml(settings.banner_url) + '" alt="">'
+          : '<div class="preview-banner-empty">Баннер магазина пока не задан</div>';
+      }
+
+      async function loadSettings() {
+        hideMessage();
+        try {
+          const result = await API.get('/showcase-admin/settings?tenant_id=' + tenantId);
+          const settings = result.settings || {
+            tenant_id: tenantId,
+            is_enabled: false,
+            show_prices: true,
+            show_only_in_stock: false,
+            title: '',
+            phone: '',
+            description: '',
+            logo_url: '',
+            banner_url: ''
+          };
+
+          state.settings = settings;
+          fillForm(settings);
+          renderPreview();
+        } catch (error) {
+          console.error('[showcase-settings] loadSettings error:', error);
+          showMessage(error?.message || error?.error || 'Ошибка загрузки настроек витрины', 'error');
+        }
+      }
+
+      async function saveSettings() {
+        hideMessage();
+        try {
+          showMessage('Сохраняем настройки...', 'info');
+
+          const payload = currentPayload();
+
+          await API.put('/showcase-admin/settings?tenant_id=' + tenantId, payload);
+
+          state.settings = payload;
+          showMessage('Настройки витрины сохранены', 'success');
+          renderPreview();
+        } catch (error) {
+          console.error('[showcase-settings] saveSettings error:', error);
+          showMessage(error?.message || error?.error || 'Ошибка сохранения настроек витрины', 'error');
+        }
+      }
+
+      function resetForm() {
+        if (!state.settings) return;
+        fillForm(state.settings);
+        renderPreview();
+        showMessage('Изменения сброшены', 'info');
+      }
+
+      [
+        titleInput,
+        phoneInput,
+        descriptionInput,
+        logoInput,
+        bannerInput,
+        enabledInput,
+        showPricesInput,
+        onlyInStockInput
+      ].forEach((el) => {
+        el.addEventListener('input', renderPreview);
+        el.addEventListener('change', renderPreview);
+      });
+
+      document.getElementById('btnReload').addEventListener('click', loadSettings);
+      document.getElementById('btnSaveTop').addEventListener('click', saveSettings);
+      document.getElementById('btnSaveBottom').addEventListener('click', saveSettings);
+      document.getElementById('btnReset').addEventListener('click', resetForm);
+
+      loadSettings();
+    })();
+  </script>
+</body>
+</html>
