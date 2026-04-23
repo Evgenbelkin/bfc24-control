@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Заказы витрины — BFC24 CONTROL</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --line:#e6ebf2;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-2:#1d4ed8;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --warning:#d97706;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+    .wrap{
+      max-width:1600px;
+      margin:0 auto;
+      padding:24px;
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .title h1{
+      margin:0 0 6px 0;
+      font-size:28px;
+      line-height:1.2;
+    }
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:11px 16px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:14px;
+      transition:.15s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-2)}
+    .btn-light{background:#fff;color:var(--text);border:1px solid var(--line)}
+    .btn-light:hover{background:#f8fafc}
+    .btn-success{background:var(--success);color:#fff}
+    .btn-danger{background:var(--danger);color:#fff}
+    .btn-warning{background:var(--warning);color:#fff}
+    .btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      transform:none!important;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .message{
+      margin:0 0 16px 0;
+      padding:12px 14px;
+      border-radius:12px;
+      display:none;
+      font-size:14px;
+      font-weight:700;
+    }
+    .message.show{display:block}
+    .message.info{background:#dbeafe;color:#1d4ed8}
+    .message.error{background:#fee2e2;color:#b91c1c}
+    .message.success{background:#dcfce7;color:#15803d}
+
+    .filters{
+      padding:18px;
+      margin-bottom:18px;
+    }
+    .filters-row{
+      display:grid;
+      grid-template-columns:1.2fr .8fr .7fr .6fr .6fr;
+      gap:12px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .field label{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .field input,
+    .field select,
+    .field textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:0 14px;
+      font-size:14px;
+      color:var(--text);
+      outline:none;
+    }
+    .field input,
+    .field select{height:44px}
+    .field textarea{
+      min-height:100px;
+      padding:12px 14px;
+      resize:vertical;
+    }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.10);
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 520px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .orders-table-wrap{
+      overflow:auto;
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width:980px;
+    }
+    thead th{
+      background:#f8fafc;
+      color:var(--muted);
+      text-align:left;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      padding:14px 12px;
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    tbody td{
+      padding:12px;
+      border-bottom:1px solid var(--line);
+      font-size:14px;
+      vertical-align:middle;
+    }
+    tbody tr:hover{
+      background:#fafcff;
+    }
+
+    .status{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:118px;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .s-new{background:#eef2f7;color:#475569}
+    .s-in_progress{background:#dbeafe;color:#1d4ed8}
+    .s-partially_picked{background:#fef3c7;color:#b45309}
+    .s-ready{background:#dcfce7;color:#15803d}
+    .s-completed{background:#d1fae5;color:#047857}
+    .s-cancelled{background:#fee2e2;color:#b91c1c}
+    .s-approved{background:#e0f2fe;color:#0369a1}
+    .s-picked{background:#dcfce7;color:#15803d}
+    .s-partial{background:#fef3c7;color:#b45309}
+
+    .sidebar{
+      padding:18px;
+      position:sticky;
+      top:16px;
+    }
+    .sidebar h2{
+      margin:0 0 10px 0;
+      font-size:22px;
+    }
+    .sidebar-sub{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:16px;
+    }
+
+    .meta-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-bottom:16px;
+    }
+    .meta-item{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#f8fafc;
+      padding:12px;
+    }
+    .meta-item .label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .meta-item .value{
+      font-size:14px;
+      font-weight:700;
+      line-height:1.4;
+      word-break:break-word;
+    }
+
+    .sidebar-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .line-card{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#f8fafc;
+      padding:12px;
+      margin-bottom:12px;
+    }
+    .line-top{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .line-image{
+      width:70px;
+      height:70px;
+      min-width:70px;
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .line-image img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .line-image-empty{
+      font-size:11px;
+      color:var(--muted);
+      text-align:center;
+      padding:6px;
+    }
+    .line-info{
+      min-width:0;
+    }
+    .line-title{
+      font-size:15px;
+      font-weight:800;
+      line-height:1.35;
+      margin-bottom:6px;
+    }
+    .line-meta{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+    }
+    .line-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .empty{
+      padding:26px 14px;
+      color:var(--muted);
+      text-align:center;
+      font-size:14px;
+    }
+
+    .pagination{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:18px;
+      padding:14px 18px;
+    }
+
+    .mono{font-family:Consolas,Menlo,monospace}
+    .muted{color:var(--muted)}
+
+    @media (max-width: 1200px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:static}
+    }
+    @media (max-width: 900px){
+      .filters-row{grid-template-columns:1fr 1fr}
+      .meta-grid{grid-template-columns:1fr}
+      .line-grid{grid-template-columns:1fr}
+    }
+    @media (max-width: 700px){
+      .wrap{padding:14px}
+      .filters-row{grid-template-columns:1fr}
+      .title h1{font-size:22px}
+      .line-top{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>Заказы витрины</h1>
+        <p>Рабочий экран продавца: взять заказ, открыть состав, отметить готовность и создать продажу.</p>
+      </div>
+      <div class="actions">
+        <a class="btn btn-light" href="/showcase-settings.html">Настройки витрины</a>
+        <a class="btn btn-light" href="/showcase.html">Открыть витрину</a>
+        <button class="btn btn-primary" id="btnReloadTop" type="button">Обновить</button>
+      </div>
+    </div>
+
+    <div class="message info" id="messageBox"></div>
+
+    <div class="card filters">
+      <div class="filters-row">
+        <div class="field">
+          <label for="searchInput">Поиск</label>
+          <input id="searchInput" type="text" placeholder="Номер заказа, покупатель, телефон" />
+        </div>
+        <div class="field">
+          <label for="statusSelect">Статус</label>
+          <select id="statusSelect">
+            <option value="">Все статусы</option>
+            <option value="new">Новый</option>
+            <option value="in_progress">В работе</option>
+            <option value="partially_picked">Частично собран</option>
+            <option value="ready">Готов</option>
+            <option value="completed">Завершён</option>
+            <option value="cancelled">Отменён</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="limitSelect">На странице</label>
+          <select id="limitSelect">
+            <option value="20" selected>20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;height:44px;">Показать</button>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="btn btn-light" id="btnClearFilters" type="button" style="width:100%;height:44px;">Сбросить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="main">
+        <div class="card orders-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Заказ</th>
+                <th>Покупатель</th>
+                <th>Телефон</th>
+                <th>Статус</th>
+                <th>Кол-во</th>
+                <th>Строк</th>
+                <th>Дата</th>
+                <th>Кто взял</th>
+                <th>Действие</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTbody">
+              <tr><td colspan="10" class="empty">Загрузка...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card pagination">
+          <div class="muted" id="summaryText">Пока нет данных</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-light" id="btnPrevPage" type="button">← Назад</button>
+            <div class="muted" id="pageInfo">Страница 1</div>
+            <button class="btn btn-light" id="btnNextPage" type="button">Вперёд →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sidebar">
+        <h2>Карточка заказа</h2>
+        <div class="sidebar-sub">Выбери заказ слева, чтобы открыть состав и действия по заказу.</div>
+
+        <div id="orderMeta">
+          <div class="empty">Заказ не выбран</div>
+        </div>
+
+        <div class="sidebar-actions" id="orderActions" style="display:none;">
+          <button class="btn btn-primary" id="btnTakeOrder" type="button">Взять в работу</button>
+          <button class="btn btn-warning" id="btnReadyOrder" type="button">Готов</button>
+          <button class="btn btn-success" id="btnCreateSale" type="button">Создать продажу</button>
+        </div>
+
+        <div id="orderLines">
+          <div class="empty">Состав заказа пока не открыт</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script>
+    (function () {
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      const tenantId = user && user.tenant_id ? Number(user.tenant_id) : 1;
+
+      const state = {
+        page: 1,
+        limit: 20,
+        total: 0,
+        items: [],
+        selectedOrderId: null,
+        selectedOrder: null
+      };
+
+      const messageBox = document.getElementById('messageBox');
+      const ordersTbody = document.getElementById('ordersTbody');
+      const orderMeta = document.getElementById('orderMeta');
+      const orderLines = document.getElementById('orderLines');
+      const orderActions = document.getElementById('orderActions');
+      const searchInput = document.getElementById('searchInput');
+      const statusSelect = document.getElementById('statusSelect');
+      const limitSelect = document.getElementById('limitSelect');
+      const summaryText = document.getElementById('summaryText');
+      const pageInfo = document.getElementById('pageInfo');
+
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function showMessage(text, variant = 'info') {
+        messageBox.textContent = text;
+        messageBox.className = 'message show ' + variant;
+      }
+
+      function hideMessage() {
+        messageBox.textContent = '';
+        messageBox.className = 'message info';
+      }
+
+      function statusLabel(status) {
+        const map = {
+          new: 'Новый',
+          in_progress: 'В работе',
+          partially_picked: 'Частично собран',
+          ready: 'Готов',
+          completed: 'Завершён',
+          cancelled: 'Отменён',
+          approved: 'Подтверждено',
+          picked: 'Собрано',
+          partial: 'Частично'
+        };
+        return map[status] || status || '—';
+      }
+
+      function statusClass(status) {
+        return 'status s-' + (status || 'new');
+      }
+
+      function displayDateTimeSafe(value) {
+        try {
+          if (typeof displayDateTime === 'function') return displayDateTime(value);
+        } catch (e) {}
+        if (!value) return '—';
+        const dt = new Date(value);
+        if (Number.isNaN(dt.getTime())) return String(value);
+        return dt.toLocaleString('ru-RU');
+      }
+
+      function intQty(value) {
+        const n = Number(value || 0);
+        if (!Number.isFinite(n)) return 0;
+        return Math.floor(n);
+      }
+
+      function imageHtml(url) {
+        if (!url) return '<div class="line-image-empty">нет фото</div>';
+        return '<img src="' + escapeHtml(url) + '" alt="">';
+      }
+
+      function renderOrders() {
+        if (!state.items.length) {
+          ordersTbody.innerHTML = '<tr><td colspan="10" class="empty">Заказы не найдены</td></tr>';
+          summaryText.textContent = 'Ничего не найдено';
+          pageInfo.textContent = 'Страница ' + state.page;
+          return;
+        }
+
+        ordersTbody.innerHTML = state.items.map((item) => `
+          <tr>
+            <td>${escapeHtml(item.id)}</td>
+            <td>
+              <strong class="mono">${escapeHtml(item.order_no || '—')}</strong>
+              <div class="muted">${escapeHtml(item.comment || '')}</div>
+            </td>
+            <td>${escapeHtml(item.buyer_name || '—')}</td>
+            <td>${escapeHtml(item.buyer_phone || '—')}</td>
+            <td><span class="${statusClass(item.status)}">${escapeHtml(statusLabel(item.status))}</span></td>
+            <td>${escapeHtml(item.requested_total_qty || '0')}</td>
+            <td>${escapeHtml(item.lines_count || '0')}</td>
+            <td>${escapeHtml(displayDateTimeSafe(item.created_at))}</td>
+            <td>${escapeHtml(item.taken_by_name || item.taken_by_username || '—')}</td>
+            <td><button class="btn btn-light js-open-order" data-order-id="${item.id}" type="button">Открыть</button></td>
+          </tr>
+        `).join('');
+
+        const from = (state.page - 1) * state.limit + 1;
+        const to = Math.min(state.total, state.page * state.limit);
+        summaryText.textContent = `Показано ${from}-${to} из ${state.total}`;
+        pageInfo.textContent = 'Страница ' + state.page;
+      }
+
+      function renderOrderMeta() {
+        const order = state.selectedOrder;
+
+        if (!order) {
+          orderMeta.innerHTML = '<div class="empty">Заказ не выбран</div>';
+          orderLines.innerHTML = '<div class="empty">Состав заказа пока не открыт</div>';
+          orderActions.style.display = 'none';
+          return;
+        }
+
+        orderMeta.innerHTML = `
+          <div class="meta-grid">
+            <div class="meta-item">
+              <div class="label">Заказ</div>
+              <div class="value mono">${escapeHtml(order.order_no || '—')}</div>
+            </div>
+            <div class="meta-item">
+              <div class="label">Статус</div>
+              <div class="value"><span class="${statusClass(order.status)}">${escapeHtml(statusLabel(order.status))}</span></div>
+            </div>
+            <div class="meta-item">
+              <div class="label">Покупатель</div>
+              <div class="value">${escapeHtml(order.buyer_name || '—')}</div>
+            </div>
+            <div class="meta-item">
+              <div class="label">Телефон</div>
+              <div class="value">${escapeHtml(order.buyer_phone || '—')}</div>
+            </div>
+            <div class="meta-item">
+              <div class="label">Кто взял</div>
+              <div class="value">${escapeHtml(order.taken_by_name || order.taken_by_username || '—')}</div>
+            </div>
+            <div class="meta-item">
+              <div class="label">Дата</div>
+              <div class="value">${escapeHtml(displayDateTimeSafe(order.created_at))}</div>
+            </div>
+          </div>
+        `;
+
+        orderActions.style.display = 'flex';
+      }
+
+      function renderOrderLines() {
+        const order = state.selectedOrder;
+        const items = order && Array.isArray(order.items) ? order.items : [];
+
+        if (!items.length) {
+          orderLines.innerHTML = '<div class="empty">Нет строк заказа</div>';
+          return;
+        }
+
+        orderLines.innerHTML = items.map((item) => `
+          <div class="line-card">
+            <div class="line-top">
+              <div class="line-image">${imageHtml(item.image_url)}</div>
+              <div class="line-info">
+                <div class="line-title">${escapeHtml(item.item_name || '—')}</div>
+                <div class="line-meta">
+                  SKU: <span class="mono">${escapeHtml(item.sku || '—')}</span><br>
+                  ШК: <span class="mono">${escapeHtml(item.barcode || '—')}</span><br>
+                  В наличии: ${escapeHtml(intQty(item.available_qty))}<br>
+                  В коробке: ${escapeHtml(intQty(item.box_qty))}
+                </div>
+              </div>
+            </div>
+
+            <div class="line-grid">
+              <div class="field">
+                <label>Запрошено</label>
+                <input type="number" value="${escapeHtml(item.requested_qty || 0)}" disabled>
+              </div>
+
+              <div class="field">
+                <label>Собрано</label>
+                <input class="js-picked-qty" data-item-id="${item.id}" type="number" step="0.001" value="${escapeHtml(item.picked_qty || 0)}">
+              </div>
+
+              <div class="field">
+                <label>Цена продажи</label>
+                <input class="js-final-price" data-item-id="${item.id}" type="number" step="0.01" value="${escapeHtml(item.final_price || '')}">
+              </div>
+
+              <div class="field">
+                <label>Статус строки</label>
+                <select class="js-line-status" data-item-id="${item.id}">
+                  <option value="approved" ${item.line_status === 'approved' ? 'selected' : ''}>Подтверждено</option>
+                  <option value="picked" ${item.line_status === 'picked' ? 'selected' : ''}>Собрано</option>
+                  <option value="partial" ${item.line_status === 'partial' ? 'selected' : ''}>Частично</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+              <button class="btn btn-primary js-save-line" data-item-id="${item.id}" type="button">Сохранить строку</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      async function loadOrders() {
+        hideMessage();
+        ordersTbody.innerHTML = '<tr><td colspan="10" class="empty">Загрузка...</td></tr>';
+
+        try {
+          const params = new URLSearchParams();
+          params.set('tenant_id', String(tenantId));
+          params.set('page', String(state.page));
+          params.set('limit', String(state.limit));
+
+          if (searchInput.value.trim()) params.set('search', searchInput.value.trim());
+          if (statusSelect.value) params.set('status', statusSelect.value);
+
+          const result = await API.get('/showcase-admin/orders?' + params.toString());
+
+          state.total = Number(result.total || 0);
+          state.items = Array.isArray(result.items) ? result.items : [];
+          renderOrders();
+        } catch (error) {
+          console.error('[showcase-admin-orders] loadOrders error:', error);
+          ordersTbody.innerHTML = '<tr><td colspan="10" class="empty">Ошибка загрузки заказов</td></tr>';
+          showMessage(error?.message || error?.error || 'Ошибка загрузки заказов витрины', 'error');
+        }
+      }
+
+      async function openOrder(orderId) {
+        hideMessage();
+        try {
+          const result = await API.get('/showcase-admin/orders/' + orderId + '?tenant_id=' + tenantId);
+          state.selectedOrderId = Number(orderId);
+          state.selectedOrder = result.order || null;
+          renderOrderMeta();
+          renderOrderLines();
+        } catch (error) {
+          console.error('[showcase-admin-orders] openOrder error:', error);
+          showMessage(error?.message || error?.error || 'Ошибка загрузки заказа', 'error');
+        }
+      }
+
+      async function takeOrder() {
+        if (!state.selectedOrderId) return;
+        try {
+          showMessage('Берём заказ в работу...', 'info');
+          await API.post('/showcase-admin/orders/' + state.selectedOrderId + '/take?tenant_id=' + tenantId, {});
+          await openOrder(state.selectedOrderId);
+          await loadOrders();
+          showMessage('Заказ взят в работу', 'success');
+        } catch (error) {
+          console.error('[showcase-admin-orders] takeOrder error:', error);
+          showMessage(error?.message || error?.error || 'Ошибка взятия заказа в работу', 'error');
+        }
+      }
+
+      async function readyOrder() {
+        if (!state.selectedOrderId) return;
+        try {
+          showMessage('Отмечаем заказ готовым...', 'info');
+          await API.post('/showcase-admin/orders/' + state.selectedOrderId + '/ready?tenant_id=' + tenantId, {});
+          await openOrder(state.selectedOrderId);
+          await loadOrders();
+          showMessage('Заказ отмечен как готовый', 'success');
+        } catch (error) {
+          console.error('[showcase-admin-orders] readyOrder error:', error);
+          showMessage(error?.message || error?.error || 'Ошибка перевода заказа в готов', 'error');
+        }
+      }
+
+      async function createSale() {
+        if (!state.selectedOrderId) return;
+        try {
+          showMessage('Создаём продажу...', 'info');
+          const result = await API.post('/showcase-admin/orders/' + state.selectedOrderId + '/create-sale?tenant_id=' + tenantId, {});
+          await openOrder(state.selectedOrderId);
+          await loadOrders();
+          showMessage('Продажа создана. sale_id: ' + (result.sale_id || ''), 'success');
+        } catch (error) {
+          console.error('[showcase-admin-orders] createSale error:', error);
+          showMessage(error?.message || error?.error || 'Ошибка создания продажи', 'error');
+        }
+      }
+
+      async function saveLine(orderItemId) {
+        if (!state.selectedOrderId) return;
+
+        const pickedInput = document.querySelector('.js-picked-qty[data-item-id="' + orderItemId + '"]');
+        const priceInput = document.querySelector('.js-final-price[data-item-id="' + orderItemId + '"]');
+        const statusInput = document.querySelector('.js-line-status[data-item-id="' + orderItemId + '"]');
+
+        try {
+          showMessage('Сохраняем строку заказа...', 'info');
+
+          await API.patch('/showcase-admin/orders/' + state.selectedOrderId + '/items/' + orderItemId + '?tenant_id=' + tenantId, {
+            picked_qty: Number(pickedInput ? pickedInput.value : 0),
+            final_price: priceInput && String(priceInput.value).trim() !== '' ? Number(priceInput.value) : null,
+            line_status: statusInput ? statusInput.value : 'approved'
+          });
+
+          await openOrder(state.selectedOrderId);
+          await loadOrders();
+          showMessage('Строка заказа сохранена', 'success');
+        } catch (error) {
+          console.error('[showcase-admin-orders] saveLine error:', error);
+          showMessage(error?.message || error?.error || 'Ошибка сохранения строки заказа', 'error');
+        }
+      }
+
+      document.getElementById('btnReloadTop').addEventListener('click', loadOrders);
+      document.getElementById('btnApplyFilters').addEventListener('click', function () {
+        state.page = 1;
+        state.limit = Number(limitSelect.value || 20);
+        loadOrders();
+      });
+      document.getElementById('btnClearFilters').addEventListener('click', function () {
+        searchInput.value = '';
+        statusSelect.value = '';
+        limitSelect.value = '20';
+        state.page = 1;
+        state.limit = 20;
+        loadOrders();
+      });
+
+      document.getElementById('btnPrevPage').addEventListener('click', function () {
+        if (state.page <= 1) return;
+        state.page -= 1;
+        loadOrders();
+      });
+
+      document.getElementById('btnNextPage').addEventListener('click', function () {
+        const maxPage = Math.max(1, Math.ceil(state.total / state.limit));
+        if (state.page >= maxPage) return;
+        state.page += 1;
+        loadOrders();
+      });
+
+      document.getElementById('btnTakeOrder').addEventListener('click', takeOrder);
+      document.getElementById('btnReadyOrder').addEventListener('click', readyOrder);
+      document.getElementById('btnCreateSale').addEventListener('click', createSale);
+
+      ordersTbody.addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-open-order');
+        if (!btn) return;
+        openOrder(Number(btn.getAttribute('data-order-id')));
+      });
+
+      orderLines.addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-save-line');
+        if (!btn) return;
+        saveLine(Number(btn.getAttribute('data-item-id')));
+      });
+
+      searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          state.page = 1;
+          state.limit = Number(limitSelect.value || 20);
+          loadOrders();
+        }
+      });
+
+      loadOrders();
+      renderOrderMeta();
+    })();
+  </script>
+</body>
+</html>
