@@ -1040,6 +1040,49 @@
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
 
+
+
+      <div class="card" onclick="window.location.href='/showcase-admin-orders.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="12" y="14" width="40" height="36" rx="5" stroke-width="2.4"/>
+                <path class="stroke-main" d="M20 24H44" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M20 32H34" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M20 40H30" stroke-width="2.4" stroke-linecap="round"/>
+                <circle class="stroke-accent" cx="44" cy="40" r="8" stroke-width="2.4"/>
+                <path class="stroke-accent" d="M40 40L43 43L49 36" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3>Заказы витрины</h3>
+          <div class="muted">Заказы покупателей с витрины, сборка и создание продажи</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/showcase-settings.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stroke-main" d="M14 24L32 12L50 24V50C50 52.2091 48.2091 54 46 54H18C15.7909 54 14 52.2091 14 50V24Z" stroke-width="2.4" stroke-linejoin="round"/>
+                <path class="stroke-main" d="M24 54V38H40V54" stroke-width="2.4" stroke-linejoin="round"/>
+                <path class="stroke-accent" d="M22 28H42" stroke-width="2.6" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M26 34H38" stroke-width="2.6" stroke-linecap="round"/>
+                <circle class="fill-accent" cx="46" cy="18" r="4"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3>Настройки витрины</h3>
+          <div class="muted">Название магазина, контакты, баннер, цены и доступность витрины</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
       <div class="card" id="subscriptionCard">
         <div class="card__content">
           <div class="card__top">
@@ -1319,7 +1362,9 @@
         "/analytics.html": "analytics",
         "/turnover.html": "turnover",
         "/debts.html": "debts",
-        "/users.html": "users"
+        "/users.html": "users",
+        "/showcase-admin-orders.html": "showcase",
+        "/showcase-settings.html": "showcase"
       };
       return map[pathname] || null;
     }
