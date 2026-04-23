@@ -134,6 +134,7 @@ router.get('/catalog', async (req, res) => {
                 i.sku,
                 i.barcode,
                 i.image_url,
+                COALESCE(i.box_qty, 0) AS box_qty,
                 COALESCE(SUM(s.qty), 0) AS physical_qty,
                 COALESCE(SUM(CASE WHEN sr.status = 'active' THEN sr.qty ELSE 0 END), 0) AS reserved_qty,
                 COALESCE(SUM(s.qty), 0) - COALESCE(SUM(CASE WHEN sr.status = 'active' THEN sr.qty ELSE 0 END), 0) AS available_qty,
@@ -394,9 +395,7 @@ router.get('/my-orders', async (req, res) => {
                 ON ss.tenant_id = o.tenant_id
             WHERE o.tenant_id = $1
               AND o.buyer_id = $2
-            GROUP BY
-                o.id,
-                ss.title
+            GROUP BY o.id, ss.title
             ORDER BY o.created_at DESC, o.id DESC
             `,
             [tenantId, buyerId]
@@ -468,7 +467,8 @@ router.get('/my-orders/:id', async (req, res) => {
                 i.name AS item_name,
                 i.sku,
                 i.barcode,
-                i.image_url
+                i.image_url,
+                COALESCE(i.box_qty, 0) AS box_qty
             FROM core.showcase_order_items oi
             JOIN core.items i
                 ON i.id = oi.item_id
