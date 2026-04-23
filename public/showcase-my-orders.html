@@ -44,13 +44,16 @@ async function loadOrders(){
       <div><b>${o.order_no}</b></div>
       <div class="status ${o.status}">${o.status}</div>
       <div>Дата: ${o.created_at}</div>
-      <button onclick="loadDetails(${o.id})">Открыть</button>
+      <button onclick="openOrder(${o.id})">Открыть</button>
       <div id="details-${o.id}"></div>
     `;
     el.appendChild(div);
   });
 }
 
+function openOrder(id) {
+  window.location.href = `/showcase-my-order-view.html?id=${id}`;
+}
 async function loadDetails(id){
   const res = await fetch(`/showcase/my-orders/${id}?tenant_id=${tenantId}&buyer_id=${buyer.id}`);
   const data = await res.json();
