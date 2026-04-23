@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Мои заказы</title>
+<style>
+body { font-family: Arial; background:#f5f6fa; margin:0; }
+.container { max-width:1000px; margin:20px auto; }
+.card { background:#fff; padding:15px; border-radius:10px; margin-bottom:15px; }
+.status { font-weight:bold; }
+.new { color:gray; }
+.in_progress { color:orange; }
+.ready { color:blue; }
+.completed { color:green; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>Мои заказы</h2>
+<div id="orders"></div>
+</div>
+
+<script>
+const token = localStorage.getItem('showcase_token');
+
+async function loadOrders(){
+  const res = await fetch('/showcase/my-orders', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  const data = await res.json();
+
+  const el = document.getElementById('orders');
+  el.innerHTML = '';
+
+  data.items.forEach(o => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+      <div><b>${o.order_no}</b></div>
+      <div class="status ${o.status}">${o.status}</div>
+      <div>Дата: ${o.created_at}</div>
+      <button onclick="loadDetails(${o.id})">Открыть</button>
+      <div id="details-${o.id}"></div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+async function loadDetails(id){
+  const res = await fetch('/showcase/my-orders/' + id, {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  const data = await res.json();
+
+  const el = document.getElementById('details-' + id);
+  el.innerHTML = data.items.map(i => `
+    <div>
+      ${i.item_name} — ${i.requested_qty}
+    </div>
+  `).join('');
+}
+
+loadOrders();
+</script>
+
+</body>
+</html>
