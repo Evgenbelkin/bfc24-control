@@ -68,8 +68,73 @@ router.post('/auth/login', async (req, res) => {
 
 
 // =========================================
+// СПИСОК КАТЕГОРИЙ ВИТРИНЫ
+// GET /showcase/categories?tenant_id=1
+// =========================================
+router.get('/categories', async (req, res) => {
+    try {
+        const tenantId = toNumber(req.query.tenant_id);
+
+        if (!tenantId) {
+            return res.status(400).json({ error: 'tenant_required' });
+        }
+
+        const settingsResult = await pool.query(
+            `
+            SELECT
+                is_enabled,
+                show_only_in_stock
+            FROM core.showcase_settings
+            WHERE tenant_id = $1
+            LIMIT 1
+            `,
+            [tenantId]
+        );
+
+        if (!settingsResult.rows.length || !settingsResult.rows[0].is_enabled) {
+            return res.status(403).json({ error: 'showcase_disabled' });
+        }
+
+        const settings = settingsResult.rows[0];
+
+        const havingSql = settings.show_only_in_stock
+            ? `HAVING (COALESCE(SUM(s.qty), 0) - COALESCE(SUM(CASE WHEN sr.status = 'active' THEN sr.qty ELSE 0 END), 0)) > 0`
+            : '';
+
+        const result = await pool.query(
+            `
+            SELECT
+                COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') AS category
+            FROM core.items i
+            LEFT JOIN core.stock s
+                ON s.item_id = i.id
+               AND s.tenant_id = i.tenant_id
+            LEFT JOIN core.stock_reservations sr
+                ON sr.item_id = i.id
+               AND sr.tenant_id = i.tenant_id
+               AND sr.status = 'active'
+            WHERE i.tenant_id = $1
+            GROUP BY COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории')
+            ${havingSql}
+            ORDER BY category ASC
+            `,
+            [tenantId]
+        );
+
+        return res.json({
+            ok: true,
+            items: result.rows.map((row) => row.category)
+        });
+    } catch (e) {
+        console.error('[showcase/categories] error:', e);
+        return res.status(500).json({ error: 'server_error' });
+    }
+});
+
+
+// =========================================
 // КАТАЛОГ
-// GET /showcase/catalog?tenant_id=1&page=1&limit=20&search=...
+// GET /showcase/catalog?tenant_id=1&page=1&limit=20&search=...&category=...
 // =========================================
 router.get('/catalog', async (req, res) => {
     try {
@@ -78,6 +143,7 @@ router.get('/catalog', async (req, res) => {
         const limit = Math.min(100, Math.max(1, toNumber(req.query.limit, 20)));
         const offset = (page - 1) * limit;
         const search = String(req.query.search || '').trim();
+        const category = String(req.query.category || '').trim();
 
         if (!tenantId) {
             return res.status(400).json({ error: 'tenant_required' });
@@ -119,6 +185,21 @@ router.get('/catalog', async (req, res) => {
             `;
         }
 
+        if (category) {
+            filterParams.push(category);
+            const categoryParam = `$${filterParams.length}`;
+
+            if (category === 'Без категории') {
+                whereSql += `
+                    AND COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') = ${categoryParam}
+                `;
+            } else {
+                whereSql += `
+                    AND COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') = ${categoryParam}
+                `;
+            }
+        }
+
         const havingSql = settings.show_only_in_stock
             ? `HAVING (COALESCE(SUM(s.qty), 0) - COALESCE(SUM(CASE WHEN sr.status = 'active' THEN sr.qty ELSE 0 END), 0)) > 0`
             : '';
@@ -134,6 +215,7 @@ router.get('/catalog', async (req, res) => {
                 i.sku,
                 i.barcode,
                 i.image_url,
+                COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') AS category,
                 COALESCE(i.box_qty, 0) AS box_qty,
                 COALESCE(SUM(s.qty), 0) AS physical_qty,
                 COALESCE(SUM(CASE WHEN sr.status = 'active' THEN sr.qty ELSE 0 END), 0) AS reserved_qty,
@@ -395,7 +477,9 @@ router.get('/my-orders', async (req, res) => {
                 ON ss.tenant_id = o.tenant_id
             WHERE o.tenant_id = $1
               AND o.buyer_id = $2
-            GROUP BY o.id, ss.title
+            GROUP BY
+                o.id,
+                ss.title
             ORDER BY o.created_at DESC, o.id DESC
             `,
             [tenantId, buyerId]
