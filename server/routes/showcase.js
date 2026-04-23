@@ -13,6 +13,57 @@ function buildLikeSearch(search) {
     return `%${String(search || '').trim()}%`;
 }
 
+
+async function getShowcaseSettings(clientOrPool, tenantId) {
+    const columnsResult = await clientOrPool.query(
+        `
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'core'
+          AND table_name = 'showcase_settings'
+        `
+    );
+
+    const columns = new Set(columnsResult.rows.map((row) => row.column_name));
+
+    const selectParts = ['is_enabled', 'show_prices', 'show_only_in_stock'];
+
+    if (columns.has('title')) selectParts.push('title');
+    if (columns.has('phone')) selectParts.push('phone');
+    if (columns.has('description')) selectParts.push('description');
+    if (columns.has('logo_url')) selectParts.push('logo_url');
+    if (columns.has('banner_url')) selectParts.push('banner_url');
+
+    const settingsResult = await clientOrPool.query(
+        `
+        SELECT
+            ${selectParts.join(',\n            ')}
+        FROM core.showcase_settings
+        WHERE tenant_id = $1
+        LIMIT 1
+        `,
+        [tenantId]
+    );
+
+    if (!settingsResult.rows.length) {
+        return null;
+    }
+
+    const settings = settingsResult.rows[0];
+
+    return {
+        is_enabled: !!settings.is_enabled,
+        show_prices: !!settings.show_prices,
+        show_only_in_stock: !!settings.show_only_in_stock,
+        title: settings.title || null,
+        phone: settings.phone || null,
+        description: settings.description || null,
+        logo_url: settings.logo_url || null,
+        banner_url: settings.banner_url || null
+    };
+}
+
+
 // =========================================
 // AUTH ПОКУПАТЕЛЯ
 // POST /showcase/auth/login
@@ -79,23 +130,11 @@ router.get('/categories', async (req, res) => {
             return res.status(400).json({ error: 'tenant_required' });
         }
 
-        const settingsResult = await pool.query(
-            `
-            SELECT
-                is_enabled,
-                show_only_in_stock
-            FROM core.showcase_settings
-            WHERE tenant_id = $1
-            LIMIT 1
-            `,
-            [tenantId]
-        );
+        const settings = await getShowcaseSettings(pool, tenantId);
 
-        if (!settingsResult.rows.length || !settingsResult.rows[0].is_enabled) {
+        if (!settings || !settings.is_enabled) {
             return res.status(403).json({ error: 'showcase_disabled' });
         }
-
-        const settings = settingsResult.rows[0];
 
         const havingSql = settings.show_only_in_stock
             ? `HAVING (COALESCE(SUM(s.qty), 0) - COALESCE(SUM(CASE WHEN sr.status = 'active' THEN sr.qty ELSE 0 END), 0)) > 0`
@@ -149,29 +188,11 @@ router.get('/catalog', async (req, res) => {
             return res.status(400).json({ error: 'tenant_required' });
         }
 
-        const settingsResult = await pool.query(
-            `
-            SELECT
-                is_enabled,
-                show_prices,
-                show_only_in_stock,
-                title,
-                phone,
-                description,
-                logo_url,
-                banner_url
-            FROM core.showcase_settings
-            WHERE tenant_id = $1
-            LIMIT 1
-            `,
-            [tenantId]
-        );
+        const settings = await getShowcaseSettings(pool, tenantId);
 
-        if (!settingsResult.rows.length || !settingsResult.rows[0].is_enabled) {
+        if (!settings || !settings.is_enabled) {
             return res.status(403).json({ error: 'showcase_disabled' });
         }
-
-        const settings = settingsResult.rows[0];
 
         const filterParams = [tenantId];
         let whereSql = `
@@ -320,22 +341,14 @@ router.post('/orders', async (req, res) => {
 
         await client.query('BEGIN');
 
-        const settingsResult = await client.query(
-            `
-            SELECT is_enabled
-            FROM core.showcase_settings
-            WHERE tenant_id = $1
-            LIMIT 1
-            `,
-            [tenantId]
-        );
+        const settings = await getShowcaseSettings(client, tenantId);
 
-        if (!settingsResult.rows.length || !settingsResult.rows[0].is_enabled) {
+        if (!settings || !settings.is_enabled) {
             await client.query('ROLLBACK');
             return res.status(403).json({ error: 'showcase_disabled' });
         }
 
-        const buyerResult = await client.query(
+const buyerResult = await client.query(
             `
             SELECT id
             FROM core.showcase_buyers
