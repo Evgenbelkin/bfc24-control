@@ -154,7 +154,12 @@ router.get('/catalog', async (req, res) => {
             SELECT
                 is_enabled,
                 show_prices,
-                show_only_in_stock
+                show_only_in_stock,
+                title,
+                phone,
+                description,
+                logo_url,
+                banner_url
             FROM core.showcase_settings
             WHERE tenant_id = $1
             LIMIT 1
@@ -265,6 +270,13 @@ router.get('/catalog', async (req, res) => {
             limit,
             total: countResult.rows[0].total,
             show_prices: settings.show_prices,
+            store: {
+                title: settings.title,
+                phone: settings.phone,
+                description: settings.description,
+                logo_url: settings.logo_url,
+                banner_url: settings.banner_url
+            },
             items: listResult.rows
         });
     } catch (e) {
