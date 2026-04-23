@@ -579,7 +579,7 @@
             <div class="cart-item-meta">
               SKU: ${escapeHtml(item.sku || '—')}<br>
               Доступно: ${escapeHtml(intQty(item.available_qty))}<br>
-              В коробке: ${escapeHtml(item.box_qty || 0)} шт
+              В коробке: ${escapeHtml(Math.floor(Number(item.box_qty || 0)))} шт
             </div>
             <div class="cart-item-controls">
               <input class="qty-input js-cart-qty" data-cart-id="${item.item_id}" type="number" step="1" value="${escapeHtml(item.qty)}">
@@ -608,7 +608,7 @@
               <div>SKU: <span class="mono">${escapeHtml(item.sku || '—')}</span></div>
               <div>ШК: <span class="mono">${escapeHtml(item.barcode || '—')}</span></div>
               <div>В наличии: <strong>${escapeHtml(intQty(item.available_qty))}</strong></div>
-              <div>В коробке: <strong>${escapeHtml(item.box_qty || 0)}</strong> шт</div>
+              <div>В коробке: <strong>${escapeHtml(Math.floor(Number(item.box_qty || 0)))}</strong> шт</div>
             </div>
 
             <div class="price">${escapeHtml(priceText(item))}</div>
