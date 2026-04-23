@@ -22,16 +22,20 @@ body { font-family: Arial; background:#f5f6fa; margin:0; }
 </div>
 
 <script>
-const token = localStorage.getItem('showcase_token');
+const buyer = JSON.parse(localStorage.getItem('showcase_buyer') || '{}');
+const tenantId = localStorage.getItem('showcase_tenant_id');
 
 async function loadOrders(){
-  const res = await fetch('/showcase/my-orders?tenant_id=1', {
-    headers: { 'Authorization': 'Bearer ' + token }
-  });
+  const res = await fetch(`/showcase/my-orders?tenant_id=${tenantId}&buyer_id=${buyer.id}`);
   const data = await res.json();
 
   const el = document.getElementById('orders');
   el.innerHTML = '';
+
+  if (!data.items || !data.items.length){
+    el.innerHTML = '<div class="card">Нет заказов</div>';
+    return;
+  }
 
   data.items.forEach(o => {
     const div = document.createElement('div');
@@ -48,9 +52,7 @@ async function loadOrders(){
 }
 
 async function loadDetails(id){
-  const res = await fetch('/showcase/my-orders/' + id + '?tenant_id=1', {
-    headers: { 'Authorization': 'Bearer ' + token }
-  });
+  const res = await fetch(`/showcase/my-orders/${id}?tenant_id=${tenantId}&buyer_id=${buyer.id}`);
   const data = await res.json();
 
   const el = document.getElementById('details-' + id);
