@@ -479,10 +479,16 @@
     <div class="layout">
       <div class="main">
         <div class="card filters">
-          <div class="filters-row">
+          <div class="filters-row" style="grid-template-columns:1.3fr .9fr .7fr .6fr;">
             <div class="field">
               <label for="searchInput">Поиск</label>
               <input id="searchInput" type="text" placeholder="Название, SKU, штрихкод" />
+            </div>
+            <div class="field">
+              <label for="categorySelect">Категория</label>
+              <select id="categorySelect">
+                <option value="">Все категории</option>
+              </select>
             </div>
             <div class="field">
               <label for="limitSelect">На странице</label>
@@ -498,6 +504,7 @@
             </div>
           </div>
         </div>
+      </div>
 
         <div class="products-grid" id="productsGrid">
           <div class="empty card" style="padding:32px;">Загрузка...</div>
@@ -569,6 +576,7 @@
       const limitSelect = document.getElementById('limitSelect');
       const pageInfo = document.getElementById('pageInfo');
       const summaryText = document.getElementById('summaryText');
+      const categorySelect = document.getElementById('categorySelect');
       const cartList = document.getElementById('cartList');
       const cartTotalQty = document.getElementById('cartTotalQty');
       const orderComment = document.getElementById('orderComment');
@@ -622,6 +630,17 @@
         bannerEl.innerHTML = bannerUrl
           ? '<img src="' + escapeHtml(bannerUrl) + '" alt="">'
           : '<div class="store-banner-empty">Баннер магазина пока не задан</div>';
+      }
+
+      async function loadCategories() {
+        try {
+          const result = await API.get('/showcase/categories?tenant_id=' + tenantId);
+          const items = Array.isArray(result.items) ? result.items : [];
+          categorySelect.innerHTML = '<option value="">Все категории</option>' +
+            items.map((item) => '<option value="' + escapeHtml(item) + '">' + escapeHtml(item) + '</option>').join('');
+        } catch (error) {
+          console.error('[showcase] loadCategories error:', error);
+        }
       }
 
       function priceText(item) {
@@ -796,6 +815,10 @@
             params.set('search', searchInput.value.trim());
           }
 
+          if (categorySelect.value) {
+            params.set('category', categorySelect.value);
+          }
+
           const result = await API.get('/showcase/catalog?' + params.toString());
 
           state.total = Number(result.total || 0);
@@ -907,7 +930,14 @@
         }
       });
 
+      categorySelect.addEventListener('change', function () {
+        state.page = 1;
+        state.limit = Number(limitSelect.value || 50);
+        loadProducts();
+      });
+
       renderCart();
+      loadCategories();
       loadProducts();
     })();
   </script>
