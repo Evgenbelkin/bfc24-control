@@ -19,18 +19,22 @@
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:16px;
     }
+
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:Arial,Helvetica,sans-serif;
       background:var(--bg);
       color:var(--text);
     }
+
     .wrap{
       max-width:1600px;
       margin:0 auto;
       padding:22px;
     }
+
     .topbar{
       display:flex;
       justify-content:space-between;
@@ -39,21 +43,25 @@
       flex-wrap:wrap;
       margin-bottom:18px;
     }
+
     .title h1{
       margin:0 0 6px 0;
       font-size:28px;
       line-height:1.2;
     }
+
     .title p{
       margin:0;
       color:var(--muted);
       font-size:14px;
     }
+
     .actions{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
     }
+
     .btn{
       border:none;
       border-radius:12px;
@@ -68,6 +76,7 @@
       justify-content:center;
       gap:8px;
     }
+
     .btn:hover{transform:translateY(-1px)}
     .btn-primary{background:var(--primary);color:#fff}
     .btn-primary:hover{background:var(--primary-2)}
@@ -81,6 +90,13 @@
       transform:none!important;
     }
 
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
     .message{
       margin:0 0 16px 0;
       padding:12px 14px;
@@ -89,23 +105,24 @@
       font-size:14px;
       font-weight:700;
     }
+
     .message.show{display:block}
     .message.info{background:#dbeafe;color:#1d4ed8}
     .message.error{background:#fee2e2;color:#b91c1c}
     .message.success{background:#dcfce7;color:#15803d}
-
 
     .store-hero{
       display:grid;
       grid-template-columns:1.2fr .8fr;
       gap:18px;
       margin-bottom:18px;
-      overflow:hidden;
     }
+
     .store-main{
-      padding:0;
       overflow:hidden;
+      padding:0;
     }
+
     .store-banner{
       width:100%;
       min-height:220px;
@@ -116,24 +133,28 @@
       justify-content:center;
       overflow:hidden;
     }
+
     .store-banner img{
       width:100%;
       height:220px;
       object-fit:cover;
       display:block;
     }
+
     .store-banner-empty{
       color:var(--muted);
       font-size:14px;
       padding:24px;
       text-align:center;
     }
+
     .store-content{
       padding:18px;
       display:flex;
       gap:16px;
       align-items:flex-start;
     }
+
     .store-logo{
       width:84px;
       height:84px;
@@ -146,35 +167,41 @@
       align-items:center;
       justify-content:center;
     }
+
     .store-logo img{
       width:100%;
       height:100%;
       object-fit:cover;
       display:block;
     }
+
     .store-logo-empty{
       color:var(--muted);
       font-size:12px;
       text-align:center;
       padding:8px;
     }
+
     .store-text h2{
       margin:0 0 8px 0;
       font-size:24px;
       line-height:1.2;
     }
+
     .store-text p{
       margin:0 0 8px 0;
       color:var(--muted);
       font-size:14px;
       line-height:1.5;
     }
+
     .store-meta{
       display:flex;
       flex-wrap:wrap;
       gap:10px;
       margin-top:10px;
     }
+
     .store-badge{
       display:inline-flex;
       align-items:center;
@@ -188,29 +215,38 @@
       font-weight:700;
     }
 
-    .layout{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) 360px;
-      gap:18px;
-      align-items:start;
+    .store-side{
+      padding:18px;
     }
 
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
+    .store-side h3{
+      margin:0 0 12px 0;
+      font-size:22px;
+    }
+
+    .store-side .store-side-desc{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:16px;
+    }
+
+    .store-side .store-side-body{
+      font-size:14px;
+      line-height:1.65;
+      color:var(--text);
     }
 
     .filters{
       padding:18px;
       margin-bottom:18px;
     }
+
     .filters-row{
       display:grid;
-      grid-template-columns:1.5fr .7fr .6fr;
+      grid-template-columns:1.3fr .9fr .7fr .6fr;
       gap:12px;
     }
+
     .field label{
       display:block;
       font-size:12px;
@@ -220,6 +256,7 @@
       text-transform:uppercase;
       letter-spacing:.04em;
     }
+
     .field input,
     .field select,
     .field textarea{
@@ -232,13 +269,18 @@
       color:var(--text);
       outline:none;
     }
+
     .field input,
-    .field select{height:44px}
+    .field select{
+      height:44px;
+    }
+
     .field textarea{
       min-height:86px;
       padding:12px 14px;
       resize:vertical;
     }
+
     .field input:focus,
     .field select:focus,
     .field textarea:focus{
@@ -246,11 +288,23 @@
       box-shadow:0 0 0 3px rgba(37,99,235,.10);
     }
 
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 360px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .main{
+      min-width:0;
+    }
+
     .products-grid{
       display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
+      grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
       gap:16px;
     }
+
     .product{
       padding:14px;
       display:flex;
@@ -258,6 +312,7 @@
       gap:12px;
       min-height:100%;
     }
+
     .product-media{
       width:100%;
       aspect-ratio:1/1;
@@ -269,24 +324,28 @@
       align-items:center;
       justify-content:center;
     }
+
     .product-media img{
       width:100%;
       height:100%;
       object-fit:cover;
       display:block;
     }
+
     .product-empty{
       color:var(--muted);
       font-size:12px;
       text-align:center;
       padding:10px;
     }
+
     .product-title{
       font-size:16px;
       font-weight:800;
       line-height:1.35;
       min-height:44px;
     }
+
     .product-meta{
       display:flex;
       flex-direction:column;
@@ -294,18 +353,21 @@
       font-size:13px;
       color:var(--muted);
     }
+
     .price{
       font-size:18px;
       font-weight:800;
       color:var(--text);
       margin-top:2px;
     }
+
     .product-actions{
       display:grid;
       grid-template-columns:110px 1fr;
       gap:10px;
       margin-top:auto;
     }
+
     .qty-input{
       width:100%;
       height:42px;
@@ -315,6 +377,7 @@
       font-size:14px;
       outline:none;
     }
+
     .qty-input:focus{
       border-color:#93c5fd;
       box-shadow:0 0 0 3px rgba(37,99,235,.10);
@@ -325,27 +388,32 @@
       top:16px;
       padding:18px;
     }
+
     .sidebar h2{
       margin:0 0 12px 0;
       font-size:22px;
     }
+
     .sidebar-sub{
       color:var(--muted);
       font-size:13px;
       margin-bottom:16px;
     }
+
     .cart-list{
       display:flex;
       flex-direction:column;
       gap:10px;
       margin-bottom:14px;
     }
+
     .cart-item{
       border:1px solid var(--line);
       border-radius:14px;
       padding:12px;
       background:#f8fafc;
     }
+
     .cart-item-top{
       display:flex;
       justify-content:space-between;
@@ -353,11 +421,13 @@
       gap:10px;
       margin-bottom:8px;
     }
+
     .cart-item-name{
       font-weight:700;
       line-height:1.35;
       font-size:14px;
     }
+
     .cart-item-remove{
       border:none;
       background:transparent;
@@ -367,17 +437,20 @@
       font-size:12px;
       padding:0;
     }
+
     .cart-item-meta{
       font-size:12px;
       color:var(--muted);
       margin-bottom:8px;
     }
+
     .cart-item-controls{
       display:grid;
       grid-template-columns:100px 1fr;
       gap:10px;
       align-items:center;
     }
+
     .cart-total{
       display:flex;
       justify-content:space-between;
@@ -387,12 +460,6 @@
       border-top:1px solid var(--line);
       font-size:15px;
       font-weight:800;
-    }
-    .empty{
-      padding:24px 10px;
-      color:var(--muted);
-      text-align:center;
-      font-size:14px;
     }
 
     .bottom-actions{
@@ -411,23 +478,42 @@
       margin-top:18px;
       padding:14px 18px;
     }
+
+    .empty{
+      padding:24px 10px;
+      color:var(--muted);
+      text-align:center;
+      font-size:14px;
+    }
+
     .muted{color:var(--muted)}
     .mono{font-family:Consolas,Menlo,monospace}
 
     @media (max-width: 1300px){
-      .products-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .products-grid{
+        grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+      }
     }
-    @media (max-width: 1000px){
-      .store-hero{grid-template-columns:1fr}
-      .layout{grid-template-columns:1fr}
-      .sidebar{position:static}
+
+    @media (max-width: 1100px){
+      .store-hero{
+        grid-template-columns:1fr;
+      }
+      .layout{
+        grid-template-columns:1fr;
+      }
+      .sidebar{
+        position:static;
+      }
     }
+
     @media (max-width: 700px){
       .wrap{padding:14px}
       .filters-row{grid-template-columns:1fr}
       .products-grid{grid-template-columns:1fr}
       .product-actions{grid-template-columns:1fr}
       .cart-item-controls{grid-template-columns:1fr}
+      .store-content{flex-direction:column}
       .title h1{font-size:22px}
     }
   </style>
@@ -455,7 +541,7 @@
           <div class="store-logo" id="storeLogo"></div>
           <div class="store-text">
             <h2 id="storeTitle">Витрина</h2>
-            <p id="storeDescription">Здесь будут отображаться товары магазина.</p>
+            <p id="storeDescription">Описание магазина пока не заполнено.</p>
             <div class="store-meta">
               <div class="store-badge" id="storePhone">Телефон не указан</div>
             </div>
@@ -463,10 +549,10 @@
         </div>
       </div>
 
-      <div class="card sidebar" style="position:static;">
-        <h2>О магазине</h2>
-        <div class="sidebar-sub">Информация о магазине, которую видит покупатель на витрине.</div>
-        <div class="cart-item-meta" style="font-size:14px;line-height:1.6;">
+      <div class="card store-side">
+        <h3>Информация о магазине</h3>
+        <div class="store-side-desc">Покупатель видит данные магазина прямо на витрине.</div>
+        <div class="store-side-body">
           <div><strong>Название:</strong> <span id="storeTitleSide">—</span></div>
           <div><strong>Телефон:</strong> <span id="storePhoneSide">—</span></div>
           <div><strong>Описание:</strong></div>
@@ -475,37 +561,35 @@
       </div>
     </div>
 
+    <div class="card filters">
+      <div class="filters-row">
+        <div class="field">
+          <label for="searchInput">Поиск</label>
+          <input id="searchInput" type="text" placeholder="Название, SKU, штрихкод" />
+        </div>
+        <div class="field">
+          <label for="categorySelect">Категория</label>
+          <select id="categorySelect">
+            <option value="">Все категории</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="limitSelect">На странице</label>
+          <select id="limitSelect">
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;height:44px;">Показать</button>
+        </div>
+      </div>
+    </div>
 
     <div class="layout">
       <div class="main">
-        <div class="card filters">
-          <div class="filters-row" style="grid-template-columns:1.3fr .9fr .7fr .6fr;">
-            <div class="field">
-              <label for="searchInput">Поиск</label>
-              <input id="searchInput" type="text" placeholder="Название, SKU, штрихкод" />
-            </div>
-            <div class="field">
-              <label for="categorySelect">Категория</label>
-              <select id="categorySelect">
-                <option value="">Все категории</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="limitSelect">На странице</label>
-              <select id="limitSelect">
-                <option value="25">25</option>
-                <option value="50" selected>50</option>
-                <option value="100">100</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>&nbsp;</label>
-              <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;height:44px;">Показать</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
         <div class="products-grid" id="productsGrid">
           <div class="empty card" style="padding:32px;">Загрузка...</div>
         </div>
@@ -573,10 +657,10 @@
       const messageBox = document.getElementById('messageBox');
       const productsGrid = document.getElementById('productsGrid');
       const searchInput = document.getElementById('searchInput');
+      const categorySelect = document.getElementById('categorySelect');
       const limitSelect = document.getElementById('limitSelect');
       const pageInfo = document.getElementById('pageInfo');
       const summaryText = document.getElementById('summaryText');
-      const categorySelect = document.getElementById('categorySelect');
       const cartList = document.getElementById('cartList');
       const cartTotalQty = document.getElementById('cartTotalQty');
       const orderComment = document.getElementById('orderComment');
@@ -604,10 +688,14 @@
         messageBox.className = 'message info';
       }
 
+      function intQty(value) {
+        const n = Number(value || 0);
+        if (!Number.isFinite(n)) return 0;
+        return Math.floor(n);
+      }
 
       function renderStore() {
         const store = state.store || {};
-
         const title = store.title || 'Витрина';
         const phone = store.phone || 'Телефон не указан';
         const description = store.description || 'Описание магазина пока не заполнено.';
@@ -636,7 +724,8 @@
         try {
           const result = await API.get('/showcase/categories?tenant_id=' + tenantId);
           const items = Array.isArray(result.items) ? result.items : [];
-          categorySelect.innerHTML = '<option value="">Все категории</option>' +
+          categorySelect.innerHTML =
+            '<option value="">Все категории</option>' +
             items.map((item) => '<option value="' + escapeHtml(item) + '">' + escapeHtml(item) + '</option>').join('');
         } catch (error) {
           console.error('[showcase] loadCategories error:', error);
@@ -646,12 +735,6 @@
       function priceText(item) {
         if (!state.showPrices) return 'Цена скрыта';
         return Number(item.price || 0).toFixed(2);
-      }
-
-      function intQty(value) {
-        const n = Number(value || 0);
-        if (!Number.isFinite(n)) return 0;
-        return Math.floor(n);
       }
 
       function getCartQty(itemId) {
@@ -771,6 +854,7 @@
             <div class="product-meta">
               <div>SKU: <span class="mono">${escapeHtml(item.sku || '—')}</span></div>
               <div>ШК: <span class="mono">${escapeHtml(item.barcode || '—')}</span></div>
+              <div>Категория: <strong>${escapeHtml(item.category || 'Без категории')}</strong></div>
               <div>В наличии: <strong>${escapeHtml(intQty(item.available_qty))}</strong></div>
               <div>В коробке: <strong>${escapeHtml(Math.floor(Number(item.box_qty || 0)))}</strong> шт</div>
             </div>
