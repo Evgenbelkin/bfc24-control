@@ -382,6 +382,7 @@ router.get('/my-orders', async (req, res) => {
                 o.ready_at,
                 o.completed_at,
                 o.cancelled_at,
+                COALESCE(ss.title, 'Витрина') AS showcase_title,
                 COALESCE(SUM(oi.requested_qty), 0) AS requested_total_qty,
                 COALESCE(SUM(oi.picked_qty), 0) AS picked_total_qty,
                 COUNT(oi.id)::INT AS lines_count
@@ -389,9 +390,13 @@ router.get('/my-orders', async (req, res) => {
             LEFT JOIN core.showcase_order_items oi
                 ON oi.order_id = o.id
                AND oi.tenant_id = o.tenant_id
+            LEFT JOIN core.showcase_settings ss
+                ON ss.tenant_id = o.tenant_id
             WHERE o.tenant_id = $1
               AND o.buyer_id = $2
-            GROUP BY o.id
+            GROUP BY
+                o.id,
+                ss.title
             ORDER BY o.created_at DESC, o.id DESC
             `,
             [tenantId, buyerId]
@@ -432,8 +437,11 @@ router.get('/my-orders/:id', async (req, res) => {
                 o.created_at,
                 o.ready_at,
                 o.completed_at,
-                o.cancelled_at
+                o.cancelled_at,
+                COALESCE(ss.title, 'Витрина') AS showcase_title
             FROM core.showcase_orders o
+            LEFT JOIN core.showcase_settings ss
+                ON ss.tenant_id = o.tenant_id
             WHERE o.tenant_id = $1
               AND o.buyer_id = $2
               AND o.id = $3
