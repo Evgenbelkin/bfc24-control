@@ -1,9 +1,3 @@
-ИМЯ ФАЙЛА:
-server/routes/showcase.js
-
-НИЖЕ ПОЛНОЕ СОДЕРЖИМОЕ ФАЙЛА:
-=====================================================
-
 const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
@@ -360,6 +354,132 @@ router.post('/orders', async (req, res) => {
         return res.status(500).json({ error: 'server_error' });
     } finally {
         client.release();
+    }
+});
+
+
+// =========================================
+// МОИ ЗАКАЗЫ ПОКУПАТЕЛЯ
+// GET /showcase/my-orders?tenant_id=1&buyer_id=2
+// =========================================
+router.get('/my-orders', async (req, res) => {
+    try {
+        const tenantId = toNumber(req.query.tenant_id);
+        const buyerId = toNumber(req.query.buyer_id);
+
+        if (!tenantId || !buyerId) {
+            return res.status(400).json({ error: 'tenant_and_buyer_required' });
+        }
+
+        const result = await pool.query(
+            `
+            SELECT
+                o.id,
+                o.order_no,
+                o.status,
+                o.comment,
+                o.created_at,
+                o.ready_at,
+                o.completed_at,
+                o.cancelled_at,
+                COALESCE(SUM(oi.requested_qty), 0) AS requested_total_qty,
+                COALESCE(SUM(oi.picked_qty), 0) AS picked_total_qty,
+                COUNT(oi.id)::INT AS lines_count
+            FROM core.showcase_orders o
+            LEFT JOIN core.showcase_order_items oi
+                ON oi.order_id = o.id
+               AND oi.tenant_id = o.tenant_id
+            WHERE o.tenant_id = $1
+              AND o.buyer_id = $2
+            GROUP BY o.id
+            ORDER BY o.created_at DESC, o.id DESC
+            `,
+            [tenantId, buyerId]
+        );
+
+        return res.json({
+            ok: true,
+            items: result.rows
+        });
+    } catch (e) {
+        console.error('[showcase/my-orders] error:', e);
+        return res.status(500).json({ error: 'server_error' });
+    }
+});
+
+
+// =========================================
+// ДЕТАЛИ МОЕГО ЗАКАЗА
+// GET /showcase/my-orders/:id?tenant_id=1&buyer_id=2
+// =========================================
+router.get('/my-orders/:id', async (req, res) => {
+    try {
+        const tenantId = toNumber(req.query.tenant_id);
+        const buyerId = toNumber(req.query.buyer_id);
+        const orderId = toNumber(req.params.id);
+
+        if (!tenantId || !buyerId || !orderId) {
+            return res.status(400).json({ error: 'tenant_buyer_order_required' });
+        }
+
+        const orderResult = await pool.query(
+            `
+            SELECT
+                o.id,
+                o.order_no,
+                o.status,
+                o.comment,
+                o.created_at,
+                o.ready_at,
+                o.completed_at,
+                o.cancelled_at
+            FROM core.showcase_orders o
+            WHERE o.tenant_id = $1
+              AND o.buyer_id = $2
+              AND o.id = $3
+            LIMIT 1
+            `,
+            [tenantId, buyerId, orderId]
+        );
+
+        if (!orderResult.rows.length) {
+            return res.status(404).json({ error: 'order_not_found' });
+        }
+
+        const itemsResult = await pool.query(
+            `
+            SELECT
+                oi.id,
+                oi.order_id,
+                oi.item_id,
+                oi.requested_qty,
+                oi.approved_qty,
+                oi.picked_qty,
+                oi.final_price,
+                oi.line_status,
+                i.name AS item_name,
+                i.sku,
+                i.barcode,
+                i.image_url
+            FROM core.showcase_order_items oi
+            JOIN core.items i
+                ON i.id = oi.item_id
+               AND i.tenant_id = oi.tenant_id
+            WHERE oi.tenant_id = $1
+              AND oi.order_id = $2
+            ORDER BY oi.id
+            `,
+            [tenantId, orderId]
+        );
+
+        return res.json({
+            ok: true,
+            order: orderResult.rows[0],
+            items: itemsResult.rows
+        });
+    } catch (e) {
+        console.error('[showcase/my-orders/:id] error:', e);
+        return res.status(500).json({ error: 'server_error' });
     }
 });
 
