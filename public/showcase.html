@@ -370,9 +370,9 @@
             <div class="field">
               <label for="limitSelect">На странице</label>
               <select id="limitSelect">
-                <option value="12" selected>12</option>
-                <option value="24">24</option>
-                <option value="48">48</option>
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
               </select>
             </div>
             <div class="field">
@@ -438,7 +438,7 @@
 
       const state = {
         page: 1,
-        limit: 12,
+        limit: 50,
         total: 0,
         items: [],
         showPrices: false,
@@ -721,7 +721,7 @@
 
       document.getElementById('btnApplyFilters').addEventListener('click', function () {
         state.page = 1;
-        state.limit = Number(limitSelect.value || 12);
+        state.limit = Number(limitSelect.value || 50);
         loadProducts();
       });
 
@@ -771,14 +771,14 @@
       searchInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
           state.page = 1;
-          state.limit = Number(limitSelect.value || 12);
+          state.limit = Number(limitSelect.value || 50);
           loadProducts();
         }
       });
 
       categorySelect.addEventListener('change', function () {
         state.page = 1;
-        state.limit = Number(limitSelect.value || 12);
+        state.limit = Number(limitSelect.value || 50);
         loadProducts();
       });
 
