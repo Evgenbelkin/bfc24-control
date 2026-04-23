@@ -25,7 +25,7 @@ body { font-family: Arial; background:#f5f6fa; margin:0; }
 const token = localStorage.getItem('showcase_token');
 
 async function loadOrders(){
-  const res = await fetch('/showcase/my-orders', {
+  const res = await fetch('/showcase/my-orders?tenant_id=1', {
     headers: { 'Authorization': 'Bearer ' + token }
   });
   const data = await res.json();
@@ -48,7 +48,7 @@ async function loadOrders(){
 }
 
 async function loadDetails(id){
-  const res = await fetch('/showcase/my-orders/' + id, {
+  const res = await fetch('/showcase/my-orders/' + id + '?tenant_id=1', {
     headers: { 'Authorization': 'Bearer ' + token }
   });
   const data = await res.json();
