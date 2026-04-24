@@ -148,8 +148,10 @@ async function insertMovementIfPossible(client, tenantId, item, qty, saleId, ord
     if (hasColumn(columns, 'item_id')) data.item_id = item.item_id;
     if (hasColumn(columns, 'movement_type')) data.movement_type = 'sale';
     if (hasColumn(columns, 'type')) data.type = 'sale';
-    if (hasColumn(columns, 'qty')) data.qty = -Math.abs(qty);
-    if (hasColumn(columns, 'quantity')) data.quantity = -Math.abs(qty);
+    // В core.movements есть CHECK movements_qty_positive.
+    // Поэтому количество пишем положительным, а смысл списания задаёт movement_type = 'sale'.
+    if (hasColumn(columns, 'qty')) data.qty = Math.abs(qty);
+    if (hasColumn(columns, 'quantity')) data.quantity = Math.abs(qty);
     if (hasColumn(columns, 'source_type')) data.source_type = 'showcase_order';
     if (hasColumn(columns, 'source_id')) data.source_id = order.id;
     if (hasColumn(columns, 'ref_type')) data.ref_type = 'showcase_order';
