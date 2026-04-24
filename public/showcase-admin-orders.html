@@ -19,18 +19,22 @@
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:16px;
     }
+
     *{box-sizing:border-box}
+
     body{
       margin:0;
       background:var(--bg);
       color:var(--text);
       font-family:Arial,Helvetica,sans-serif;
     }
+
     .wrap{
       max-width:1600px;
       margin:0 auto;
       padding:24px;
     }
+
     .topbar{
       display:flex;
       justify-content:space-between;
@@ -39,25 +43,29 @@
       flex-wrap:wrap;
       margin-bottom:18px;
     }
+
     .title h1{
       margin:0 0 6px 0;
       font-size:28px;
       line-height:1.2;
     }
+
     .title p{
       margin:0;
       color:var(--muted);
       font-size:14px;
     }
+
     .actions{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
     }
+
     .btn{
       border:none;
       border-radius:12px;
-      padding:11px 16px;
+      padding:10px 14px;
       cursor:pointer;
       font-weight:700;
       font-size:14px;
@@ -67,7 +75,9 @@
       align-items:center;
       justify-content:center;
       gap:8px;
+      min-height:40px;
     }
+
     .btn:hover{transform:translateY(-1px)}
     .btn-primary{background:var(--primary);color:#fff}
     .btn-primary:hover{background:var(--primary-2)}
@@ -76,8 +86,9 @@
     .btn-success{background:var(--success);color:#fff}
     .btn-danger{background:var(--danger);color:#fff}
     .btn-warning{background:var(--warning);color:#fff}
+    .btn-small{padding:8px 10px;font-size:13px;min-height:34px}
     .btn:disabled{
-      opacity:.6;
+      opacity:.55;
       cursor:not-allowed;
       transform:none!important;
     }
@@ -97,6 +108,7 @@
       font-size:14px;
       font-weight:700;
     }
+
     .message.show{display:block}
     .message.info{background:#dbeafe;color:#1d4ed8}
     .message.error{background:#fee2e2;color:#b91c1c}
@@ -106,16 +118,19 @@
       padding:18px;
       margin-bottom:18px;
     }
+
     .filters-row{
       display:grid;
       grid-template-columns:1.2fr .8fr .7fr .6fr .6fr;
       gap:12px;
     }
+
     .field{
       display:flex;
       flex-direction:column;
       gap:6px;
     }
+
     .field label{
       display:block;
       font-size:12px;
@@ -124,6 +139,7 @@
       text-transform:uppercase;
       letter-spacing:.04em;
     }
+
     .field input,
     .field select,
     .field textarea{
@@ -131,18 +147,21 @@
       border:1px solid var(--line);
       border-radius:12px;
       background:#fff;
-      padding:0 14px;
+      padding:0 12px;
       font-size:14px;
       color:var(--text);
       outline:none;
     }
+
     .field input,
-    .field select{height:44px}
+    .field select{height:40px}
+
     .field textarea{
-      min-height:100px;
-      padding:12px 14px;
+      min-height:86px;
+      padding:12px;
       resize:vertical;
     }
+
     .field input:focus,
     .field select:focus,
     .field textarea:focus{
@@ -150,22 +169,21 @@
       box-shadow:0 0 0 3px rgba(37,99,235,.10);
     }
 
-    .layout{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) 520px;
-      gap:18px;
-      align-items:start;
+    .table-card{
+      overflow:hidden;
     }
 
     .orders-table-wrap{
       overflow:auto;
     }
+
     table{
       width:100%;
       border-collapse:separate;
       border-spacing:0;
-      min-width:980px;
+      min-width:1180px;
     }
+
     thead th{
       background:#f8fafc;
       color:var(--muted);
@@ -179,14 +197,101 @@
       top:0;
       z-index:1;
     }
+
     tbody td{
       padding:12px;
       border-bottom:1px solid var(--line);
       font-size:14px;
       vertical-align:middle;
+      background:#fff;
     }
-    tbody tr:hover{
+
+    tbody tr.order-row:hover td{
       background:#fafcff;
+    }
+
+    tbody tr.order-row.active td{
+      background:#eff6ff;
+    }
+
+    .details-row td{
+      padding:0;
+      background:#f8fafc;
+    }
+
+    .order-details{
+      padding:18px;
+      border-bottom:1px solid var(--line);
+      background:#f8fafc;
+    }
+
+    .details-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .details-title h3{
+      margin:0 0 6px 0;
+      font-size:20px;
+    }
+
+    .details-title p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .details-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .line-table{
+      width:100%;
+      min-width:1100px;
+      border-collapse:separate;
+      border-spacing:0;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      overflow:hidden;
+    }
+
+    .line-table th{
+      position:static;
+      background:#fff;
+      border-bottom:1px solid var(--line);
+    }
+
+    .line-table td{
+      background:#fff;
+      border-bottom:1px solid var(--line);
+    }
+
+    .line-table tr:last-child td{
+      border-bottom:none;
+    }
+
+    .line-row.done td{
+      background:#dcfce7;
+    }
+
+    .line-row.partial td{
+      background:#fef3c7;
+    }
+
+    .line-row.missing td{
+      background:#fee2e2;
+    }
+
+    .line-row.new td{
+      background:#fff;
     }
 
     .status{
@@ -200,6 +305,7 @@
       font-weight:800;
       white-space:nowrap;
     }
+
     .s-new{background:#eef2f7;color:#475569}
     .s-in_progress{background:#dbeafe;color:#1d4ed8}
     .s-partially_picked{background:#fef3c7;color:#b45309}
@@ -210,111 +316,97 @@
     .s-picked{background:#dcfce7;color:#15803d}
     .s-partial{background:#fef3c7;color:#b45309}
 
-    .sidebar{
-      padding:18px;
-      position:sticky;
-      top:16px;
-    }
-    .sidebar h2{
-      margin:0 0 10px 0;
-      font-size:22px;
-    }
-    .sidebar-sub{
-      color:var(--muted);
-      font-size:13px;
-      margin-bottom:16px;
-    }
-
-    .meta-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-bottom:16px;
-    }
-    .meta-item{
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:#f8fafc;
-      padding:12px;
-    }
-    .meta-item .label{
-      font-size:12px;
-      color:var(--muted);
-      font-weight:700;
-      margin-bottom:6px;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-    }
-    .meta-item .value{
-      font-size:14px;
-      font-weight:700;
-      line-height:1.4;
-      word-break:break-word;
-    }
-
-    .sidebar-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom:16px;
-    }
-
-    .line-card{
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:#f8fafc;
-      padding:12px;
-      margin-bottom:12px;
-    }
-    .line-top{
+    .product-cell{
       display:flex;
       gap:12px;
-      align-items:flex-start;
-      margin-bottom:10px;
+      align-items:center;
+      min-width:280px;
     }
-    .line-image{
-      width:70px;
-      height:70px;
-      min-width:70px;
-      border-radius:14px;
-      overflow:hidden;
+
+    .product-img{
+      width:64px;
+      height:64px;
+      min-width:64px;
+      border-radius:12px;
       border:1px solid var(--line);
-      background:#fff;
+      background:#f8fafc;
+      overflow:hidden;
       display:flex;
       align-items:center;
       justify-content:center;
     }
-    .line-image img{
+
+    .product-img img{
       width:100%;
       height:100%;
       object-fit:cover;
       display:block;
     }
-    .line-image-empty{
-      font-size:11px;
+
+    .product-img-empty{
       color:var(--muted);
+      font-size:11px;
       text-align:center;
-      padding:6px;
+      padding:5px;
     }
-    .line-info{
-      min-width:0;
-    }
-    .line-title{
-      font-size:15px;
+
+    .product-name{
       font-weight:800;
+      margin-bottom:4px;
       line-height:1.35;
-      margin-bottom:6px;
     }
-    .line-meta{
+
+    .product-meta{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .qty-input,
+    .price-input{
+      width:100%;
+      max-width:110px;
+      height:38px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:0 10px;
+      font-size:14px;
+      background:#fff;
+    }
+
+    .line-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      min-width:220px;
+    }
+
+    .summary-box{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .summary-item{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+    }
+
+    .summary-item .label{
       font-size:12px;
       color:var(--muted);
-      line-height:1.5;
+      font-weight:700;
+      margin-bottom:5px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
     }
-    .line-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:10px;
+
+    .summary-item .value{
+      font-size:16px;
+      font-weight:800;
     }
 
     .empty{
@@ -336,21 +428,18 @@
 
     .mono{font-family:Consolas,Menlo,monospace}
     .muted{color:var(--muted)}
+    .nowrap{white-space:nowrap}
 
-    @media (max-width: 1200px){
-      .layout{grid-template-columns:1fr}
-      .sidebar{position:static}
-    }
-    @media (max-width: 900px){
+    @media (max-width: 1000px){
       .filters-row{grid-template-columns:1fr 1fr}
-      .meta-grid{grid-template-columns:1fr}
-      .line-grid{grid-template-columns:1fr}
+      .summary-box{grid-template-columns:1fr 1fr}
     }
+
     @media (max-width: 700px){
       .wrap{padding:14px}
       .filters-row{grid-template-columns:1fr}
+      .summary-box{grid-template-columns:1fr}
       .title h1{font-size:22px}
-      .line-top{flex-direction:column}
     }
   </style>
 </head>
@@ -359,11 +448,12 @@
     <div class="topbar">
       <div class="title">
         <h1>Заказы витрины</h1>
-        <p>Рабочий экран продавца: взять заказ, открыть состав, отметить готовность и создать продажу.</p>
+        <p>Рабочий экран продавца: заказ раскрывается под строкой, позиции подсвечиваются по сборке.</p>
       </div>
       <div class="actions">
-        <a class="btn btn-light" href="/showcase-settings.html">Настройки витрины</a>
+        <a class="btn btn-light" href="/index.html">← Главное меню</a>
         <a class="btn btn-light" href="/showcase.html">Открыть витрину</a>
+        <a class="btn btn-light" href="/showcase-settings.html">Настройки витрины</a>
         <button class="btn btn-primary" id="btnReloadTop" type="button">Обновить</button>
       </div>
     </div>
@@ -376,6 +466,7 @@
           <label for="searchInput">Поиск</label>
           <input id="searchInput" type="text" placeholder="Номер заказа, покупатель, телефон" />
         </div>
+
         <div class="field">
           <label for="statusSelect">Статус</label>
           <select id="statusSelect">
@@ -388,6 +479,7 @@
             <option value="cancelled">Отменён</option>
           </select>
         </div>
+
         <div class="field">
           <label for="limitSelect">На странице</label>
           <select id="limitSelect">
@@ -396,68 +488,49 @@
             <option value="100">100</option>
           </select>
         </div>
+
         <div class="field">
           <label>&nbsp;</label>
-          <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;height:44px;">Показать</button>
+          <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;">Показать</button>
         </div>
+
         <div class="field">
           <label>&nbsp;</label>
-          <button class="btn btn-light" id="btnClearFilters" type="button" style="width:100%;height:44px;">Сбросить</button>
+          <button class="btn btn-light" id="btnClearFilters" type="button" style="width:100%;">Сбросить</button>
         </div>
       </div>
     </div>
 
-    <div class="layout">
-      <div class="main">
-        <div class="card orders-table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Заказ</th>
-                <th>Покупатель</th>
-                <th>Телефон</th>
-                <th>Статус</th>
-                <th>Кол-во</th>
-                <th>Строк</th>
-                <th>Дата</th>
-                <th>Кто взял</th>
-                <th>Действие</th>
-              </tr>
-            </thead>
-            <tbody id="ordersTbody">
-              <tr><td colspan="10" class="empty">Загрузка...</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="card pagination">
-          <div class="muted" id="summaryText">Пока нет данных</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <button class="btn btn-light" id="btnPrevPage" type="button">← Назад</button>
-            <div class="muted" id="pageInfo">Страница 1</div>
-            <button class="btn btn-light" id="btnNextPage" type="button">Вперёд →</button>
-          </div>
-        </div>
+    <div class="card table-card">
+      <div class="orders-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Заказ</th>
+              <th>Покупатель</th>
+              <th>Телефон</th>
+              <th>Статус</th>
+              <th>Кол-во</th>
+              <th>Строк</th>
+              <th>Дата</th>
+              <th>Кто взял</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTbody">
+            <tr><td colspan="10" class="empty">Загрузка...</td></tr>
+          </tbody>
+        </table>
       </div>
+    </div>
 
-      <div class="card sidebar">
-        <h2>Карточка заказа</h2>
-        <div class="sidebar-sub">Выбери заказ слева, чтобы открыть состав и действия по заказу.</div>
-
-        <div id="orderMeta">
-          <div class="empty">Заказ не выбран</div>
-        </div>
-
-        <div class="sidebar-actions" id="orderActions" style="display:none;">
-          <button class="btn btn-primary" id="btnTakeOrder" type="button">Взять в работу</button>
-          <button class="btn btn-warning" id="btnReadyOrder" type="button">Готов</button>
-          <button class="btn btn-success" id="btnCreateSale" type="button">Создать продажу</button>
-        </div>
-
-        <div id="orderLines">
-          <div class="empty">Состав заказа пока не открыт</div>
-        </div>
+    <div class="card pagination">
+      <div class="muted" id="summaryText">Пока нет данных</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-light" id="btnPrevPage" type="button">← Назад</button>
+        <div class="muted" id="pageInfo">Страница 1</div>
+        <button class="btn btn-light" id="btnNextPage" type="button">Вперёд →</button>
       </div>
     </div>
   </div>
@@ -466,6 +539,7 @@
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
   <script src="/js/i18n.js"></script>
+
   <script>
     (function () {
       const user = JSON.parse(localStorage.getItem('user') || 'null');
@@ -475,21 +549,30 @@
         page: 1,
         limit: 20,
         total: 0,
-        items: [],
-        selectedOrderId: null,
-        selectedOrder: null
+        orders: [],
+        openedOrderId: null,
+        openedOrder: null
       };
 
       const messageBox = document.getElementById('messageBox');
       const ordersTbody = document.getElementById('ordersTbody');
-      const orderMeta = document.getElementById('orderMeta');
-      const orderLines = document.getElementById('orderLines');
-      const orderActions = document.getElementById('orderActions');
       const searchInput = document.getElementById('searchInput');
       const statusSelect = document.getElementById('statusSelect');
       const limitSelect = document.getElementById('limitSelect');
       const summaryText = document.getElementById('summaryText');
       const pageInfo = document.getElementById('pageInfo');
+
+      const errorMap = {
+        order_not_editable: 'Заказ нельзя редактировать в текущем статусе. Возможно, он уже завершён или отменён.',
+        order_not_found: 'Заказ не найден.',
+        invalid_status: 'Неверный статус заказа.',
+        not_enough_stock: 'Недостаточно товара на остатке.',
+        invalid_qty: 'Некорректное количество.',
+        invalid_payload: 'Некорректные данные запроса.',
+        server_error: 'Ошибка сервера. Проверь логи backend.',
+        unauthorized: 'Нет авторизации. Войди в систему заново.',
+        forbidden: 'Недостаточно прав для выполнения действия.'
+      };
 
       function escapeHtml(value) {
         if (value === null || value === undefined) return '';
@@ -499,6 +582,11 @@
           .replace(/>/g, '&gt;')
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#039;');
+      }
+
+      function translateError(error) {
+        const raw = error && (error.error || error.message) ? (error.error || error.message) : String(error || '');
+        return errorMap[raw] || raw || 'Неизвестная ошибка';
       }
 
       function showMessage(text, variant = 'info') {
@@ -540,146 +628,227 @@
         return dt.toLocaleString('ru-RU');
       }
 
-      function intQty(value) {
+      function qtyNumber(value) {
         const n = Number(value || 0);
-        if (!Number.isFinite(n)) return 0;
-        return Math.floor(n);
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      function formatQty(value) {
+        const n = qtyNumber(value);
+        if (Number.isInteger(n)) return String(n);
+        return String(Number(n.toFixed(3)));
+      }
+
+      function money(value) {
+        const n = Number(value || 0);
+        if (!Number.isFinite(n)) return '0.00';
+        return n.toFixed(2);
+      }
+
+      function lineVisualClass(item) {
+        const requested = qtyNumber(item.requested_qty);
+        const picked = qtyNumber(item.picked_qty);
+
+        if (picked <= 0) return 'missing';
+        if (picked < requested) return 'partial';
+        return 'done';
+      }
+
+      function lineHumanStatus(item) {
+        const requested = qtyNumber(item.requested_qty);
+        const picked = qtyNumber(item.picked_qty);
+
+        if (picked <= 0) return 'Не собрано';
+        if (picked < requested) return 'Частично';
+        return 'Собрано';
+      }
+
+      function canEditOrder(order) {
+        return order && !['completed', 'cancelled'].includes(order.status);
+      }
+
+      function canCreateSale(order) {
+        return order && order.status === 'ready';
       }
 
       function imageHtml(url) {
-        if (!url) return '<div class="line-image-empty">нет фото</div>';
+        if (!url) return '<div class="product-img-empty">нет фото</div>';
         return '<img src="' + escapeHtml(url) + '" alt="">';
       }
 
       function renderOrders() {
-        if (!state.items.length) {
+        if (!state.orders.length) {
           ordersTbody.innerHTML = '<tr><td colspan="10" class="empty">Заказы не найдены</td></tr>';
           summaryText.textContent = 'Ничего не найдено';
           pageInfo.textContent = 'Страница ' + state.page;
           return;
         }
 
-        ordersTbody.innerHTML = state.items.map((item) => `
-          <tr>
-            <td>${escapeHtml(item.id)}</td>
-            <td>
-              <strong class="mono">${escapeHtml(item.order_no || '—')}</strong>
-              <div class="muted">${escapeHtml(item.comment || '')}</div>
-            </td>
-            <td>${escapeHtml(item.buyer_name || '—')}</td>
-            <td>${escapeHtml(item.buyer_phone || '—')}</td>
-            <td><span class="${statusClass(item.status)}">${escapeHtml(statusLabel(item.status))}</span></td>
-            <td>${escapeHtml(item.requested_total_qty || '0')}</td>
-            <td>${escapeHtml(item.lines_count || '0')}</td>
-            <td>${escapeHtml(displayDateTimeSafe(item.created_at))}</td>
-            <td>${escapeHtml(item.taken_by_name || item.taken_by_username || '—')}</td>
-            <td><button class="btn btn-light js-open-order" data-order-id="${item.id}" type="button">Открыть</button></td>
-          </tr>
-        `).join('');
+        const rows = [];
+
+        state.orders.forEach((order) => {
+          const isActive = Number(state.openedOrderId) === Number(order.id);
+
+          rows.push(`
+            <tr class="order-row ${isActive ? 'active' : ''}">
+              <td>${escapeHtml(order.id)}</td>
+              <td>
+                <strong class="mono">${escapeHtml(order.order_no || '—')}</strong>
+                <div class="muted">${escapeHtml(order.comment || '')}</div>
+              </td>
+              <td>${escapeHtml(order.buyer_name || '—')}</td>
+              <td>${escapeHtml(order.buyer_phone || '—')}</td>
+              <td><span class="${statusClass(order.status)}">${escapeHtml(statusLabel(order.status))}</span></td>
+              <td>${escapeHtml(formatQty(order.requested_total_qty))}</td>
+              <td>${escapeHtml(order.lines_count || '0')}</td>
+              <td class="nowrap">${escapeHtml(displayDateTimeSafe(order.created_at))}</td>
+              <td>${escapeHtml(order.taken_by_name || order.taken_by_username || '—')}</td>
+              <td><button class="btn btn-light btn-small js-open-order" data-order-id="${order.id}" type="button">${isActive ? 'Скрыть' : 'Открыть'}</button></td>
+            </tr>
+          `);
+
+          if (isActive && state.openedOrder) {
+            rows.push(`
+              <tr class="details-row">
+                <td colspan="10">
+                  ${renderOpenedOrder()}
+                </td>
+              </tr>
+            `);
+          }
+        });
+
+        ordersTbody.innerHTML = rows.join('');
 
         const from = (state.page - 1) * state.limit + 1;
         const to = Math.min(state.total, state.page * state.limit);
-        summaryText.textContent = `Показано ${from}-${to} из ${state.total}`;
+        summaryText.textContent = 'Показано ' + from + '-' + to + ' из ' + state.total;
         pageInfo.textContent = 'Страница ' + state.page;
       }
 
-      function renderOrderMeta() {
-        const order = state.selectedOrder;
+      function renderOpenedOrder() {
+        const order = state.openedOrder;
+        const items = Array.isArray(order.items) ? order.items : [];
+        const editable = canEditOrder(order);
+        const saleAllowed = canCreateSale(order);
 
-        if (!order) {
-          orderMeta.innerHTML = '<div class="empty">Заказ не выбран</div>';
-          orderLines.innerHTML = '<div class="empty">Состав заказа пока не открыт</div>';
-          orderActions.style.display = 'none';
-          return;
-        }
+        const requestedTotal = items.reduce((sum, item) => sum + qtyNumber(item.requested_qty), 0);
+        const pickedTotal = items.reduce((sum, item) => sum + qtyNumber(item.picked_qty), 0);
+        const sumTotal = items.reduce((sum, item) => sum + qtyNumber(item.picked_qty) * Number(item.final_price || 0), 0);
+        const doneLines = items.filter((item) => lineVisualClass(item) === 'done').length;
 
-        orderMeta.innerHTML = `
-          <div class="meta-grid">
-            <div class="meta-item">
-              <div class="label">Заказ</div>
-              <div class="value mono">${escapeHtml(order.order_no || '—')}</div>
+        return `
+          <div class="order-details">
+            <div class="details-head">
+              <div class="details-title">
+                <h3>${escapeHtml(order.order_no || 'Заказ')}</h3>
+                <p>
+                  Покупатель: <strong>${escapeHtml(order.buyer_name || '—')}</strong>
+                  · Телефон: <strong>${escapeHtml(order.buyer_phone || '—')}</strong>
+                  · Статус: <span class="${statusClass(order.status)}">${escapeHtml(statusLabel(order.status))}</span>
+                </p>
+              </div>
+
+              <div class="details-actions">
+                <button class="btn btn-primary btn-small js-take-order" data-order-id="${order.id}" ${editable ? '' : 'disabled'} type="button">Взять заказ</button>
+                <button class="btn btn-warning btn-small js-ready-order" data-order-id="${order.id}" ${editable ? '' : 'disabled'} type="button">Заказ готов</button>
+                <button class="btn btn-success btn-small js-create-sale" data-order-id="${order.id}" ${saleAllowed ? '' : 'disabled'} type="button">Создать продажу</button>
+              </div>
             </div>
-            <div class="meta-item">
-              <div class="label">Статус</div>
-              <div class="value"><span class="${statusClass(order.status)}">${escapeHtml(statusLabel(order.status))}</span></div>
+
+            <div class="summary-box">
+              <div class="summary-item">
+                <div class="label">Заказано</div>
+                <div class="value">${escapeHtml(formatQty(requestedTotal))}</div>
+              </div>
+              <div class="summary-item">
+                <div class="label">Собрано</div>
+                <div class="value">${escapeHtml(formatQty(pickedTotal))}</div>
+              </div>
+              <div class="summary-item">
+                <div class="label">Строк собрано</div>
+                <div class="value">${escapeHtml(doneLines)} / ${escapeHtml(items.length)}</div>
+              </div>
+              <div class="summary-item">
+                <div class="label">Сумма</div>
+                <div class="value">${escapeHtml(money(sumTotal))}</div>
+              </div>
             </div>
-            <div class="meta-item">
-              <div class="label">Покупатель</div>
-              <div class="value">${escapeHtml(order.buyer_name || '—')}</div>
-            </div>
-            <div class="meta-item">
-              <div class="label">Телефон</div>
-              <div class="value">${escapeHtml(order.buyer_phone || '—')}</div>
-            </div>
-            <div class="meta-item">
-              <div class="label">Кто взял</div>
-              <div class="value">${escapeHtml(order.taken_by_name || order.taken_by_username || '—')}</div>
-            </div>
-            <div class="meta-item">
-              <div class="label">Дата</div>
-              <div class="value">${escapeHtml(displayDateTimeSafe(order.created_at))}</div>
+
+            <div style="overflow:auto;">
+              <table class="line-table">
+                <thead>
+                  <tr>
+                    <th>Товар</th>
+                    <th>Заказано</th>
+                    <th>Собрано</th>
+                    <th>Цена</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${items.map(renderLineRow).join('')}
+                </tbody>
+              </table>
             </div>
           </div>
         `;
-
-        orderActions.style.display = 'flex';
       }
 
-      function renderOrderLines() {
-        const order = state.selectedOrder;
-        const items = order && Array.isArray(order.items) ? order.items : [];
+      function renderLineRow(item) {
+        const visual = lineVisualClass(item);
+        const editable = canEditOrder(state.openedOrder);
+        const requested = qtyNumber(item.requested_qty);
+        const finalPrice = item.final_price === null || item.final_price === undefined || item.final_price === '' ? '' : money(item.final_price);
 
-        if (!items.length) {
-          orderLines.innerHTML = '<div class="empty">Нет строк заказа</div>';
-          return;
-        }
-
-        orderLines.innerHTML = items.map((item) => `
-          <div class="line-card">
-            <div class="line-top">
-              <div class="line-image">${imageHtml(item.image_url)}</div>
-              <div class="line-info">
-                <div class="line-title">${escapeHtml(item.item_name || '—')}</div>
-                <div class="line-meta">
-                  SKU: <span class="mono">${escapeHtml(item.sku || '—')}</span><br>
-                  ШК: <span class="mono">${escapeHtml(item.barcode || '—')}</span><br>
-                  В наличии: ${escapeHtml(intQty(item.available_qty))}<br>
-                  В коробке: ${escapeHtml(intQty(item.box_qty))}
+        return `
+          <tr class="line-row ${visual}">
+            <td>
+              <div class="product-cell">
+                <div class="product-img">${imageHtml(item.image_url)}</div>
+                <div>
+                  <div class="product-name">${escapeHtml(item.item_name || '—')}</div>
+                  <div class="product-meta">
+                    SKU: <span class="mono">${escapeHtml(item.sku || '—')}</span><br>
+                    ШК: <span class="mono">${escapeHtml(item.barcode || '—')}</span><br>
+                    В наличии: ${escapeHtml(formatQty(item.available_qty))}<br>
+                    В коробке: ${escapeHtml(formatQty(item.box_qty || 0))}
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div class="line-grid">
-              <div class="field">
-                <label>Запрошено</label>
-                <input type="number" value="${escapeHtml(item.requested_qty || 0)}" disabled>
+            </td>
+            <td><strong>${escapeHtml(formatQty(item.requested_qty))}</strong></td>
+            <td>
+              <input class="qty-input js-picked-qty" data-line-id="${item.id}" type="number" step="0.001" value="${escapeHtml(formatQty(item.picked_qty || 0))}" ${editable ? '' : 'disabled'}>
+            </td>
+            <td>
+              <input class="price-input js-final-price" data-line-id="${item.id}" type="number" step="0.01" value="${escapeHtml(finalPrice)}" ${editable ? '' : 'disabled'}>
+            </td>
+            <td>
+              <span class="${statusClass(item.line_status || 'new')}">${escapeHtml(lineHumanStatus(item))}</span>
+            </td>
+            <td>
+              <div class="line-actions">
+                <button class="btn btn-success btn-small js-line-done" data-line-id="${item.id}" data-requested="${requested}" ${editable ? '' : 'disabled'} type="button">Собрано</button>
+                <button class="btn btn-warning btn-small js-line-save" data-line-id="${item.id}" ${editable ? '' : 'disabled'} type="button">Сохранить</button>
+                <button class="btn btn-danger btn-small js-line-missing" data-line-id="${item.id}" ${editable ? '' : 'disabled'} type="button">Нет</button>
               </div>
+            </td>
+          </tr>
+        `;
+      }
 
-              <div class="field">
-                <label>Собрано</label>
-                <input class="js-picked-qty" data-item-id="${item.id}" type="number" step="0.001" value="${escapeHtml(item.picked_qty || 0)}">
-              </div>
+      async function apiGet(path) {
+        return API.get(path);
+      }
 
-              <div class="field">
-                <label>Цена продажи</label>
-                <input class="js-final-price" data-item-id="${item.id}" type="number" step="0.01" value="${escapeHtml(item.final_price || '')}">
-              </div>
+      async function apiPost(path, body) {
+        return API.post(path, body || {});
+      }
 
-              <div class="field">
-                <label>Статус строки</label>
-                <select class="js-line-status" data-item-id="${item.id}">
-                  <option value="approved" ${item.line_status === 'approved' ? 'selected' : ''}>Подтверждено</option>
-                  <option value="picked" ${item.line_status === 'picked' ? 'selected' : ''}>Собрано</option>
-                  <option value="partial" ${item.line_status === 'partial' ? 'selected' : ''}>Частично</option>
-                </select>
-              </div>
-            </div>
-
-            <div style="margin-top:10px;display:flex;justify-content:flex-end;">
-              <button class="btn btn-primary js-save-line" data-item-id="${item.id}" type="button">Сохранить строку</button>
-            </div>
-          </div>
-        `).join('');
+      async function apiPatch(path, body) {
+        return API.patch(path, body || {});
       }
 
       async function loadOrders() {
@@ -695,111 +864,153 @@
           if (searchInput.value.trim()) params.set('search', searchInput.value.trim());
           if (statusSelect.value) params.set('status', statusSelect.value);
 
-          const result = await API.get('/showcase-admin/orders?' + params.toString());
+          const result = await apiGet('/showcase-admin/orders?' + params.toString());
 
           state.total = Number(result.total || 0);
-          state.items = Array.isArray(result.items) ? result.items : [];
+          state.orders = Array.isArray(result.items) ? result.items : [];
+
+          if (state.openedOrderId) {
+            const exists = state.orders.some((item) => Number(item.id) === Number(state.openedOrderId));
+            if (!exists) {
+              state.openedOrderId = null;
+              state.openedOrder = null;
+            }
+          }
+
           renderOrders();
         } catch (error) {
           console.error('[showcase-admin-orders] loadOrders error:', error);
           ordersTbody.innerHTML = '<tr><td colspan="10" class="empty">Ошибка загрузки заказов</td></tr>';
-          showMessage(error?.message || error?.error || 'Ошибка загрузки заказов витрины', 'error');
+          showMessage(translateError(error), 'error');
         }
       }
 
       async function openOrder(orderId) {
         hideMessage();
+
+        if (Number(state.openedOrderId) === Number(orderId)) {
+          state.openedOrderId = null;
+          state.openedOrder = null;
+          renderOrders();
+          return;
+        }
+
         try {
-          const result = await API.get('/showcase-admin/orders/' + orderId + '?tenant_id=' + tenantId);
-          state.selectedOrderId = Number(orderId);
-          state.selectedOrder = result.order || null;
-          renderOrderMeta();
-          renderOrderLines();
+          const result = await apiGet('/showcase-admin/orders/' + orderId + '?tenant_id=' + tenantId);
+          state.openedOrderId = Number(orderId);
+          state.openedOrder = result.order || null;
+          renderOrders();
         } catch (error) {
           console.error('[showcase-admin-orders] openOrder error:', error);
-          showMessage(error?.message || error?.error || 'Ошибка загрузки заказа', 'error');
+          showMessage(translateError(error), 'error');
         }
       }
 
-      async function takeOrder() {
-        if (!state.selectedOrderId) return;
+      async function refreshOpenedOrder() {
+        if (!state.openedOrderId) return;
+        const result = await apiGet('/showcase-admin/orders/' + state.openedOrderId + '?tenant_id=' + tenantId);
+        state.openedOrder = result.order || null;
+      }
+
+      async function takeOrder(orderId) {
         try {
           showMessage('Берём заказ в работу...', 'info');
-          await API.post('/showcase-admin/orders/' + state.selectedOrderId + '/take?tenant_id=' + tenantId, {});
-          await openOrder(state.selectedOrderId);
+          await apiPost('/showcase-admin/orders/' + orderId + '/take?tenant_id=' + tenantId, {});
+          await refreshOpenedOrder();
           await loadOrders();
           showMessage('Заказ взят в работу', 'success');
         } catch (error) {
           console.error('[showcase-admin-orders] takeOrder error:', error);
-          showMessage(error?.message || error?.error || 'Ошибка взятия заказа в работу', 'error');
+          showMessage(translateError(error), 'error');
         }
       }
 
-      async function readyOrder() {
-        if (!state.selectedOrderId) return;
+      async function readyOrder(orderId) {
         try {
           showMessage('Отмечаем заказ готовым...', 'info');
-          await API.post('/showcase-admin/orders/' + state.selectedOrderId + '/ready?tenant_id=' + tenantId, {});
-          await openOrder(state.selectedOrderId);
+          await apiPost('/showcase-admin/orders/' + orderId + '/ready?tenant_id=' + tenantId, {});
+          await refreshOpenedOrder();
           await loadOrders();
           showMessage('Заказ отмечен как готовый', 'success');
         } catch (error) {
           console.error('[showcase-admin-orders] readyOrder error:', error);
-          showMessage(error?.message || error?.error || 'Ошибка перевода заказа в готов', 'error');
+          showMessage(translateError(error), 'error');
         }
       }
 
-      async function createSale() {
-        if (!state.selectedOrderId) return;
+      async function createSale(orderId) {
         try {
           showMessage('Создаём продажу...', 'info');
-          const result = await API.post('/showcase-admin/orders/' + state.selectedOrderId + '/create-sale?tenant_id=' + tenantId, {});
-          await openOrder(state.selectedOrderId);
+          const result = await apiPost('/showcase-admin/orders/' + orderId + '/create-sale?tenant_id=' + tenantId, {});
+          await refreshOpenedOrder();
           await loadOrders();
-          showMessage('Продажа создана. sale_id: ' + (result.sale_id || ''), 'success');
+          showMessage('Продажа создана. ID: ' + (result.sale_id || '—'), 'success');
         } catch (error) {
           console.error('[showcase-admin-orders] createSale error:', error);
-          showMessage(error?.message || error?.error || 'Ошибка создания продажи', 'error');
+          showMessage(translateError(error), 'error');
         }
       }
 
-      async function saveLine(orderItemId) {
-        if (!state.selectedOrderId) return;
+      function getLineInputs(lineId) {
+        const pickedInput = document.querySelector('.js-picked-qty[data-line-id="' + lineId + '"]');
+        const priceInput = document.querySelector('.js-final-price[data-line-id="' + lineId + '"]');
+        return { pickedInput, priceInput };
+      }
 
-        const pickedInput = document.querySelector('.js-picked-qty[data-item-id="' + orderItemId + '"]');
-        const priceInput = document.querySelector('.js-final-price[data-item-id="' + orderItemId + '"]');
-        const statusInput = document.querySelector('.js-line-status[data-item-id="' + orderItemId + '"]');
+      async function saveLine(lineId, mode, requestedQty) {
+        const { pickedInput, priceInput } = getLineInputs(lineId);
+
+        let pickedQty = Number(pickedInput ? pickedInput.value : 0);
+        let finalPrice = priceInput && String(priceInput.value).trim() !== '' ? Number(priceInput.value) : null;
+        let lineStatus = 'approved';
+
+        if (mode === 'done') {
+          pickedQty = Number(requestedQty || 0);
+          lineStatus = 'picked';
+        } else if (mode === 'missing') {
+          pickedQty = 0;
+          lineStatus = 'partial';
+        } else {
+          const requested = Number(requestedQty || 0);
+          if (pickedQty <= 0) lineStatus = 'partial';
+          else if (pickedQty >= requested) lineStatus = 'picked';
+          else lineStatus = 'partial';
+        }
 
         try {
           showMessage('Сохраняем строку заказа...', 'info');
 
-          await API.patch('/showcase-admin/orders/' + state.selectedOrderId + '/items/' + orderItemId + '?tenant_id=' + tenantId, {
-            picked_qty: Number(pickedInput ? pickedInput.value : 0),
-            final_price: priceInput && String(priceInput.value).trim() !== '' ? Number(priceInput.value) : null,
-            line_status: statusInput ? statusInput.value : 'approved'
+          await apiPatch('/showcase-admin/orders/' + state.openedOrderId + '/items/' + lineId + '?tenant_id=' + tenantId, {
+            picked_qty: pickedQty,
+            final_price: finalPrice,
+            line_status: lineStatus
           });
 
-          await openOrder(state.selectedOrderId);
+          await refreshOpenedOrder();
           await loadOrders();
           showMessage('Строка заказа сохранена', 'success');
         } catch (error) {
           console.error('[showcase-admin-orders] saveLine error:', error);
-          showMessage(error?.message || error?.error || 'Ошибка сохранения строки заказа', 'error');
+          showMessage(translateError(error), 'error');
         }
       }
 
       document.getElementById('btnReloadTop').addEventListener('click', loadOrders);
+
       document.getElementById('btnApplyFilters').addEventListener('click', function () {
         state.page = 1;
         state.limit = Number(limitSelect.value || 20);
         loadOrders();
       });
+
       document.getElementById('btnClearFilters').addEventListener('click', function () {
         searchInput.value = '';
         statusSelect.value = '';
         limitSelect.value = '20';
         state.page = 1;
         state.limit = 20;
+        state.openedOrderId = null;
+        state.openedOrder = null;
         loadOrders();
       });
 
@@ -816,20 +1027,51 @@
         loadOrders();
       });
 
-      document.getElementById('btnTakeOrder').addEventListener('click', takeOrder);
-      document.getElementById('btnReadyOrder').addEventListener('click', readyOrder);
-      document.getElementById('btnCreateSale').addEventListener('click', createSale);
-
       ordersTbody.addEventListener('click', function (e) {
-        const btn = e.target.closest('.js-open-order');
-        if (!btn) return;
-        openOrder(Number(btn.getAttribute('data-order-id')));
-      });
+        const openBtn = e.target.closest('.js-open-order');
+        if (openBtn) {
+          openOrder(Number(openBtn.getAttribute('data-order-id')));
+          return;
+        }
 
-      orderLines.addEventListener('click', function (e) {
-        const btn = e.target.closest('.js-save-line');
-        if (!btn) return;
-        saveLine(Number(btn.getAttribute('data-item-id')));
+        const takeBtn = e.target.closest('.js-take-order');
+        if (takeBtn) {
+          takeOrder(Number(takeBtn.getAttribute('data-order-id')));
+          return;
+        }
+
+        const readyBtn = e.target.closest('.js-ready-order');
+        if (readyBtn) {
+          readyOrder(Number(readyBtn.getAttribute('data-order-id')));
+          return;
+        }
+
+        const saleBtn = e.target.closest('.js-create-sale');
+        if (saleBtn) {
+          createSale(Number(saleBtn.getAttribute('data-order-id')));
+          return;
+        }
+
+        const doneBtn = e.target.closest('.js-line-done');
+        if (doneBtn) {
+          saveLine(Number(doneBtn.getAttribute('data-line-id')), 'done', Number(doneBtn.getAttribute('data-requested')));
+          return;
+        }
+
+        const saveBtn = e.target.closest('.js-line-save');
+        if (saveBtn) {
+          const lineId = Number(saveBtn.getAttribute('data-line-id'));
+          const item = state.openedOrder && Array.isArray(state.openedOrder.items)
+            ? state.openedOrder.items.find((line) => Number(line.id) === lineId)
+            : null;
+          saveLine(lineId, 'save', item ? Number(item.requested_qty) : 0);
+          return;
+        }
+
+        const missingBtn = e.target.closest('.js-line-missing');
+        if (missingBtn) {
+          saveLine(Number(missingBtn.getAttribute('data-line-id')), 'missing', 0);
+        }
       });
 
       searchInput.addEventListener('keydown', function (e) {
@@ -840,8 +1082,12 @@
         }
       });
 
+      statusSelect.addEventListener('change', function () {
+        state.page = 1;
+        loadOrders();
+      });
+
       loadOrders();
-      renderOrderMeta();
     })();
   </script>
 </body>
