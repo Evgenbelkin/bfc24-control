@@ -44,6 +44,102 @@ function buildDynamicInsert(schemaName, tableName, rowData) {
     };
 }
 
+
+async function getAggregatedStockQty(client, tenantId, itemId, lockRows = false) {
+    if (lockRows) {
+        const rowsResult = await client.query(
+            `
+            SELECT COALESCE(qty, 0) AS qty
+            FROM core.stock
+            WHERE tenant_id = $1
+              AND item_id = $2
+            FOR UPDATE
+            `,
+            [tenantId, itemId]
+        );
+
+        return rowsResult.rows.reduce((sum, row) => sum + toNumber(row.qty), 0);
+    }
+
+    const result = await client.query(
+        `
+        SELECT COALESCE(SUM(qty), 0) AS qty
+        FROM core.stock
+        WHERE tenant_id = $1
+          AND item_id = $2
+        `,
+        [tenantId, itemId]
+    );
+
+    return result.rows.length ? toNumber(result.rows[0].qty) : 0;
+}
+
+async function consumeStockByItem(client, tenantId, itemId, qtyToConsume) {
+    let remaining = toNumber(qtyToConsume);
+
+    if (remaining <= 0) {
+        return;
+    }
+
+    const stockRowsResult = await client.query(
+        `
+        SELECT
+            ctid::TEXT AS row_ctid,
+            COALESCE(qty, 0) AS qty
+        FROM core.stock
+        WHERE tenant_id = $1
+          AND item_id = $2
+          AND COALESCE(qty, 0) > 0
+        ORDER BY qty DESC
+        FOR UPDATE
+        `,
+        [tenantId, itemId]
+    );
+
+    const totalQty = stockRowsResult.rows.reduce((sum, row) => sum + toNumber(row.qty), 0);
+
+    if (remaining > totalQty) {
+        const error = new Error('not_enough_stock_for_sale');
+        error.code = 'not_enough_stock_for_sale';
+        error.physical_qty = totalQty;
+        error.picked_qty = remaining;
+        error.item_id = itemId;
+        throw error;
+    }
+
+    for (const row of stockRowsResult.rows) {
+        if (remaining <= 0) {
+            break;
+        }
+
+        const rowQty = toNumber(row.qty);
+        const consumeQty = Math.min(rowQty, remaining);
+
+        await client.query(
+            `
+            UPDATE core.stock
+            SET
+                qty = qty - $1,
+                updated_at = CASE
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM information_schema.columns
+                        WHERE table_schema = 'core'
+                          AND table_name = 'stock'
+                          AND column_name = 'updated_at'
+                    )
+                    THEN NOW()
+                    ELSE updated_at
+                END
+            WHERE ctid = $2::tid
+            `,
+            [consumeQty, row.row_ctid]
+        );
+
+        remaining -= consumeQty;
+    }
+}
+
 async function getOrderWithItems(client, tenantId, orderId) {
     const orderResult = await client.query(
         `
@@ -125,15 +221,15 @@ async function getOrderWithItems(client, tenantId, orderId) {
             ON i.id = oi.item_id
            AND i.tenant_id = oi.tenant_id
         LEFT JOIN (
-    SELECT
-        item_id,
-        tenant_id,
-        SUM(qty) AS qty
-    FROM core.stock
-    GROUP BY item_id, tenant_id
-) s
-    ON s.item_id = oi.item_id
-   AND s.tenant_id = oi.tenant_id
+            SELECT
+                tenant_id,
+                item_id,
+                SUM(qty) AS qty
+            FROM core.stock
+            GROUP BY tenant_id, item_id
+        ) s
+            ON s.item_id = oi.item_id
+           AND s.tenant_id = oi.tenant_id
         WHERE oi.tenant_id = $1
           AND oi.order_id = $2
         ORDER BY oi.id
@@ -300,8 +396,13 @@ router.get('/orders', authRequired, async (req, res) => {
                 b.phone AS buyer_phone,
                 u.full_name AS taken_by_name,
                 u.username AS taken_by_username,
-                COALESCE(SUM(oi.requested_qty), 0) AS requested_total_qty,
+                COALESCE(SUM(oi.requested_qty), 0) AS requested_plan_total_qty,
                 COALESCE(SUM(oi.picked_qty), 0) AS picked_total_qty,
+                CASE
+                    WHEN COALESCE(SUM(oi.picked_qty), 0) > 0
+                        THEN COALESCE(SUM(oi.picked_qty), 0)
+                    ELSE COALESCE(SUM(oi.requested_qty), 0)
+                END AS requested_total_qty,
                 COUNT(oi.id)::INT AS lines_count
             FROM core.showcase_orders o
             LEFT JOIN core.showcase_buyers b
@@ -432,7 +533,14 @@ router.post('/orders/:id/take', authRequired, async (req, res) => {
                       AND sr.status = 'active'
                 ), 0) AS total_reserved_qty
             FROM core.showcase_order_items oi
-            LEFT JOIN core.stock s
+            LEFT JOIN (
+                SELECT
+                    tenant_id,
+                    item_id,
+                    SUM(qty) AS qty
+                FROM core.stock
+                GROUP BY tenant_id, item_id
+            ) s
                 ON s.item_id = oi.item_id
                AND s.tenant_id = oi.tenant_id
             WHERE oi.tenant_id = $1
@@ -632,14 +740,14 @@ router.patch('/orders/:orderId/items/:itemRowId', authRequired, async (req, res)
 
                 const stockResult = await client.query(
                     `
-                    SELECT COALESCE(s.qty, 0) AS physical_qty
+                    SELECT COALESCE(SUM(s.qty), 0) AS physical_qty
                     FROM core.showcase_order_items oi
                     LEFT JOIN core.stock s
                         ON s.item_id = oi.item_id
                        AND s.tenant_id = oi.tenant_id
                     WHERE oi.tenant_id = $1
                       AND oi.id = $2
-                    LIMIT 1
+                    GROUP BY oi.id
                     `,
                     [tenantId, itemRowId]
                 );
@@ -935,20 +1043,11 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             return res.status(400).json({ error: 'no_picked_items_for_sale' });
         }
 
-        // Проверка остатков перед списанием
+        // Проверка остатков перед списанием.
+        // У одного товара может быть несколько строк core.stock по разным МХ.
+        // Поэтому остаток считаем суммарно, а не через одну произвольную строку.
         for (const item of itemsResult.rows) {
-            const stockResult = await client.query(
-                `
-                SELECT COALESCE(qty, 0) AS qty
-                FROM core.stock
-                WHERE tenant_id = $1
-                  AND item_id = $2
-                FOR UPDATE
-                `,
-                [tenantId, item.item_id]
-            );
-
-            const physicalQty = stockResult.rows.length ? toNumber(stockResult.rows[0].qty) : 0;
+            const physicalQty = await getAggregatedStockQty(client, tenantId, item.item_id, true);
             const pickedQty = toNumber(item.picked_qty);
 
             if (pickedQty > physicalQty) {
@@ -1029,27 +1128,7 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             const saleItemInsert = buildDynamicInsert('core', 'sale_items', saleItemData);
             await client.query(saleItemInsert.sql, saleItemInsert.values);
 
-            await client.query(
-                `
-                UPDATE core.stock
-                SET
-                    qty = qty - $3,
-                    updated_at = CASE
-                        WHEN EXISTS (
-                            SELECT 1
-                            FROM information_schema.columns
-                            WHERE table_schema = 'core'
-                              AND table_name = 'stock'
-                              AND column_name = 'updated_at'
-                        )
-                        THEN NOW()
-                        ELSE updated_at
-                    END
-                WHERE tenant_id = $1
-                  AND item_id = $2
-                `,
-                [tenantId, item.item_id, lineQty]
-            );
+            await consumeStockByItem(client, tenantId, item.item_id, lineQty);
         }
 
         await client.query(
@@ -1097,6 +1176,16 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
         });
     } catch (e) {
         await client.query('ROLLBACK');
+
+        if (e && e.code === 'not_enough_stock_for_sale') {
+            return res.status(400).json({
+                error: 'not_enough_stock_for_sale',
+                item_id: e.item_id,
+                physical_qty: e.physical_qty,
+                picked_qty: e.picked_qty
+            });
+        }
+
         console.error('[showcase-admin/orders/:id/create-sale]', e);
         res.status(500).json({ error: 'server_error', message: e.message });
     } finally {
