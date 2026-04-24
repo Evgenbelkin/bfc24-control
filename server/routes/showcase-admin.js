@@ -124,9 +124,16 @@ async function getOrderWithItems(client, tenantId, orderId) {
         JOIN core.items i
             ON i.id = oi.item_id
            AND i.tenant_id = oi.tenant_id
-        LEFT JOIN core.stock s
-            ON s.item_id = oi.item_id
-           AND s.tenant_id = oi.tenant_id
+        LEFT JOIN (
+    SELECT
+        item_id,
+        tenant_id,
+        SUM(qty) AS qty
+    FROM core.stock
+    GROUP BY item_id, tenant_id
+) s
+    ON s.item_id = oi.item_id
+   AND s.tenant_id = oi.tenant_id
         WHERE oi.tenant_id = $1
           AND oi.order_id = $2
         ORDER BY oi.id
