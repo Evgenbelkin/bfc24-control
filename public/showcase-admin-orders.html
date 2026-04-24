@@ -448,7 +448,7 @@
     <div class="topbar">
       <div class="title">
         <h1>Заказы витрины</h1>
-        <p>Рабочий экран продавца: заказ раскрывается под строкой, позиции подсвечиваются по сборке.</p>
+        <p>Рабочий экран продавца: взять заказ, собрать позиции, отметить готовым и провести продажу.</p>
       </div>
       <div class="actions">
         <a class="btn btn-light" href="/index.html">← Главное меню</a>
@@ -475,7 +475,7 @@
             <option value="in_progress">В работе</option>
             <option value="partially_picked">Частично собран</option>
             <option value="ready">Готов</option>
-            <option value="completed">Завершён</option>
+            <option value="completed">Продажа проведена</option>
             <option value="cancelled">Отменён</option>
           </select>
         </div>
@@ -563,10 +563,16 @@
       const pageInfo = document.getElementById('pageInfo');
 
       const errorMap = {
-        order_not_editable: 'Заказ нельзя редактировать в текущем статусе. Возможно, он уже завершён или отменён.',
+        order_not_editable: 'Заказ нельзя редактировать в текущем статусе. Сначала возьми новый заказ в работу. После проведения продажи изменения запрещены.',
         order_not_found: 'Заказ не найден.',
         invalid_status: 'Неверный статус заказа.',
         not_enough_stock: 'Недостаточно товара на остатке.',
+        order_not_ready_for_sale: 'Сначала отметь заказ как готовый, потом можно провести продажу.',
+        sale_already_created: 'Продажа по этому заказу уже проведена.',
+        no_picked_items_for_sale: 'Нельзя провести продажу: в заказе нет собранных товаров.',
+        nothing_picked_yet: 'Нельзя отметить заказ готовым: сначала собери хотя бы одну позицию.',
+        order_already_taken_or_not_new: 'Заказ уже взят в работу или больше не новый.',
+        order_not_ready_for_this_action: 'Заказ нельзя перевести в готовый в текущем статусе.',
         invalid_qty: 'Некорректное количество.',
         invalid_payload: 'Некорректные данные запроса.',
         server_error: 'Ошибка сервера. Проверь логи backend.',
@@ -605,7 +611,7 @@
           in_progress: 'В работе',
           partially_picked: 'Частично собран',
           ready: 'Готов',
-          completed: 'Завершён',
+          completed: 'Продажа проведена',
           cancelled: 'Отменён',
           approved: 'Подтверждено',
           picked: 'Собрано',
@@ -664,7 +670,7 @@
       }
 
       function canEditOrder(order) {
-        return order && !['completed', 'cancelled'].includes(order.status);
+        return order && ['in_progress', 'partially_picked', 'ready'].includes(order.status);
       }
 
       function canCreateSale(order) {
@@ -749,10 +755,17 @@
                 </p>
               </div>
 
-              <div class="details-actions">
-                <button class="btn btn-primary btn-small js-take-order" data-order-id="${order.id}" ${editable ? '' : 'disabled'} type="button">Взять заказ</button>
-                <button class="btn btn-warning btn-small js-ready-order" data-order-id="${order.id}" ${editable ? '' : 'disabled'} type="button">Заказ готов</button>
-                <button class="btn btn-success btn-small js-create-sale" data-order-id="${order.id}" ${saleAllowed ? '' : 'disabled'} type="button">Создать продажу</button>
+              <div>
+                <div class="details-actions">
+                  <button class="btn btn-primary btn-small js-take-order" data-order-id="${order.id}" ${order.status === 'new' ? '' : 'disabled'} type="button">Взять заказ</button>
+                  <button class="btn btn-warning btn-small js-ready-order" data-order-id="${order.id}" ${editable && order.status !== 'new' && order.status !== 'ready' ? '' : 'disabled'} type="button">Заказ готов</button>
+                  <button class="btn btn-success btn-small js-create-sale" data-order-id="${order.id}" ${saleAllowed ? '' : 'disabled'} type="button">Провести продажу</button>
+                </div>
+                <div class="muted" style="margin-top:8px;text-align:right;font-size:12px;">
+                  ${order.status === 'new' ? 'Сначала возьми заказ в работу.' : ''}
+                  ${order.status === 'ready' ? 'Заказ готов. Теперь можно провести продажу.' : ''}
+                  ${order.status === 'completed' ? 'Продажа уже проведена. Заказ закрыт для изменений.' : ''}
+                </div>
               </div>
             </div>
 
@@ -940,11 +953,11 @@
 
       async function createSale(orderId) {
         try {
-          showMessage('Создаём продажу...', 'info');
+          showMessage('Проводим продажу...', 'info');
           const result = await apiPost('/showcase-admin/orders/' + orderId + '/create-sale?tenant_id=' + tenantId, {});
           await refreshOpenedOrder();
           await loadOrders();
-          showMessage('Продажа создана. ID: ' + (result.sale_id || '—'), 'success');
+          showMessage('Продажа проведена. ID: ' + (result.sale_id || '—'), 'success');
         } catch (error) {
           console.error('[showcase-admin-orders] createSale error:', error);
           showMessage(translateError(error), 'error');
