@@ -140,6 +140,63 @@ async function consumeStockByItem(client, tenantId, itemId, qtyToConsume) {
     }
 }
 
+async function insertMovementIfPossible(client, tenantId, item, qty, saleId, order) {
+    const columns = await getTableColumns(client, 'core', 'movements');
+    const data = {};
+
+    if (hasColumn(columns, 'tenant_id')) data.tenant_id = tenantId;
+    if (hasColumn(columns, 'item_id')) data.item_id = item.item_id;
+    if (hasColumn(columns, 'movement_type')) data.movement_type = 'sale';
+    if (hasColumn(columns, 'type')) data.type = 'sale';
+    if (hasColumn(columns, 'qty')) data.qty = -Math.abs(qty);
+    if (hasColumn(columns, 'quantity')) data.quantity = -Math.abs(qty);
+    if (hasColumn(columns, 'source_type')) data.source_type = 'showcase_order';
+    if (hasColumn(columns, 'source_id')) data.source_id = order.id;
+    if (hasColumn(columns, 'ref_type')) data.ref_type = 'showcase_order';
+    if (hasColumn(columns, 'ref_id')) data.ref_id = order.id;
+    if (hasColumn(columns, 'sale_id')) data.sale_id = saleId;
+    if (hasColumn(columns, 'comment')) data.comment = `Продажа из витрины #${order.order_no}`;
+    if (hasColumn(columns, 'created_at')) data.created_at = new Date().toISOString();
+    if (hasColumn(columns, 'updated_at')) data.updated_at = new Date().toISOString();
+
+    if (!Object.keys(data).length) {
+        return;
+    }
+
+    const insert = buildDynamicInsert('core', 'movements', data);
+    await client.query(insert.sql, insert.values);
+}
+
+async function insertCashTransactionIfPossible(client, tenantId, saleId, amount, order, userId) {
+    const columns = await getTableColumns(client, 'core', 'cash_transactions');
+    const data = {};
+
+    if (hasColumn(columns, 'tenant_id')) data.tenant_id = tenantId;
+    if (hasColumn(columns, 'sale_id')) data.sale_id = saleId;
+    if (hasColumn(columns, 'amount')) data.amount = amount;
+    if (hasColumn(columns, 'transaction_type')) data.transaction_type = 'income';
+    if (hasColumn(columns, 'type')) data.type = 'income';
+    if (hasColumn(columns, 'direction')) data.direction = 'income';
+    if (hasColumn(columns, 'payment_method')) data.payment_method = 'cash';
+    if (hasColumn(columns, 'source_type')) data.source_type = 'showcase_order';
+    if (hasColumn(columns, 'source_id')) data.source_id = order.id;
+    if (hasColumn(columns, 'comment')) data.comment = `Оплата продажи из витрины #${order.order_no}`;
+    if (hasColumn(columns, 'created_by')) data.created_by = userId;
+    if (hasColumn(columns, 'created_at')) data.created_at = new Date().toISOString();
+    if (hasColumn(columns, 'updated_at')) data.updated_at = new Date().toISOString();
+
+    if (!Object.keys(data).length) {
+        return;
+    }
+
+    try {
+        const insert = buildDynamicInsert('core', 'cash_transactions', data);
+        await client.query(insert.sql, insert.values);
+    } catch (e) {
+        console.warn('[showcase-admin/create-sale] cash transaction skipped:', e.message);
+    }
+}
+
 async function getOrderWithItems(client, tenantId, orderId) {
     const orderResult = await client.query(
         `
@@ -220,14 +277,7 @@ async function getOrderWithItems(client, tenantId, orderId) {
         JOIN core.items i
             ON i.id = oi.item_id
            AND i.tenant_id = oi.tenant_id
-        LEFT JOIN (
-            SELECT
-                tenant_id,
-                item_id,
-                SUM(qty) AS qty
-            FROM core.stock
-            GROUP BY tenant_id, item_id
-        ) s
+        LEFT JOIN core.stock s
             ON s.item_id = oi.item_id
            AND s.tenant_id = oi.tenant_id
         WHERE oi.tenant_id = $1
@@ -1077,7 +1127,7 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
         if (hasColumn(salesColumns, 'sale_date')) saleData.sale_date = new Date().toISOString();
         if (hasColumn(salesColumns, 'comment')) saleData.comment = `Создано из showcase order #${order.order_no}`;
         if (hasColumn(salesColumns, 'sale_type')) saleData.sale_type = 'retail';
-        if (hasColumn(salesColumns, 'payment_status')) saleData.payment_status = 'unpaid';
+        if (hasColumn(salesColumns, 'payment_status')) saleData.payment_status = 'paid';
         if (hasColumn(salesColumns, 'payment_method')) saleData.payment_method = 'cash';
         if (hasColumn(salesColumns, 'total_amount')) saleData.total_amount = totalAmount;
         if (hasColumn(salesColumns, 'total')) saleData.total = totalAmount;
@@ -1129,7 +1179,10 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             await client.query(saleItemInsert.sql, saleItemInsert.values);
 
             await consumeStockByItem(client, tenantId, item.item_id, lineQty);
+            await insertMovementIfPossible(client, tenantId, item, lineQty, saleId, order);
         }
+
+        await insertCashTransactionIfPossible(client, tenantId, saleId, totalAmount, order, userId);
 
         await client.query(
             `
