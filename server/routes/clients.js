@@ -517,4 +517,293 @@ router.patch(
   }
 );
 
+
+router.post(
+  "/:id/showcase/create",
+  authRequired,
+  requireRole("owner", "admin", "client_owner", "client_manager", "client"),
+  async (req, res) => {
+    const dbClient = await pool.connect();
+
+    try {
+      const tenantId = getEffectiveTenantId(req);
+      const clientId = Number(req.params.id);
+
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: "tenant_not_defined",
+        });
+      }
+
+      if (!Number.isFinite(clientId) || clientId <= 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_client_id",
+        });
+      }
+
+      const client = await getClientById({
+        tenantId,
+        clientId,
+      });
+
+      if (!client) {
+        return res.status(404).json({
+          ok: false,
+          error: "client_not_found",
+        });
+      }
+
+      const oldAccess = await getShowcaseAccessByClient({
+        tenantId,
+        clientId,
+      });
+
+      if (oldAccess) {
+        return res.status(409).json({
+          ok: false,
+          error: "showcase_access_already_exists",
+          showcase_access: {
+            id: oldAccess.id,
+            login: oldAccess.login,
+            is_active: oldAccess.is_active,
+            counterparty_id: oldAccess.counterparty_id,
+          },
+        });
+      }
+
+      const login = buildShowcaseLogin({
+        tenantId,
+        clientId,
+      });
+      const password = generateShowcasePassword(10);
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      await dbClient.query("BEGIN");
+
+      await dbClient.query(
+        `
+          DELETE FROM core.showcase_buyers
+          WHERE tenant_id = $1
+            AND login = $2
+            AND counterparty_id IS NULL
+        `,
+        [tenantId, login]
+      );
+
+      const sql = `
+        INSERT INTO core.showcase_buyers
+        (
+          tenant_id,
+          counterparty_id,
+          name,
+          login,
+          password_hash,
+          phone,
+          email,
+          comment,
+          is_active
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, NULL, $7, true)
+        RETURNING
+          id,
+          tenant_id,
+          counterparty_id,
+          name,
+          login,
+          phone,
+          email,
+          comment,
+          is_active,
+          created_at,
+          updated_at
+      `;
+
+      const { rows } = await dbClient.query(sql, [
+        tenantId,
+        clientId,
+        client.name,
+        login,
+        passwordHash,
+        client.phone || null,
+        client.comment || null,
+      ]);
+
+      await dbClient.query("COMMIT");
+
+      return res.status(201).json({
+        ok: true,
+        showcase_access: rows[0],
+        login,
+        password,
+      });
+    } catch (e) {
+      try {
+        await dbClient.query("ROLLBACK");
+      } catch {}
+
+      console.error("[POST /clients/:id/showcase/create] error:", e);
+      return res.status(500).json({
+        ok: false,
+        error: "showcase_access_create_failed",
+        details: e.message,
+      });
+    } finally {
+      dbClient.release();
+    }
+  }
+);
+
+router.post(
+  "/:id/showcase/reset-password",
+  authRequired,
+  requireRole("owner", "admin", "client_owner", "client_manager", "client"),
+  async (req, res) => {
+    try {
+      const tenantId = getEffectiveTenantId(req);
+      const clientId = Number(req.params.id);
+
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: "tenant_not_defined",
+        });
+      }
+
+      if (!Number.isFinite(clientId) || clientId <= 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_client_id",
+        });
+      }
+
+      const access = await getShowcaseAccessByClient({
+        tenantId,
+        clientId,
+      });
+
+      if (!access) {
+        return res.status(404).json({
+          ok: false,
+          error: "showcase_access_not_found",
+        });
+      }
+
+      const password = generateShowcasePassword(10);
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      const sql = `
+        UPDATE core.showcase_buyers
+        SET
+          password_hash = $1,
+          updated_at = NOW()
+        WHERE tenant_id = $2
+          AND counterparty_id = $3
+        RETURNING
+          id,
+          tenant_id,
+          counterparty_id,
+          name,
+          login,
+          phone,
+          email,
+          comment,
+          is_active,
+          created_at,
+          updated_at
+      `;
+
+      const { rows } = await pool.query(sql, [
+        passwordHash,
+        tenantId,
+        clientId,
+      ]);
+
+      return res.json({
+        ok: true,
+        showcase_access: rows[0],
+        login: rows[0].login,
+        password,
+      });
+    } catch (e) {
+      console.error("[POST /clients/:id/showcase/reset-password] error:", e);
+      return res.status(500).json({
+        ok: false,
+        error: "showcase_access_reset_password_failed",
+        details: e.message,
+      });
+    }
+  }
+);
+
+router.patch(
+  "/:id/showcase/toggle",
+  authRequired,
+  requireRole("owner", "admin", "client_owner", "client_manager", "client"),
+  async (req, res) => {
+    try {
+      const tenantId = getEffectiveTenantId(req);
+      const clientId = Number(req.params.id);
+
+      if (!tenantId) {
+        return res.status(400).json({
+          ok: false,
+          error: "tenant_not_defined",
+        });
+      }
+
+      if (!Number.isFinite(clientId) || clientId <= 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "invalid_client_id",
+        });
+      }
+
+      const sql = `
+        UPDATE core.showcase_buyers
+        SET
+          is_active = NOT is_active,
+          updated_at = NOW()
+        WHERE tenant_id = $1
+          AND counterparty_id = $2
+        RETURNING
+          id,
+          tenant_id,
+          counterparty_id,
+          name,
+          login,
+          phone,
+          email,
+          comment,
+          is_active,
+          created_at,
+          updated_at
+      `;
+
+      const { rows } = await pool.query(sql, [tenantId, clientId]);
+
+      if (!rows.length) {
+        return res.status(404).json({
+          ok: false,
+          error: "showcase_access_not_found",
+        });
+      }
+
+      return res.json({
+        ok: true,
+        showcase_access: rows[0],
+      });
+    } catch (e) {
+      console.error("[PATCH /clients/:id/showcase/toggle] error:", e);
+      return res.status(500).json({
+        ok: false,
+        error: "showcase_access_toggle_failed",
+        details: e.message,
+      });
+    }
+  }
+);
+
+
 module.exports = router;
