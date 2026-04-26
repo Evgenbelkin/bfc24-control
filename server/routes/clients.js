@@ -5,6 +5,7 @@ const {
   requireRole,
   getEffectiveTenantId,
 } = require("../middleware/auth");
+const bcrypt = require("bcrypt");
 
 const router = express.Router();
 
@@ -438,5 +439,81 @@ router.patch(
     }
   }
 );
+
+/* ================== SHOWCASE ================== */
+
+router.post("/:id/showcase/create", authRequired, async (req, res) => {
+  try {
+    const tenantId = getEffectiveTenantId(req);
+    const clientId = Number(req.params.id);
+
+    const login = "client_" + clientId;
+    const password = Math.random().toString(36).slice(-8);
+    const hash = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      `DELETE FROM core.showcase_buyers WHERE counterparty_id=$1`,
+      [clientId]
+    );
+
+    await pool.query(
+      `
+      INSERT INTO core.showcase_buyers
+      (tenant_id, name, login, password_hash, is_active, counterparty_id)
+      VALUES ($1,$2,$3,$4,true,$5)
+    `,
+      [tenantId, "Client " + clientId, login, hash, clientId]
+    );
+
+    res.json({ ok: true, login, password });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ ok: false });
+  }
+});
+
+router.post("/:id/showcase/reset-password", authRequired, async (req, res) => {
+  try {
+    const clientId = Number(req.params.id);
+
+    const password = Math.random().toString(36).slice(-8);
+    const hash = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      `
+      UPDATE core.showcase_buyers
+      SET password_hash=$1, updated_at=NOW()
+      WHERE counterparty_id=$2
+    `,
+      [hash, clientId]
+    );
+
+    res.json({ ok: true, password });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ ok: false });
+  }
+});
+
+router.patch("/:id/showcase/toggle", authRequired, async (req, res) => {
+  try {
+    const clientId = Number(req.params.id);
+
+    const { rows } = await pool.query(
+      `
+      UPDATE core.showcase_buyers
+      SET is_active = NOT is_active
+      WHERE counterparty_id=$1
+      RETURNING is_active
+    `,
+      [clientId]
+    );
+
+    res.json({ ok: true, is_active: rows[0]?.is_active });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ ok: false });
+  }
+});
 
 module.exports = router;
