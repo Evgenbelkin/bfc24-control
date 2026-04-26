@@ -225,38 +225,73 @@ router.get("/stock-value", authRequired, async (req, res) => {
 
     const { rows } = await pool.query(
       `
+      WITH batch_calc AS (
+        SELECT
+          b.id,
+          b.tenant_id,
+          b.item_id,
+          b.qty_total,
+          b.qty_remaining,
+          b.unit_cost,
+          b.cny_rate,
+          b.usd_rate,
+          b.delivery_cost,
+
+          /*
+            ВАЖНО:
+            В модуле "Партии / Себестоимость" поле b.unit_cost используется как
+            закупка в юанях за 1 шт, а НЕ как готовая себестоимость в рублях.
+
+            Реальная себестоимость 1 шт в рублях:
+            закупка_юань_за_шт * курс_юаня + доставка_доллар_за_партию * курс_доллара / кол-во_в_партии
+          */
+          (
+            COALESCE(b.unit_cost, 0) * COALESCE(b.cny_rate, 0)
+            +
+            CASE
+              WHEN COALESCE(b.qty_total, 0) > 0
+              THEN COALESCE(b.delivery_cost, 0) * COALESCE(b.usd_rate, 0) / b.qty_total
+              ELSE 0
+            END
+          ) AS unit_cost_rub
+
+        FROM core.item_batches b
+        WHERE b.tenant_id = $1
+          AND COALESCE(b.qty_remaining, 0) > 0
+      )
+
       SELECT
-        i.id                                              AS item_id,
-        i.name                                            AS item_name,
+        i.id                                                                AS item_id,
+        i.name                                                              AS item_name,
         i.sku,
         i.unit,
         i.sale_price,
 
         -- Остаток в партиях (должен совпадать с core.stock)
-        COALESCE(SUM(b.qty_remaining), 0)                 AS qty_in_batches,
+        COALESCE(SUM(b.qty_remaining), 0)                                   AS qty_in_batches,
 
-        -- Средняя себестоимость остатка (взвешенная по партиям)
+        -- Средняя себестоимость остатка в рублях
         CASE
           WHEN SUM(b.qty_remaining) > 0
           THEN ROUND(
-            SUM(b.qty_remaining * b.unit_cost) / SUM(b.qty_remaining),
+            SUM(b.qty_remaining * b.unit_cost_rub) / SUM(b.qty_remaining),
             4
           )
           ELSE 0
-        END                                               AS avg_unit_cost,
+        END                                                                 AS avg_unit_cost,
 
-        -- Стоимость остатка по себестоимости (капитализация)
-        COALESCE(SUM(b.qty_remaining * b.unit_cost), 0)   AS stock_cost_value,
+        -- Стоимость остатка по реальной себестоимости в рублях
+        COALESCE(SUM(b.qty_remaining * b.unit_cost_rub), 0)                 AS stock_cost_value,
 
         -- Стоимость остатка по цене продажи (потенциальная выручка)
-        COALESCE(SUM(b.qty_remaining) * i.sale_price, 0)  AS stock_sale_value,
+        COALESCE(SUM(b.qty_remaining) * i.sale_price, 0)                    AS stock_sale_value,
 
         -- Потенциальная прибыль при продаже всего остатка
         COALESCE(
           SUM(b.qty_remaining) * i.sale_price
-          - SUM(b.qty_remaining * b.unit_cost),
+          - SUM(b.qty_remaining * b.unit_cost_rub),
           0
-        )                                                 AS potential_profit,
+        )                                                                   AS potential_profit,
 
         -- Фактический остаток из core.stock (для сверки)
         COALESCE(
@@ -264,14 +299,11 @@ router.get("/stock-value", authRequired, async (req, res) => {
            FROM core.stock s
            WHERE s.tenant_id = b.tenant_id AND s.item_id = b.item_id),
           0
-        )                                                 AS qty_in_stock
+        )                                                                   AS qty_in_stock
 
-      FROM core.item_batches b
+      FROM batch_calc b
       JOIN core.items i
         ON i.id = b.item_id AND i.tenant_id = b.tenant_id
-      WHERE
-        b.tenant_id = $1
-        AND b.qty_remaining > 0
       GROUP BY i.id, i.name, i.sku, i.unit, i.sale_price, b.tenant_id, b.item_id
       ORDER BY stock_cost_value DESC
       `,
@@ -320,6 +352,7 @@ router.get("/stock-value", authRequired, async (req, res) => {
     return res.status(500).json({ ok: false, error: "stock_value_failed" });
   }
 });
+
 
 // ─── GET /reports/item/:id ────────────────────────────────────────────────────
 //
