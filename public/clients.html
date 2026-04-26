@@ -993,14 +993,25 @@
     async function createShowcaseAccess(id) {
       try {
         clearSubmitStatus();
+
+        const password = prompt("Введите пароль для клиента:");
+        if (!password) {
+          setSubmitStatusText("Пароль не введён", "error");
+          return;
+        }
+
         setSubmitStatusText("Создаю доступ к витрине...", "info");
 
-        const data = await apiPost(`/clients/${id}/showcase/create`, {});
-        const login = data.login || data.showcase?.login || "";
-        const password = data.password || "";
+        const data = await apiPost(`/clients/${id}/showcase/create`, {
+          password
+        });
 
+        const login = data.login || "";
         await loadData();
-        showShowcaseCredentials({ login, password });
+
+        alert("Доступ создан\n\nЛогин: " + login + "\nПароль: " + password);
+        setSubmitStatusText("Доступ к витрине создан", "success");
+
       } catch (err) {
         setSubmitStatusText("Ошибка витрины: " + Ui.translateError(err.message), "error");
       }
@@ -1009,14 +1020,25 @@
     async function resetShowcasePassword(id) {
       try {
         clearSubmitStatus();
+
+        const password = prompt("Введите новый пароль:");
+        if (!password) {
+          setSubmitStatusText("Пароль не введён", "error");
+          return;
+        }
+
         setSubmitStatusText("Сбрасываю пароль витрины...", "info");
 
-        const data = await apiPost(`/clients/${id}/showcase/reset-password`, {});
-        const login = data.login || data.showcase?.login || "";
-        const password = data.password || "";
+        const data = await apiPost(`/clients/${id}/showcase/reset-password`, {
+          password
+        });
 
+        const login = data.login || "";
         await loadData();
-        showShowcaseCredentials({ login, password });
+
+        alert("Пароль обновлён\n\nЛогин: " + login + "\nПароль: " + password);
+        setSubmitStatusText("Пароль обновлён", "success");
+
       } catch (err) {
         setSubmitStatusText("Ошибка витрины: " + Ui.translateError(err.message), "error");
       }
