@@ -310,7 +310,7 @@
     .s-in_progress{background:#dbeafe;color:#1d4ed8}
     .s-partially_picked{background:#fef3c7;color:#b45309}
     .s-ready{background:#dcfce7;color:#15803d}
-    .s-completed{background:#d1fae5;color:#047857}
+    .s-completed{background:#dbeafe;color:#1d4ed8}
     .s-cancelled{background:#fee2e2;color:#b91c1c}
     .s-approved{background:#e0f2fe;color:#0369a1}
     .s-picked{background:#dcfce7;color:#15803d}
@@ -569,6 +569,7 @@
         not_enough_stock: 'Недостаточно товара на остатке.',
         order_not_ready_for_sale: 'Сначала отметь заказ как готовый, потом можно провести продажу.',
         sale_already_created: 'Продажа по этому заказу уже проведена.',
+        counterparty_required_for_debt: 'Для продажи в долг нужен клиент. Проверь покупателя витрины.',
         no_picked_items_for_sale: 'Нельзя провести продажу: в заказе нет собранных товаров.',
         nothing_picked_yet: 'Нельзя отметить заказ готовым: сначала собери хотя бы одну позицию.',
         order_already_taken_or_not_new: 'Заказ уже взят в работу или больше не новый.',
@@ -759,7 +760,8 @@
                 <div class="details-actions">
                   <button class="btn btn-primary btn-small js-take-order" data-order-id="${order.id}" ${order.status === 'new' ? '' : 'disabled'} type="button">Взять заказ</button>
                   <button class="btn btn-warning btn-small js-ready-order" data-order-id="${order.id}" ${editable && order.status !== 'new' && order.status !== 'ready' ? '' : 'disabled'} type="button">Заказ готов</button>
-                  <button class="btn btn-success btn-small js-create-sale" data-order-id="${order.id}" ${saleAllowed ? '' : 'disabled'} type="button">Провести продажу</button>
+                  <button class="btn btn-success btn-small js-create-sale" data-order-id="${order.id}" data-debt="false" ${saleAllowed ? '' : 'disabled'} type="button">Провести продажу</button>
+                  <button class="btn btn-light btn-small js-create-sale" data-order-id="${order.id}" data-debt="true" ${saleAllowed ? '' : 'disabled'} type="button">Продажа в долг</button>
                 </div>
                 <div class="muted" style="margin-top:8px;text-align:right;font-size:12px;">
                   ${order.status === 'new' ? 'Сначала возьми заказ в работу.' : ''}
@@ -951,13 +953,15 @@
         }
       }
 
-      async function createSale(orderId) {
+      async function createSale(orderId, isDebt) {
         try {
-          showMessage('Проводим продажу...', 'info');
-          const result = await apiPost('/showcase-admin/orders/' + orderId + '/create-sale?tenant_id=' + tenantId, {});
+          showMessage(isDebt ? 'Проводим продажу в долг...' : 'Проводим продажу...', 'info');
+          const result = await apiPost('/showcase-admin/orders/' + orderId + '/create-sale?tenant_id=' + tenantId, {
+            is_debt: !!isDebt
+          });
           await refreshOpenedOrder();
           await loadOrders();
-          showMessage('Продажа проведена. ID: ' + (result.sale_id || '—'), 'success');
+          showMessage((isDebt ? 'Продажа в долг проведена. ID: ' : 'Продажа проведена. ID: ') + (result.sale_id || '—'), 'success');
         } catch (error) {
           console.error('[showcase-admin-orders] createSale error:', error);
           showMessage(translateError(error), 'error');
@@ -1061,7 +1065,10 @@
 
         const saleBtn = e.target.closest('.js-create-sale');
         if (saleBtn) {
-          createSale(Number(saleBtn.getAttribute('data-order-id')));
+          createSale(
+            Number(saleBtn.getAttribute('data-order-id')),
+            saleBtn.getAttribute('data-debt') === 'true'
+          );
           return;
         }
 

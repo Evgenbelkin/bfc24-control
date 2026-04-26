@@ -140,24 +140,95 @@ async function consumeStockByItem(client, tenantId, itemId, qtyToConsume) {
     }
 }
 
-async function insertMovementIfPossible(client, tenantId, item, qty, saleId, order) {
+async function ensureCounterpartyFromShowcaseBuyer(client, tenantId, order) {
+    if (!order || !order.buyer_id) {
+        return null;
+    }
+
+    const buyerResult = await client.query(
+        `
+        SELECT
+            id,
+            tenant_id,
+            name,
+            login,
+            phone
+        FROM core.showcase_buyers
+        WHERE tenant_id = $1
+          AND id = $2
+        LIMIT 1
+        `,
+        [tenantId, order.buyer_id]
+    );
+
+    if (!buyerResult.rows.length) {
+        return null;
+    }
+
+    const buyer = buyerResult.rows[0];
+    const buyerName = String(buyer.name || buyer.login || '').trim();
+
+    if (!buyerName) {
+        return null;
+    }
+
+    const existingResult = await client.query(
+        `
+        SELECT id
+        FROM core.counterparties
+        WHERE tenant_id = $1
+          AND lower(name) = lower($2)
+        ORDER BY id ASC
+        LIMIT 1
+        `,
+        [tenantId, buyerName]
+    );
+
+    if (existingResult.rows.length) {
+        return existingResult.rows[0].id;
+    }
+
+    const columns = await getTableColumns(client, 'core', 'counterparties');
+    const data = {};
+
+    if (hasColumn(columns, 'tenant_id')) data.tenant_id = tenantId;
+    if (hasColumn(columns, 'name')) data.name = buyerName;
+    if (hasColumn(columns, 'phone')) data.phone = buyer.phone || null;
+    if (hasColumn(columns, 'comment')) data.comment = `Создано автоматически из покупателя витрины #${buyer.id}`;
+    if (hasColumn(columns, 'is_active')) data.is_active = true;
+    if (hasColumn(columns, 'created_at')) data.created_at = new Date().toISOString();
+    if (hasColumn(columns, 'updated_at')) data.updated_at = new Date().toISOString();
+
+    const insert = buildDynamicInsert('core', 'counterparties', data);
+    const insertResult = await client.query(insert.sql, insert.values);
+
+    return insertResult.rows[0] && insertResult.rows[0].id ? insertResult.rows[0].id : null;
+}
+
+async function insertMovementIfPossible(client, tenantId, item, qty, saleId, order, userId) {
     const columns = await getTableColumns(client, 'core', 'movements');
     const data = {};
 
     if (hasColumn(columns, 'tenant_id')) data.tenant_id = tenantId;
     if (hasColumn(columns, 'item_id')) data.item_id = item.item_id;
+    if (hasColumn(columns, 'location_id')) data.location_id = null;
     if (hasColumn(columns, 'movement_type')) data.movement_type = 'sale';
     if (hasColumn(columns, 'type')) data.type = 'sale';
-    // В core.movements есть CHECK movements_qty_positive.
-    // Поэтому количество пишем положительным, а смысл списания задаёт movement_type = 'sale'.
+
+    // В core.movements действует CHECK на положительное количество.
+    // Смысл списания задаёт movement_type = 'sale', а qty остаётся положительным.
     if (hasColumn(columns, 'qty')) data.qty = Math.abs(qty);
     if (hasColumn(columns, 'quantity')) data.quantity = Math.abs(qty);
+
+    // ref_type/ref_id лучше связывать с продажей, чтобы карточка продажи могла найти движение.
+    if (hasColumn(columns, 'ref_type')) data.ref_type = 'sale';
+    if (hasColumn(columns, 'ref_id')) data.ref_id = saleId;
+
     if (hasColumn(columns, 'source_type')) data.source_type = 'showcase_order';
     if (hasColumn(columns, 'source_id')) data.source_id = order.id;
-    if (hasColumn(columns, 'ref_type')) data.ref_type = 'showcase_order';
-    if (hasColumn(columns, 'ref_id')) data.ref_id = order.id;
     if (hasColumn(columns, 'sale_id')) data.sale_id = saleId;
     if (hasColumn(columns, 'comment')) data.comment = `Продажа из витрины #${order.order_no}`;
+    if (hasColumn(columns, 'created_by')) data.created_by = userId;
     if (hasColumn(columns, 'created_at')) data.created_at = new Date().toISOString();
     if (hasColumn(columns, 'updated_at')) data.updated_at = new Date().toISOString();
 
@@ -169,17 +240,19 @@ async function insertMovementIfPossible(client, tenantId, item, qty, saleId, ord
     await client.query(insert.sql, insert.values);
 }
 
-async function insertCashTransactionIfPossible(client, tenantId, saleId, amount, order, userId) {
+async function insertCashTransactionIfPossible(client, tenantId, saleId, amount, order, userId, counterpartyId) {
     const columns = await getTableColumns(client, 'core', 'cash_transactions');
     const data = {};
 
     if (hasColumn(columns, 'tenant_id')) data.tenant_id = tenantId;
-    if (hasColumn(columns, 'sale_id')) data.sale_id = saleId;
-    if (hasColumn(columns, 'amount')) data.amount = amount;
     if (hasColumn(columns, 'transaction_type')) data.transaction_type = 'income';
     if (hasColumn(columns, 'type')) data.type = 'income';
     if (hasColumn(columns, 'direction')) data.direction = 'income';
+    if (hasColumn(columns, 'category')) data.category = 'sale';
     if (hasColumn(columns, 'payment_method')) data.payment_method = 'cash';
+    if (hasColumn(columns, 'amount')) data.amount = amount;
+    if (hasColumn(columns, 'counterparty_id')) data.counterparty_id = counterpartyId || null;
+    if (hasColumn(columns, 'sale_id')) data.sale_id = saleId;
     if (hasColumn(columns, 'source_type')) data.source_type = 'showcase_order';
     if (hasColumn(columns, 'source_id')) data.source_id = order.id;
     if (hasColumn(columns, 'comment')) data.comment = `Оплата продажи из витрины #${order.order_no}`;
@@ -188,15 +261,48 @@ async function insertCashTransactionIfPossible(client, tenantId, saleId, amount,
     if (hasColumn(columns, 'updated_at')) data.updated_at = new Date().toISOString();
 
     if (!Object.keys(data).length) {
-        return;
+        return null;
     }
 
-    try {
-        const insert = buildDynamicInsert('core', 'cash_transactions', data);
-        await client.query(insert.sql, insert.values);
-    } catch (e) {
-        console.warn('[showcase-admin/create-sale] cash transaction skipped:', e.message);
+    const insert = buildDynamicInsert('core', 'cash_transactions', data);
+    const result = await client.query(insert.sql, insert.values);
+    return result.rows[0] || null;
+}
+
+async function insertDebtIfPossible(client, tenantId, saleId, totalAmount, paidAmount, debtAmount, order, counterpartyId) {
+    if (!(debtAmount > 0)) {
+        return null;
     }
+
+    if (!counterpartyId) {
+        const error = new Error('counterparty_required_for_debt');
+        error.code = 'counterparty_required_for_debt';
+        throw error;
+    }
+
+    const columns = await getTableColumns(client, 'core', 'debts');
+    const data = {};
+
+    if (hasColumn(columns, 'tenant_id')) data.tenant_id = tenantId;
+    if (hasColumn(columns, 'counterparty_id')) data.counterparty_id = counterpartyId;
+    if (hasColumn(columns, 'sale_id')) data.sale_id = saleId;
+    if (hasColumn(columns, 'initial_amount')) data.initial_amount = totalAmount;
+    if (hasColumn(columns, 'amount')) data.amount = totalAmount;
+    if (hasColumn(columns, 'paid_amount')) data.paid_amount = paidAmount;
+    if (hasColumn(columns, 'balance_amount')) data.balance_amount = debtAmount;
+    if (hasColumn(columns, 'debt_amount')) data.debt_amount = debtAmount;
+    if (hasColumn(columns, 'status')) data.status = paidAmount > 0 ? 'partial' : 'open';
+    if (hasColumn(columns, 'comment')) data.comment = `Долг по продаже из витрины #${order.order_no}`;
+    if (hasColumn(columns, 'created_at')) data.created_at = new Date().toISOString();
+    if (hasColumn(columns, 'updated_at')) data.updated_at = new Date().toISOString();
+
+    if (!Object.keys(data).length) {
+        return null;
+    }
+
+    const insert = buildDynamicInsert('core', 'debts', data);
+    const result = await client.query(insert.sql, insert.values);
+    return result.rows[0] || null;
 }
 
 async function getOrderWithItems(client, tenantId, orderId) {
@@ -279,7 +385,14 @@ async function getOrderWithItems(client, tenantId, orderId) {
         JOIN core.items i
             ON i.id = oi.item_id
            AND i.tenant_id = oi.tenant_id
-        LEFT JOIN core.stock s
+        LEFT JOIN (
+            SELECT
+                tenant_id,
+                item_id,
+                SUM(qty) AS qty
+            FROM core.stock
+            GROUP BY tenant_id, item_id
+        ) s
             ON s.item_id = oi.item_id
            AND s.tenant_id = oi.tenant_id
         WHERE oi.tenant_id = $1
@@ -1060,6 +1173,7 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
         }
 
         const order = orderResult.rows[0];
+        const isDebt = req.body && (req.body.is_debt === true || req.body.is_debt === 'true');
 
         if (order.status !== 'ready') {
             await client.query('ROLLBACK');
@@ -1070,6 +1184,8 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             await client.query('ROLLBACK');
             return res.status(400).json({ error: 'sale_already_created' });
         }
+
+        const counterpartyId = await ensureCounterpartyFromShowcaseBuyer(client, tenantId, order);
 
         const itemsResult = await client.query(
             `
@@ -1123,17 +1239,26 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             totalAmount += linePrice * lineQty;
         }
 
+        const paidAmount = isDebt ? 0 : totalAmount;
+        const debtAmount = totalAmount - paidAmount;
+        const paymentStatus = isDebt ? 'unpaid' : 'paid';
+        const paymentMethod = isDebt ? 'transfer' : 'cash';
+
         const saleData = {};
+        const saleComment = `Создано из showcase order #${order.order_no}`;
 
         if (hasColumn(salesColumns, 'tenant_id')) saleData.tenant_id = tenantId;
+        if (hasColumn(salesColumns, 'counterparty_id')) saleData.counterparty_id = counterpartyId || null;
         if (hasColumn(salesColumns, 'sale_date')) saleData.sale_date = new Date().toISOString();
-        if (hasColumn(salesColumns, 'comment')) saleData.comment = `Создано из showcase order #${order.order_no}`;
+        if (hasColumn(salesColumns, 'comment')) saleData.comment = saleComment;
         if (hasColumn(salesColumns, 'sale_type')) saleData.sale_type = 'retail';
-        if (hasColumn(salesColumns, 'payment_status')) saleData.payment_status = 'paid';
-        if (hasColumn(salesColumns, 'payment_method')) saleData.payment_method = 'cash';
+        if (hasColumn(salesColumns, 'payment_status')) saleData.payment_status = paymentStatus;
+        if (hasColumn(salesColumns, 'payment_method')) saleData.payment_method = paymentMethod;
         if (hasColumn(salesColumns, 'total_amount')) saleData.total_amount = totalAmount;
         if (hasColumn(salesColumns, 'total')) saleData.total = totalAmount;
         if (hasColumn(salesColumns, 'revenue')) saleData.revenue = totalAmount;
+        if (hasColumn(salesColumns, 'paid_amount')) saleData.paid_amount = paidAmount;
+        if (hasColumn(salesColumns, 'debt_amount')) saleData.debt_amount = debtAmount;
         if (hasColumn(salesColumns, 'created_at')) saleData.created_at = new Date().toISOString();
         if (hasColumn(salesColumns, 'updated_at')) saleData.updated_at = new Date().toISOString();
         if (hasColumn(salesColumns, 'created_by')) saleData.created_by = userId;
@@ -1181,10 +1306,36 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             await client.query(saleItemInsert.sql, saleItemInsert.values);
 
             await consumeStockByItem(client, tenantId, item.item_id, lineQty);
-            await insertMovementIfPossible(client, tenantId, item, lineQty, saleId, order);
+            await insertMovementIfPossible(client, tenantId, item, lineQty, saleId, order, userId);
         }
 
-        await insertCashTransactionIfPossible(client, tenantId, saleId, totalAmount, order, userId);
+        let cashTransaction = null;
+        let debt = null;
+
+        if (paidAmount > 0) {
+            cashTransaction = await insertCashTransactionIfPossible(
+                client,
+                tenantId,
+                saleId,
+                paidAmount,
+                order,
+                userId,
+                counterpartyId
+            );
+        }
+
+        if (debtAmount > 0) {
+            debt = await insertDebtIfPossible(
+                client,
+                tenantId,
+                saleId,
+                totalAmount,
+                paidAmount,
+                debtAmount,
+                order,
+                counterpartyId
+            );
+        }
 
         await client.query(
             `
@@ -1214,9 +1365,12 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             [tenantId, orderId, saleId]
         );
 
-        await createEvent(client, tenantId, orderId, 'sale_created', userId, null, {
+        await createEvent(client, tenantId, orderId, isDebt ? 'sale_created_debt' : 'sale_created_paid', userId, null, {
             sale_id: saleId,
-            total_amount: totalAmount
+            total_amount: totalAmount,
+            paid_amount: paidAmount,
+            debt_amount: debtAmount,
+            payment_status: paymentStatus
         });
 
         await client.query('COMMIT');
@@ -1227,6 +1381,11 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             ok: true,
             sale_id: saleId,
             total_amount: totalAmount,
+            paid_amount: paidAmount,
+            debt_amount: debtAmount,
+            payment_status: paymentStatus,
+            cash_transaction: cashTransaction,
+            debt,
             order: freshOrder
         });
     } catch (e) {
