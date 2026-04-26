@@ -136,54 +136,31 @@ router.get('/categories', async (req, res) => {
             return res.status(403).json({ error: 'showcase_disabled' });
         }
 
-        /*
-          Категории витрины должны строиться на backend, а не собираться на frontend.
-          Логика синхронизирована с /showcase/catalog:
-          - берём core.items.category;
-          - пустые категории показываем как "Без категории";
-          - если включено show_only_in_stock, показываем только категории товаров с доступным остатком;
-          - учитываем активные резервы, чтобы не показывать категории без доступного товара.
-        */
-        const stockFilterSql = settings.show_only_in_stock
-            ? `
-              AND (
-                COALESCE(stock_agg.physical_qty, 0)
-                - COALESCE(reserved_agg.reserved_qty, 0)
-              ) > 0
-            `
+        const categoryExpr = `COALESCE(NULLIF(TRIM(c.name), ''), NULLIF(TRIM(i.category), ''), 'Без категории')`;
+
+        const havingSql = settings.show_only_in_stock
+            ? `HAVING (COALESCE(SUM(s.qty), 0) - COALESCE(SUM(CASE WHEN sr.status = 'active' THEN sr.qty ELSE 0 END), 0)) > 0`
             : '';
 
         const result = await pool.query(
             `
-            SELECT DISTINCT
-                COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') AS category
+            SELECT
+                ${categoryExpr} AS category
             FROM core.items i
-            LEFT JOIN (
-                SELECT
-                    tenant_id,
-                    item_id,
-                    COALESCE(SUM(qty), 0) AS physical_qty
-                FROM core.stock
-                WHERE tenant_id = $1
-                GROUP BY tenant_id, item_id
-            ) stock_agg
-                ON stock_agg.tenant_id = i.tenant_id
-               AND stock_agg.item_id = i.id
-            LEFT JOIN (
-                SELECT
-                    tenant_id,
-                    item_id,
-                    COALESCE(SUM(qty), 0) AS reserved_qty
-                FROM core.stock_reservations
-                WHERE tenant_id = $1
-                  AND status = 'active'
-                GROUP BY tenant_id, item_id
-            ) reserved_agg
-                ON reserved_agg.tenant_id = i.tenant_id
-               AND reserved_agg.item_id = i.id
+            LEFT JOIN core.categories c
+                ON c.id = i.category_id
+               AND c.tenant_id = i.tenant_id
+               AND c.is_active = TRUE
+            LEFT JOIN core.stock s
+                ON s.item_id = i.id
+               AND s.tenant_id = i.tenant_id
+            LEFT JOIN core.stock_reservations sr
+                ON sr.item_id = i.id
+               AND sr.tenant_id = i.tenant_id
+               AND sr.status = 'active'
             WHERE i.tenant_id = $1
-              AND COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') IS NOT NULL
-              ${stockFilterSql}
+            GROUP BY ${categoryExpr}
+            ${havingSql}
             ORDER BY category ASC
             `,
             [tenantId]
@@ -198,6 +175,7 @@ router.get('/categories', async (req, res) => {
         return res.status(500).json({ error: 'server_error' });
     }
 });
+
 
 
 
@@ -224,6 +202,8 @@ router.get('/catalog', async (req, res) => {
             return res.status(403).json({ error: 'showcase_disabled' });
         }
 
+        const categoryExpr = `COALESCE(NULLIF(TRIM(c.name), ''), NULLIF(TRIM(i.category), ''), 'Без категории')`;
+
         const filterParams = [tenantId];
         let whereSql = `
             WHERE i.tenant_id = $1
@@ -245,15 +225,9 @@ router.get('/catalog', async (req, res) => {
             filterParams.push(category);
             const categoryParam = `$${filterParams.length}`;
 
-            if (category === 'Без категории') {
-                whereSql += `
-                    AND COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') = ${categoryParam}
-                `;
-            } else {
-                whereSql += `
-                    AND COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') = ${categoryParam}
-                `;
-            }
+            whereSql += `
+                AND ${categoryExpr} = ${categoryParam}
+            `;
         }
 
         const havingSql = settings.show_only_in_stock
@@ -271,13 +245,17 @@ router.get('/catalog', async (req, res) => {
                 i.sku,
                 i.barcode,
                 i.image_url,
-                COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') AS category,
+                ${categoryExpr} AS category,
                 COALESCE(i.box_qty, 0) AS box_qty,
                 COALESCE(SUM(s.qty), 0) AS physical_qty,
                 COALESCE(SUM(CASE WHEN sr.status = 'active' THEN sr.qty ELSE 0 END), 0) AS reserved_qty,
                 COALESCE(SUM(s.qty), 0) - COALESCE(SUM(CASE WHEN sr.status = 'active' THEN sr.qty ELSE 0 END), 0) AS available_qty,
                 ${settings.show_prices ? 'COALESCE(i.sale_price, 0)' : 'NULL'} AS price
             FROM core.items i
+            LEFT JOIN core.categories c
+                ON c.id = i.category_id
+               AND c.tenant_id = i.tenant_id
+               AND c.is_active = TRUE
             LEFT JOIN core.stock s
                 ON s.item_id = i.id
                AND s.tenant_id = i.tenant_id
@@ -286,7 +264,7 @@ router.get('/catalog', async (req, res) => {
                AND sr.tenant_id = i.tenant_id
                AND sr.status = 'active'
             ${whereSql}
-            GROUP BY i.id
+            GROUP BY i.id, c.name
             ${havingSql}
             ORDER BY i.name ASC, i.id ASC
             LIMIT ${limitParam} OFFSET ${offsetParam}
@@ -297,6 +275,10 @@ router.get('/catalog', async (req, res) => {
             FROM (
                 SELECT i.id
                 FROM core.items i
+                LEFT JOIN core.categories c
+                    ON c.id = i.category_id
+                   AND c.tenant_id = i.tenant_id
+                   AND c.is_active = TRUE
                 LEFT JOIN core.stock s
                     ON s.item_id = i.id
                    AND s.tenant_id = i.tenant_id
@@ -305,7 +287,7 @@ router.get('/catalog', async (req, res) => {
                    AND sr.tenant_id = i.tenant_id
                    AND sr.status = 'active'
                 ${whereSql}
-                GROUP BY i.id
+                GROUP BY i.id, c.name
                 ${havingSql}
             ) t
         `;
@@ -335,6 +317,7 @@ router.get('/catalog', async (req, res) => {
         return res.status(500).json({ error: 'server_error' });
     }
 });
+
 
 
 // =========================================
