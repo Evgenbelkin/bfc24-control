@@ -577,7 +577,15 @@ router.post(
         tenantId,
         clientId,
       });
-      const password = generateShowcasePassword(10);
+      const password = String(req.body.password || "").trim();
+
+      if (!password) {
+        return res.status(400).json({
+          ok: false,
+          error: "password_required",
+        });
+      }
+
       const passwordHash = await bcrypt.hash(password, 10);
 
       await dbClient.query("BEGIN");
@@ -690,7 +698,15 @@ router.post(
         });
       }
 
-      const password = generateShowcasePassword(10);
+      const password = String(req.body.password || "").trim();
+
+      if (!password) {
+        return res.status(400).json({
+          ok: false,
+          error: "password_required",
+        });
+      }
+
       const passwordHash = await bcrypt.hash(password, 10);
 
       const sql = `
