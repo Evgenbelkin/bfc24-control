@@ -408,6 +408,40 @@ async function getOrderWithItems(client, tenantId, orderId) {
     };
 }
 
+
+async function deductFromBatchesFIFO(client, tenantId, itemId, qty) {
+    let remaining = Number(qty);
+
+    const batchesResult = await client.query(`
+        SELECT id, qty_remaining
+        FROM core.item_batches
+        WHERE tenant_id = $1
+          AND item_id = $2
+          AND qty_remaining > 0
+        ORDER BY created_at ASC
+        FOR UPDATE
+    `, [tenantId, itemId]);
+
+    for (const batch of batchesResult.rows) {
+        if (remaining <= 0) break;
+
+        const take = Math.min(Number(batch.qty_remaining), remaining);
+
+        await client.query(`
+            UPDATE core.item_batches
+            SET qty_remaining = qty_remaining - $1
+            WHERE id = $2
+        `, [take, batch.id]);
+
+        remaining -= take;
+    }
+
+    if (remaining > 0) {
+        throw new Error('not_enough_batches');
+    }
+}
+
+
 async function createEvent(client, tenantId, orderId, eventType, userId, comment = null, payload = null) {
     await client.query(
         `
@@ -1305,6 +1339,10 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             const saleItemInsert = buildDynamicInsert('core', 'sale_items', saleItemData);
             await client.query(saleItemInsert.sql, saleItemInsert.values);
 
+            // списываем партии FIFO
+            await deductFromBatchesFIFO(client, tenantId, item.item_id, lineQty);
+
+            // списываем stock
             await consumeStockByItem(client, tenantId, item.item_id, lineQty);
             await insertMovementIfPossible(client, tenantId, item, lineQty, saleId, order, userId);
         }
