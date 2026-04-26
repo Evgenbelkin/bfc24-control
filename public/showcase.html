@@ -526,11 +526,11 @@
         <p>Каталог товаров с остатками, коробочностью, корзиной и созданием заказа.</p>
       </div>
       <div class="actions">
-  <a class="btn btn-light" href="/index.html">← Назад</a>
-  <a class="btn btn-light" href="/showcase-login.html">Сменить покупателя</a>
-  <button class="btn btn-light" id="btnMyOrders" type="button">Мои заказы</button>
-  <button class="btn btn-primary" id="btnRefresh" type="button">Обновить</button>
-</div>
+        <button class="btn btn-light" id="btnBack" type="button">← Назад</button>
+        <a class="btn btn-light" href="/showcase-login.html">Сменить покупателя</a>
+        <button class="btn btn-light" id="btnMyOrders" type="button">Мои заказы</button>
+        <button class="btn btn-primary" id="btnRefresh" type="button">Обновить</button>
+      </div>
     </div>
 
     <div class="message info" id="messageBox"></div>
@@ -638,12 +638,26 @@
   <script>
     (function () {
       const buyer = JSON.parse(localStorage.getItem('showcase_buyer') || 'null');
-      const tenantId = Number(localStorage.getItem('showcase_tenant_id') || 1);
 
       if (!buyer || !buyer.id) {
         location.href = '/showcase-login.html';
         return;
       }
+
+      const tenantId = Number(
+        buyer.tenant_id ||
+        localStorage.getItem('showcase_tenant_id') ||
+        1
+      );
+
+      if (!tenantId) {
+        localStorage.removeItem('showcase_buyer');
+        localStorage.removeItem('showcase_tenant_id');
+        location.href = '/showcase-login.html';
+        return;
+      }
+
+      localStorage.setItem('showcase_tenant_id', String(tenantId));
 
       const state = {
         page: 1,
@@ -955,6 +969,15 @@
           showMessage(error?.message || error?.error || 'Ошибка создания заказа', 'error');
         }
       }
+
+      document.getElementById('btnBack').addEventListener('click', function () {
+        if (window.history.length > 1) {
+          window.history.back();
+          return;
+        }
+
+        window.location.href = '/showcase-login.html';
+      });
 
       document.getElementById('btnRefresh').addEventListener('click', loadProducts);
 
