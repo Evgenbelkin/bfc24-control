@@ -9,6 +9,14 @@ function toNumber(value, fallback = 0) {
     return Number.isFinite(n) ? n : fallback;
 }
 
+function round2(value) {
+    return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+}
+
+function round4(value) {
+    return Math.round((Number(value) + Number.EPSILON) * 10000) / 10000;
+}
+
 function buildLikeSearch(search) {
     return `%${String(search || '').trim()}%`;
 }
@@ -204,6 +212,90 @@ async function ensureCounterpartyFromShowcaseBuyer(client, tenantId, order) {
 
     return insertResult.rows[0] && insertResult.rows[0].id ? insertResult.rows[0].id : null;
 }
+
+
+async function deductFromBatchesFIFO(client, tenantId, itemId, qtyNeeded) {
+    const { rows: batches } = await client.query(
+        `
+        SELECT
+            id,
+            qty_remaining,
+            unit_cost,
+            batch_date
+        FROM core.item_batches
+        WHERE tenant_id = $1
+          AND item_id = $2
+          AND qty_remaining > 0
+        ORDER BY batch_date ASC, id ASC
+        FOR UPDATE
+        `,
+        [tenantId, itemId]
+    );
+
+    let remaining = Number(qtyNeeded);
+    let totalCost = 0;
+    const deductions = [];
+
+    for (const batch of batches) {
+        if (remaining <= 0) {
+            break;
+        }
+
+        const available = Number(batch.qty_remaining);
+        const unitCost = Number(batch.unit_cost);
+        const taken = Math.min(available, remaining);
+
+        if (taken > 0) {
+            await client.query(
+                `
+                UPDATE core.item_batches
+                SET
+                    qty_remaining = qty_remaining - $1,
+                    updated_at = CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM information_schema.columns
+                            WHERE table_schema = 'core'
+                              AND table_name = 'item_batches'
+                              AND column_name = 'updated_at'
+                        )
+                        THEN NOW()
+                        ELSE updated_at
+                    END
+                WHERE id = $2
+                  AND tenant_id = $3
+                `,
+                [taken, batch.id, tenantId]
+            );
+
+            deductions.push({
+                batch_id: Number(batch.id),
+                batch_date: batch.batch_date,
+                qty_taken: Number(taken),
+                unit_cost: Number(unitCost),
+                line_cost: round2(taken * unitCost)
+            });
+
+            totalCost += taken * unitCost;
+            remaining -= taken;
+        }
+    }
+
+    if (remaining > 0.000001) {
+        const error = new Error('batches_insufficient');
+        error.code = 'batches_insufficient';
+        error.item_id = itemId;
+        error.remaining = remaining;
+        throw error;
+    }
+
+    return {
+        deductions,
+        totalCost: round2(totalCost),
+        avgCostPrice: qtyNeeded > 0 ? round4(totalCost / qtyNeeded) : 0
+    };
+}
+
 
 async function insertMovementIfPossible(client, tenantId, item, qty, saleId, order, userId) {
     const columns = await getTableColumns(client, 'core', 'movements');
@@ -407,40 +499,6 @@ async function getOrderWithItems(client, tenantId, orderId) {
         items: itemsResult.rows
     };
 }
-
-
-async function deductFromBatchesFIFO(client, tenantId, itemId, qty) {
-    let remaining = Number(qty);
-
-    const batchesResult = await client.query(`
-        SELECT id, qty_remaining
-        FROM core.item_batches
-        WHERE tenant_id = $1
-          AND item_id = $2
-          AND qty_remaining > 0
-        ORDER BY created_at ASC
-        FOR UPDATE
-    `, [tenantId, itemId]);
-
-    for (const batch of batchesResult.rows) {
-        if (remaining <= 0) break;
-
-        const take = Math.min(Number(batch.qty_remaining), remaining);
-
-        await client.query(`
-            UPDATE core.item_batches
-            SET qty_remaining = qty_remaining - $1
-            WHERE id = $2
-        `, [take, batch.id]);
-
-        remaining -= take;
-    }
-
-    if (remaining > 0) {
-        throw new Error('not_enough_batches');
-    }
-}
-
 
 async function createEvent(client, tenantId, orderId, eventType, userId, comment = null, payload = null) {
     await client.query(
@@ -1315,7 +1373,18 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
         for (const item of itemsResult.rows) {
             const lineQty = toNumber(item.picked_qty, 0);
             const linePrice = toNumber(item.final_price, toNumber(item.base_price, 0));
-            const lineTotal = lineQty * linePrice;
+            const lineTotal = round2(lineQty * linePrice);
+
+            const fifoResult = await deductFromBatchesFIFO(
+                client,
+                tenantId,
+                item.item_id,
+                lineQty
+            );
+
+            const lineCost = fifoResult.totalCost;
+            const costPrice = fifoResult.avgCostPrice;
+            const grossProfit = round2(lineTotal - lineCost);
 
             const saleItemData = {};
 
@@ -1330,6 +1399,13 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             if (hasColumn(saleItemsColumns, 'total')) saleItemData.total = lineTotal;
             if (hasColumn(saleItemsColumns, 'line_total')) saleItemData.line_total = lineTotal;
             if (hasColumn(saleItemsColumns, 'line_amount')) saleItemData.line_amount = lineTotal;
+            if (hasColumn(saleItemsColumns, 'cost_price')) saleItemData.cost_price = costPrice;
+            if (hasColumn(saleItemsColumns, 'cost')) saleItemData.cost = lineCost;
+            if (hasColumn(saleItemsColumns, 'total_cost')) saleItemData.total_cost = lineCost;
+            if (hasColumn(saleItemsColumns, 'discount_amount')) saleItemData.discount_amount = 0;
+            if (hasColumn(saleItemsColumns, 'gross_profit')) saleItemData.gross_profit = grossProfit;
+            if (hasColumn(saleItemsColumns, 'profit')) saleItemData.profit = grossProfit;
+            if (hasColumn(saleItemsColumns, 'batch_deductions')) saleItemData.batch_deductions = JSON.stringify(fifoResult.deductions);
             if (hasColumn(saleItemsColumns, 'name')) saleItemData.name = item.item_name;
             if (hasColumn(saleItemsColumns, 'sku')) saleItemData.sku = item.sku;
             if (hasColumn(saleItemsColumns, 'barcode')) saleItemData.barcode = item.barcode;
@@ -1339,10 +1415,6 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
             const saleItemInsert = buildDynamicInsert('core', 'sale_items', saleItemData);
             await client.query(saleItemInsert.sql, saleItemInsert.values);
 
-            // списываем партии FIFO
-            await deductFromBatchesFIFO(client, tenantId, item.item_id, lineQty);
-
-            // списываем stock
             await consumeStockByItem(client, tenantId, item.item_id, lineQty);
             await insertMovementIfPossible(client, tenantId, item, lineQty, saleId, order, userId);
         }
@@ -1435,6 +1507,14 @@ router.post('/orders/:id/create-sale', authRequired, async (req, res) => {
                 item_id: e.item_id,
                 physical_qty: e.physical_qty,
                 picked_qty: e.picked_qty
+            });
+        }
+
+        if (e && e.code === 'batches_insufficient') {
+            return res.status(400).json({
+                error: 'batches_insufficient',
+                item_id: e.item_id,
+                remaining: e.remaining
             });
         }
 
