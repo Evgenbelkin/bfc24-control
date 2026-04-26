@@ -662,6 +662,51 @@
       submitStatusState = null;
       hideStatus(els.submitStatus);
     }
+    function setSubmitStatusText(text, type = "info") {
+      submitStatusState = null;
+      showStatus(els.submitStatus, text, type);
+    }
+
+    function copyTextToClipboard(text) {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        return navigator.clipboard.writeText(text);
+      }
+
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return Promise.resolve();
+    }
+
+    function showShowcaseCredentials({ login, password }) {
+      const message = [
+        "Доступ к витрине создан.",
+        "",
+        "Логин: " + login,
+        "Пароль: " + password,
+        "",
+        "Скопируй эти данные и отправь клиенту. Пароль потом можно будет только сбросить."
+      ].join("\n");
+
+      setSubmitStatusText(message, "success");
+      alert(message);
+    }
+
+    async function copyShowcaseLogin(login) {
+      try {
+        await copyTextToClipboard(login);
+        setSubmitStatusText("Логин скопирован: " + login, "success");
+      } catch (err) {
+        setSubmitStatusText("Не удалось скопировать логин: " + Ui.translateError(err.message), "error");
+      }
+    }
+
 
     function restoreStatusesAfterLanguageChange() {
       if (pageStatusState) {
@@ -805,6 +850,10 @@
         ? ""
         : `<button type="button" class="btn btn-success" onclick="createShowcaseAccess('${escapeHtml(row.id)}')">Создать доступ</button>`;
 
+      const copyLoginButton = row.showcase_login
+        ? `<button type="button" class="btn btn-light" onclick="copyShowcaseLogin('${escapeHtml(row.showcase_login)}')">Скопировать логин</button>`
+        : "";
+
       const resetButton = hasAccess
         ? `<button type="button" class="btn btn-secondary" onclick="resetShowcasePassword('${escapeHtml(row.id)}')">Сбросить пароль</button>`
         : "";
@@ -821,6 +870,7 @@
           </div>
           <div class="showcase-actions">
             ${createButton}
+            ${copyLoginButton}
             ${resetButton}
             ${toggleButton}
           </div>
@@ -943,58 +993,45 @@
     async function createShowcaseAccess(id) {
       try {
         clearSubmitStatus();
-        setSubmitStatus("clients.showcaseCreating", {}, "info");
+        setSubmitStatusText("Создаю доступ к витрине...", "info");
 
         const data = await apiPost(`/clients/${id}/showcase/create`, {});
-        const login = data.login || "";
+        const login = data.login || data.showcase?.login || "";
         const password = data.password || "";
 
-        setSubmitStatus("clients.showcaseCreated", {
-          login,
-          password
-        }, "success");
-
         await loadData();
+        showShowcaseCredentials({ login, password });
       } catch (err) {
-        setSubmitStatus("clients.showcaseError", {
-          error: Ui.translateError(err.message)
-        }, "error");
+        setSubmitStatusText("Ошибка витрины: " + Ui.translateError(err.message), "error");
       }
     }
 
     async function resetShowcasePassword(id) {
       try {
         clearSubmitStatus();
-        setSubmitStatus("clients.showcaseResetting", {}, "info");
+        setSubmitStatusText("Сбрасываю пароль витрины...", "info");
 
         const data = await apiPost(`/clients/${id}/showcase/reset-password`, {});
+        const login = data.login || data.showcase?.login || "";
         const password = data.password || "";
 
-        setSubmitStatus("clients.showcasePasswordReset", {
-          password
-        }, "success");
-
         await loadData();
+        showShowcaseCredentials({ login, password });
       } catch (err) {
-        setSubmitStatus("clients.showcaseError", {
-          error: Ui.translateError(err.message)
-        }, "error");
+        setSubmitStatusText("Ошибка витрины: " + Ui.translateError(err.message), "error");
       }
     }
 
     async function toggleShowcaseAccess(id) {
       try {
         clearSubmitStatus();
-        setSubmitStatus("clients.showcaseToggling", {}, "info");
+        setSubmitStatusText("Меняю статус доступа к витрине...", "info");
 
         await apiPatch(`/clients/${id}/showcase/toggle`, {});
-        setSubmitStatus("clients.showcaseToggled", {}, "success");
-
         await loadData();
+        setSubmitStatusText("Статус доступа к витрине изменён.", "success");
       } catch (err) {
-        setSubmitStatus("clients.showcaseError", {
-          error: Ui.translateError(err.message)
-        }, "error");
+        setSubmitStatusText("Ошибка витрины: " + Ui.translateError(err.message), "error");
       }
     }
 

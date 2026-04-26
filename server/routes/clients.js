@@ -1,11 +1,11 @@
 const express = require("express");
 const pool = require("../db");
+const bcrypt = require("bcrypt");
 const {
   authRequired,
   requireRole,
   getEffectiveTenantId,
 } = require("../middleware/auth");
-const bcrypt = require("bcrypt");
 
 const router = express.Router();
 
@@ -69,6 +69,67 @@ async function checkClientDuplicate({ tenantId, name, phone, excludeId = null })
   return { ok: true };
 }
 
+function generateShowcasePassword(length = 10) {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+  let password = "";
+
+  for (let i = 0; i < length; i += 1) {
+    password += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+
+  return password;
+}
+
+function buildShowcaseLogin({ tenantId, clientId }) {
+  return `client_${tenantId}_${clientId}`;
+}
+
+async function getClientById({ tenantId, clientId }) {
+  const sql = `
+    SELECT
+      id,
+      tenant_id,
+      name,
+      phone,
+      comment,
+      is_active,
+      created_at,
+      updated_at
+    FROM core.counterparties
+    WHERE id = $1
+      AND tenant_id = $2
+    LIMIT 1
+  `;
+
+  const { rows } = await pool.query(sql, [clientId, tenantId]);
+  return rows[0] || null;
+}
+
+async function getShowcaseAccessByClient({ tenantId, clientId }) {
+  const sql = `
+    SELECT
+      id,
+      tenant_id,
+      counterparty_id,
+      name,
+      login,
+      phone,
+      email,
+      comment,
+      is_active,
+      created_at,
+      updated_at
+    FROM core.showcase_buyers
+    WHERE tenant_id = $1
+      AND counterparty_id = $2
+    ORDER BY id DESC
+    LIMIT 1
+  `;
+
+  const { rows } = await pool.query(sql, [tenantId, clientId]);
+  return rows[0] || null;
+}
+
 router.get("/", authRequired, async (req, res) => {
   try {
     const tenantId = getEffectiveTenantId(req);
@@ -101,8 +162,16 @@ router.get("/", authRequired, async (req, res) => {
         c.comment,
         c.is_active,
         c.created_at,
-        c.updated_at
+        c.updated_at,
+        sb.id AS showcase_buyer_id,
+        sb.login AS showcase_login,
+        sb.is_active AS showcase_is_active,
+        sb.created_at AS showcase_created_at,
+        sb.updated_at AS showcase_updated_at
       FROM core.counterparties c
+      LEFT JOIN core.showcase_buyers sb
+        ON sb.counterparty_id = c.id
+       AND sb.tenant_id = c.tenant_id
       ${whereSql}
       ORDER BY c.id DESC
     `;
@@ -151,8 +220,16 @@ router.get("/:id", authRequired, async (req, res) => {
         c.comment,
         c.is_active,
         c.created_at,
-        c.updated_at
+        c.updated_at,
+        sb.id AS showcase_buyer_id,
+        sb.login AS showcase_login,
+        sb.is_active AS showcase_is_active,
+        sb.created_at AS showcase_created_at,
+        sb.updated_at AS showcase_updated_at
       FROM core.counterparties c
+      LEFT JOIN core.showcase_buyers sb
+        ON sb.counterparty_id = c.id
+       AND sb.tenant_id = c.tenant_id
       WHERE c.id = $1
         AND c.tenant_id = $2
       LIMIT 1
@@ -439,81 +516,5 @@ router.patch(
     }
   }
 );
-
-/* ================== SHOWCASE ================== */
-
-router.post("/:id/showcase/create", authRequired, async (req, res) => {
-  try {
-    const tenantId = getEffectiveTenantId(req);
-    const clientId = Number(req.params.id);
-
-    const login = "client_" + clientId;
-    const password = Math.random().toString(36).slice(-8);
-    const hash = await bcrypt.hash(password, 10);
-
-    await pool.query(
-      `DELETE FROM core.showcase_buyers WHERE counterparty_id=$1`,
-      [clientId]
-    );
-
-    await pool.query(
-      `
-      INSERT INTO core.showcase_buyers
-      (tenant_id, name, login, password_hash, is_active, counterparty_id)
-      VALUES ($1,$2,$3,$4,true,$5)
-    `,
-      [tenantId, "Client " + clientId, login, hash, clientId]
-    );
-
-    res.json({ ok: true, login, password });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ ok: false });
-  }
-});
-
-router.post("/:id/showcase/reset-password", authRequired, async (req, res) => {
-  try {
-    const clientId = Number(req.params.id);
-
-    const password = Math.random().toString(36).slice(-8);
-    const hash = await bcrypt.hash(password, 10);
-
-    await pool.query(
-      `
-      UPDATE core.showcase_buyers
-      SET password_hash=$1, updated_at=NOW()
-      WHERE counterparty_id=$2
-    `,
-      [hash, clientId]
-    );
-
-    res.json({ ok: true, password });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ ok: false });
-  }
-});
-
-router.patch("/:id/showcase/toggle", authRequired, async (req, res) => {
-  try {
-    const clientId = Number(req.params.id);
-
-    const { rows } = await pool.query(
-      `
-      UPDATE core.showcase_buyers
-      SET is_active = NOT is_active
-      WHERE counterparty_id=$1
-      RETURNING is_active
-    `,
-      [clientId]
-    );
-
-    res.json({ ok: true, is_active: rows[0]?.is_active });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ ok: false });
-  }
-});
 
 module.exports = router;
