@@ -136,25 +136,54 @@ router.get('/categories', async (req, res) => {
             return res.status(403).json({ error: 'showcase_disabled' });
         }
 
-        const havingSql = settings.show_only_in_stock
-            ? `HAVING (COALESCE(SUM(s.qty), 0) - COALESCE(SUM(CASE WHEN sr.status = 'active' THEN sr.qty ELSE 0 END), 0)) > 0`
+        /*
+          Категории витрины должны строиться на backend, а не собираться на frontend.
+          Логика синхронизирована с /showcase/catalog:
+          - берём core.items.category;
+          - пустые категории показываем как "Без категории";
+          - если включено show_only_in_stock, показываем только категории товаров с доступным остатком;
+          - учитываем активные резервы, чтобы не показывать категории без доступного товара.
+        */
+        const stockFilterSql = settings.show_only_in_stock
+            ? `
+              AND (
+                COALESCE(stock_agg.physical_qty, 0)
+                - COALESCE(reserved_agg.reserved_qty, 0)
+              ) > 0
+            `
             : '';
 
         const result = await pool.query(
             `
-            SELECT
+            SELECT DISTINCT
                 COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') AS category
             FROM core.items i
-            LEFT JOIN core.stock s
-                ON s.item_id = i.id
-               AND s.tenant_id = i.tenant_id
-            LEFT JOIN core.stock_reservations sr
-                ON sr.item_id = i.id
-               AND sr.tenant_id = i.tenant_id
-               AND sr.status = 'active'
+            LEFT JOIN (
+                SELECT
+                    tenant_id,
+                    item_id,
+                    COALESCE(SUM(qty), 0) AS physical_qty
+                FROM core.stock
+                WHERE tenant_id = $1
+                GROUP BY tenant_id, item_id
+            ) stock_agg
+                ON stock_agg.tenant_id = i.tenant_id
+               AND stock_agg.item_id = i.id
+            LEFT JOIN (
+                SELECT
+                    tenant_id,
+                    item_id,
+                    COALESCE(SUM(qty), 0) AS reserved_qty
+                FROM core.stock_reservations
+                WHERE tenant_id = $1
+                  AND status = 'active'
+                GROUP BY tenant_id, item_id
+            ) reserved_agg
+                ON reserved_agg.tenant_id = i.tenant_id
+               AND reserved_agg.item_id = i.id
             WHERE i.tenant_id = $1
-            GROUP BY COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории')
-            ${havingSql}
+              AND COALESCE(NULLIF(TRIM(i.category), ''), 'Без категории') IS NOT NULL
+              ${stockFilterSql}
             ORDER BY category ASC
             `,
             [tenantId]
@@ -169,6 +198,7 @@ router.get('/categories', async (req, res) => {
         return res.status(500).json({ error: 'server_error' });
     }
 });
+
 
 
 // =========================================
