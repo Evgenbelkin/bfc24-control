@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="showcaseOrderView.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -222,6 +222,8 @@
       border-color:#93c5fd;
       box-shadow:0 0 0 3px rgba(37,99,235,.10);
     }
+    #langSwitcher{display:flex;gap:8px;flex-wrap:wrap;}
+    #langSwitcher button.active{background:var(--primary);color:#fff;border-color:var(--primary);}
     .empty{
       padding:36px 20px;
       text-align:center;
@@ -241,12 +243,13 @@
   <div class="wrap">
     <div class="topbar">
       <div class="title">
-        <h1 id="pageTitle">Карточка заказа</h1>
-        <p>Рабочий экран продавца для обработки заказа, редактирования строк и завершения продажи.</p>
+        <h1 id="pageTitle" data-i18n="showcaseOrderView.heading">Карточка заказа</h1>
+        <p data-i18n="showcaseOrderView.subtitle">Рабочий экран продавца для обработки заказа, редактирования строк и завершения продажи.</p>
       </div>
       <div class="actions">
-        <a class="btn btn-light" href="/showcase-orders.html">← К списку заказов</a>
-        <button class="btn btn-primary" id="btnRefresh" type="button">Обновить</button>
+        <div id="langSwitcher"></div>
+        <a class="btn btn-light" href="/showcase-orders.html" data-i18n="showcaseOrderView.backToOrdersButton">← К списку заказов</a>
+        <button class="btn btn-primary" id="btnRefresh" type="button" data-i18n="showcaseOrderView.refreshButton">Обновить</button>
       </div>
     </div>
 
@@ -255,44 +258,44 @@
     <div class="card section">
       <div class="meta-grid">
         <div class="meta-item">
-          <div class="label">Номер заказа</div>
+          <div class="label" data-i18n="showcaseOrderView.metaOrderNo">Номер заказа</div>
           <div class="value mono" id="metaOrderNo">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Клиент</div>
+          <div class="label" data-i18n="showcaseOrderView.metaClient">Клиент</div>
           <div class="value" id="metaBuyer">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Телефон</div>
+          <div class="label" data-i18n="showcaseOrderView.metaPhone">Телефон</div>
           <div class="value" id="metaPhone">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Статус</div>
+          <div class="label" data-i18n="showcaseOrderView.metaStatus">Статус</div>
           <div class="value"><span class="status s-new" id="metaStatus">—</span></div>
         </div>
         <div class="meta-item">
-          <div class="label">Комментарий</div>
+          <div class="label" data-i18n="showcaseOrderView.metaComment">Комментарий</div>
           <div class="value" id="metaComment">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Кто взял</div>
+          <div class="label" data-i18n="showcaseOrderView.metaTakenBy">Кто взял</div>
           <div class="value" id="metaTakenBy">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Дата создания</div>
+          <div class="label" data-i18n="showcaseOrderView.metaCreatedAt">Дата создания</div>
           <div class="value" id="metaCreatedAt">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Продажа</div>
+          <div class="label" data-i18n="showcaseOrderView.metaSale">Продажа</div>
           <div class="value" id="metaSaleId">—</div>
         </div>
       </div>
 
       <div class="toolbar">
-        <button class="btn btn-primary" id="btnTake" type="button">Взять в работу</button>
-        <button class="btn btn-success" id="btnReady" type="button">Готов</button>
-        <button class="btn btn-warning" id="btnCreateSale" type="button">Создать продажу</button>
-        <button class="btn btn-danger" id="btnCancelOrder" type="button">Отменить заказ</button>
+        <button class="btn btn-primary" id="btnTake" type="button" data-i18n="showcaseOrderView.takeButton">Взять в работу</button>
+        <button class="btn btn-success" id="btnReady" type="button" data-i18n="showcaseOrderView.readyButton">Готов</button>
+        <button class="btn btn-warning" id="btnCreateSale" type="button" data-i18n="showcaseOrderView.createSaleButton">Создать продажу</button>
+        <button class="btn btn-danger" id="btnCancelOrder" type="button" data-i18n="showcaseOrderView.cancelOrderButton">Отменить заказ</button>
       </div>
     </div>
 
@@ -300,21 +303,21 @@
       <table>
         <thead>
           <tr>
-            <th>Фото</th>
-            <th>Товар</th>
+            <th data-i18n="showcaseOrderView.tablePhoto">Фото</th>
+            <th data-i18n="showcaseOrderView.tableProduct">Товар</th>
             <th>SKU / ШК</th>
-            <th>Остаток</th>
-            <th>Запрос</th>
-            <th>Резерв</th>
-            <th>Подтверждено</th>
-            <th>Собрано</th>
-            <th>Цена</th>
-            <th>Статус строки</th>
-            <th>Сохранить</th>
+            <th data-i18n="showcaseOrderView.tableStock">Остаток</th>
+            <th data-i18n="showcaseOrderView.tableRequested">Запрос</th>
+            <th data-i18n="showcaseOrderView.tableReserved">Резерв</th>
+            <th data-i18n="showcaseOrderView.tableApproved">Подтверждено</th>
+            <th data-i18n="showcaseOrderView.tablePicked">Собрано</th>
+            <th data-i18n="showcaseOrderView.tablePrice">Цена</th>
+            <th data-i18n="showcaseOrderView.tableLineStatus">Статус строки</th>
+            <th data-i18n="showcaseOrderView.tableSave">Сохранить</th>
           </tr>
         </thead>
         <tbody id="itemsTbody">
-          <tr><td colspan="11" class="empty">Загрузка...</td></tr>
+          <tr><td colspan="11" class="empty" data-i18n="showcaseOrderView.loading">Загрузка...</td></tr>
         </tbody>
       </table>
     </div>
@@ -338,8 +341,23 @@
       const params = new URLSearchParams(location.search);
       const orderId = Number(params.get('id') || 0);
 
+      function t(key, fallback) {
+        return window.i18n && typeof window.i18n.t === 'function' ? window.i18n.t(key, fallback) : fallback;
+      }
+
+      function formatI18n(key, params, fallback) {
+        return window.i18n && typeof window.i18n.format === 'function' ? window.i18n.format(key, params, fallback) : String(fallback || '').replace(/\{(\w+)\}/g, function (_, name) { return params && params[name] !== undefined ? String(params[name]) : '{' + name + '}'; });
+      }
+
+      if (window.i18n && typeof window.i18n.renderLanguageSwitcher === 'function') {
+        window.i18n.renderLanguageSwitcher('langSwitcher');
+      }
+      if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+        window.i18n.applyTranslations();
+      }
+
       if (!orderId) {
-        alert('Не передан id заказа');
+        alert(t('showcaseOrderView.missingOrderIdAlert', 'Не передан id заказа'));
         location.href = '/showcase-orders.html';
         return;
       }
@@ -373,18 +391,18 @@
 
       function statusLabel(status) {
         const map = {
-          new: 'Новый',
-          in_progress: 'В работе',
-          partially_picked: 'Частично собран',
-          ready: 'Готов',
-          completed: 'Завершён',
-          cancelled: 'Отменён',
-          approved: 'Подтверждено',
-          picked: 'Собрано',
-          partial: 'Частично',
-          new_line: 'Новая строка'
+          new: 'statusNew',
+          in_progress: 'statusInProgress',
+          partially_picked: 'statusPartiallyPicked',
+          ready: 'statusReady',
+          completed: 'statusCompleted',
+          cancelled: 'statusCancelled',
+          approved: 'statusApproved',
+          picked: 'statusPicked',
+          partial: 'statusPartial',
+          new_line: 'statusNewLine'
         };
-        return map[status] || status || '—';
+        return map[status] ? t('showcaseOrderView.' + map[status], status) : (status || '—');
       }
 
       function statusClass(status) {
@@ -408,7 +426,7 @@
         if (!value) return '—';
         const dt = new Date(value);
         if (Number.isNaN(dt.getTime())) return String(value);
-        return dt.toLocaleString('ru-RU');
+        return dt.toLocaleString(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'en' ? 'en-US' : 'ru-RU');
       }
 
       function setText(id, value) {
@@ -421,7 +439,7 @@
         const order = state.order;
         if (!order) return;
 
-        document.getElementById('pageTitle').textContent = 'Заказ ' + (order.order_no || '');
+        document.getElementById('pageTitle').textContent = formatI18n('showcaseOrderView.dynamicTitle', { orderNo: order.order_no || '' }, 'Заказ {orderNo}');
         setText('metaOrderNo', order.order_no || '—');
         setText('metaBuyer', order.buyer_name || '—');
         setText('metaPhone', order.buyer_phone || '—');
@@ -447,14 +465,14 @@
       }
 
       function imageHtml(url) {
-        if (!url) return '<div class="thumb empty">нет фото</div>';
+        if (!url) return '<div class="thumb empty">' + escapeHtml(t('showcaseOrderView.noPhoto', 'нет фото')) + '</div>';
         return '<img class="thumb" src="' + escapeHtml(url) + '" alt="">';
       }
 
       function renderItems() {
         const order = state.order;
         if (!order || !Array.isArray(order.items) || !order.items.length) {
-          itemsTbody.innerHTML = '<tr><td colspan="11" class="empty">Строк заказа нет</td></tr>';
+          itemsTbody.innerHTML = '<tr><td colspan="11" class="empty">' + escapeHtml(t('showcaseOrderView.noLines', 'Строк заказа нет')) + '</td></tr>';
           return;
         }
 
@@ -484,15 +502,15 @@
             </td>
             <td>
               <select class="field-select js-line-status" ${editable ? '' : 'disabled'}>
-                <option value="new" ${item.line_status === 'new' ? 'selected' : ''}>Новая</option>
-                <option value="approved" ${item.line_status === 'approved' ? 'selected' : ''}>Подтверждено</option>
-                <option value="picked" ${item.line_status === 'picked' ? 'selected' : ''}>Собрано</option>
-                <option value="partial" ${item.line_status === 'partial' ? 'selected' : ''}>Частично</option>
-                <option value="cancelled" ${item.line_status === 'cancelled' ? 'selected' : ''}>Отменено</option>
+                <option value="new" ${item.line_status === 'new' ? 'selected' : ''}>${escapeHtml(t('showcaseOrderView.lineStatusNew', 'Новая'))}</option>
+                <option value="approved" ${item.line_status === 'approved' ? 'selected' : ''}>${escapeHtml(t('showcaseOrderView.statusApproved', 'Подтверждено'))}</option>
+                <option value="picked" ${item.line_status === 'picked' ? 'selected' : ''}>${escapeHtml(t('showcaseOrderView.statusPicked', 'Собрано'))}</option>
+                <option value="partial" ${item.line_status === 'partial' ? 'selected' : ''}>${escapeHtml(t('showcaseOrderView.statusPartial', 'Частично'))}</option>
+                <option value="cancelled" ${item.line_status === 'cancelled' ? 'selected' : ''}>${escapeHtml(t('showcaseOrderView.lineStatusCancelled', 'Отменено'))}</option>
               </select>
             </td>
             <td>
-              <button class="btn btn-light btn-sm js-save-line" data-item-row-id="${item.id}" ${editable ? '' : 'disabled'}>Сохранить</button>
+              <button class="btn btn-light btn-sm js-save-line" data-item-row-id="${item.id}" ${editable ? '' : 'disabled'}>${escapeHtml(t('showcaseOrderView.saveButton', 'Сохранить'))}</button>
             </td>
           </tr>
         `).join('');
@@ -500,7 +518,7 @@
 
       async function loadOrder() {
         hideMessage();
-        itemsTbody.innerHTML = '<tr><td colspan="11" class="empty">Загрузка...</td></tr>';
+        itemsTbody.innerHTML = '<tr><td colspan="11" class="empty" data-i18n="showcaseOrderView.loading">Загрузка...</td></tr>';
 
         try {
           const result = await API.get('/showcase-admin/orders/' + orderId + '?tenant_id=' + tenantId);
@@ -511,24 +529,24 @@
           console.error('[showcase-order-view] loadOrder error:', error);
           const text = (typeof translateError === 'function')
             ? translateError(error?.error || error?.message || 'server_error')
-            : (error?.error || error?.message || 'Ошибка загрузки заказа');
+            : (error?.error || error?.message || t('showcaseOrderView.loadOrderError', 'Ошибка загрузки заказа'));
 
-          itemsTbody.innerHTML = '<tr><td colspan="11" class="empty">Ошибка загрузки</td></tr>';
+          itemsTbody.innerHTML = '<tr><td colspan="11" class="empty">' + escapeHtml(t('showcaseOrderView.loadError', 'Ошибка загрузки')) + '</td></tr>';
           showMessage(text, 'error');
         }
       }
 
       async function takeOrder() {
         try {
-          showMessage('Берём заказ в работу...', 'info');
+          showMessage(t('showcaseOrderView.takingOrderStatus', 'Берём заказ в работу...'), 'info');
           await API.post('/showcase-admin/orders/' + orderId + '/take?tenant_id=' + tenantId, {});
-          showMessage('Заказ взят в работу', 'success');
+          showMessage(t('showcaseOrderView.orderTakenStatus', 'Заказ взят в работу'), 'success');
           await loadOrder();
         } catch (error) {
           console.error('[showcase-order-view] takeOrder error:', error);
           const text = (typeof translateError === 'function')
             ? translateError(error?.error || error?.message || 'server_error')
-            : (error?.error || error?.message || 'Ошибка взятия заказа в работу');
+            : (error?.error || error?.message || t('showcaseOrderView.takeOrderError', 'Ошибка взятия заказа в работу'));
           showMessage(text, 'error');
         }
       }
@@ -545,7 +563,7 @@
 
         try {
           button.disabled = true;
-          showMessage('Сохраняем строку...', 'info');
+          showMessage(t('showcaseOrderView.savingLineStatus', 'Сохраняем строку...'), 'info');
 
           await API.patch('/showcase-admin/orders/' + orderId + '/items/' + itemRowId + '?tenant_id=' + tenantId, {
             approved_qty: approvedQty,
@@ -554,13 +572,13 @@
             line_status: lineStatus
           });
 
-          showMessage('Строка сохранена', 'success');
+          showMessage(t('showcaseOrderView.lineSavedStatus', 'Строка сохранена'), 'success');
           await loadOrder();
         } catch (error) {
           console.error('[showcase-order-view] saveLine error:', error);
           const text = (typeof translateError === 'function')
             ? translateError(error?.error || error?.message || 'server_error')
-            : (error?.error || error?.message || 'Ошибка сохранения строки');
+            : (error?.error || error?.message || t('showcaseOrderView.saveLineError', 'Ошибка сохранения строки'));
           showMessage(text, 'error');
         } finally {
           button.disabled = false;
@@ -569,49 +587,49 @@
 
       async function setReady() {
         try {
-          showMessage('Переводим заказ в готовность...', 'info');
+          showMessage(t('showcaseOrderView.markingReadyStatus', 'Переводим заказ в готовность...'), 'info');
           await API.post('/showcase-admin/orders/' + orderId + '/ready?tenant_id=' + tenantId, {});
-          showMessage('Заказ переведён в статус "Готов"', 'success');
+          showMessage(t('showcaseOrderView.readyStatus', 'Заказ переведён в статус "Готов"'), 'success');
           await loadOrder();
         } catch (error) {
           console.error('[showcase-order-view] setReady error:', error);
           const text = (typeof translateError === 'function')
             ? translateError(error?.error || error?.message || 'server_error')
-            : (error?.error || error?.message || 'Ошибка перевода заказа в готовность');
+            : (error?.error || error?.message || t('showcaseOrderView.readyError', 'Ошибка перевода заказа в готовность'));
           showMessage(text, 'error');
         }
       }
 
       async function createSale() {
-        if (!confirm('Создать продажу из этого заказа?')) return;
+        if (!confirm(t('showcaseOrderView.confirmCreateSale', 'Создать продажу из этого заказа?'))) return;
 
         try {
-          showMessage('Создаём продажу...', 'info');
+          showMessage(t('showcaseOrderView.creatingSaleStatus', 'Создаём продажу...'), 'info');
           const result = await API.post('/showcase-admin/orders/' + orderId + '/create-sale?tenant_id=' + tenantId, {});
-          showMessage('Продажа создана. ID: ' + (result.sale_id || '—'), 'success');
+          showMessage(formatI18n('showcaseOrderView.saleCreatedStatus', { id: result.sale_id || '—' }, 'Продажа создана. ID: {id}'), 'success');
           await loadOrder();
         } catch (error) {
           console.error('[showcase-order-view] createSale error:', error);
           const text = (typeof translateError === 'function')
             ? translateError(error?.error || error?.message || 'server_error')
-            : (error?.error || error?.message || 'Ошибка создания продажи');
+            : (error?.error || error?.message || t('showcaseOrderView.createSaleError', 'Ошибка создания продажи'));
           showMessage(text, 'error');
         }
       }
 
       async function cancelOrder() {
-        if (!confirm('Отменить заказ?')) return;
+        if (!confirm(t('showcaseOrderView.confirmCancelOrder', 'Отменить заказ?'))) return;
 
         try {
-          showMessage('Отменяем заказ...', 'info');
+          showMessage(t('showcaseOrderView.cancellingOrderStatus', 'Отменяем заказ...'), 'info');
           await API.post('/showcase-admin/orders/' + orderId + '/cancel?tenant_id=' + tenantId, {});
-          showMessage('Заказ отменён', 'success');
+          showMessage(t('showcaseOrderView.orderCancelledStatus', 'Заказ отменён'), 'success');
           await loadOrder();
         } catch (error) {
           console.error('[showcase-order-view] cancelOrder error:', error);
           const text = (typeof translateError === 'function')
             ? translateError(error?.error || error?.message || 'server_error')
-            : (error?.error || error?.message || 'Ошибка отмены заказа');
+            : (error?.error || error?.message || t('showcaseOrderView.cancelOrderError', 'Ошибка отмены заказа'));
           showMessage(text, 'error');
         }
       }
@@ -626,6 +644,14 @@
         const btn = e.target.closest('.js-save-line');
         if (!btn) return;
         saveLine(btn);
+      });
+
+      document.addEventListener('app:language-changed', function () {
+        if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+          window.i18n.applyTranslations();
+        }
+        renderMeta();
+        renderItems();
       });
 
       loadOrder();

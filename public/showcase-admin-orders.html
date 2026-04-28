@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="showcaseAdminOrders.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -430,6 +430,9 @@
     .muted{color:var(--muted)}
     .nowrap{white-space:nowrap}
 
+    #langSwitcher{display:flex;gap:8px;flex-wrap:wrap;}
+    #langSwitcher button.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
     @media (max-width: 1000px){
       .filters-row{grid-template-columns:1fr 1fr}
       .summary-box{grid-template-columns:1fr 1fr}
@@ -447,14 +450,15 @@
   <div class="wrap">
     <div class="topbar">
       <div class="title">
-        <h1>Заказы витрины</h1>
-        <p>Рабочий экран продавца: взять заказ, собрать позиции, отметить готовым и провести продажу.</p>
+        <h1 data-i18n="showcaseAdminOrders.heading">Заказы витрины</h1>
+        <p data-i18n="showcaseAdminOrders.subtitle">Рабочий экран продавца: взять заказ, собрать позиции, отметить готовым и провести продажу.</p>
       </div>
       <div class="actions">
-        <a class="btn btn-light" href="/index.html">← Главное меню</a>
-        <a class="btn btn-light" href="/showcase.html">Открыть витрину</a>
-        <a class="btn btn-light" href="/showcase-settings.html">Настройки витрины</a>
-        <button class="btn btn-primary" id="btnReloadTop" type="button">Обновить</button>
+        <div id="langSwitcher"></div>
+        <a class="btn btn-light" href="/index.html" data-i18n="showcaseAdminOrders.mainMenuButton">← Главное меню</a>
+        <a class="btn btn-light" href="/showcase.html" data-i18n="showcaseAdminOrders.openShowcaseButton">Открыть витрину</a>
+        <a class="btn btn-light" href="/showcase-settings.html" data-i18n="showcaseAdminOrders.settingsButton">Настройки витрины</a>
+        <button class="btn btn-primary" id="btnReloadTop" type="button" data-i18n="showcaseAdminOrders.refreshButton">Обновить</button>
       </div>
     </div>
 
@@ -463,25 +467,25 @@
     <div class="card filters">
       <div class="filters-row">
         <div class="field">
-          <label for="searchInput">Поиск</label>
-          <input id="searchInput" type="text" placeholder="Номер заказа, покупатель, телефон" />
+          <label for="searchInput" data-i18n="showcaseAdminOrders.searchLabel">Поиск</label>
+          <input id="searchInput" type="text" placeholder="Номер заказа, покупатель, телефон" data-i18n-placeholder="showcaseAdminOrders.searchPlaceholder" />
         </div>
 
         <div class="field">
-          <label for="statusSelect">Статус</label>
+          <label for="statusSelect" data-i18n="showcaseAdminOrders.statusLabel">Статус</label>
           <select id="statusSelect">
-            <option value="">Все статусы</option>
-            <option value="new">Новый</option>
-            <option value="in_progress">В работе</option>
-            <option value="partially_picked">Частично собран</option>
-            <option value="ready">Готов</option>
-            <option value="completed">Продажа проведена</option>
-            <option value="cancelled">Отменён</option>
+            <option value="" data-i18n="showcaseAdminOrders.allStatusesOption">Все статусы</option>
+            <option value="new" data-i18n="showcaseAdminOrders.statusNew">Новый</option>
+            <option value="in_progress" data-i18n="showcaseAdminOrders.statusInProgress">В работе</option>
+            <option value="partially_picked" data-i18n="showcaseAdminOrders.statusPartiallyPicked">Частично собран</option>
+            <option value="ready" data-i18n="showcaseAdminOrders.statusReady">Готов</option>
+            <option value="completed" data-i18n="showcaseAdminOrders.statusCompletedSale">Продажа проведена</option>
+            <option value="cancelled" data-i18n="showcaseAdminOrders.statusCancelled">Отменён</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="limitSelect">На странице</label>
+          <label for="limitSelect" data-i18n="showcaseAdminOrders.limitLabel">На странице</label>
           <select id="limitSelect">
             <option value="20" selected>20</option>
             <option value="50">50</option>
@@ -491,12 +495,12 @@
 
         <div class="field">
           <label>&nbsp;</label>
-          <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;">Показать</button>
+          <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;" data-i18n="showcaseAdminOrders.showButton">Показать</button>
         </div>
 
         <div class="field">
           <label>&nbsp;</label>
-          <button class="btn btn-light" id="btnClearFilters" type="button" style="width:100%;">Сбросить</button>
+          <button class="btn btn-light" id="btnClearFilters" type="button" style="width:100%;" data-i18n="showcaseAdminOrders.resetButton">Сбросить</button>
         </div>
       </div>
     </div>
@@ -507,30 +511,30 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Заказ</th>
-              <th>Покупатель</th>
-              <th>Телефон</th>
-              <th>Статус</th>
-              <th>Кол-во</th>
-              <th>Строк</th>
-              <th>Дата</th>
-              <th>Кто взял</th>
-              <th>Действие</th>
+              <th data-i18n="showcaseAdminOrders.tableOrder">Заказ</th>
+              <th data-i18n="showcaseAdminOrders.tableBuyer">Покупатель</th>
+              <th data-i18n="showcaseAdminOrders.tablePhone">Телефон</th>
+              <th data-i18n="showcaseAdminOrders.tableStatus">Статус</th>
+              <th data-i18n="showcaseAdminOrders.tableQty">Кол-во</th>
+              <th data-i18n="showcaseAdminOrders.tableLines">Строк</th>
+              <th data-i18n="showcaseAdminOrders.tableDate">Дата</th>
+              <th data-i18n="showcaseAdminOrders.tableTakenBy">Кто взял</th>
+              <th data-i18n="showcaseAdminOrders.tableAction">Действие</th>
             </tr>
           </thead>
           <tbody id="ordersTbody">
-            <tr><td colspan="10" class="empty">Загрузка...</td></tr>
+            <tr><td colspan="10" class="empty" data-i18n="showcaseAdminOrders.loading">Загрузка...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <div class="card pagination">
-      <div class="muted" id="summaryText">Пока нет данных</div>
+      <div class="muted" id="summaryText" data-i18n="showcaseAdminOrders.noDataYet">Пока нет данных</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <button class="btn btn-light" id="btnPrevPage" type="button">← Назад</button>
-        <div class="muted" id="pageInfo">Страница 1</div>
-        <button class="btn btn-light" id="btnNextPage" type="button">Вперёд →</button>
+        <button class="btn btn-light" id="btnPrevPage" type="button" data-i18n="showcaseAdminOrders.prevButton">← Назад</button>
+        <div class="muted" id="pageInfo" data-i18n="showcaseAdminOrders.pageInfoInitial">Страница 1</div>
+        <button class="btn btn-light" id="btnNextPage" type="button" data-i18n="showcaseAdminOrders.nextButton">Вперёд →</button>
       </div>
     </div>
   </div>
@@ -562,23 +566,38 @@
       const summaryText = document.getElementById('summaryText');
       const pageInfo = document.getElementById('pageInfo');
 
+      function t(key, fallback) {
+        return window.i18n && typeof window.i18n.t === 'function' ? window.i18n.t(key, fallback) : fallback;
+      }
+
+      function formatI18n(key, params, fallback) {
+        return window.i18n && typeof window.i18n.format === 'function' ? window.i18n.format(key, params, fallback) : String(fallback || '').replace(/\{(\w+)\}/g, function (_, name) { return params && params[name] !== undefined ? String(params[name]) : '{' + name + '}'; });
+      }
+
+      if (window.i18n && typeof window.i18n.renderLanguageSwitcher === 'function') {
+        window.i18n.renderLanguageSwitcher('langSwitcher');
+      }
+      if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+        window.i18n.applyTranslations();
+      }
+
       const errorMap = {
-        order_not_editable: 'Заказ нельзя редактировать в текущем статусе. Сначала возьми новый заказ в работу. После проведения продажи изменения запрещены.',
-        order_not_found: 'Заказ не найден.',
-        invalid_status: 'Неверный статус заказа.',
-        not_enough_stock: 'Недостаточно товара на остатке.',
-        order_not_ready_for_sale: 'Сначала отметь заказ как готовый, потом можно провести продажу.',
-        sale_already_created: 'Продажа по этому заказу уже проведена.',
-        counterparty_required_for_debt: 'Для продажи в долг нужен клиент. Проверь покупателя витрины.',
-        no_picked_items_for_sale: 'Нельзя провести продажу: в заказе нет собранных товаров.',
-        nothing_picked_yet: 'Нельзя отметить заказ готовым: сначала собери хотя бы одну позицию.',
-        order_already_taken_or_not_new: 'Заказ уже взят в работу или больше не новый.',
-        order_not_ready_for_this_action: 'Заказ нельзя перевести в готовый в текущем статусе.',
-        invalid_qty: 'Некорректное количество.',
-        invalid_payload: 'Некорректные данные запроса.',
-        server_error: 'Ошибка сервера. Проверь логи backend.',
-        unauthorized: 'Нет авторизации. Войди в систему заново.',
-        forbidden: 'Недостаточно прав для выполнения действия.'
+        order_not_editable: 'errorOrderNotEditable',
+        order_not_found: 'errorOrderNotFound',
+        invalid_status: 'errorInvalidStatus',
+        not_enough_stock: 'errorNotEnoughStock',
+        order_not_ready_for_sale: 'errorOrderNotReadyForSale',
+        sale_already_created: 'errorSaleAlreadyCreated',
+        counterparty_required_for_debt: 'errorCounterpartyRequiredForDebt',
+        no_picked_items_for_sale: 'errorNoPickedItemsForSale',
+        nothing_picked_yet: 'errorNothingPickedYet',
+        order_already_taken_or_not_new: 'errorOrderAlreadyTakenOrNotNew',
+        order_not_ready_for_this_action: 'errorOrderNotReadyForThisAction',
+        invalid_qty: 'errorInvalidQty',
+        invalid_payload: 'errorInvalidPayload',
+        server_error: 'errorServerError',
+        unauthorized: 'errorUnauthorized',
+        forbidden: 'errorForbidden'
       };
 
       function escapeHtml(value) {
@@ -593,7 +612,7 @@
 
       function translateError(error) {
         const raw = error && (error.error || error.message) ? (error.error || error.message) : String(error || '');
-        return errorMap[raw] || raw || 'Неизвестная ошибка';
+        return errorMap[raw] ? t('showcaseAdminOrders.' + errorMap[raw], raw) : (raw || t('showcaseAdminOrders.errorUnknown', 'Неизвестная ошибка'));
       }
 
       function showMessage(text, variant = 'info') {
@@ -608,17 +627,17 @@
 
       function statusLabel(status) {
         const map = {
-          new: 'Новый',
-          in_progress: 'В работе',
-          partially_picked: 'Частично собран',
-          ready: 'Готов',
-          completed: 'Продажа проведена',
-          cancelled: 'Отменён',
-          approved: 'Подтверждено',
-          picked: 'Собрано',
-          partial: 'Частично'
+          new: 'statusNew',
+          in_progress: 'statusInProgress',
+          partially_picked: 'statusPartiallyPicked',
+          ready: 'statusReady',
+          completed: 'statusCompletedSale',
+          cancelled: 'statusCancelled',
+          approved: 'statusApproved',
+          picked: 'statusPicked',
+          partial: 'statusPartial'
         };
-        return map[status] || status || '—';
+        return map[status] ? t('showcaseAdminOrders.' + map[status], status) : (status || '—');
       }
 
       function statusClass(status) {
@@ -632,7 +651,7 @@
         if (!value) return '—';
         const dt = new Date(value);
         if (Number.isNaN(dt.getTime())) return String(value);
-        return dt.toLocaleString('ru-RU');
+        return dt.toLocaleString(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'en' ? 'en-US' : 'ru-RU');
       }
 
       function qtyNumber(value) {
@@ -665,9 +684,9 @@
         const requested = qtyNumber(item.requested_qty);
         const picked = qtyNumber(item.picked_qty);
 
-        if (picked <= 0) return 'Не собрано';
-        if (picked < requested) return 'Частично';
-        return 'Собрано';
+        if (picked <= 0) return t('showcaseAdminOrders.lineNotPicked', 'Не собрано');
+        if (picked < requested) return t('showcaseAdminOrders.statusPartial', 'Частично');
+        return t('showcaseAdminOrders.statusPicked', 'Собрано');
       }
 
       function canEditOrder(order) {
@@ -679,15 +698,15 @@
       }
 
       function imageHtml(url) {
-        if (!url) return '<div class="product-img-empty">нет фото</div>';
+        if (!url) return '<div class="product-img-empty">' + escapeHtml(t('showcaseAdminOrders.noPhoto', 'нет фото')) + '</div>';
         return '<img src="' + escapeHtml(url) + '" alt="">';
       }
 
       function renderOrders() {
         if (!state.orders.length) {
-          ordersTbody.innerHTML = '<tr><td colspan="10" class="empty">Заказы не найдены</td></tr>';
-          summaryText.textContent = 'Ничего не найдено';
-          pageInfo.textContent = 'Страница ' + state.page;
+          ordersTbody.innerHTML = '<tr><td colspan="10" class="empty">' + escapeHtml(t('showcaseAdminOrders.ordersNotFound', 'Заказы не найдены')) + '</td></tr>';
+          summaryText.textContent = t('showcaseAdminOrders.nothingFound', 'Ничего не найдено');
+          pageInfo.textContent = formatI18n('showcaseAdminOrders.pageInfo', { page: state.page }, 'Страница {page}');
           return;
         }
 
@@ -710,7 +729,7 @@
               <td>${escapeHtml(order.lines_count || '0')}</td>
               <td class="nowrap">${escapeHtml(displayDateTimeSafe(order.created_at))}</td>
               <td>${escapeHtml(order.taken_by_name || order.taken_by_username || '—')}</td>
-              <td><button class="btn btn-light btn-small js-open-order" data-order-id="${order.id}" type="button">${isActive ? 'Скрыть' : 'Открыть'}</button></td>
+              <td><button class="btn btn-light btn-small js-open-order" data-order-id="${order.id}" type="button">${isActive ? t('showcaseAdminOrders.hideButton', 'Скрыть') : t('showcaseAdminOrders.openButton', 'Открыть')}</button></td>
             </tr>
           `);
 
@@ -726,11 +745,14 @@
         });
 
         ordersTbody.innerHTML = rows.join('');
+        if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+          window.i18n.applyTranslations(ordersTbody);
+        }
 
         const from = (state.page - 1) * state.limit + 1;
         const to = Math.min(state.total, state.page * state.limit);
-        summaryText.textContent = 'Показано ' + from + '-' + to + ' из ' + state.total;
-        pageInfo.textContent = 'Страница ' + state.page;
+        summaryText.textContent = formatI18n('showcaseAdminOrders.shownSummary', { from: from, to: to, total: state.total }, 'Показано {from}-{to} из {total}');
+        pageInfo.textContent = formatI18n('showcaseAdminOrders.pageInfo', { page: state.page }, 'Страница {page}');
       }
 
       function renderOpenedOrder() {
@@ -748,44 +770,44 @@
           <div class="order-details">
             <div class="details-head">
               <div class="details-title">
-                <h3>${escapeHtml(order.order_no || 'Заказ')}</h3>
+                <h3>${escapeHtml(order.order_no || t('showcaseAdminOrders.orderFallback', 'Заказ'))}</h3>
                 <p>
-                  Покупатель: <strong>${escapeHtml(order.buyer_name || '—')}</strong>
-                  · Телефон: <strong>${escapeHtml(order.buyer_phone || '—')}</strong>
-                  · Статус: <span class="${statusClass(order.status)}">${escapeHtml(statusLabel(order.status))}</span>
+                  ${escapeHtml(t('showcaseAdminOrders.buyerInline', 'Покупатель'))}: <strong>${escapeHtml(order.buyer_name || '—')}</strong>
+                  · ${escapeHtml(t('showcaseAdminOrders.phoneInline', 'Телефон'))}: <strong>${escapeHtml(order.buyer_phone || '—')}</strong>
+                  · ${escapeHtml(t('showcaseAdminOrders.statusInline', 'Статус'))}: <span class="${statusClass(order.status)}">${escapeHtml(statusLabel(order.status))}</span>
                 </p>
               </div>
 
               <div>
                 <div class="details-actions">
-                  <button class="btn btn-primary btn-small js-take-order" data-order-id="${order.id}" ${order.status === 'new' ? '' : 'disabled'} type="button">Взять заказ</button>
-                  <button class="btn btn-warning btn-small js-ready-order" data-order-id="${order.id}" ${editable && order.status !== 'new' && order.status !== 'ready' ? '' : 'disabled'} type="button">Заказ готов</button>
-                  <button class="btn btn-success btn-small js-create-sale" data-order-id="${order.id}" data-debt="false" ${saleAllowed ? '' : 'disabled'} type="button">Провести продажу</button>
-                  <button class="btn btn-light btn-small js-create-sale" data-order-id="${order.id}" data-debt="true" ${saleAllowed ? '' : 'disabled'} type="button">Продажа в долг</button>
+                  <button class="btn btn-primary btn-small js-take-order" data-order-id="${order.id}" ${order.status === 'new' ? '' : 'disabled'} type="button">${escapeHtml(t('showcaseAdminOrders.takeOrderButton', 'Взять заказ'))}</button>
+                  <button class="btn btn-warning btn-small js-ready-order" data-order-id="${order.id}" ${editable && order.status !== 'new' && order.status !== 'ready' ? '' : 'disabled'} type="button">${escapeHtml(t('showcaseAdminOrders.orderReadyButton', 'Заказ готов'))}</button>
+                  <button class="btn btn-success btn-small js-create-sale" data-order-id="${order.id}" data-debt="false" ${saleAllowed ? '' : 'disabled'} type="button">${escapeHtml(t('showcaseAdminOrders.createSaleButton', 'Провести продажу'))}</button>
+                  <button class="btn btn-light btn-small js-create-sale" data-order-id="${order.id}" data-debt="true" ${saleAllowed ? '' : 'disabled'} type="button">${escapeHtml(t('showcaseAdminOrders.createDebtSaleButton', 'Продажа в долг'))}</button>
                 </div>
                 <div class="muted" style="margin-top:8px;text-align:right;font-size:12px;">
-                  ${order.status === 'new' ? 'Сначала возьми заказ в работу.' : ''}
-                  ${order.status === 'ready' ? 'Заказ готов. Теперь можно провести продажу.' : ''}
-                  ${order.status === 'completed' ? 'Продажа уже проведена. Заказ закрыт для изменений.' : ''}
+                  ${order.status === 'new' ? t('showcaseAdminOrders.hintTakeOrderFirst', 'Сначала возьми заказ в работу.') : ''}
+                  ${order.status === 'ready' ? t('showcaseAdminOrders.hintReadyForSale', 'Заказ готов. Теперь можно провести продажу.') : ''}
+                  ${order.status === 'completed' ? t('showcaseAdminOrders.hintCompletedClosed', 'Продажа уже проведена. Заказ закрыт для изменений.') : ''}
                 </div>
               </div>
             </div>
 
             <div class="summary-box">
               <div class="summary-item">
-                <div class="label">Заказано</div>
+                <div class="label">${escapeHtml(t('showcaseAdminOrders.summaryOrdered', 'Заказано'))}</div>
                 <div class="value">${escapeHtml(formatQty(requestedTotal))}</div>
               </div>
               <div class="summary-item">
-                <div class="label">Собрано</div>
+                <div class="label">${escapeHtml(t('showcaseAdminOrders.summaryPicked', 'Собрано'))}</div>
                 <div class="value">${escapeHtml(formatQty(pickedTotal))}</div>
               </div>
               <div class="summary-item">
-                <div class="label">Строк собрано</div>
+                <div class="label">${escapeHtml(t('showcaseAdminOrders.summaryLinesPicked', 'Строк собрано'))}</div>
                 <div class="value">${escapeHtml(doneLines)} / ${escapeHtml(items.length)}</div>
               </div>
               <div class="summary-item">
-                <div class="label">Сумма</div>
+                <div class="label">${escapeHtml(t('showcaseAdminOrders.summaryAmount', 'Сумма'))}</div>
                 <div class="value">${escapeHtml(money(sumTotal))}</div>
               </div>
             </div>
@@ -794,12 +816,12 @@
               <table class="line-table">
                 <thead>
                   <tr>
-                    <th>Товар</th>
-                    <th>Заказано</th>
-                    <th>Собрано</th>
-                    <th>Цена</th>
-                    <th>Статус</th>
-                    <th>Действия</th>
+                    <th>${escapeHtml(t('showcaseAdminOrders.lineTableProduct', 'Товар'))}</th>
+                    <th>${escapeHtml(t('showcaseAdminOrders.lineTableOrdered', 'Заказано'))}</th>
+                    <th>${escapeHtml(t('showcaseAdminOrders.lineTablePicked', 'Собрано'))}</th>
+                    <th>${escapeHtml(t('showcaseAdminOrders.lineTablePrice', 'Цена'))}</th>
+                    <th data-i18n="showcaseAdminOrders.tableStatus">Статус</th>
+                    <th>${escapeHtml(t('showcaseAdminOrders.lineTableActions', 'Действия'))}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -826,9 +848,9 @@
                   <div class="product-name">${escapeHtml(item.item_name || '—')}</div>
                   <div class="product-meta">
                     SKU: <span class="mono">${escapeHtml(item.sku || '—')}</span><br>
-                    ШК: <span class="mono">${escapeHtml(item.barcode || '—')}</span><br>
-                    В наличии: ${escapeHtml(formatQty(item.available_qty))}<br>
-                    В коробке: ${escapeHtml(formatQty(item.box_qty || 0))}
+                    ${escapeHtml(t('showcaseAdminOrders.barcodeShort', 'ШК'))}: <span class="mono">${escapeHtml(item.barcode || '—')}</span><br>
+                    ${escapeHtml(t('showcaseAdminOrders.availableLabel', 'В наличии'))}: ${escapeHtml(formatQty(item.available_qty))}<br>
+                    ${escapeHtml(t('showcaseAdminOrders.boxQtyLabel', 'В коробке'))}: ${escapeHtml(formatQty(item.box_qty || 0))}
                   </div>
                 </div>
               </div>
@@ -845,9 +867,9 @@
             </td>
             <td>
               <div class="line-actions">
-                <button class="btn btn-success btn-small js-line-done" data-line-id="${item.id}" data-requested="${requested}" ${editable ? '' : 'disabled'} type="button">Собрано</button>
-                <button class="btn btn-warning btn-small js-line-save" data-line-id="${item.id}" ${editable ? '' : 'disabled'} type="button">Сохранить</button>
-                <button class="btn btn-danger btn-small js-line-missing" data-line-id="${item.id}" ${editable ? '' : 'disabled'} type="button">Нет</button>
+                <button class="btn btn-success btn-small js-line-done" data-line-id="${item.id}" data-requested="${requested}" ${editable ? '' : 'disabled'} type="button">${escapeHtml(t('showcaseAdminOrders.lineDoneButton', 'Собрано'))}</button>
+                <button class="btn btn-warning btn-small js-line-save" data-line-id="${item.id}" ${editable ? '' : 'disabled'} type="button">${escapeHtml(t('showcaseAdminOrders.saveButton', 'Сохранить'))}</button>
+                <button class="btn btn-danger btn-small js-line-missing" data-line-id="${item.id}" ${editable ? '' : 'disabled'} type="button">${escapeHtml(t('showcaseAdminOrders.noButton', 'Нет'))}</button>
               </div>
             </td>
           </tr>
@@ -868,7 +890,7 @@
 
       async function loadOrders() {
         hideMessage();
-        ordersTbody.innerHTML = '<tr><td colspan="10" class="empty">Загрузка...</td></tr>';
+        ordersTbody.innerHTML = '<tr><td colspan="10" class="empty" data-i18n="showcaseAdminOrders.loading">Загрузка...</td></tr>';
 
         try {
           const params = new URLSearchParams();
@@ -895,7 +917,7 @@
           renderOrders();
         } catch (error) {
           console.error('[showcase-admin-orders] loadOrders error:', error);
-          ordersTbody.innerHTML = '<tr><td colspan="10" class="empty">Ошибка загрузки заказов</td></tr>';
+          ordersTbody.innerHTML = '<tr><td colspan="10" class="empty">' + escapeHtml(t('showcaseAdminOrders.loadOrdersError', 'Ошибка загрузки заказов')) + '</td></tr>';
           showMessage(translateError(error), 'error');
         }
       }
@@ -929,11 +951,11 @@
 
       async function takeOrder(orderId) {
         try {
-          showMessage('Берём заказ в работу...', 'info');
+          showMessage(t('showcaseAdminOrders.takingOrderStatus', 'Берём заказ в работу...'), 'info');
           await apiPost('/showcase-admin/orders/' + orderId + '/take?tenant_id=' + tenantId, {});
           await refreshOpenedOrder();
           await loadOrders();
-          showMessage('Заказ взят в работу', 'success');
+          showMessage(t('showcaseAdminOrders.orderTakenStatus', 'Заказ взят в работу'), 'success');
         } catch (error) {
           console.error('[showcase-admin-orders] takeOrder error:', error);
           showMessage(translateError(error), 'error');
@@ -942,11 +964,11 @@
 
       async function readyOrder(orderId) {
         try {
-          showMessage('Отмечаем заказ готовым...', 'info');
+          showMessage(t('showcaseAdminOrders.markingReadyStatus', 'Отмечаем заказ готовым...'), 'info');
           await apiPost('/showcase-admin/orders/' + orderId + '/ready?tenant_id=' + tenantId, {});
           await refreshOpenedOrder();
           await loadOrders();
-          showMessage('Заказ отмечен как готовый', 'success');
+          showMessage(t('showcaseAdminOrders.orderMarkedReadyStatus', 'Заказ отмечен как готовый'), 'success');
         } catch (error) {
           console.error('[showcase-admin-orders] readyOrder error:', error);
           showMessage(translateError(error), 'error');
@@ -955,13 +977,13 @@
 
       async function createSale(orderId, isDebt) {
         try {
-          showMessage(isDebt ? 'Проводим продажу в долг...' : 'Проводим продажу...', 'info');
+          showMessage(isDebt ? t('showcaseAdminOrders.creatingDebtSaleStatus', 'Проводим продажу в долг...') : t('showcaseAdminOrders.creatingSaleStatus', 'Проводим продажу...'), 'info');
           const result = await apiPost('/showcase-admin/orders/' + orderId + '/create-sale?tenant_id=' + tenantId, {
             is_debt: !!isDebt
           });
           await refreshOpenedOrder();
           await loadOrders();
-          showMessage((isDebt ? 'Продажа в долг проведена. ID: ' : 'Продажа проведена. ID: ') + (result.sale_id || '—'), 'success');
+          showMessage(formatI18n(isDebt ? 'showcaseAdminOrders.debtSaleCreatedStatus' : 'showcaseAdminOrders.saleCreatedStatus', { id: result.sale_id || '—' }, isDebt ? 'Продажа в долг проведена. ID: {id}' : 'Продажа проведена. ID: {id}'), 'success');
         } catch (error) {
           console.error('[showcase-admin-orders] createSale error:', error);
           showMessage(translateError(error), 'error');
@@ -995,7 +1017,7 @@
         }
 
         try {
-          showMessage('Сохраняем строку заказа...', 'info');
+          showMessage(t('showcaseAdminOrders.savingLineStatus', 'Сохраняем строку заказа...'), 'info');
 
           await apiPatch('/showcase-admin/orders/' + state.openedOrderId + '/items/' + lineId + '?tenant_id=' + tenantId, {
             picked_qty: pickedQty,
@@ -1005,7 +1027,7 @@
 
           await refreshOpenedOrder();
           await loadOrders();
-          showMessage('Строка заказа сохранена', 'success');
+          showMessage(t('showcaseAdminOrders.lineSavedStatus', 'Строка заказа сохранена'), 'success');
         } catch (error) {
           console.error('[showcase-admin-orders] saveLine error:', error);
           showMessage(translateError(error), 'error');
@@ -1105,6 +1127,13 @@
       statusSelect.addEventListener('change', function () {
         state.page = 1;
         loadOrders();
+      });
+
+      document.addEventListener('app:language-changed', function () {
+        if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+          window.i18n.applyTranslations();
+        }
+        renderOrders();
       });
 
       loadOrders();
