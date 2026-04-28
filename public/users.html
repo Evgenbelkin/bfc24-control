@@ -761,21 +761,35 @@
 
 
     const AVAILABLE_MODULES = [
-      { code: "items",     labelKey: "users.moduleItems" },
-      { code: "locations", labelKey: "users.moduleLocations" },
-      { code: "clients",   labelKey: "users.moduleClients" },
-      { code: "stock",     labelKey: "users.moduleStock" },
-      { code: "movements", labelKey: "users.moduleMovements" },
-      { code: "incoming",  labelKey: "users.moduleIncoming" },
-      { code: "sales",     labelKey: "users.moduleSales" },
-      { code: "writeoff",  labelKey: "users.moduleWriteoff" },
-      { code: "cash",      labelKey: "users.moduleCash" },
-      { code: "expenses",  labelKey: "users.moduleExpenses" },
-      { code: "analytics", labelKey: "users.moduleAnalytics" },
-      { code: "turnover",  labelKey: "users.moduleTurnover" },
-      { code: "debts",     labelKey: "users.moduleDebts" },
-      { code: "users",     labelKey: "users.moduleUsers" }
-    ];
+  { key: "items", label: "users.moduleItems" },
+  { key: "locations", label: "users.moduleLocations" },
+  { key: "clients", label: "users.moduleClients" },
+  { key: "stock", label: "users.moduleStock" },
+  { key: "movements", label: "users.moduleMovements" },
+  { key: "incoming", label: "users.moduleIncoming" },
+  { key: "sales", label: "users.moduleSales" },
+  { key: "writeoff", label: "users.moduleWriteoff" },
+  { key: "cash", label: "users.moduleCash" },
+  { key: "expenses", label: "users.moduleExpenses" },
+  { key: "analytics", label: "users.moduleAnalytics" },
+  { key: "turnover", label: "users.moduleTurnover" },
+  { key: "debts", label: "users.moduleDebts" },
+  { key: "users", label: "users.moduleUsers" },
+
+  // 🔥 ДОБАВЛЕННЫЕ МОДУЛИ
+  { key: "batches", label: "users.moduleBatches" },
+  { key: "transfer", label: "users.moduleTransfer" },
+  { key: "sales-history", label: "users.moduleSalesHistory" },
+  { key: "pnl", label: "users.modulePnl" },
+
+  // витрина
+  { key: "showcase", label: "users.moduleShowcase" },
+  { key: "showcase-admin-orders", label: "users.moduleShowcaseOrders" },
+  { key: "showcase-settings", label: "users.moduleShowcaseSettings" },
+
+  // доп
+  { key: "notifications", label: "users.moduleNotifications" }
+];
 
     function normalizeModules(value) {
       let source = value;

@@ -355,7 +355,17 @@
         confirmUnblock: "Разблокировать пользователя {name}?",
         promptNewPassword: "Введите новый пароль для {name}:",
         passwordResetSuccess: "Пароль пользователя {name} успешно обновлён",
-        actionError: "Ошибка действия: {error}"
+        actionError: "Ошибка действия: {error}",
+        moduleBatches: "Партии / Себестоимость",
+moduleTransfer: "Перемещения",
+moduleSalesHistory: "История продаж",
+modulePnl: "P&L / Прибыль",
+
+moduleShowcase: "Витрина",
+moduleShowcaseOrders: "Заказы витрины",
+moduleShowcaseSettings: "Настройки витрины",
+
+moduleNotifications: "Уведомления",
       },
 
       locations: {
