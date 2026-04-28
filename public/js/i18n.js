@@ -1236,6 +1236,39 @@ sales: {
         payErrorStatus: "Ошибка оплаты: {error}"
       },
 
+
+      showcaseLogin: {
+        pageTitle: "Вход покупателя — BFC24 CONTROL",
+        heading: "Вход",
+        subtitle: "Вход для покупателей витрины. После входа откроется каталог товаров.",
+        tenantLabel: "Tenant ID",
+        loginLabel: "Логин",
+        passwordLabel: "Пароль",
+        submitButton: "Войти",
+        testHint: "Тестовый вход: tenant_id = 1, login = buyer1, password = 123456",
+        requiredError: "Заполни tenant_id, логин и пароль",
+        loadingButton: "Входим...",
+        loginFailed: "Не удалось выполнить вход",
+        loginError: "Ошибка входа",
+        invalidCredentials: "Неверный логин или пароль",
+        requiredApiError: "Нужно заполнить tenant_id, логин и пароль"
+      },
+
+      showcaseMyOrders: {
+        pageTitle: "Мои заказы — BFC24 CONTROL",
+        heading: "Мои заказы",
+        noOrders: "Нет заказов",
+        dateLabel: "Дата",
+        openButton: "Открыть",
+        statusNew: "Новый",
+        statusInProgress: "В работе",
+        statusReady: "Готов",
+        statusCompleted: "Завершён",
+        statusPartiallyPicked: "Частично собран",
+        statusCancelled: "Отменён",
+        statusUnknown: "Неизвестный статус"
+      },
+
       expenses: {
         pageTitle: "BFC24 CONTROL — Расходы",
         heading: "Расходы",
@@ -1262,18 +1295,6 @@ sales: {
         commentPlaceholder: "Например: аренда контейнера за апрель",
         saveButton: "Сохранить расход",
         clearButton: "Очистить",
-        formEditTitle: "Редактирование расхода",
-        updateButton: "Сохранить изменения",
-        editButton: "Изменить",
-        deleteButton: "Удалить",
-        expenseDateRequired: "Укажи дату расхода",
-        updatingStatus: "Обновление расхода...",
-        updatedStatus: "Расход обновлён",
-        deleteConfirm: "Удалить этот расход?",
-        deletingStatus: "Удаление расхода...",
-        deletedStatus: "Расход удалён",
-        deleteErrorStatus: "Ошибка удаления: {error}",
-        rowNotFound: "Запись не найдена",
         historyTitle: "Фильтры и история расходов",
         searchLabel: "Поиск по комментарию / категории / пользователю",
         searchPlaceholder: "Например: аренда, зарплата, admin",
@@ -1290,16 +1311,13 @@ sales: {
         statsRows: "Записей",
         statsTotal: "Сумма расходов",
         statsAverage: "Средний расход",
-        statsMax: "Максимальный расход",
         tableType: "Тип",
         tableAmount: "Сумма",
         tableCategory: "Категория",
         tablePayment: "Оплата",
         tableComment: "Комментарий",
         tableCreatedBy: "Создал",
-        tableExpenseDate: "Дата расхода",
-        tableDate: "Создан",
-        tableActions: "Действия",
+        tableDate: "Дата",
         loadingRows: "Загрузка данных...",
         noData: "Нет данных",
         noUser: "-",
@@ -1313,8 +1331,11 @@ sales: {
         paymentRequired: "Выбери способ оплаты",
         savingStatus: "Сохраняю расход...",
         savedStatus: "Расход успешно сохранён",
-        saveErrorStatus: "Ошибка: {error}"
-      },
+        saveErrorStatus: "Ошибка: {error}",
+      
+        statsMax: "Максимальный расход",
+        tableExpenseDate: "Дата расхода",
+        tableActions: "Действия",},
 
       analytics: {
         pageTitle: "BFC24 CONTROL — Аналитика",
@@ -2884,6 +2905,39 @@ sales: {
         payErrorStatus: "Payment error: {error}"
       },
 
+
+      showcaseLogin: {
+        pageTitle: "Buyer login — BFC24 CONTROL",
+        heading: "Login",
+        subtitle: "Login for showcase buyers. After login, the product catalog will open.",
+        tenantLabel: "Tenant ID",
+        loginLabel: "Login",
+        passwordLabel: "Password",
+        submitButton: "Log in",
+        testHint: "Test login: tenant_id = 1, login = buyer1, password = 123456",
+        requiredError: "Fill in tenant_id, login and password",
+        loadingButton: "Logging in...",
+        loginFailed: "Could not log in",
+        loginError: "Login error",
+        invalidCredentials: "Invalid login or password",
+        requiredApiError: "tenant_id, login and password are required"
+      },
+
+      showcaseMyOrders: {
+        pageTitle: "My orders — BFC24 CONTROL",
+        heading: "My orders",
+        noOrders: "No orders",
+        dateLabel: "Date",
+        openButton: "Open",
+        statusNew: "New",
+        statusInProgress: "In progress",
+        statusReady: "Ready",
+        statusCompleted: "Completed",
+        statusPartiallyPicked: "Partially picked",
+        statusCancelled: "Cancelled",
+        statusUnknown: "Unknown status"
+      },
+
       expenses: {
         pageTitle: "BFC24 CONTROL — Expenses",
         heading: "Expenses",
@@ -2910,18 +2964,6 @@ sales: {
         commentPlaceholder: "For example: container rent for April",
         saveButton: "Save expense",
         clearButton: "Clear",
-        formEditTitle: "Edit expense",
-        updateButton: "Save changes",
-        editButton: "Edit",
-        deleteButton: "Delete",
-        expenseDateRequired: "Enter the expense date",
-        updatingStatus: "Updating expense...",
-        updatedStatus: "Expense updated",
-        deleteConfirm: "Delete this expense?",
-        deletingStatus: "Deleting expense...",
-        deletedStatus: "Expense deleted",
-        deleteErrorStatus: "Delete error: {error}",
-        rowNotFound: "Record not found",
         historyTitle: "Filters and expense history",
         searchLabel: "Search by comment / category / user",
         searchPlaceholder: "For example: rent, salary, admin",
@@ -2938,16 +2980,13 @@ sales: {
         statsRows: "Records",
         statsTotal: "Total expenses",
         statsAverage: "Average expense",
-        statsMax: "Maximum expense",
         tableType: "Type",
         tableAmount: "Amount",
         tableCategory: "Category",
         tablePayment: "Payment",
         tableComment: "Comment",
         tableCreatedBy: "Created by",
-        tableExpenseDate: "Expense date",
-        tableDate: "Created at",
-        tableActions: "Actions",
+        tableDate: "Date",
         loadingRows: "Loading data...",
         noData: "No data",
         noUser: "-",
@@ -2961,8 +3000,11 @@ sales: {
         paymentRequired: "Select a payment method",
         savingStatus: "Saving expense...",
         savedStatus: "Expense saved successfully",
-        saveErrorStatus: "Error: {error}"
-      },
+        saveErrorStatus: "Error: {error}",
+      
+        statsMax: "Maximum expense",
+        tableExpenseDate: "Expense date",
+        tableActions: "Actions",},
 
       analytics: {
         pageTitle: "BFC24 CONTROL — Analytics",
@@ -4490,6 +4532,39 @@ sales: {
         payErrorStatus: "付款错误: {error}"
       },
 
+
+      showcaseLogin: {
+        pageTitle: "买家登录 — BFC24 CONTROL",
+        heading: "登录",
+        subtitle: "买家登录后将打开商品目录。",
+        tenantLabel: "Tenant ID",
+        loginLabel: "登录名",
+        passwordLabel: "密码",
+        submitButton: "登录",
+        testHint: "测试登录：tenant_id = 1, login = buyer1, password = 123456",
+        requiredError: "请填写 tenant_id、登录名和密码",
+        loadingButton: "正在登录...",
+        loginFailed: "无法登录",
+        loginError: "登录错误",
+        invalidCredentials: "登录名或密码错误",
+        requiredApiError: "需要填写 tenant_id、登录名和密码"
+      },
+
+      showcaseMyOrders: {
+        pageTitle: "我的订单 — BFC24 CONTROL",
+        heading: "我的订单",
+        noOrders: "暂无订单",
+        dateLabel: "日期",
+        openButton: "打开",
+        statusNew: "新订单",
+        statusInProgress: "处理中",
+        statusReady: "已就绪",
+        statusCompleted: "已完成",
+        statusPartiallyPicked: "部分拣货",
+        statusCancelled: "已取消",
+        statusUnknown: "未知状态"
+      },
+
       expenses: {
         pageTitle: "BFC24 CONTROL — 支出",
         heading: "支出",
@@ -4516,18 +4591,6 @@ sales: {
         commentPlaceholder: "例如：4 月集装箱租金",
         saveButton: "保存支出",
         clearButton: "清空",
-        formEditTitle: "编辑支出",
-        updateButton: "保存更改",
-        editButton: "编辑",
-        deleteButton: "删除",
-        expenseDateRequired: "请输入支出日期",
-        updatingStatus: "正在更新支出...",
-        updatedStatus: "支出已更新",
-        deleteConfirm: "删除这笔支出？",
-        deletingStatus: "正在删除支出...",
-        deletedStatus: "支出已删除",
-        deleteErrorStatus: "删除错误：{error}",
-        rowNotFound: "未找到记录",
         historyTitle: "筛选与支出历史",
         searchLabel: "按备注 / 分类 / 用户搜索",
         searchPlaceholder: "例如：租金、工资、admin",
@@ -4544,16 +4607,13 @@ sales: {
         statsRows: "记录数",
         statsTotal: "支出总额",
         statsAverage: "平均支出",
-        statsMax: "最大支出",
         tableType: "类型",
         tableAmount: "金额",
         tableCategory: "分类",
         tablePayment: "付款",
         tableComment: "备注",
         tableCreatedBy: "创建人",
-        tableExpenseDate: "支出日期",
-        tableDate: "创建时间",
-        tableActions: "操作",
+        tableDate: "日期",
         loadingRows: "正在加载数据...",
         noData: "没有数据",
         noUser: "-",
@@ -4567,8 +4627,11 @@ sales: {
         paymentRequired: "请选择付款方式",
         savingStatus: "正在保存支出...",
         savedStatus: "支出保存成功",
-        saveErrorStatus: "错误：{error}"
-      },
+        saveErrorStatus: "错误：{error}",
+      
+        statsMax: "最大支出",
+        tableExpenseDate: "支出日期",
+        tableActions: "操作",},
 
       analytics: {
         pageTitle: "BFC24 CONTROL — 分析",

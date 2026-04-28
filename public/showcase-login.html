@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="showcaseLogin.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -116,33 +116,57 @@
       color:var(--muted);
       text-align:center;
     }
+    #langSwitcher{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    #langSwitcher .btn-light{
+      width:auto;
+      height:36px;
+      min-width:52px;
+      padding:0 12px;
+      margin-top:0;
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+      font-size:13px;
+    }
+    #langSwitcher .btn-light.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Вход</h1>
-    <p>Вход для покупателей витрины. После входа откроется каталог товаров.</p>
+    <div id="langSwitcher"></div>
+    <h1 data-i18n="showcaseLogin.heading">Вход</h1>
+    <p data-i18n="showcaseLogin.subtitle">Вход для покупателей витрины. После входа откроется каталог товаров.</p>
 
     <div class="message error" id="messageBox"></div>
 
     <div class="field">
-      <label for="tenantInput">Tenant ID</label>
+      <label for="tenantInput" data-i18n="showcaseLogin.tenantLabel">Tenant ID</label>
       <input id="tenantInput" type="number" value="1" />
     </div>
 
     <div class="field">
-      <label for="loginInput">Логин</label>
+      <label for="loginInput" data-i18n="showcaseLogin.loginLabel">Логин</label>
       <input id="loginInput" type="text" value="buyer1" />
     </div>
 
     <div class="field">
-      <label for="passwordInput">Пароль</label>
+      <label for="passwordInput" data-i18n="showcaseLogin.passwordLabel">Пароль</label>
       <input id="passwordInput" type="password" value="123456" />
     </div>
 
-    <button class="btn" id="loginBtn" type="button">Войти</button>
+    <button class="btn" id="loginBtn" type="button" data-i18n="showcaseLogin.submitButton">Войти</button>
 
-    <div class="hint">Тестовый вход: tenant_id = 1, login = buyer1, password = 123456</div>
+    <div class="hint" data-i18n="showcaseLogin.testHint">Тестовый вход: tenant_id = 1, login = buyer1, password = 123456</div>
   </div>
 
   <script src="/js/config.js"></script>
@@ -156,6 +180,22 @@
       const passwordInput = document.getElementById('passwordInput');
       const loginBtn = document.getElementById('loginBtn');
       const messageBox = document.getElementById('messageBox');
+
+      function t(key, fallback) {
+        return window.i18n && typeof window.i18n.t === 'function' ? window.i18n.t(key, fallback) : fallback;
+      }
+
+      function setLoginButtonIdle() {
+        loginBtn.textContent = t('showcaseLogin.submitButton', 'Войти');
+      }
+
+      if (window.i18n && typeof window.i18n.renderLanguageSwitcher === 'function') {
+        window.i18n.renderLanguageSwitcher('langSwitcher');
+      }
+      if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+        window.i18n.applyTranslations();
+      }
+      document.addEventListener('app:language-changed', setLoginButtonIdle);
 
       function showError(text) {
         messageBox.textContent = text;
@@ -175,12 +215,12 @@
         const password = String(passwordInput.value || '');
 
         if (!tenant_id || !login || !password) {
-          showError('Заполни tenant_id, логин и пароль');
+          showError(t('showcaseLogin.requiredError', 'Заполни tenant_id, логин и пароль'));
           return;
         }
 
         loginBtn.disabled = true;
-        loginBtn.textContent = 'Входим...';
+        loginBtn.textContent = t('showcaseLogin.loadingButton', 'Входим...');
 
         try {
           const result = await API.post('/showcase/auth/login', {
@@ -190,7 +230,7 @@
           });
 
           if (!result || !result.ok || !result.buyer) {
-            showError('Не удалось выполнить вход');
+            showError(t('showcaseLogin.loginFailed', 'Не удалось выполнить вход'));
             return;
           }
 
@@ -201,11 +241,11 @@
         } catch (error) {
           console.error('[showcase-login] login error:', error);
 
-          let text = 'Ошибка входа';
+          let text = t('showcaseLogin.loginError', 'Ошибка входа');
           if (error && error.error === 'invalid_credentials') {
-            text = 'Неверный логин или пароль';
+            text = t('showcaseLogin.invalidCredentials', 'Неверный логин или пароль');
           } else if (error && error.error === 'login_password_tenant_required') {
-            text = 'Нужно заполнить tenant_id, логин и пароль';
+            text = t('showcaseLogin.requiredApiError', 'Нужно заполнить tenant_id, логин и пароль');
           } else if (error && error.message) {
             text = error.message;
           }
@@ -213,7 +253,7 @@
           showError(text);
         } finally {
           loginBtn.disabled = false;
-          loginBtn.textContent = 'Войти';
+          setLoginButtonIdle();
         }
       }
 

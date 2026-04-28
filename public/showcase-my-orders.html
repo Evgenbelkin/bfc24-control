@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="showcaseMyOrders.pageTitle">
 <head>
 <meta charset="UTF-8">
-<title>Мои заказы</title>
+<title>Мои заказы — BFC24 CONTROL</title>
 <style>
 body { font-family: Arial; background:#f5f6fa; margin:0; }
 .container { max-width:1000px; margin:20px auto; }
@@ -12,18 +12,55 @@ body { font-family: Arial; background:#f5f6fa; margin:0; }
 .in_progress { color:orange; }
 .ready { color:blue; }
 .completed { color:green; }
+#langSwitcher { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; margin-bottom:15px; }
+#langSwitcher button { border:1px solid #dfe3eb; border-radius:10px; background:#fff; padding:8px 12px; cursor:pointer; font-weight:bold; }
+#langSwitcher button.active { background:#2563eb; color:#fff; border-color:#2563eb; }
+.topline { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+button { border:1px solid #dfe3eb; border-radius:10px; background:#fff; padding:8px 12px; cursor:pointer; font-weight:bold; }
 </style>
 </head>
 <body>
 
 <div class="container">
-<h2>Мои заказы</h2>
+<div class="topline">
+<h2 data-i18n="showcaseMyOrders.heading">Мои заказы</h2>
+<div id="langSwitcher"></div>
+</div>
 <div id="orders"></div>
 </div>
+
+<script src="/js/config.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/app-ui.js"></script>
+<script src="/js/i18n.js"></script>
 
 <script>
 const buyer = JSON.parse(localStorage.getItem('showcase_buyer') || '{}');
 const tenantId = localStorage.getItem('showcase_tenant_id');
+
+function t(key, fallback) {
+  return window.i18n && typeof window.i18n.t === 'function' ? window.i18n.t(key, fallback) : fallback;
+}
+
+function statusText(status) {
+  const map = {
+    new: 'showcaseMyOrders.statusNew',
+    in_progress: 'showcaseMyOrders.statusInProgress',
+    ready: 'showcaseMyOrders.statusReady',
+    completed: 'showcaseMyOrders.statusCompleted',
+    partially_picked: 'showcaseMyOrders.statusPartiallyPicked',
+    cancelled: 'showcaseMyOrders.statusCancelled'
+  };
+  return t(map[status] || 'showcaseMyOrders.statusUnknown', status || t('showcaseMyOrders.statusUnknown', 'Неизвестный статус'));
+}
+
+if (window.i18n && typeof window.i18n.renderLanguageSwitcher === 'function') {
+  window.i18n.renderLanguageSwitcher('langSwitcher');
+}
+if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+  window.i18n.applyTranslations();
+}
+document.addEventListener('app:language-changed', loadOrders);
 
 async function loadOrders(){
   const res = await fetch(`/showcase/my-orders?tenant_id=${tenantId}&buyer_id=${buyer.id}`);
@@ -33,7 +70,7 @@ async function loadOrders(){
   el.innerHTML = '';
 
   if (!data.items || !data.items.length){
-    el.innerHTML = '<div class="card">Нет заказов</div>';
+    el.innerHTML = `<div class="card">${t('showcaseMyOrders.noOrders', 'Нет заказов')}</div>`;
     return;
   }
 
@@ -42,9 +79,9 @@ async function loadOrders(){
     div.className = 'card';
     div.innerHTML = `
       <div><b>${o.order_no}</b></div>
-      <div class="status ${o.status}">${o.status}</div>
-      <div>Дата: ${o.created_at}</div>
-      <button onclick="openOrder(${o.id})">Открыть</button>
+      <div class="status ${o.status}">${statusText(o.status)}</div>
+      <div>${t('showcaseMyOrders.dateLabel', 'Дата')}: ${o.created_at}</div>
+      <button onclick="openOrder(${o.id})">${t('showcaseMyOrders.openButton', 'Открыть')}</button>
       <div id="details-${o.id}"></div>
     `;
     el.appendChild(div);
