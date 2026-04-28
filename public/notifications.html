@@ -511,10 +511,11 @@
     }
 
     function buildPath(path) {
-      const tenantId = encodeURIComponent(getTenantId());
-      const separator = path.includes('?') ? '&' : '?';
-      return `${path}${separator}tenant_id=${tenantId}`;
-    }
+  const tenantId = encodeURIComponent(getTenantId());
+  const apiPath = path.startsWith('/api/') ? path : `/api${path}`;
+  const separator = apiPath.includes('?') ? '&' : '?';
+  return `${apiPath}${separator}tenant_id=${tenantId}`;
+}
 
     async function loadSettings() {
       clearStatus(els.settingsStatus);
