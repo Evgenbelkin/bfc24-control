@@ -359,7 +359,7 @@
 
     .modules-grid{
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:10px 14px;
       margin-top:10px;
     }
@@ -417,6 +417,12 @@
         justify-content:space-between;
       }
     }
+      @media (max-width:560px){
+      .modules-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -465,7 +471,9 @@
             <label for="password" data-i18n="users.passwordLabel">Пароль</label>
             <input id="password" type="password" data-i18n-placeholder="users.passwordPlaceholder" placeholder="Пароль нового пользователя" autocomplete="new-password" />
             <div class="helper" id="passwordHelper" data-i18n="users.passwordHelper">Обязателен при создании. При редактировании — оставьте пустым, чтобы не менять.</div>
-            <div class="field full">
+          </div>
+
+          <div class="field full">
             <label data-i18n="users.modulesLabel">Доступные модули</label>
             <div class="modules-box">
               <div class="helper" data-i18n="users.modulesHelper">Отметь только те модули, которые должен видеть и использовать сотрудник.</div>
