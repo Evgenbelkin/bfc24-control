@@ -51,9 +51,12 @@ const ALLOWED_MODULE_CODES = [
   "locations",
   "clients",
   "stock",
+  "transfer",
+  "batches",
   "movements",
   "incoming",
   "sales",
+  "sales-history",
   "writeoff",
   "cash",
   "expenses",
@@ -61,6 +64,11 @@ const ALLOWED_MODULE_CODES = [
   "turnover",
   "debts",
   "users",
+  "showcase-admin-orders",
+  "showcase-settings",
+  "showcase",
+  "notifications",
+  "pnl",
 ];
 
 function normalizeModulesInput(value) {
