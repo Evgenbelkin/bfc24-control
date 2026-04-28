@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>BFC24 CONTROL — Уведомления</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #687386;
+      --border: #dde3ee;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --ok: #16a34a;
+      --warn: #ca8a04;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .title h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      line-height: 1.15;
+    }
+
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .card .hint {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 14px 0 7px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .switch-row {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #f8fafc;
+    }
+
+    .switch-row input {
+      width: 20px;
+      height: 20px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 12px 15px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #eef2ff;
+      color: #1e3a8a;
+    }
+
+    .btn-light {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .status {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      display: none;
+      white-space: pre-wrap;
+      line-height: 1.45;
+    }
+
+    .status.ok {
+      display: block;
+      background: #ecfdf5;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .status.err {
+      display: block;
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .status.info {
+      display: block;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .mini {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-top: 8px;
+    }
+
+    .logs-wrap {
+      grid-column: 1 / -1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    .table-scroll {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 13px;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge.sent {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge.failed {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge.skipped {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge.pending {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .message-cell {
+      max-width: 420px;
+      white-space: pre-wrap;
+      color: #334155;
+    }
+
+    .error-cell {
+      max-width: 260px;
+      color: var(--danger);
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        padding: 16px;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .title h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <div class="title">
+        <h1>Уведомления</h1>
+        <p>Telegram-уведомления о новых заказах с витрины и системных событиях.</p>
+      </div>
+      <a class="back" href="/index.html">← Главное меню</a>
+    </div>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Telegram</h2>
+        <p class="hint">
+          Укажите токен Telegram-бота и chat_id владельца магазина. После включения сюда будут приходить уведомления о новых заказах с витрины.
+        </p>
+
+        <form id="settingsForm">
+          <label for="botToken">Bot token</label>
+          <input id="botToken" type="password" autocomplete="off" placeholder="123456789:AA..." />
+          <div class="mini" id="tokenHint">Если токен уже сохранён, поле можно оставить пустым только при повторном сохранении текущих настроек.</div>
+
+          <label for="ownerChatId">Owner chat_id</label>
+          <input id="ownerChatId" type="text" autocomplete="off" placeholder="Например: 1471228265" />
+
+          <div class="switch-row">
+            <input id="isEnabled" type="checkbox" />
+            <div>
+              <strong>Включить Telegram-уведомления</strong>
+              <div class="mini">Если выключено, события будут логироваться как skipped и сообщения не будут отправляться.</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn-primary">Сохранить настройки</button>
+            <button type="button" id="testBtn" class="btn-secondary">Отправить тест</button>
+            <button type="button" id="reloadBtn" class="btn-light">Обновить</button>
+          </div>
+
+          <div id="settingsStatus" class="status"></div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Как подключить</h2>
+        <p class="hint">
+          Первый запуск делается один раз для каждого клиента/магазина.
+        </p>
+
+        <ol>
+          <li>Создайте Telegram-бота через <strong>@BotFather</strong>.</li>
+          <li>Скопируйте <strong>bot token</strong>.</li>
+          <li>Напишите боту любое сообщение от аккаунта владельца.</li>
+          <li>Получите <strong>chat_id</strong> через тестовый endpoint или бот-инструмент.</li>
+          <li>Сохраните настройки и нажмите “Отправить тест”.</li>
+        </ol>
+
+        <div class="status info" style="display:block;">
+          Важно: Telegram-бот не может написать человеку первым. Владелец должен сначала открыть бота и нажать Start.
+        </div>
+      </div>
+
+      <div class="card logs-wrap">
+        <div class="row" style="justify-content:space-between; margin-bottom: 12px;">
+          <div>
+            <h2 style="margin-bottom:4px;">История уведомлений</h2>
+            <p class="hint" style="margin-bottom:0;">Последние системные уведомления и ошибки отправки.</p>
+          </div>
+          <button type="button" id="logsBtn" class="btn-light">Обновить историю</button>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Событие</th>
+                <th>Канал</th>
+                <th>Получатель</th>
+                <th>Статус</th>
+                <th>Сообщение</th>
+                <th>Ошибка</th>
+              </tr>
+            </thead>
+            <tbody id="logsBody">
+              <tr>
+                <td colspan="7">Загрузка...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const els = {
+      form: document.getElementById('settingsForm'),
+      botToken: document.getElementById('botToken'),
+      ownerChatId: document.getElementById('ownerChatId'),
+      isEnabled: document.getElementById('isEnabled'),
+      settingsStatus: document.getElementById('settingsStatus'),
+      testBtn: document.getElementById('testBtn'),
+      reloadBtn: document.getElementById('reloadBtn'),
+      logsBtn: document.getElementById('logsBtn'),
+      logsBody: document.getElementById('logsBody'),
+      tokenHint: document.getElementById('tokenHint'),
+    };
+
+    function getTenantId() {
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get('tenant_id');
+      if (fromUrl) return fromUrl;
+
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+        if (user && user.tenant_id) return user.tenant_id;
+      } catch (err) {}
+
+      return '1';
+    }
+
+    function htmlEscape(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function showStatus(el, type, text) {
+      el.className = 'status ' + type;
+      el.textContent = text;
+    }
+
+    function clearStatus(el) {
+      el.className = 'status';
+      el.textContent = '';
+    }
+
+    function translateError(error) {
+      if (window.AppUI && typeof window.AppUI.translateError === 'function') {
+        return window.AppUI.translateError(error);
+      }
+
+      const dict = {
+        tenant_id_required: 'Не найден tenant_id.',
+        telegram_settings_required: 'Для включения Telegram нужно заполнить bot token и chat_id.',
+        telegram_disabled: 'Telegram-уведомления выключены.',
+        telegram_settings_incomplete: 'Настройки Telegram заполнены не полностью.',
+        telegram_send_failed: 'Не удалось отправить сообщение в Telegram.',
+        internal_error: 'Внутренняя ошибка сервера.',
+      };
+
+      return dict[error] || error || 'Ошибка';
+    }
+
+    async function apiGet(path) {
+      if (window.api && typeof window.api.get === 'function') {
+        return window.api.get(path);
+      }
+
+      const token = localStorage.getItem('token') || '';
+      const res = await fetch(path, {
+        headers: {
+          Authorization: token ? 'Bearer ' + token : '',
+        },
+      });
+      return res.json();
+    }
+
+    async function apiPost(path, body) {
+      if (window.api && typeof window.api.post === 'function') {
+        return window.api.post(path, body);
+      }
+
+      const token = localStorage.getItem('token') || '';
+      const res = await fetch(path, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token ? 'Bearer ' + token : '',
+        },
+        body: JSON.stringify(body || {}),
+      });
+      return res.json();
+    }
+
+    function buildPath(path) {
+      const tenantId = encodeURIComponent(getTenantId());
+      const separator = path.includes('?') ? '&' : '?';
+      return `${path}${separator}tenant_id=${tenantId}`;
+    }
+
+    async function loadSettings() {
+      clearStatus(els.settingsStatus);
+
+      const data = await apiGet(buildPath('/notifications/settings'));
+
+      if (!data || !data.ok) {
+        showStatus(els.settingsStatus, 'err', translateError(data && data.error));
+        return;
+      }
+
+      const settings = data.settings || {};
+      els.botToken.value = '';
+      els.ownerChatId.value = settings.owner_chat_id || '';
+      els.isEnabled.checked = !!settings.is_enabled;
+
+      if (settings.bot_token_masked) {
+        els.tokenHint.textContent = `Сохранённый токен: ${settings.bot_token_masked}. Чтобы оставить его, не заполняйте поле token.`;
+      } else {
+        els.tokenHint.textContent = 'Токен ещё не сохранён.';
+      }
+    }
+
+    async function saveSettings() {
+      clearStatus(els.settingsStatus);
+
+      const body = {
+        bot_token: els.botToken.value.trim(),
+        owner_chat_id: els.ownerChatId.value.trim(),
+        is_enabled: els.isEnabled.checked,
+      };
+
+      const data = await apiPost(buildPath('/notifications/settings'), body);
+
+      if (!data || !data.ok) {
+        showStatus(els.settingsStatus, 'err', translateError(data && data.error));
+        return;
+      }
+
+      els.botToken.value = '';
+      showStatus(els.settingsStatus, 'ok', 'Настройки сохранены.');
+      await loadSettings();
+    }
+
+    async function sendTest() {
+      clearStatus(els.settingsStatus);
+      showStatus(els.settingsStatus, 'info', 'Отправляю тестовое сообщение...');
+
+      const data = await apiPost(buildPath('/notifications/test'), {});
+
+      if (!data || !data.ok) {
+        showStatus(els.settingsStatus, 'err', translateError(data && data.error));
+        await loadLogs();
+        return;
+      }
+
+      showStatus(els.settingsStatus, 'ok', 'Тестовое сообщение отправлено.');
+      await loadLogs();
+    }
+
+    function formatDate(value) {
+      if (!value) return '—';
+      try {
+        return new Date(value).toLocaleString('ru-RU');
+      } catch (err) {
+        return value;
+      }
+    }
+
+    function renderLogs(logs) {
+      if (!logs || !logs.length) {
+        els.logsBody.innerHTML = '<tr><td colspan="7">История пока пустая.</td></tr>';
+        return;
+      }
+
+      els.logsBody.innerHTML = logs.map((log) => {
+        const status = htmlEscape(log.status || 'pending');
+        return `
+          <tr>
+            <td>${htmlEscape(formatDate(log.created_at))}</td>
+            <td>${htmlEscape(log.event_type || '')}</td>
+            <td>${htmlEscape(log.channel || '')}</td>
+            <td>${htmlEscape(log.recipient || '')}</td>
+            <td><span class="badge ${status}">${status}</span></td>
+            <td class="message-cell">${htmlEscape(log.message_text || '')}</td>
+            <td class="error-cell">${htmlEscape(log.error_text || '')}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadLogs() {
+      const data = await apiGet(buildPath('/notifications/logs?limit=100'));
+
+      if (!data || !data.ok) {
+        els.logsBody.innerHTML = `<tr><td colspan="7">${htmlEscape(translateError(data && data.error))}</td></tr>`;
+        return;
+      }
+
+      renderLogs(data.logs || []);
+    }
+
+    els.form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      await saveSettings();
+    });
+
+    els.testBtn.addEventListener('click', sendTest);
+    els.reloadBtn.addEventListener('click', loadSettings);
+    els.logsBtn.addEventListener('click', loadLogs);
+
+    (async function init() {
+      await loadSettings();
+      await loadLogs();
+    })();
+  </script>
+</body>
+</html>
