@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru" data-page-title-i18n="showcaseMyOrderView.pageTitle">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Мой заказ — BFC24 CONTROL</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --line:#e6ebf2;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-2:#1d4ed8;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --warning:#d97706;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:24px;
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .title h1{
+      margin:0 0 6px 0;
+      font-size:28px;
+      line-height:1.2;
+    }
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    #langSwitcher{display:flex;gap:8px;flex-wrap:wrap;}
+    #langSwitcher button.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:11px 16px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:14px;
+      transition:.15s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-light{background:#fff;color:var(--text);border:1px solid var(--line)}
+    .btn-light:hover{background:#f8fafc}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-2)}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .section{
+      padding:18px;
+      margin-bottom:18px;
+    }
+    .meta-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+    }
+    .meta-item{
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      min-height:88px;
+    }
+    .meta-item .label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .meta-item .value{
+      font-size:15px;
+      font-weight:700;
+      word-break:break-word;
+    }
+    .status{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:118px;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .s-new{background:#eef2f7;color:#475569}
+    .s-in_progress{background:#dbeafe;color:#1d4ed8}
+    .s-partially_picked{background:#fef3c7;color:#b45309}
+    .s-ready{background:#dcfce7;color:#15803d}
+    .s-completed{background:#d1fae5;color:#047857}
+    .s-cancelled{background:#fee2e2;color:#b91c1c}
+    .message{
+      margin:0 0 16px 0;
+      padding:12px 14px;
+      border-radius:12px;
+      display:none;
+      font-size:14px;
+      font-weight:700;
+    }
+    .message.show{display:block}
+    .message.info{background:#dbeafe;color:#1d4ed8}
+    .message.error{background:#fee2e2;color:#b91c1c}
+    .table-wrap{
+      overflow:auto;
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width:900px;
+    }
+    thead th{
+      background:#f8fafc;
+      color:var(--muted);
+      text-align:left;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      padding:14px 12px;
+      border-bottom:1px solid var(--line);
+    }
+    tbody td{
+      padding:12px;
+      border-bottom:1px solid var(--line);
+      font-size:14px;
+      vertical-align:middle;
+    }
+    .thumb{
+      width:52px;
+      height:52px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      object-fit:cover;
+      display:block;
+    }
+    .thumb.empty{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--muted);
+      font-size:11px;
+      background:#f8fafc;
+    }
+    .mono{font-family:Consolas,Menlo,monospace}
+    .muted{color:var(--muted)}
+    .empty{
+      padding:36px 20px;
+      text-align:center;
+      color:var(--muted);
+    }
+    @media (max-width: 1000px){
+      .meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (max-width: 700px){
+      .wrap{padding:14px}
+      .meta-grid{grid-template-columns:1fr}
+      .title h1{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1 id="pageTitle" data-i18n="showcaseMyOrderView.heading">Мой заказ</h1>
+        <p data-i18n="showcaseMyOrderView.subtitle">Подробная информация о заказе, его статусе и составе.</p>
+      </div>
+      <div class="actions">
+        <div id="langSwitcher"></div>
+        <a class="btn btn-light" href="/showcase-my-orders.html" data-i18n="showcaseMyOrderView.backToOrdersButton">← Назад к заказам</a>
+        <a class="btn btn-light" href="/showcase.html" data-i18n="showcaseMyOrderView.toShowcaseButton">К витрине</a>
+        <button class="btn btn-primary" id="btnRefresh" type="button" data-i18n="showcaseMyOrderView.refreshButton">Обновить</button>
+      </div>
+    </div>
+
+    <div class="message info" id="messageBox"></div>
+
+    <div class="card section">
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="label" data-i18n="showcaseMyOrderView.metaOrderNo">Номер заказа</div>
+          <div class="value mono" id="metaOrderNo">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label" data-i18n="showcaseMyOrderView.metaStatus">Статус</div>
+          <div class="value"><span class="status s-new" id="metaStatus">—</span></div>
+        </div>
+        <div class="meta-item">
+          <div class="label" data-i18n="showcaseMyOrderView.metaCreatedAt">Дата создания</div>
+          <div class="value" id="metaCreatedAt">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label" data-i18n="showcaseMyOrderView.metaShowcase">Витрина / магазин</div>
+          <div class="value" id="metaShowcaseTitle">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label" data-i18n="showcaseMyOrderView.metaComment">Комментарий</div>
+          <div class="value" id="metaComment">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label" data-i18n="showcaseMyOrderView.metaReadyAt">Готов</div>
+          <div class="value" id="metaReadyAt">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label" data-i18n="showcaseMyOrderView.metaCompletedAt">Завершён</div>
+          <div class="value" id="metaCompletedAt">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="label" data-i18n="showcaseMyOrderView.metaCancelledAt">Отменён</div>
+          <div class="value" id="metaCancelledAt">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="showcaseMyOrderView.tablePhoto">Фото</th>
+            <th data-i18n="showcaseMyOrderView.tableProduct">Товар</th>
+            <th data-i18n="showcaseMyOrderView.tableSkuBarcode">SKU / ШК</th>
+            <th data-i18n="showcaseMyOrderView.tableRequested">Запрошено</th>
+            <th data-i18n="showcaseMyOrderView.tableApproved">Подтверждено</th>
+            <th data-i18n="showcaseMyOrderView.tablePicked">Собрано</th>
+            <th data-i18n="showcaseMyOrderView.tablePrice">Цена</th>
+            <th data-i18n="showcaseMyOrderView.tableLineStatus">Статус строки</th>
+          </tr>
+        </thead>
+        <tbody id="itemsTbody">
+          <tr><td colspan="8" class="empty" data-i18n="showcaseMyOrderView.loading">Загрузка...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script>
+    (function () {
+
+      function T(key, fallback) {
+        return window.i18n && typeof window.i18n.t === 'function' ? window.i18n.t(key, fallback) : fallback;
+      }
+
+      function F(key, params, fallback) {
+        return window.i18n && typeof window.i18n.format === 'function' ? window.i18n.format(key, params, fallback) : String(fallback || '').replace(/\{(\w+)\}/g, function (_, name) { return params && params[name] !== undefined ? String(params[name]) : '{' + name + '}'; });
+      }
+
+      function initI18n() {
+        if (window.i18n && typeof window.i18n.renderLanguageSwitcher === 'function') {
+          window.i18n.renderLanguageSwitcher('langSwitcher');
+        }
+        if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+          window.i18n.applyTranslations();
+        }
+      }
+      const buyer = JSON.parse(localStorage.getItem('showcase_buyer') || 'null');
+      const tenantId = Number(localStorage.getItem('showcase_tenant_id') || 1);
+      const params = new URLSearchParams(location.search);
+      const orderId = Number(params.get('id') || 0);
+
+      if (!buyer || !buyer.id) {
+        location.href = '/showcase-login.html';
+        return;
+      }
+
+      if (!orderId) {
+        alert(T('showcaseMyOrderView.missingOrderIdAlert', 'Не передан id заказа'));
+        location.href = '/showcase-my-orders.html';
+        return;
+      }
+
+      const state = { order: null, items: [] };
+      const messageBox = document.getElementById('messageBox');
+      const itemsTbody = document.getElementById('itemsTbody');
+
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function showMessage(text, variant = 'info') {
+        messageBox.textContent = text;
+        messageBox.className = 'message show ' + variant;
+      }
+
+      function hideMessage() {
+        messageBox.textContent = '';
+        messageBox.className = 'message info';
+      }
+
+      function statusLabel(status) {
+        const map = {
+          new: T('showcaseMyOrderView.statusNew', 'Новый'),
+          in_progress: T('showcaseMyOrderView.statusInProgress', 'В работе'),
+          partially_picked: T('showcaseMyOrderView.statusPartiallyPicked', 'Частично собран'),
+          ready: T('showcaseMyOrderView.statusReady', 'Готов'),
+          completed: T('showcaseMyOrderView.statusCompleted', 'Завершён'),
+          cancelled: T('showcaseMyOrderView.statusCancelled', 'Отменён'),
+          approved: T('showcaseMyOrderView.statusApproved', 'Подтверждено'),
+          picked: T('showcaseMyOrderView.statusPicked', 'Собрано'),
+          partial: T('showcaseMyOrderView.statusPartial', 'Частично')
+        };
+        return map[status] || status || '—';
+      }
+
+      function statusClass(status) {
+        return 'status s-' + (status || 'new');
+      }
+
+      function displayDateTimeSafe(value) {
+        try {
+          if (typeof displayDateTime === 'function') return displayDateTime(value);
+        } catch (e) {}
+        if (!value) return '—';
+        const dt = new Date(value);
+        if (Number.isNaN(dt.getTime())) return String(value);
+        return dt.toLocaleString(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'en' ? 'en-US' : 'ru-RU');
+      }
+
+      function imageHtml(url) {
+        if (!url) return '<div class="thumb empty">' + T('showcaseMyOrderView.noPhoto', 'нет фото') + '</div>';
+        return '<img class="thumb" src="' + escapeHtml(url) + '" alt="">';
+      }
+
+      function setText(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = value || '—';
+      }
+
+      function renderMeta() {
+        const order = state.order;
+        if (!order) return;
+
+        document.getElementById('pageTitle').textContent = F('showcaseMyOrderView.dynamicTitle', { orderNo: order.order_no || '' }, 'Заказ {orderNo}');
+        setText('metaOrderNo', order.order_no || '—');
+        setText('metaCreatedAt', displayDateTimeSafe(order.created_at));
+        setText('metaComment', order.comment || '—');
+        setText('metaReadyAt', displayDateTimeSafe(order.ready_at));
+        setText('metaCompletedAt', displayDateTimeSafe(order.completed_at));
+        setText('metaCancelledAt', displayDateTimeSafe(order.cancelled_at));
+        setText('metaShowcaseTitle', order.showcase_title || order.client_name || '—');
+
+        const statusEl = document.getElementById('metaStatus');
+        statusEl.className = statusClass(order.status);
+        statusEl.textContent = statusLabel(order.status);
+      }
+
+      function renderItems() {
+        if (!state.items.length) {
+          itemsTbody.innerHTML = '<tr><td colspan="8" class="empty">' + T('showcaseMyOrderView.noLines', 'Строк заказа нет') + '</td></tr>';
+          return;
+        }
+
+        itemsTbody.innerHTML = state.items.map((item) => `
+          <tr>
+            <td>${imageHtml(item.image_url)}</td>
+            <td><strong>${escapeHtml(item.item_name || '—')}</strong></td>
+            <td>
+              <div class="mono">${escapeHtml(item.sku || '—')}</div>
+              <div class="muted">${escapeHtml(item.barcode || '')}</div>
+            </td>
+            <td>${escapeHtml(item.requested_qty || '0')}</td>
+            <td>${escapeHtml(item.approved_qty ?? '—')}</td>
+            <td>${escapeHtml(item.picked_qty ?? '—')}</td>
+            <td>${item.final_price !== null && item.final_price !== undefined ? escapeHtml(item.final_price) : '—'}</td>
+            <td><span class="${statusClass(item.line_status)}">${escapeHtml(statusLabel(item.line_status))}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      async function loadOrder() {
+        hideMessage();
+        itemsTbody.innerHTML = '<tr><td colspan="8" class="empty" data-i18n="showcaseMyOrderView.loading">Загрузка...</td></tr>';
+
+        try {
+          const result = await API.get('/showcase/my-orders/' + orderId + '?tenant_id=' + tenantId + '&buyer_id=' + buyer.id);
+          state.order = result.order || null;
+          state.items = Array.isArray(result.items) ? result.items : [];
+          renderMeta();
+          renderItems();
+        } catch (error) {
+          console.error('[showcase-my-order-view] loadOrder error:', error);
+          itemsTbody.innerHTML = '<tr><td colspan="8" class="empty">' + T('showcaseMyOrderView.loadOrderError', T('showcaseMyOrderView.loadOrderError', 'Ошибка загрузки заказа')) + '</td></tr>';
+          showMessage(error?.message || error?.error || T('showcaseMyOrderView.loadOrderError', 'Ошибка загрузки заказа'), 'error');
+        }
+      }
+
+      document.getElementById('btnRefresh').addEventListener('click', loadOrder);
+      initI18n();
+      document.addEventListener('app:language-changed', function () {
+        renderMeta();
+        renderItems();
+      });
+      loadOrder();
+    })();
+  </script>
+</body>
+</html>

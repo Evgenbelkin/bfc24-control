@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ru" data-page-title-i18n="showcaseOrders.pageTitle">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Заказы витрины — BFC24 CONTROL</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --line:#e6ebf2;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-2:#1d4ed8;
+      --success:#16a34a;
+      --warning:#d97706;
+      --danger:#dc2626;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:1400px;
+      margin:0 auto;
+      padding:24px;
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+    .title h1{
+      margin:0 0 6px 0;
+      font-size:28px;
+      line-height:1.2;
+    }
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    #langSwitcher{display:flex;gap:8px;flex-wrap:wrap;}
+    #langSwitcher button.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:11px 16px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:14px;
+      transition:.15s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-2)}
+    .btn-light{background:#fff;color:var(--text);border:1px solid var(--line)}
+    .btn-light:hover{background:#f8fafc}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:16px;
+      margin-bottom:20px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .kpi{
+      padding:18px;
+    }
+    .kpi .label{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:8px;
+    }
+    .kpi .value{
+      font-size:28px;
+      font-weight:800;
+      line-height:1;
+    }
+    .filters{
+      padding:18px;
+      margin-bottom:18px;
+    }
+    .filters-row{
+      display:grid;
+      grid-template-columns:1.4fr .7fr .6fr .6fr;
+      gap:12px;
+    }
+    .field label{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    .field input,
+    .field select{
+      width:100%;
+      height:44px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:0 14px;
+      font-size:14px;
+      color:var(--text);
+      outline:none;
+    }
+    .field input:focus,
+    .field select:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.10);
+    }
+    .table-wrap{
+      overflow:auto;
+      padding:0;
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width:1100px;
+    }
+    thead th{
+      position:sticky;
+      top:0;
+      z-index:2;
+      background:#f8fafc;
+      color:var(--muted);
+      text-align:left;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+    }
+    tbody td{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      font-size:14px;
+      vertical-align:middle;
+    }
+    tbody tr:hover{
+      background:#fbfdff;
+    }
+    .muted{color:var(--muted)}
+    .mono{font-family:Consolas,Menlo,monospace}
+    .status{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:118px;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .s-new{background:#eef2f7;color:#475569}
+    .s-in_progress{background:#dbeafe;color:#1d4ed8}
+    .s-partially_picked{background:#fef3c7;color:#b45309}
+    .s-ready{background:#dcfce7;color:#15803d}
+    .s-completed{background:#d1fae5;color:#047857}
+    .s-cancelled{background:#fee2e2;color:#b91c1c}
+    .row-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .btn-sm{
+      min-height:36px;
+      padding:8px 12px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:700;
+    }
+    .empty{
+      padding:36px 20px;
+      text-align:center;
+      color:var(--muted);
+    }
+    .footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:16px 18px;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .pager{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .message{
+      margin:0 0 16px 0;
+      padding:12px 14px;
+      border-radius:12px;
+      display:none;
+      font-size:14px;
+      font-weight:700;
+    }
+    .message.show{display:block}
+    .message.info{background:#dbeafe;color:#1d4ed8}
+    .message.error{background:#fee2e2;color:#b91c1c}
+    .message.success{background:#dcfce7;color:#15803d}
+    @media (max-width: 1100px){
+      .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .filters-row{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width: 700px){
+      .wrap{padding:14px}
+      .grid{grid-template-columns:1fr}
+      .filters-row{grid-template-columns:1fr}
+      .title h1{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1 data-i18n="showcaseOrders.heading">Заказы витрины</h1>
+        <p data-i18n="showcaseOrders.subtitle">Список заказов покупателей, статусы обработки и быстрый переход в карточку заказа.</p>
+      </div>
+      <div class="actions">
+        <div id="langSwitcher"></div>
+        <a class="btn btn-light" href="/index.html" data-i18n="showcaseOrders.backButton">← Назад в меню</a>
+        <button class="btn btn-primary" id="btnRefresh" type="button" data-i18n="showcaseOrders.refreshButton">Обновить</button>
+      </div>
+    </div>
+
+    <div class="message info" id="messageBox"></div>
+
+    <div class="grid">
+      <div class="card kpi">
+        <div class="label" data-i18n="showcaseOrders.kpiTotal">Всего заказов</div>
+        <div class="value" id="kpiTotal">0</div>
+      </div>
+      <div class="card kpi">
+        <div class="label" data-i18n="showcaseOrders.kpiNew">Новые</div>
+        <div class="value" id="kpiNew">0</div>
+      </div>
+      <div class="card kpi">
+        <div class="label" data-i18n="showcaseOrders.kpiWork">В работе</div>
+        <div class="value" id="kpiWork">0</div>
+      </div>
+      <div class="card kpi">
+        <div class="label" data-i18n="showcaseOrders.kpiDone">Готовы / завершены</div>
+        <div class="value" id="kpiDone">0</div>
+      </div>
+    </div>
+
+    <div class="card filters">
+      <div class="filters-row">
+        <div class="field">
+          <label for="searchInput" data-i18n="showcaseOrders.searchLabel">Поиск</label>
+          <input id="searchInput" type="text" placeholder="Номер заказа, клиент, телефон" data-i18n-placeholder="showcaseOrders.searchPlaceholder" />
+        </div>
+        <div class="field">
+          <label for="statusFilter" data-i18n="showcaseOrders.statusLabel">Статус</label>
+          <select id="statusFilter">
+            <option value="" data-i18n="showcaseOrders.allStatuses">Все статусы</option>
+            <option value="new" data-i18n="showcaseOrders.statusNew">Новый</option>
+            <option value="in_progress" data-i18n="showcaseOrders.statusInProgress">В работе</option>
+            <option value="partially_picked" data-i18n="showcaseOrders.statusPartiallyPicked">Частично собран</option>
+            <option value="ready" data-i18n="showcaseOrders.statusReady">Готов</option>
+            <option value="completed" data-i18n="showcaseOrders.statusCompleted">Завершён</option>
+            <option value="cancelled" data-i18n="showcaseOrders.statusCancelled">Отменён</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="limitSelect" data-i18n="showcaseOrders.limitLabel">На странице</label>
+          <select id="limitSelect">
+            <option value="10">10</option>
+            <option value="20" selected>20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;height:44px;" data-i18n="showcaseOrders.applyButton">Применить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="showcaseOrders.tableOrderNo">№ заказа</th>
+            <th data-i18n="showcaseOrders.tableClient">Клиент</th>
+            <th data-i18n="showcaseOrders.tablePhone">Телефон</th>
+            <th data-i18n="showcaseOrders.tableStatus">Статус</th>
+            <th data-i18n="showcaseOrders.tableRequested">Запрошено</th>
+            <th data-i18n="showcaseOrders.tablePicked">Собрано</th>
+            <th data-i18n="showcaseOrders.tableDate">Дата</th>
+            <th data-i18n="showcaseOrders.tableTakenBy">Кто взял</th>
+            <th data-i18n="showcaseOrders.tableAction">Действие</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTbody">
+          <tr><td colspan="9" class="empty" data-i18n="showcaseOrders.loading">Загрузка...</td></tr>
+        </tbody>
+      </table>
+
+      <div class="footer">
+        <div class="muted" id="summaryText" data-i18n="showcaseOrders.noDataYet">Пока нет данных</div>
+        <div class="pager">
+          <button class="btn btn-light btn-sm" id="btnPrevPage" type="button" data-i18n="showcaseOrders.prevButton">← Назад</button>
+          <div class="muted" id="pageInfo" data-i18n="showcaseOrders.pageInitial">Страница 1</div>
+          <button class="btn btn-light btn-sm" id="btnNextPage" type="button" data-i18n="showcaseOrders.nextButton">Вперёд →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script>
+    (function () {
+
+      function T(key, fallback) {
+        return window.i18n && typeof window.i18n.t === 'function' ? window.i18n.t(key, fallback) : fallback;
+      }
+
+      function F(key, params, fallback) {
+        return window.i18n && typeof window.i18n.format === 'function' ? window.i18n.format(key, params, fallback) : String(fallback || '').replace(/\{(\w+)\}/g, function (_, name) { return params && params[name] !== undefined ? String(params[name]) : '{' + name + '}'; });
+      }
+
+      function initI18n() {
+        if (window.i18n && typeof window.i18n.renderLanguageSwitcher === 'function') {
+          window.i18n.renderLanguageSwitcher('langSwitcher');
+        }
+        if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+          window.i18n.applyTranslations();
+        }
+      }
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+      if (!token || !user) {
+        location.href = '/login.html';
+        return;
+      }
+
+      const tenantId = user && user.tenant_id ? Number(user.tenant_id) : 1;
+
+      const state = {
+        page: 1,
+        limit: 20,
+        total: 0,
+        items: []
+      };
+
+      const messageBox = document.getElementById('messageBox');
+      const ordersTbody = document.getElementById('ordersTbody');
+      const searchInput = document.getElementById('searchInput');
+      const statusFilter = document.getElementById('statusFilter');
+      const limitSelect = document.getElementById('limitSelect');
+      const pageInfo = document.getElementById('pageInfo');
+      const summaryText = document.getElementById('summaryText');
+
+      const kpiTotal = document.getElementById('kpiTotal');
+      const kpiNew = document.getElementById('kpiNew');
+      const kpiWork = document.getElementById('kpiWork');
+      const kpiDone = document.getElementById('kpiDone');
+
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function showMessage(text, variant = 'info') {
+        messageBox.textContent = text;
+        messageBox.className = 'message show ' + variant;
+      }
+
+      function hideMessage() {
+        messageBox.className = 'message info';
+        messageBox.textContent = '';
+      }
+
+      function statusLabel(status) {
+        const map = {
+          new: T('showcaseOrders.statusNew', 'Новый'),
+          in_progress: T('showcaseOrders.statusInProgress', 'В работе'),
+          partially_picked: T('showcaseOrders.statusPartiallyPicked', 'Частично собран'),
+          ready: T('showcaseOrders.statusReady', 'Готов'),
+          completed: T('showcaseOrders.statusCompleted', 'Завершён'),
+          cancelled: T('showcaseOrders.statusCancelled', 'Отменён')
+        };
+        return map[status] || status || '—';
+      }
+
+      function statusClass(status) {
+        return 'status s-' + (status || 'new');
+      }
+
+      function displayDateTimeSafe(value) {
+        try {
+          if (typeof displayDateTime === 'function') {
+            return displayDateTime(value);
+          }
+        } catch (e) {}
+        if (!value) return '—';
+        const dt = new Date(value);
+        if (Number.isNaN(dt.getTime())) return String(value);
+        return dt.toLocaleString(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'en' ? 'en-US' : 'ru-RU');
+      }
+
+      function orderActionHtml(order) {
+        const id = Number(order.id);
+        if (order.status === 'new') {
+          return `
+            <div class="row-actions">
+              <button class="btn btn-primary btn-sm" data-action="take" data-id="${id}">${T('showcaseOrders.takeButton', 'Взять в работу')}</button>
+              <a class="btn btn-light btn-sm" href="/showcase-order-view.html?id=${id}">${T('showcaseOrders.openButton', 'Открыть')}</a>
+            </div>
+          `;
+        }
+        if (order.status === 'ready') {
+          return `<a class="btn btn-primary btn-sm" href="/showcase-order-view.html?id=${id}">${T('showcaseOrders.readyForSaleButton', 'Готов к продаже')}</a>`;
+        }
+        return `<a class="btn btn-light btn-sm" href="/showcase-order-view.html?id=${id}">${T('showcaseOrders.openButton', 'Открыть')}</a>`;
+      }
+
+      function renderTable() {
+        if (!state.items.length) {
+          ordersTbody.innerHTML = '<tr><td colspan="9" class="empty">' + T('showcaseOrders.ordersNotFound', 'Заказы не найдены') + '</td></tr>';
+          pageInfo.textContent = F('showcaseOrders.pageInfo', { page: state.page }, 'Страница {page}');
+          summaryText.textContent = T('showcaseOrders.nothingFound', 'Ничего не найдено');
+          return;
+        }
+
+        ordersTbody.innerHTML = state.items.map((order) => `
+          <tr>
+            <td class="mono">${escapeHtml(order.order_no || '—')}</td>
+            <td>${escapeHtml(order.buyer_name || '—')}</td>
+            <td>${escapeHtml(order.buyer_phone || '—')}</td>
+            <td><span class="${statusClass(order.status)}">${escapeHtml(statusLabel(order.status))}</span></td>
+            <td>${escapeHtml(order.requested_total_qty || '0')}</td>
+            <td>${escapeHtml(order.picked_total_qty || '0')}</td>
+            <td>${escapeHtml(displayDateTimeSafe(order.created_at))}</td>
+            <td>${escapeHtml(order.taken_by_name || '—')}</td>
+            <td>${orderActionHtml(order)}</td>
+          </tr>
+        `).join('');
+
+        const from = (state.page - 1) * state.limit + 1;
+        const to = Math.min(state.total, state.page * state.limit);
+        pageInfo.textContent = F('showcaseOrders.pageInfo', { page: state.page }, 'Страница {page}');
+        summaryText.textContent = F('showcaseOrders.shownSummary', { from: from, to: to, total: state.total }, 'Показано {from}-{to} из {total}');
+      }
+
+      function renderKpi() {
+        let countNew = 0;
+        let countWork = 0;
+        let countDone = 0;
+
+        state.items.forEach((item) => {
+          if (item.status === 'new') countNew += 1;
+          if (item.status === 'in_progress' || item.status === 'partially_picked') countWork += 1;
+          if (item.status === 'ready' || item.status === 'completed') countDone += 1;
+        });
+
+        kpiTotal.textContent = String(state.total || 0);
+        kpiNew.textContent = String(countNew);
+        kpiWork.textContent = String(countWork);
+        kpiDone.textContent = String(countDone);
+      }
+
+      async function loadOrders() {
+        hideMessage();
+        ordersTbody.innerHTML = '<tr><td colspan="9" class="empty" data-i18n="showcaseOrders.loading">Загрузка...</td></tr>';
+
+        try {
+          const params = new URLSearchParams();
+          params.set('tenant_id', String(tenantId));
+          params.set('page', String(state.page));
+          params.set('limit', String(state.limit));
+
+          if (searchInput.value.trim()) {
+            params.set('search', searchInput.value.trim());
+          }
+          if (statusFilter.value) {
+            params.set('status', statusFilter.value);
+          }
+
+          const result = await API.get('/showcase-admin/orders?' + params.toString());
+
+          state.total = Number(result.total || 0);
+          state.items = Array.isArray(result.items) ? result.items : [];
+
+          renderTable();
+          renderKpi();
+        } catch (error) {
+          console.error('[showcase-orders] loadOrders error:', error);
+          const text = (typeof translateError === 'function')
+            ? translateError(error?.error || error?.message || 'server_error')
+            : (error?.error || error?.message || T('showcaseOrders.loadOrdersError', 'Ошибка загрузки заказов'));
+
+          ordersTbody.innerHTML = '<tr><td colspan="9" class="empty">' + T('showcaseOrders.loadError', 'Ошибка загрузки') + '</td></tr>';
+          showMessage(text, 'error');
+        }
+      }
+
+      async function takeOrder(orderId) {
+        try {
+          showMessage(T('showcaseOrders.takingOrderStatus', 'Берём заказ в работу...'), 'info');
+          await API.post('/showcase-admin/orders/' + orderId + '/take?tenant_id=' + tenantId, {});
+          showMessage(T('showcaseOrders.orderTakenStatus', 'Заказ взят в работу'), 'success');
+          await loadOrders();
+        } catch (error) {
+          console.error('[showcase-orders] takeOrder error:', error);
+          const text = (typeof translateError === 'function')
+            ? translateError(error?.error || error?.message || 'server_error')
+            : (error?.error || error?.message || T('showcaseOrders.takeOrderError', 'Ошибка взятия заказа в работу'));
+          showMessage(text, 'error');
+        }
+      }
+
+      document.getElementById('btnRefresh').addEventListener('click', loadOrders);
+
+      document.getElementById('btnApplyFilters').addEventListener('click', function () {
+        state.page = 1;
+        state.limit = Number(limitSelect.value || 20);
+        initI18n();
+      document.addEventListener('app:language-changed', function () {
+        renderTable();
+      });
+      loadOrders();
+      });
+
+      document.getElementById('btnPrevPage').addEventListener('click', function () {
+        if (state.page <= 1) return;
+        state.page -= 1;
+        loadOrders();
+      });
+
+      document.getElementById('btnNextPage').addEventListener('click', function () {
+        const maxPage = Math.max(1, Math.ceil(state.total / state.limit));
+        if (state.page >= maxPage) return;
+        state.page += 1;
+        loadOrders();
+      });
+
+      ordersTbody.addEventListener('click', async function (e) {
+        const btn = e.target.closest('[data-action="take"]');
+        if (!btn) return;
+
+        const orderId = Number(btn.getAttribute('data-id'));
+        if (!orderId) return;
+
+        await takeOrder(orderId);
+      });
+
+      searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          state.page = 1;
+          state.limit = Number(limitSelect.value || 20);
+          loadOrders();
+        }
+      });
+
+      loadOrders();
+    })();
+  </script>
+</body>
+</html>

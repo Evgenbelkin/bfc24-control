@@ -2,7 +2,7 @@
 <html lang="ru" translate="no" data-page-title-i18n="clients.pageTitle">
 <head>
   <meta charset="UTF-8" />
-  <title>BFC24 CONTROL — Клиенты</title>
+  <title data-i18n="clients.pageTitle">BFC24 CONTROL — Клиенты</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="google" content="notranslate" />
 
@@ -285,6 +285,71 @@
       flex-wrap:wrap;
     }
 
+    .btn-success{
+      background:var(--success);
+      color:#fff;
+    }
+
+    .btn-danger{
+      background:var(--danger);
+      color:#fff;
+    }
+
+    .showcase-box{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:220px;
+    }
+
+    .showcase-main{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    .showcase-login{
+      font-weight:700;
+      color:#111827;
+      word-break:break-all;
+    }
+
+    .showcase-badge{
+      display:inline-flex;
+      align-items:center;
+      width:max-content;
+      border-radius:999px;
+      padding:4px 8px;
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .showcase-badge.on{
+      background:#dcfce7;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+
+    .showcase-badge.off{
+      background:#fee2e2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+
+    .showcase-actions{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+
+    .showcase-actions .btn{
+      padding:9px 10px;
+      border-radius:10px;
+      font-size:12px;
+    }
+
     .empty{
       text-align:center;
       color:var(--muted);
@@ -372,8 +437,8 @@
           </div>
 
           <div class="toolbar-actions">
-            <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
-            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn" data-i18n="clients.saveButton">Сохранить</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;" data-i18n="clients.cancelEditButton">Отменить редактирование</button>
             <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="clients.refreshButton">Обновить список</button>
           </div>
         </div>
@@ -396,12 +461,13 @@
               <th data-i18n="clients.tableComment">Комментарий</th>
               <th data-i18n="clients.tableActive">Активно</th>
               <th data-i18n="clients.tableDate">Дата</th>
+              <th data-i18n="clients.tableShowcase">Витрина</th>
               <th data-i18n="clients.tableActions">Действия</th>
             </tr>
           </thead>
           <tbody id="tbody">
             <tr>
-              <td colspan="7" class="empty" data-i18n="clients.loadingData">Загрузка данных...</td>
+              <td colspan="8" class="empty" data-i18n="clients.loadingData">Загрузка данных...</td>
             </tr>
           </tbody>
         </table>
@@ -596,6 +662,47 @@
       submitStatusState = null;
       hideStatus(els.submitStatus);
     }
+    function setSubmitStatusText(text, type = "info") {
+      submitStatusState = null;
+      showStatus(els.submitStatus, text, type);
+    }
+
+    function copyTextToClipboard(text) {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        return navigator.clipboard.writeText(text);
+      }
+
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return Promise.resolve();
+    }
+
+    function showShowcaseCredentials({ login, password }) {
+      const message = i18n.format("clients.showcaseCredentialsMessage", {
+        login,
+        password
+      });
+
+      setSubmitStatusText(message, "success");
+      alert(message);
+    }
+
+    async function copyShowcaseLogin(login) {
+      try {
+        await copyTextToClipboard(login);
+        setSubmitStatusText(i18n.format("clients.showcaseLoginCopied", { login }), "success");
+      } catch (err) {
+        setSubmitStatusText(i18n.format("clients.showcaseLoginCopyFailed", { error: Ui.translateError(err.message) }), "error");
+      }
+    }
+
 
     function restoreStatusesAfterLanguageChange() {
       if (pageStatusState) {
@@ -654,6 +761,10 @@
       return ApiBridge.put(path, body);
     }
 
+    async function apiPatch(path, body) {
+      return ApiBridge.patch(path, body);
+    }
+
     function normalizeClient(row) {
       return {
         id: row.id,
@@ -661,7 +772,10 @@
         phone: row.phone || "",
         comment: row.comment || "",
         is_active: row.is_active === false ? false : true,
-        created_at: row.created_at || row.date || null
+        created_at: row.created_at || row.date || null,
+        showcase_buyer_id: row.showcase_buyer_id || row.showcase_id || null,
+        showcase_login: row.showcase_login || row.login || "",
+        showcase_is_active: row.showcase_is_active === false ? false : (row.showcase_is_active === true ? true : null)
       };
     }
 
@@ -718,6 +832,48 @@
       });
     }
 
+    function renderShowcaseCell(row) {
+      const hasAccess = !!row.showcase_buyer_id || !!row.showcase_login;
+      const loginHtml = row.showcase_login
+        ? `<div><span class="muted">${escapeHtml(i18n.t("clients.showcaseLoginLabel"))}</span> <span class="showcase-login">${escapeHtml(row.showcase_login)}</span></div>`
+        : `<div class="muted">${escapeHtml(i18n.t("clients.showcaseNotCreated"))}</div>`;
+
+      const badgeHtml = hasAccess
+        ? `<span class="showcase-badge ${row.showcase_is_active === false ? "off" : "on"}">${escapeHtml(row.showcase_is_active === false ? i18n.t("clients.showcaseStatusOff") : i18n.t("clients.showcaseStatusOn"))}</span>`
+        : `<span class="showcase-badge off">${escapeHtml(i18n.t("clients.showcaseNoAccess"))}</span>`;
+
+      const createButton = hasAccess
+        ? ""
+        : `<button type="button" class="btn btn-success" onclick="createShowcaseAccess('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("clients.showcaseCreateAccessButton"))}</button>`;
+
+      const copyLoginButton = row.showcase_login
+        ? `<button type="button" class="btn btn-light" onclick="copyShowcaseLogin('${escapeHtml(row.showcase_login)}')">${escapeHtml(i18n.t("clients.showcaseCopyLoginButton"))}</button>`
+        : "";
+
+      const resetButton = hasAccess
+        ? `<button type="button" class="btn btn-secondary" onclick="resetShowcasePassword('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("clients.showcaseResetPasswordButton"))}</button>`
+        : "";
+
+      const toggleButton = hasAccess
+        ? `<button type="button" class="btn ${row.showcase_is_active === false ? "btn-success" : "btn-danger"}" onclick="toggleShowcaseAccess('${escapeHtml(row.id)}')">${escapeHtml(row.showcase_is_active === false ? i18n.t("clients.showcaseEnableButton") : i18n.t("clients.showcaseDisableButton"))}</button>`
+        : "";
+
+      return `
+        <div class="showcase-box">
+          <div class="showcase-main">
+            ${badgeHtml}
+            ${loginHtml}
+          </div>
+          <div class="showcase-actions">
+            ${createButton}
+            ${copyLoginButton}
+            ${resetButton}
+            ${toggleButton}
+          </div>
+        </div>
+      `;
+    }
+
     function renderTable() {
       const rows = getFilteredRows();
       els.clientsCount.textContent = String(clientsData.length);
@@ -725,7 +881,7 @@
       if (!rows.length) {
         els.tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="empty">${escapeHtml(i18n.t("clients.noData"))}</td>
+            <td colspan="8" class="empty">${escapeHtml(i18n.t("clients.noData"))}</td>
           </tr>
         `;
         return;
@@ -739,6 +895,7 @@
           <td>${escapeHtml(row.comment)}</td>
           <td>${row.is_active ? escapeHtml(i18n.t("clients.activeYes")) : escapeHtml(i18n.t("clients.activeNo"))}</td>
           <td>${escapeHtml(formatDate(row.created_at))}</td>
+          <td>${renderShowcaseCell(row)}</td>
           <td>
             <div class="row-actions">
               <button type="button" class="btn btn-secondary" onclick="editClient('${escapeHtml(row.id)}')">${escapeHtml(i18n.t("clients.editButton"))}</button>
@@ -751,7 +908,7 @@
     function renderLoadingRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="7" class="empty">${escapeHtml(i18n.t("clients.loadingData"))}</td>
+          <td colspan="8" class="empty">${escapeHtml(i18n.t("clients.loadingData"))}</td>
         </tr>
       `;
     }
@@ -759,7 +916,7 @@
     function renderLoadErrorRow() {
       els.tbody.innerHTML = `
         <tr>
-          <td colspan="7" class="empty">${escapeHtml(i18n.t("clients.loadErrorRow"))}</td>
+          <td colspan="8" class="empty">${escapeHtml(i18n.t("clients.loadErrorRow"))}</td>
         </tr>
       `;
     }
@@ -829,6 +986,73 @@
       }
     }
 
+    async function createShowcaseAccess(id) {
+      try {
+        clearSubmitStatus();
+
+        const password = prompt(i18n.t("clients.showcaseCreatePasswordPrompt"));
+        if (!password) {
+          setSubmitStatusText(i18n.t("clients.showcasePasswordRequired"), "error");
+          return;
+        }
+
+        setSubmitStatusText(i18n.t("clients.showcaseCreatingAccess"), "info");
+
+        const data = await apiPost(`/clients/${id}/showcase/create`, {
+          password
+        });
+
+        const login = data.login || "";
+        await loadData();
+
+        alert(i18n.format("clients.showcaseCreatedAlert", { login, password }));
+        setSubmitStatusText(i18n.t("clients.showcaseCreatedStatus"), "success");
+
+      } catch (err) {
+        setSubmitStatusText(i18n.format("clients.showcaseError", { error: Ui.translateError(err.message) }), "error");
+      }
+    }
+
+    async function resetShowcasePassword(id) {
+      try {
+        clearSubmitStatus();
+
+        const password = prompt(i18n.t("clients.showcaseResetPasswordPrompt"));
+        if (!password) {
+          setSubmitStatusText(i18n.t("clients.showcasePasswordRequired"), "error");
+          return;
+        }
+
+        setSubmitStatusText(i18n.t("clients.showcaseResettingPassword"), "info");
+
+        const data = await apiPost(`/clients/${id}/showcase/reset-password`, {
+          password
+        });
+
+        const login = data.login || "";
+        await loadData();
+
+        alert(i18n.format("clients.showcasePasswordUpdatedAlert", { login, password }));
+        setSubmitStatusText(i18n.t("clients.showcasePasswordUpdatedStatus"), "success");
+
+      } catch (err) {
+        setSubmitStatusText(i18n.format("clients.showcaseError", { error: Ui.translateError(err.message) }), "error");
+      }
+    }
+
+    async function toggleShowcaseAccess(id) {
+      try {
+        clearSubmitStatus();
+        setSubmitStatusText(i18n.t("clients.showcaseChangingStatus"), "info");
+
+        await apiPatch(`/clients/${id}/showcase/toggle`, {});
+        await loadData();
+        setSubmitStatusText(i18n.t("clients.showcaseStatusChanged"), "success");
+      } catch (err) {
+        setSubmitStatusText(i18n.format("clients.showcaseError", { error: Ui.translateError(err.message) }), "error");
+      }
+    }
+
     function bindEvents() {
       els.clientForm.addEventListener("submit", handleSubmit);
       els.searchInput.addEventListener("input", renderTable);
@@ -860,8 +1084,15 @@
 
     bootstrap();
     window.editClient = editClient;
+    window.createShowcaseAccess = createShowcaseAccess;
+    window.resetShowcasePassword = resetShowcasePassword;
+    window.toggleShowcaseAccess = toggleShowcaseAccess;
     window.goBack = goBack;
     window.logout = logout;
   </script>
 </body>
 </html>
+<!-- line guard: keep original length -->
+<!-- line guard: keep original length -->
+<!-- line guard: keep original length -->
+<!-- line guard: keep original length -->

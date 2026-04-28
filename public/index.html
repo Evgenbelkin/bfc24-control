@@ -650,11 +650,11 @@
 
     <div id="impersonationBanner" class="impersonation-banner">
       <div>
-        <div class="impersonation-banner__title">Режим поддержки владельца</div>
-        <div class="impersonation-banner__text">Вы вошли в кабинет клиента: <span id="impersonationTenantName">—</span></div>
+        <div class="impersonation-banner__title" data-i18n="index.impersonationTitle">Режим поддержки владельца</div>
+        <div class="impersonation-banner__text"><span data-i18n="index.impersonationText">Вы вошли в кабинет клиента:</span> <span id="impersonationTenantName">—</span></div>
       </div>
       <div class="impersonation-banner__actions">
-        <button type="button" class="impersonation-btn" id="impersonationBackBtn">Вернуться в кабинет владельца</button>
+        <button type="button" class="impersonation-btn" id="impersonationBackBtn" data-i18n="index.impersonationBackButton">Вернуться в кабинет владельца</button>
       </div>
     </div>
 
@@ -1040,6 +1040,69 @@
         <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
       </div>
 
+
+
+      <div class="card" onclick="window.location.href='/showcase-admin-orders.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="stroke-main" x="12" y="14" width="40" height="36" rx="5" stroke-width="2.4"/>
+                <path class="stroke-main" d="M20 24H44" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M20 32H34" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="stroke-main" d="M20 40H30" stroke-width="2.4" stroke-linecap="round"/>
+                <circle class="stroke-accent" cx="44" cy="40" r="8" stroke-width="2.4"/>
+                <path class="stroke-accent" d="M40 40L43 43L49 36" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.showcaseAdminOrdersTitle">Заказы витрины</h3>
+          <div class="muted" data-i18n="index.showcaseAdminOrdersDesc">Заказы покупателей с витрины, сборка и создание продажи</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/showcase-settings.html'">
+        <div class="card__content">
+          <div class="card__top">
+            <div class="card__icon">
+              <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="stroke-main" d="M14 24L32 12L50 24V50C50 52.2091 48.2091 54 46 54H18C15.7909 54 14 52.2091 14 50V24Z" stroke-width="2.4" stroke-linejoin="round"/>
+                <path class="stroke-main" d="M24 54V38H40V54" stroke-width="2.4" stroke-linejoin="round"/>
+                <path class="stroke-accent" d="M22 28H42" stroke-width="2.6" stroke-linecap="round"/>
+                <path class="stroke-accent" d="M26 34H38" stroke-width="2.6" stroke-linecap="round"/>
+                <circle class="fill-accent" cx="46" cy="18" r="4"/>
+              </svg>
+            </div>
+            <div class="card__arrow">→</div>
+          </div>
+          <h3 data-i18n="index.showcaseSettingsTitle">Настройки витрины</h3>
+          <div class="muted" data-i18n="index.showcaseSettingsDesc">Название магазина, контакты, баннер, цены и доступность витрины</div>
+        </div>
+        <div class="card__footer" data-i18n="index.openModule">Открыть модуль</div>
+      </div>
+
+      <div class="card" onclick="window.location.href='/showcase.html'">
+  <div class="card__content">
+    <div class="card__top">
+      <div class="card__icon">
+        <svg class="menu-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect class="stroke-main" x="12" y="16" width="40" height="32" rx="6" stroke-width="2.4"/>
+          <path class="stroke-main" d="M12 26H52" stroke-width="2.4" stroke-linecap="round"/>
+          <path class="stroke-main" d="M20 36H30" stroke-width="2.4" stroke-linecap="round"/>
+          <path class="stroke-main" d="M34 36H44" stroke-width="2.4" stroke-linecap="round"/>
+          <path class="stroke-accent" d="M22 44H42" stroke-width="2.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="card__arrow">→</div>
+    </div>
+    <h3 data-i18n="index.showcaseTitle">Витрина</h3>
+    <div class="muted" data-i18n="index.showcaseDesc">Открыть витрину и отправить ссылку клиенту</div>
+  </div>
+  <div class="card__footer" data-i18n="index.showcaseOpenButton">Открыть витрину</div>
+</div>
+
       <div class="card" id="subscriptionCard">
         <div class="card__content">
           <div class="card__top">
@@ -1319,7 +1382,9 @@
         "/analytics.html": "analytics",
         "/turnover.html": "turnover",
         "/debts.html": "debts",
-        "/users.html": "users"
+        "/users.html": "users",
+        "/showcase-admin-orders.html": null,
+"/showcase-settings.html": null
       };
       return map[pathname] || null;
     }
@@ -1399,7 +1464,7 @@ if (card.id === "subscriptionCard") {
         : "";
 
       const impersonationText = user?.impersonation
-        ? `<div style="margin-top:6px;"><b>Режим:</b> поддержка владельца</div>`
+        ? `<div style="margin-top:6px;"><b>${Ui.escapeHtml(i18n.t("index.impersonationModeLabel"))}:</b> ${Ui.escapeHtml(i18n.t("index.impersonationModeValue"))}</div>`
         : "";
 
       userBox.innerHTML = `

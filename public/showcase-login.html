@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru" data-page-title-i18n="showcaseLogin.pageTitle">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вход покупателя — BFC24 CONTROL</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --line:#e6ebf2;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-2:#1d4ed8;
+      --danger:#dc2626;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--bg);
+      font-family:Arial,Helvetica,sans-serif;
+      color:var(--text);
+      padding:20px;
+    }
+    .card{
+      width:100%;
+      max-width:380px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:28px;
+    }
+    h1{
+      margin:0 0 8px 0;
+      font-size:28px;
+    }
+    p{
+      margin:0 0 18px 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
+    .field{
+      margin-bottom:12px;
+    }
+    .field label{
+      display:block;
+      margin-bottom:6px;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .field input{
+      width:100%;
+      height:44px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:0 14px;
+      font-size:14px;
+      color:var(--text);
+      outline:none;
+      background:#fff;
+    }
+    .field input:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.10);
+    }
+    .btn{
+      width:100%;
+      height:46px;
+      border:none;
+      border-radius:12px;
+      background:var(--primary);
+      color:#fff;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      transition:.15s ease;
+      margin-top:6px;
+    }
+    .btn:hover{background:var(--primary-2)}
+    .btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+    .message{
+      display:none;
+      margin-bottom:14px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+    }
+    .message.show{display:block}
+    .message.error{
+      background:#fee2e2;
+      color:#b91c1c;
+    }
+    .message.success{
+      background:#dcfce7;
+      color:#15803d;
+    }
+    .hint{
+      margin-top:12px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+    }
+    #langSwitcher{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    #langSwitcher .btn-light{
+      width:auto;
+      height:36px;
+      min-width:52px;
+      padding:0 12px;
+      margin-top:0;
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+      font-size:13px;
+    }
+    #langSwitcher .btn-light.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="langSwitcher"></div>
+    <h1 data-i18n="showcaseLogin.heading">Вход</h1>
+    <p data-i18n="showcaseLogin.subtitle">Вход для покупателей витрины. После входа откроется каталог товаров.</p>
+
+    <div class="message error" id="messageBox"></div>
+
+    <div class="field">
+      <label for="tenantInput" data-i18n="showcaseLogin.tenantLabel">Tenant ID</label>
+      <input id="tenantInput" type="number" value="1" />
+    </div>
+
+    <div class="field">
+      <label for="loginInput" data-i18n="showcaseLogin.loginLabel">Логин</label>
+      <input id="loginInput" type="text" value="buyer1" />
+    </div>
+
+    <div class="field">
+      <label for="passwordInput" data-i18n="showcaseLogin.passwordLabel">Пароль</label>
+      <input id="passwordInput" type="password" value="123456" />
+    </div>
+
+    <button class="btn" id="loginBtn" type="button" data-i18n="showcaseLogin.submitButton">Войти</button>
+
+    <div class="hint" data-i18n="showcaseLogin.testHint">Тестовый вход: tenant_id = 1, login = buyer1, password = 123456</div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script>
+    (function () {
+      const tenantInput = document.getElementById('tenantInput');
+      const loginInput = document.getElementById('loginInput');
+      const passwordInput = document.getElementById('passwordInput');
+      const loginBtn = document.getElementById('loginBtn');
+      const messageBox = document.getElementById('messageBox');
+
+      function t(key, fallback) {
+        return window.i18n && typeof window.i18n.t === 'function' ? window.i18n.t(key, fallback) : fallback;
+      }
+
+      function setLoginButtonIdle() {
+        loginBtn.textContent = t('showcaseLogin.submitButton', 'Войти');
+      }
+
+      if (window.i18n && typeof window.i18n.renderLanguageSwitcher === 'function') {
+        window.i18n.renderLanguageSwitcher('langSwitcher');
+      }
+      if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+        window.i18n.applyTranslations();
+      }
+      document.addEventListener('app:language-changed', setLoginButtonIdle);
+
+      function showError(text) {
+        messageBox.textContent = text;
+        messageBox.className = 'message error show';
+      }
+
+      function hideError() {
+        messageBox.textContent = '';
+        messageBox.className = 'message error';
+      }
+
+      async function login() {
+        hideError();
+
+        const tenant_id = Number(tenantInput.value || 0);
+        const login = String(loginInput.value || '').trim();
+        const password = String(passwordInput.value || '');
+
+        if (!tenant_id || !login || !password) {
+          showError(t('showcaseLogin.requiredError', 'Заполни tenant_id, логин и пароль'));
+          return;
+        }
+
+        loginBtn.disabled = true;
+        loginBtn.textContent = t('showcaseLogin.loadingButton', 'Входим...');
+
+        try {
+          const result = await API.post('/showcase/auth/login', {
+            tenant_id,
+            login,
+            password
+          });
+
+          if (!result || !result.ok || !result.buyer) {
+            showError(t('showcaseLogin.loginFailed', 'Не удалось выполнить вход'));
+            return;
+          }
+
+          localStorage.setItem('showcase_buyer', JSON.stringify(result.buyer));
+          localStorage.setItem('showcase_tenant_id', String(tenant_id));
+
+          location.href = '/showcase.html';
+        } catch (error) {
+          console.error('[showcase-login] login error:', error);
+
+          let text = t('showcaseLogin.loginError', 'Ошибка входа');
+          if (error && error.error === 'invalid_credentials') {
+            text = t('showcaseLogin.invalidCredentials', 'Неверный логин или пароль');
+          } else if (error && error.error === 'login_password_tenant_required') {
+            text = t('showcaseLogin.requiredApiError', 'Нужно заполнить tenant_id, логин и пароль');
+          } else if (error && error.message) {
+            text = error.message;
+          }
+
+          showError(text);
+        } finally {
+          loginBtn.disabled = false;
+          setLoginButtonIdle();
+        }
+      }
+
+      loginBtn.addEventListener('click', login);
+
+      passwordInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') login();
+      });
+
+      loginInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') login();
+      });
+    })();
+  </script>
+</body>
+</html>
