@@ -256,7 +256,8 @@
         showcasePasswordUpdatedStatus: "Пароль обновлён",
         showcaseChangingStatus: "Меняю статус доступа к витрине...",
         showcaseStatusChanged: "Статус доступа к витрине изменён.",
-        showcaseError: "Ошибка витрины: {error}",},
+        showcaseError: "Ошибка витрины: {error}",
+      },
 
       users: {
         pageTitle: "BFC24 CONTROL — Пользователи",
@@ -1297,8 +1298,11 @@ sales: {
         paymentRequired: "Выбери способ оплаты",
         savingStatus: "Сохраняю расход...",
         savedStatus: "Расход успешно сохранён",
-        saveErrorStatus: "Ошибка: {error}"
-      },
+        saveErrorStatus: "Ошибка: {error}",
+      
+        statsMax: "Максимальный расход",
+        tableExpenseDate: "Дата расхода",
+        tableActions: "Действия",},
 
       analytics: {
         pageTitle: "BFC24 CONTROL — Аналитика",
@@ -1887,7 +1891,8 @@ sales: {
         showcasePasswordUpdatedStatus: "Password updated",
         showcaseChangingStatus: "Changing showcase access status...",
         showcaseStatusChanged: "Showcase access status changed.",
-        showcaseError: "Showcase error: {error}",},
+        showcaseError: "Showcase error: {error}",
+      },
 
       users: {
         pageTitle: "BFC24 CONTROL — Users",
@@ -2929,8 +2934,11 @@ sales: {
         paymentRequired: "Select a payment method",
         savingStatus: "Saving expense...",
         savedStatus: "Expense saved successfully",
-        saveErrorStatus: "Error: {error}"
-      },
+        saveErrorStatus: "Error: {error}",
+      
+        statsMax: "Maximum expense",
+        tableExpenseDate: "Expense date",
+        tableActions: "Actions",},
 
       analytics: {
         pageTitle: "BFC24 CONTROL — Analytics",
@@ -3446,7 +3454,8 @@ sales: {
         showcasePasswordUpdatedStatus: "密码已更新",
         showcaseChangingStatus: "正在更改展示页访问状态...",
         showcaseStatusChanged: "展示页访问状态已更改。",
-        showcaseError: "展示页错误：{error}",},
+        showcaseError: "展示页错误：{error}",
+      },
 
       users: {
         pageTitle: "BFC24 CONTROL — 用户",
@@ -4519,8 +4528,11 @@ sales: {
         paymentRequired: "请选择付款方式",
         savingStatus: "正在保存支出...",
         savedStatus: "支出保存成功",
-        saveErrorStatus: "错误：{error}"
-      },
+        saveErrorStatus: "错误：{error}",
+      
+        statsMax: "最大支出",
+        tableExpenseDate: "支出日期",
+        tableActions: "操作",},
 
       analytics: {
         pageTitle: "BFC24 CONTROL — 分析",
