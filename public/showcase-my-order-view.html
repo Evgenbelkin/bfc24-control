@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="showcaseMyOrderView.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -54,6 +54,10 @@
       gap:10px;
       flex-wrap:wrap;
     }
+
+    #langSwitcher{display:flex;gap:8px;flex-wrap:wrap;}
+    #langSwitcher button.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
     .btn{
       border:none;
       border-radius:12px;
@@ -199,13 +203,14 @@
   <div class="wrap">
     <div class="topbar">
       <div class="title">
-        <h1 id="pageTitle">Мой заказ</h1>
-        <p>Подробная информация о заказе, его статусе и составе.</p>
+        <h1 id="pageTitle" data-i18n="showcaseMyOrderView.heading">Мой заказ</h1>
+        <p data-i18n="showcaseMyOrderView.subtitle">Подробная информация о заказе, его статусе и составе.</p>
       </div>
       <div class="actions">
-        <a class="btn btn-light" href="/showcase-my-orders.html">← Назад к заказам</a>
-        <a class="btn btn-light" href="/showcase.html">К витрине</a>
-        <button class="btn btn-primary" id="btnRefresh" type="button">Обновить</button>
+        <div id="langSwitcher"></div>
+        <a class="btn btn-light" href="/showcase-my-orders.html" data-i18n="showcaseMyOrderView.backToOrdersButton">← Назад к заказам</a>
+        <a class="btn btn-light" href="/showcase.html" data-i18n="showcaseMyOrderView.toShowcaseButton">К витрине</a>
+        <button class="btn btn-primary" id="btnRefresh" type="button" data-i18n="showcaseMyOrderView.refreshButton">Обновить</button>
       </div>
     </div>
 
@@ -214,35 +219,35 @@
     <div class="card section">
       <div class="meta-grid">
         <div class="meta-item">
-          <div class="label">Номер заказа</div>
+          <div class="label" data-i18n="showcaseMyOrderView.metaOrderNo">Номер заказа</div>
           <div class="value mono" id="metaOrderNo">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Статус</div>
+          <div class="label" data-i18n="showcaseMyOrderView.metaStatus">Статус</div>
           <div class="value"><span class="status s-new" id="metaStatus">—</span></div>
         </div>
         <div class="meta-item">
-          <div class="label">Дата создания</div>
+          <div class="label" data-i18n="showcaseMyOrderView.metaCreatedAt">Дата создания</div>
           <div class="value" id="metaCreatedAt">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Витрина / магазин</div>
+          <div class="label" data-i18n="showcaseMyOrderView.metaShowcase">Витрина / магазин</div>
           <div class="value" id="metaShowcaseTitle">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Комментарий</div>
+          <div class="label" data-i18n="showcaseMyOrderView.metaComment">Комментарий</div>
           <div class="value" id="metaComment">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Готов</div>
+          <div class="label" data-i18n="showcaseMyOrderView.metaReadyAt">Готов</div>
           <div class="value" id="metaReadyAt">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Завершён</div>
+          <div class="label" data-i18n="showcaseMyOrderView.metaCompletedAt">Завершён</div>
           <div class="value" id="metaCompletedAt">—</div>
         </div>
         <div class="meta-item">
-          <div class="label">Отменён</div>
+          <div class="label" data-i18n="showcaseMyOrderView.metaCancelledAt">Отменён</div>
           <div class="value" id="metaCancelledAt">—</div>
         </div>
       </div>
@@ -252,18 +257,18 @@
       <table>
         <thead>
           <tr>
-            <th>Фото</th>
-            <th>Товар</th>
-            <th>SKU / ШК</th>
-            <th>Запрошено</th>
-            <th>Подтверждено</th>
-            <th>Собрано</th>
-            <th>Цена</th>
-            <th>Статус строки</th>
+            <th data-i18n="showcaseMyOrderView.tablePhoto">Фото</th>
+            <th data-i18n="showcaseMyOrderView.tableProduct">Товар</th>
+            <th data-i18n="showcaseMyOrderView.tableSkuBarcode">SKU / ШК</th>
+            <th data-i18n="showcaseMyOrderView.tableRequested">Запрошено</th>
+            <th data-i18n="showcaseMyOrderView.tableApproved">Подтверждено</th>
+            <th data-i18n="showcaseMyOrderView.tablePicked">Собрано</th>
+            <th data-i18n="showcaseMyOrderView.tablePrice">Цена</th>
+            <th data-i18n="showcaseMyOrderView.tableLineStatus">Статус строки</th>
           </tr>
         </thead>
         <tbody id="itemsTbody">
-          <tr><td colspan="8" class="empty">Загрузка...</td></tr>
+          <tr><td colspan="8" class="empty" data-i18n="showcaseMyOrderView.loading">Загрузка...</td></tr>
         </tbody>
       </table>
     </div>
@@ -275,6 +280,23 @@
   <script src="/js/i18n.js"></script>
   <script>
     (function () {
+
+      function T(key, fallback) {
+        return window.i18n && typeof window.i18n.t === 'function' ? window.i18n.t(key, fallback) : fallback;
+      }
+
+      function F(key, params, fallback) {
+        return window.i18n && typeof window.i18n.format === 'function' ? window.i18n.format(key, params, fallback) : String(fallback || '').replace(/\{(\w+)\}/g, function (_, name) { return params && params[name] !== undefined ? String(params[name]) : '{' + name + '}'; });
+      }
+
+      function initI18n() {
+        if (window.i18n && typeof window.i18n.renderLanguageSwitcher === 'function') {
+          window.i18n.renderLanguageSwitcher('langSwitcher');
+        }
+        if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+          window.i18n.applyTranslations();
+        }
+      }
       const buyer = JSON.parse(localStorage.getItem('showcase_buyer') || 'null');
       const tenantId = Number(localStorage.getItem('showcase_tenant_id') || 1);
       const params = new URLSearchParams(location.search);
@@ -286,7 +308,7 @@
       }
 
       if (!orderId) {
-        alert('Не передан id заказа');
+        alert(T('showcaseMyOrderView.missingOrderIdAlert', 'Не передан id заказа'));
         location.href = '/showcase-my-orders.html';
         return;
       }
@@ -317,15 +339,15 @@
 
       function statusLabel(status) {
         const map = {
-          new: 'Новый',
-          in_progress: 'В работе',
-          partially_picked: 'Частично собран',
-          ready: 'Готов',
-          completed: 'Завершён',
-          cancelled: 'Отменён',
-          approved: 'Подтверждено',
-          picked: 'Собрано',
-          partial: 'Частично'
+          new: T('showcaseMyOrderView.statusNew', 'Новый'),
+          in_progress: T('showcaseMyOrderView.statusInProgress', 'В работе'),
+          partially_picked: T('showcaseMyOrderView.statusPartiallyPicked', 'Частично собран'),
+          ready: T('showcaseMyOrderView.statusReady', 'Готов'),
+          completed: T('showcaseMyOrderView.statusCompleted', 'Завершён'),
+          cancelled: T('showcaseMyOrderView.statusCancelled', 'Отменён'),
+          approved: T('showcaseMyOrderView.statusApproved', 'Подтверждено'),
+          picked: T('showcaseMyOrderView.statusPicked', 'Собрано'),
+          partial: T('showcaseMyOrderView.statusPartial', 'Частично')
         };
         return map[status] || status || '—';
       }
@@ -341,11 +363,11 @@
         if (!value) return '—';
         const dt = new Date(value);
         if (Number.isNaN(dt.getTime())) return String(value);
-        return dt.toLocaleString('ru-RU');
+        return dt.toLocaleString(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'en' ? 'en-US' : 'ru-RU');
       }
 
       function imageHtml(url) {
-        if (!url) return '<div class="thumb empty">нет фото</div>';
+        if (!url) return '<div class="thumb empty">' + T('showcaseMyOrderView.noPhoto', 'нет фото') + '</div>';
         return '<img class="thumb" src="' + escapeHtml(url) + '" alt="">';
       }
 
@@ -359,7 +381,7 @@
         const order = state.order;
         if (!order) return;
 
-        document.getElementById('pageTitle').textContent = 'Заказ ' + (order.order_no || '');
+        document.getElementById('pageTitle').textContent = F('showcaseMyOrderView.dynamicTitle', { orderNo: order.order_no || '' }, 'Заказ {orderNo}');
         setText('metaOrderNo', order.order_no || '—');
         setText('metaCreatedAt', displayDateTimeSafe(order.created_at));
         setText('metaComment', order.comment || '—');
@@ -375,7 +397,7 @@
 
       function renderItems() {
         if (!state.items.length) {
-          itemsTbody.innerHTML = '<tr><td colspan="8" class="empty">Строк заказа нет</td></tr>';
+          itemsTbody.innerHTML = '<tr><td colspan="8" class="empty">' + T('showcaseMyOrderView.noLines', 'Строк заказа нет') + '</td></tr>';
           return;
         }
 
@@ -398,7 +420,7 @@
 
       async function loadOrder() {
         hideMessage();
-        itemsTbody.innerHTML = '<tr><td colspan="8" class="empty">Загрузка...</td></tr>';
+        itemsTbody.innerHTML = '<tr><td colspan="8" class="empty" data-i18n="showcaseMyOrderView.loading">Загрузка...</td></tr>';
 
         try {
           const result = await API.get('/showcase/my-orders/' + orderId + '?tenant_id=' + tenantId + '&buyer_id=' + buyer.id);
@@ -408,12 +430,17 @@
           renderItems();
         } catch (error) {
           console.error('[showcase-my-order-view] loadOrder error:', error);
-          itemsTbody.innerHTML = '<tr><td colspan="8" class="empty">Ошибка загрузки заказа</td></tr>';
-          showMessage(error?.message || error?.error || 'Ошибка загрузки заказа', 'error');
+          itemsTbody.innerHTML = '<tr><td colspan="8" class="empty">' + T('showcaseMyOrderView.loadOrderError', T('showcaseMyOrderView.loadOrderError', 'Ошибка загрузки заказа')) + '</td></tr>';
+          showMessage(error?.message || error?.error || T('showcaseMyOrderView.loadOrderError', 'Ошибка загрузки заказа'), 'error');
         }
       }
 
       document.getElementById('btnRefresh').addEventListener('click', loadOrder);
+      initI18n();
+      document.addEventListener('app:language-changed', function () {
+        renderMeta();
+        renderItems();
+      });
       loadOrder();
     })();
   </script>

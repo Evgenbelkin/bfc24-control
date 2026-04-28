@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="showcaseSettings.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -61,6 +61,10 @@
       gap:10px;
       flex-wrap:wrap;
     }
+
+
+    #langSwitcher{display:flex;gap:8px;flex-wrap:wrap;}
+    #langSwitcher button.active{background:var(--primary);color:#fff;border-color:var(--primary);}
 
     .btn{
       border:none;
@@ -371,13 +375,14 @@
   <div class="wrap">
     <div class="topbar">
       <div class="title">
-        <h1>Настройки витрины</h1>
-        <p>Управление магазином, его контактами, отображением цен и доступностью витрины для покупателей.</p>
+        <h1 data-i18n="showcaseSettings.heading">Настройки витрины</h1>
+        <p data-i18n="showcaseSettings.subtitle">Управление магазином, его контактами, отображением цен и доступностью витрины для покупателей.</p>
       </div>
       <div class="actions">
-        <a class="btn btn-light" href="/showcase.html">Открыть витрину</a>
-        <button class="btn btn-light" id="btnReload" type="button">Обновить</button>
-        <button class="btn btn-success" id="btnSaveTop" type="button">Сохранить</button>
+        <div id="langSwitcher"></div>
+        <a class="btn btn-light" href="/showcase.html" data-i18n="showcaseSettings.openShowcaseButton">Открыть витрину</a>
+        <button class="btn btn-light" id="btnReload" type="button" data-i18n="showcaseSettings.refreshButton">Обновить</button>
+        <button class="btn btn-success" id="btnSaveTop" type="button" data-i18n="showcaseSettings.saveButton">Сохранить</button>
       </div>
     </div>
 
@@ -388,30 +393,30 @@
         <div class="card section">
           <div class="form-grid">
             <div class="field">
-              <label for="titleInput">Название магазина</label>
-              <input id="titleInput" type="text" placeholder="Например: Оптовый магазин Иванова" />
+              <label for="titleInput" data-i18n="showcaseSettings.titleLabel">Название магазина</label>
+              <input id="titleInput" type="text" placeholder="Например: Оптовый магазин Иванова" data-i18n-placeholder="showcaseSettings.titlePlaceholder" />
             </div>
 
             <div class="field">
-              <label for="phoneInput">Телефон</label>
+              <label for="phoneInput" data-i18n="showcaseSettings.phoneLabel">Телефон</label>
               <input id="phoneInput" type="text" placeholder="+79991234567" />
             </div>
 
             <div class="field full">
-              <label for="descriptionInput">Описание магазина</label>
-              <textarea id="descriptionInput" placeholder="Короткое описание магазина, условий работы, ассортимента и т.д."></textarea>
+              <label for="descriptionInput" data-i18n="showcaseSettings.descriptionLabel">Описание магазина</label>
+              <textarea id="descriptionInput" placeholder="Короткое описание магазина, условий работы, ассортимента и т.д." data-i18n-placeholder="showcaseSettings.descriptionPlaceholder"></textarea>
             </div>
 
             <div class="field full">
-              <label for="logoInput">URL логотипа</label>
-              <input id="logoInput" type="text" placeholder="/uploads/logo.png или https://..." />
-              <div class="hint">Пока используем URL. Позже можно сделать отдельную загрузку файла.</div>
+              <label for="logoInput" data-i18n="showcaseSettings.logoLabel">URL логотипа</label>
+              <input id="logoInput" type="text" placeholder="/uploads/logo.png или https://..." data-i18n-placeholder="showcaseSettings.logoPlaceholder" />
+              <div class="hint" data-i18n="showcaseSettings.logoHint">Пока используем URL. Позже можно сделать отдельную загрузку файла.</div>
             </div>
 
             <div class="field full">
-              <label for="bannerInput">URL баннера</label>
-              <input id="bannerInput" type="text" placeholder="/uploads/banner.jpg или https://..." />
-              <div class="hint">Баннер показывается в верхней части витрины.</div>
+              <label for="bannerInput" data-i18n="showcaseSettings.bannerLabel">URL баннера</label>
+              <input id="bannerInput" type="text" placeholder="/uploads/banner.jpg или https://..." data-i18n-placeholder="showcaseSettings.bannerPlaceholder" />
+              <div class="hint" data-i18n="showcaseSettings.bannerHint">Баннер показывается в верхней части витрины.</div>
             </div>
           </div>
         </div>
@@ -420,24 +425,24 @@
           <div class="switch-row">
             <label class="switch-card">
               <div>
-                <h3>Витрина включена</h3>
-                <p>Если выключить, покупатели не смогут открыть каталог товаров и оформить заказ.</p>
+                <h3 data-i18n="showcaseSettings.enabledTitle">Витрина включена</h3>
+                <p data-i18n="showcaseSettings.enabledText">Если выключить, покупатели не смогут открыть каталог товаров и оформить заказ.</p>
               </div>
               <input id="enabledInput" type="checkbox" />
             </label>
 
             <label class="switch-card">
               <div>
-                <h3>Показывать цены</h3>
-                <p>Если выключить, на витрине будет надпись "Цена скрыта" вместо цены товара.</p>
+                <h3 data-i18n="showcaseSettings.pricesTitle">Показывать цены</h3>
+                <p data-i18n="showcaseSettings.pricesText">Если выключить, на витрине будет надпись "Цена скрыта" вместо цены товара.</p>
               </div>
               <input id="showPricesInput" type="checkbox" />
             </label>
 
             <label class="switch-card">
               <div>
-                <h3>Показывать только товары в наличии</h3>
-                <p>Если включить, витрина будет скрывать позиции, где доступный остаток меньше или равен нулю.</p>
+                <h3 data-i18n="showcaseSettings.stockOnlyTitle">Показывать только товары в наличии</h3>
+                <p data-i18n="showcaseSettings.stockOnlyText">Если включить, витрина будет скрывать позиции, где доступный остаток меньше или равен нулю.</p>
               </div>
               <input id="onlyInStockInput" type="checkbox" />
             </label>
@@ -446,14 +451,14 @@
 
         <div class="card section">
           <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-light" id="btnReset" type="button">Сбросить</button>
-            <button class="btn btn-success" id="btnSaveBottom" type="button">Сохранить настройки</button>
+            <button class="btn btn-light" id="btnReset" type="button" data-i18n="showcaseSettings.resetButton">Сбросить</button>
+            <button class="btn btn-success" id="btnSaveBottom" type="button" data-i18n="showcaseSettings.saveSettingsButton">Сохранить настройки</button>
           </div>
         </div>
       </div>
 
       <div class="card preview-wrap">
-        <h2 class="preview-title">Предпросмотр витрины</h2>
+        <h2 class="preview-title" data-i18n="showcaseSettings.previewTitle">Предпросмотр витрины</h2>
 
         <div class="preview-hero">
           <div class="preview-banner" id="previewBanner"></div>
@@ -474,16 +479,16 @@
 
         <div class="status-list">
           <div class="status-item">
-            <strong>Что увидит покупатель</strong>
-            Название магазина, телефон, описание, баннер и логотип будут показаны на витрине сверху.
+            <strong data-i18n="showcaseSettings.buyerPreviewTitle">Что увидит покупатель</strong>
+            <span data-i18n="showcaseSettings.buyerPreviewText">Название магазина, телефон, описание, баннер и логотип будут показаны на витрине сверху.</span>
           </div>
           <div class="status-item">
-            <strong>Показ цен</strong>
-            Если включено, покупатели увидят цены товаров. Если выключено — только сами товары и остатки.
+            <strong data-i18n="showcaseSettings.pricePreviewTitle">Показ цен</strong>
+            <span data-i18n="showcaseSettings.pricePreviewText">Если включено, покупатели увидят цены товаров. Если выключено — только сами товары и остатки.</span>
           </div>
           <div class="status-item">
-            <strong>Показ остатков</strong>
-            Если включить режим "Только в наличии", витрина автоматически скроет отсутствующие товары.
+            <strong data-i18n="showcaseSettings.stockPreviewTitle">Показ остатков</strong>
+            <span data-i18n="showcaseSettings.stockPreviewText">Если включить режим "Только в наличии", витрина автоматически скроет отсутствующие товары.</span>
           </div>
         </div>
       </div>
@@ -496,6 +501,23 @@
   <script src="/js/i18n.js"></script>
   <script>
     (function () {
+
+      function T(key, fallback) {
+        return window.i18n && typeof window.i18n.t === 'function' ? window.i18n.t(key, fallback) : fallback;
+      }
+
+      function F(key, params, fallback) {
+        return window.i18n && typeof window.i18n.format === 'function' ? window.i18n.format(key, params, fallback) : String(fallback || '').replace(/\{(\w+)\}/g, function (_, name) { return params && params[name] !== undefined ? String(params[name]) : '{' + name + '}'; });
+      }
+
+      function initI18n() {
+        if (window.i18n && typeof window.i18n.renderLanguageSwitcher === 'function') {
+          window.i18n.renderLanguageSwitcher('langSwitcher');
+        }
+        if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+          window.i18n.applyTranslations();
+        }
+      }
       const user = JSON.parse(localStorage.getItem('user') || 'null');
       const tenantId = user && user.tenant_id ? Number(user.tenant_id) : 1;
 
@@ -561,22 +583,22 @@
       function renderPreview() {
         const settings = currentPayload();
 
-        document.getElementById('previewTitle').textContent = settings.title || 'Витрина';
-        document.getElementById('previewDescription').textContent = settings.description || 'Описание магазина пока не заполнено.';
-        document.getElementById('previewPhone').textContent = settings.phone || 'Телефон не указан';
-        document.getElementById('previewEnabled').textContent = settings.is_enabled ? 'Витрина включена' : 'Витрина выключена';
-        document.getElementById('previewPrices').textContent = settings.show_prices ? 'Цены показаны' : 'Цены скрыты';
-        document.getElementById('previewStockMode').textContent = settings.show_only_in_stock ? 'Только в наличии' : 'Показывать все товары';
+        document.getElementById('previewTitle').textContent = settings.title || T('showcaseSettings.previewDefaultTitle', 'Витрина');
+        document.getElementById('previewDescription').textContent = settings.description || T('showcaseSettings.previewDefaultDescription', 'Описание магазина пока не заполнено.');
+        document.getElementById('previewPhone').textContent = settings.phone || T('showcaseSettings.previewPhoneMissing', 'Телефон не указан');
+        document.getElementById('previewEnabled').textContent = settings.is_enabled ? T('showcaseSettings.previewEnabledOn', 'Витрина включена') : T('showcaseSettings.previewEnabledOff', 'Витрина выключена');
+        document.getElementById('previewPrices').textContent = settings.show_prices ? T('showcaseSettings.previewPricesShown', 'Цены показаны') : T('showcaseSettings.previewPricesHidden', 'Цены скрыты');
+        document.getElementById('previewStockMode').textContent = settings.show_only_in_stock ? T('showcaseSettings.previewOnlyInStock', 'Только в наличии') : T('showcaseSettings.previewAllProducts', 'Показывать все товары');
 
         const previewLogo = document.getElementById('previewLogo');
         previewLogo.innerHTML = settings.logo_url
           ? '<img src="' + escapeHtml(settings.logo_url) + '" alt="">'
-          : '<div class="preview-logo-empty">логотип<br>не задан</div>';
+          : '<div class="preview-logo-empty">' + T('showcaseSettings.logoNotSetHtml', 'логотип<br>не задан') + '</div>';
 
         const previewBanner = document.getElementById('previewBanner');
         previewBanner.innerHTML = settings.banner_url
           ? '<img src="' + escapeHtml(settings.banner_url) + '" alt="">'
-          : '<div class="preview-banner-empty">Баннер магазина пока не задан</div>';
+          : '<div class="preview-banner-empty">' + T('showcaseSettings.bannerNotSet', 'Баннер магазина пока не задан') + '</div>';
       }
 
       async function loadSettings() {
@@ -600,25 +622,25 @@
           renderPreview();
         } catch (error) {
           console.error('[showcase-settings] loadSettings error:', error);
-          showMessage(error?.message || error?.error || 'Ошибка загрузки настроек витрины', 'error');
+          showMessage(error?.message || error?.error || T('showcaseSettings.loadError', 'Ошибка загрузки настроек витрины'), 'error');
         }
       }
 
       async function saveSettings() {
         hideMessage();
         try {
-          showMessage('Сохраняем настройки...', 'info');
+          showMessage(T('showcaseSettings.savingStatus', 'Сохраняем настройки...'), 'info');
 
           const payload = currentPayload();
 
           await API.put('/showcase-admin/settings?tenant_id=' + tenantId, payload);
 
           state.settings = payload;
-          showMessage('Настройки витрины сохранены', 'success');
+          showMessage(T('showcaseSettings.savedStatus', 'Настройки витрины сохранены'), 'success');
           renderPreview();
         } catch (error) {
           console.error('[showcase-settings] saveSettings error:', error);
-          showMessage(error?.message || error?.error || 'Ошибка сохранения настроек витрины', 'error');
+          showMessage(error?.message || error?.error || T('showcaseSettings.saveError', 'Ошибка сохранения настроек витрины'), 'error');
         }
       }
 
@@ -626,7 +648,7 @@
         if (!state.settings) return;
         fillForm(state.settings);
         renderPreview();
-        showMessage('Изменения сброшены', 'info');
+        showMessage(T('showcaseSettings.resetStatus', 'Изменения сброшены'), 'info');
       }
 
       [
@@ -648,6 +670,10 @@
       document.getElementById('btnSaveBottom').addEventListener('click', saveSettings);
       document.getElementById('btnReset').addEventListener('click', resetForm);
 
+      initI18n();
+      document.addEventListener('app:language-changed', function () {
+        renderPreview();
+      });
       loadSettings();
     })();
   </script>

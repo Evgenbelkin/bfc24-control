@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="showcaseOrders.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -54,6 +54,10 @@
       gap:10px;
       flex-wrap:wrap;
     }
+
+    #langSwitcher{display:flex;gap:8px;flex-wrap:wrap;}
+    #langSwitcher button.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
     .btn{
       border:none;
       border-radius:12px;
@@ -241,12 +245,13 @@
   <div class="wrap">
     <div class="topbar">
       <div class="title">
-        <h1>Заказы витрины</h1>
-        <p>Список заказов покупателей, статусы обработки и быстрый переход в карточку заказа.</p>
+        <h1 data-i18n="showcaseOrders.heading">Заказы витрины</h1>
+        <p data-i18n="showcaseOrders.subtitle">Список заказов покупателей, статусы обработки и быстрый переход в карточку заказа.</p>
       </div>
       <div class="actions">
-        <a class="btn btn-light" href="/index.html">← Назад в меню</a>
-        <button class="btn btn-primary" id="btnRefresh" type="button">Обновить</button>
+        <div id="langSwitcher"></div>
+        <a class="btn btn-light" href="/index.html" data-i18n="showcaseOrders.backButton">← Назад в меню</a>
+        <button class="btn btn-primary" id="btnRefresh" type="button" data-i18n="showcaseOrders.refreshButton">Обновить</button>
       </div>
     </div>
 
@@ -254,19 +259,19 @@
 
     <div class="grid">
       <div class="card kpi">
-        <div class="label">Всего заказов</div>
+        <div class="label" data-i18n="showcaseOrders.kpiTotal">Всего заказов</div>
         <div class="value" id="kpiTotal">0</div>
       </div>
       <div class="card kpi">
-        <div class="label">Новые</div>
+        <div class="label" data-i18n="showcaseOrders.kpiNew">Новые</div>
         <div class="value" id="kpiNew">0</div>
       </div>
       <div class="card kpi">
-        <div class="label">В работе</div>
+        <div class="label" data-i18n="showcaseOrders.kpiWork">В работе</div>
         <div class="value" id="kpiWork">0</div>
       </div>
       <div class="card kpi">
-        <div class="label">Готовы / завершены</div>
+        <div class="label" data-i18n="showcaseOrders.kpiDone">Готовы / завершены</div>
         <div class="value" id="kpiDone">0</div>
       </div>
     </div>
@@ -274,23 +279,23 @@
     <div class="card filters">
       <div class="filters-row">
         <div class="field">
-          <label for="searchInput">Поиск</label>
-          <input id="searchInput" type="text" placeholder="Номер заказа, клиент, телефон" />
+          <label for="searchInput" data-i18n="showcaseOrders.searchLabel">Поиск</label>
+          <input id="searchInput" type="text" placeholder="Номер заказа, клиент, телефон" data-i18n-placeholder="showcaseOrders.searchPlaceholder" />
         </div>
         <div class="field">
-          <label for="statusFilter">Статус</label>
+          <label for="statusFilter" data-i18n="showcaseOrders.statusLabel">Статус</label>
           <select id="statusFilter">
-            <option value="">Все статусы</option>
-            <option value="new">Новый</option>
-            <option value="in_progress">В работе</option>
-            <option value="partially_picked">Частично собран</option>
-            <option value="ready">Готов</option>
-            <option value="completed">Завершён</option>
-            <option value="cancelled">Отменён</option>
+            <option value="" data-i18n="showcaseOrders.allStatuses">Все статусы</option>
+            <option value="new" data-i18n="showcaseOrders.statusNew">Новый</option>
+            <option value="in_progress" data-i18n="showcaseOrders.statusInProgress">В работе</option>
+            <option value="partially_picked" data-i18n="showcaseOrders.statusPartiallyPicked">Частично собран</option>
+            <option value="ready" data-i18n="showcaseOrders.statusReady">Готов</option>
+            <option value="completed" data-i18n="showcaseOrders.statusCompleted">Завершён</option>
+            <option value="cancelled" data-i18n="showcaseOrders.statusCancelled">Отменён</option>
           </select>
         </div>
         <div class="field">
-          <label for="limitSelect">На странице</label>
+          <label for="limitSelect" data-i18n="showcaseOrders.limitLabel">На странице</label>
           <select id="limitSelect">
             <option value="10">10</option>
             <option value="20" selected>20</option>
@@ -300,7 +305,7 @@
         </div>
         <div class="field">
           <label>&nbsp;</label>
-          <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;height:44px;">Применить</button>
+          <button class="btn btn-primary" id="btnApplyFilters" type="button" style="width:100%;height:44px;" data-i18n="showcaseOrders.applyButton">Применить</button>
         </div>
       </div>
     </div>
@@ -309,28 +314,28 @@
       <table>
         <thead>
           <tr>
-            <th>№ заказа</th>
-            <th>Клиент</th>
-            <th>Телефон</th>
-            <th>Статус</th>
-            <th>Запрошено</th>
-            <th>Собрано</th>
-            <th>Дата</th>
-            <th>Кто взял</th>
-            <th>Действие</th>
+            <th data-i18n="showcaseOrders.tableOrderNo">№ заказа</th>
+            <th data-i18n="showcaseOrders.tableClient">Клиент</th>
+            <th data-i18n="showcaseOrders.tablePhone">Телефон</th>
+            <th data-i18n="showcaseOrders.tableStatus">Статус</th>
+            <th data-i18n="showcaseOrders.tableRequested">Запрошено</th>
+            <th data-i18n="showcaseOrders.tablePicked">Собрано</th>
+            <th data-i18n="showcaseOrders.tableDate">Дата</th>
+            <th data-i18n="showcaseOrders.tableTakenBy">Кто взял</th>
+            <th data-i18n="showcaseOrders.tableAction">Действие</th>
           </tr>
         </thead>
         <tbody id="ordersTbody">
-          <tr><td colspan="9" class="empty">Загрузка...</td></tr>
+          <tr><td colspan="9" class="empty" data-i18n="showcaseOrders.loading">Загрузка...</td></tr>
         </tbody>
       </table>
 
       <div class="footer">
-        <div class="muted" id="summaryText">Пока нет данных</div>
+        <div class="muted" id="summaryText" data-i18n="showcaseOrders.noDataYet">Пока нет данных</div>
         <div class="pager">
-          <button class="btn btn-light btn-sm" id="btnPrevPage" type="button">← Назад</button>
-          <div class="muted" id="pageInfo">Страница 1</div>
-          <button class="btn btn-light btn-sm" id="btnNextPage" type="button">Вперёд →</button>
+          <button class="btn btn-light btn-sm" id="btnPrevPage" type="button" data-i18n="showcaseOrders.prevButton">← Назад</button>
+          <div class="muted" id="pageInfo" data-i18n="showcaseOrders.pageInitial">Страница 1</div>
+          <button class="btn btn-light btn-sm" id="btnNextPage" type="button" data-i18n="showcaseOrders.nextButton">Вперёд →</button>
         </div>
       </div>
     </div>
@@ -342,6 +347,23 @@
   <script src="/js/i18n.js"></script>
   <script>
     (function () {
+
+      function T(key, fallback) {
+        return window.i18n && typeof window.i18n.t === 'function' ? window.i18n.t(key, fallback) : fallback;
+      }
+
+      function F(key, params, fallback) {
+        return window.i18n && typeof window.i18n.format === 'function' ? window.i18n.format(key, params, fallback) : String(fallback || '').replace(/\{(\w+)\}/g, function (_, name) { return params && params[name] !== undefined ? String(params[name]) : '{' + name + '}'; });
+      }
+
+      function initI18n() {
+        if (window.i18n && typeof window.i18n.renderLanguageSwitcher === 'function') {
+          window.i18n.renderLanguageSwitcher('langSwitcher');
+        }
+        if (window.i18n && typeof window.i18n.applyTranslations === 'function') {
+          window.i18n.applyTranslations();
+        }
+      }
       const token = localStorage.getItem('token');
       const user = JSON.parse(localStorage.getItem('user') || 'null');
 
@@ -394,12 +416,12 @@
 
       function statusLabel(status) {
         const map = {
-          new: 'Новый',
-          in_progress: 'В работе',
-          partially_picked: 'Частично собран',
-          ready: 'Готов',
-          completed: 'Завершён',
-          cancelled: 'Отменён'
+          new: T('showcaseOrders.statusNew', 'Новый'),
+          in_progress: T('showcaseOrders.statusInProgress', 'В работе'),
+          partially_picked: T('showcaseOrders.statusPartiallyPicked', 'Частично собран'),
+          ready: T('showcaseOrders.statusReady', 'Готов'),
+          completed: T('showcaseOrders.statusCompleted', 'Завершён'),
+          cancelled: T('showcaseOrders.statusCancelled', 'Отменён')
         };
         return map[status] || status || '—';
       }
@@ -417,7 +439,7 @@
         if (!value) return '—';
         const dt = new Date(value);
         if (Number.isNaN(dt.getTime())) return String(value);
-        return dt.toLocaleString('ru-RU');
+        return dt.toLocaleString(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'en' ? 'en-US' : 'ru-RU');
       }
 
       function orderActionHtml(order) {
@@ -425,22 +447,22 @@
         if (order.status === 'new') {
           return `
             <div class="row-actions">
-              <button class="btn btn-primary btn-sm" data-action="take" data-id="${id}">Взять в работу</button>
-              <a class="btn btn-light btn-sm" href="/showcase-order-view.html?id=${id}">Открыть</a>
+              <button class="btn btn-primary btn-sm" data-action="take" data-id="${id}">${T('showcaseOrders.takeButton', 'Взять в работу')}</button>
+              <a class="btn btn-light btn-sm" href="/showcase-order-view.html?id=${id}">${T('showcaseOrders.openButton', 'Открыть')}</a>
             </div>
           `;
         }
         if (order.status === 'ready') {
-          return `<a class="btn btn-primary btn-sm" href="/showcase-order-view.html?id=${id}">Готов к продаже</a>`;
+          return `<a class="btn btn-primary btn-sm" href="/showcase-order-view.html?id=${id}">${T('showcaseOrders.readyForSaleButton', 'Готов к продаже')}</a>`;
         }
-        return `<a class="btn btn-light btn-sm" href="/showcase-order-view.html?id=${id}">Открыть</a>`;
+        return `<a class="btn btn-light btn-sm" href="/showcase-order-view.html?id=${id}">${T('showcaseOrders.openButton', 'Открыть')}</a>`;
       }
 
       function renderTable() {
         if (!state.items.length) {
-          ordersTbody.innerHTML = '<tr><td colspan="9" class="empty">Заказы не найдены</td></tr>';
-          pageInfo.textContent = 'Страница ' + state.page;
-          summaryText.textContent = 'Ничего не найдено';
+          ordersTbody.innerHTML = '<tr><td colspan="9" class="empty">' + T('showcaseOrders.ordersNotFound', 'Заказы не найдены') + '</td></tr>';
+          pageInfo.textContent = F('showcaseOrders.pageInfo', { page: state.page }, 'Страница {page}');
+          summaryText.textContent = T('showcaseOrders.nothingFound', 'Ничего не найдено');
           return;
         }
 
@@ -460,8 +482,8 @@
 
         const from = (state.page - 1) * state.limit + 1;
         const to = Math.min(state.total, state.page * state.limit);
-        pageInfo.textContent = 'Страница ' + state.page;
-        summaryText.textContent = `Показано ${from}-${to} из ${state.total}`;
+        pageInfo.textContent = F('showcaseOrders.pageInfo', { page: state.page }, 'Страница {page}');
+        summaryText.textContent = F('showcaseOrders.shownSummary', { from: from, to: to, total: state.total }, 'Показано {from}-{to} из {total}');
       }
 
       function renderKpi() {
@@ -483,7 +505,7 @@
 
       async function loadOrders() {
         hideMessage();
-        ordersTbody.innerHTML = '<tr><td colspan="9" class="empty">Загрузка...</td></tr>';
+        ordersTbody.innerHTML = '<tr><td colspan="9" class="empty" data-i18n="showcaseOrders.loading">Загрузка...</td></tr>';
 
         try {
           const params = new URLSearchParams();
@@ -509,24 +531,24 @@
           console.error('[showcase-orders] loadOrders error:', error);
           const text = (typeof translateError === 'function')
             ? translateError(error?.error || error?.message || 'server_error')
-            : (error?.error || error?.message || 'Ошибка загрузки заказов');
+            : (error?.error || error?.message || T('showcaseOrders.loadOrdersError', 'Ошибка загрузки заказов'));
 
-          ordersTbody.innerHTML = '<tr><td colspan="9" class="empty">Ошибка загрузки</td></tr>';
+          ordersTbody.innerHTML = '<tr><td colspan="9" class="empty">' + T('showcaseOrders.loadError', 'Ошибка загрузки') + '</td></tr>';
           showMessage(text, 'error');
         }
       }
 
       async function takeOrder(orderId) {
         try {
-          showMessage('Берём заказ в работу...', 'info');
+          showMessage(T('showcaseOrders.takingOrderStatus', 'Берём заказ в работу...'), 'info');
           await API.post('/showcase-admin/orders/' + orderId + '/take?tenant_id=' + tenantId, {});
-          showMessage('Заказ взят в работу', 'success');
+          showMessage(T('showcaseOrders.orderTakenStatus', 'Заказ взят в работу'), 'success');
           await loadOrders();
         } catch (error) {
           console.error('[showcase-orders] takeOrder error:', error);
           const text = (typeof translateError === 'function')
             ? translateError(error?.error || error?.message || 'server_error')
-            : (error?.error || error?.message || 'Ошибка взятия заказа в работу');
+            : (error?.error || error?.message || T('showcaseOrders.takeOrderError', 'Ошибка взятия заказа в работу'));
           showMessage(text, 'error');
         }
       }
@@ -536,7 +558,11 @@
       document.getElementById('btnApplyFilters').addEventListener('click', function () {
         state.page = 1;
         state.limit = Number(limitSelect.value || 20);
-        loadOrders();
+        initI18n();
+      document.addEventListener('app:language-changed', function () {
+        renderTable();
+      });
+      loadOrders();
       });
 
       document.getElementById('btnPrevPage').addEventListener('click', function () {
