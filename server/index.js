@@ -33,6 +33,7 @@ const transfersRouter = require("./routes/transfers");
 const showcaseRoutes = require('./routes/showcase');
 const showcaseAdminRoutes = require('./routes/showcase-admin');
 const showcaseAdminSettings = require('./routes/showcase-admin-settings');
+const notificationsRouter = require('./routes/notifications');
 
 // 🔥 ДОБАВЛЕНО
 const subscriptionRequestsRoutes = require("./routes/subscription-requests");
@@ -116,6 +117,7 @@ app.use("/stock", transfersRouter);
 app.use('/showcase', showcaseRoutes);
 app.use('/showcase-admin', showcaseAdminRoutes);
 app.use('/showcase-admin', showcaseAdminSettings);
+app.use('/api/notifications', notificationsRouter);
 
 // 🔥 ДОБАВЛЕНО (ВАЖНО — ДО owner-activity можно, это норм)
 app.use("/", subscriptionRequestsRoutes);
