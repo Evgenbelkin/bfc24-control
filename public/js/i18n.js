@@ -604,6 +604,13 @@
         importFinished: "Импорт завершён. Создано: {created}. Пропущено: {skipped}.",
         importDoneChooseNext: "Импорт выполнен. Можешь выбрать следующий файл.",
         importFileChosen: "Файл выбран: {name}",
+        downloadTemplateButton: "Скачать шаблон",
+        importTemplateHint: "Не уверены в формате файла?",
+        importColumnsFound: "Найдено колонок: {found} из {total}",
+        importColumnsMissingPrefix: "Не найдены:",
+        importFormatWarning: "Похоже, файл не соответствует формату BFC24 — большинство колонок не распознано. Скачайте шаблон и перенесите данные в него.",
+        templateDownloading: "Скачиваем шаблон...",
+        templateDownloadError: "Не удалось скачать шаблон",
 
       },
 sales: {
@@ -2602,6 +2609,13 @@ sales: {
         importFinished: "Import completed. Created: {created}. Skipped: {skipped}.",
         importDoneChooseNext: "Import complete. You can choose the next file.",
         importFileChosen: "Selected file: {name}",
+        downloadTemplateButton: "Download template",
+        importTemplateHint: "Not sure about the file format?",
+        importColumnsFound: "Columns found: {found} of {total}",
+        importColumnsMissingPrefix: "Not found:",
+        importFormatWarning: "This file doesn't look like the BFC24 format — most columns weren't recognized. Download the template and move your data into it.",
+        templateDownloading: "Downloading template...",
+        templateDownloadError: "Failed to download template",
 
       },
 sales: {
@@ -4562,6 +4576,13 @@ sales: {
         importSelectFileFirst: "请先选择 Excel 文件",
         importDoneChooseNext: "导入完成。你可以选择下一个文件。",
         importFileChosen: "已选择文件：{name}",
+        downloadTemplateButton: "下载模板",
+        importTemplateHint: "不确定文件格式？",
+        importColumnsFound: "已识别列数：{found} / {total}",
+        importColumnsMissingPrefix: "未找到：",
+        importFormatWarning: "该文件似乎不符合 BFC24 格式——大部分列未被识别。请下载模板并将数据迁移进去。",
+        templateDownloading: "正在下载模板...",
+        templateDownloadError: "模板下载失败",
 
       },
 sales: {

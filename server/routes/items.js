@@ -43,6 +43,47 @@ const ALLOWED_IMAGE_MIME_TYPES = {
 const IMPORT_REQUIRED_COLUMNS = ["MARK"];
 const IMPORT_PREVIEW_LIMIT = 500;
 const IMPORT_ROWS_LIMIT = 1500;
+
+// Единый источник правды для колонок импорта: используется и для парсинга
+// файла (mapImportRow), и для генерации шаблона (/import/template), и для
+// подсказки пользователю, какие колонки в его файле распознаны (/import/preview).
+// Если добавляете новую колонку импорта — добавьте её сюда, и она автоматически
+// появится в шаблоне и в проверке распознавания.
+const IMPORT_TEMPLATE_COLUMNS = [
+  { key: "MARK", label: "Артикул / SKU", example: "HH-87141", required: true },
+  { key: "PHOTO", label: "Фото (вставить картинку в ячейку)", example: "", required: false },
+  { key: "FACTORY", label: "Фабрика", example: "Shenzhen Factory", required: false },
+  { key: "QTY", label: "Шт/кор", example: 72, required: false },
+  { key: "FACTORY_ARTICLE", label: "Артикул фабрики", example: "XJ-2048", required: false },
+  { key: "BARCODE", label: "Штрихкод", example: "1234567890123", required: false },
+  { key: "WEIGHT_KG", label: "Вес коробки, кг", example: 12.5, required: false },
+  { key: "LENGTH_CM", label: "Длина коробки, см", example: 60, required: false },
+  { key: "WIDTH_CM", label: "Ширина коробки, см", example: 40, required: false },
+  { key: "HEIGHT_CM", label: "Высота коробки, см", example: 35, required: false },
+  { key: "CATEGORY", label: "Категория", example: "Электроника", required: false },
+  { key: "NAME", label: "Название", example: "Тест товар", required: false },
+  { key: "SALE_PRICE", label: "Цена продажи", example: 990, required: false },
+];
+
+// Колонки, которые реально влияют на текстовые поля товара (без PHOTO —
+// картинки распознаются отдельно, по вставленным в ячейки изображениям,
+// а не по значению в колонке).
+const IMPORT_RECOGNIZED_CHECK_COLUMNS = IMPORT_TEMPLATE_COLUMNS
+  .map((col) => col.key)
+  .filter((key) => key !== "PHOTO");
+
+function getImportColumnsRecognition(headers) {
+  const headerSet = new Set(Array.isArray(headers) ? headers : []);
+  const recognized = IMPORT_RECOGNIZED_CHECK_COLUMNS.filter((key) => headerSet.has(key));
+  const missing = IMPORT_RECOGNIZED_CHECK_COLUMNS.filter((key) => !headerSet.has(key));
+
+  return {
+    recognized_columns: recognized,
+    missing_columns: missing,
+    recognized_count: recognized.length,
+    total_known_columns: IMPORT_RECOGNIZED_CHECK_COLUMNS.length,
+  };
+}
 const IMPORT_CACHE_TTL_MS = 1000 * 60 * 60;
 
 function normalizeOptionalText(value) {
@@ -609,6 +650,7 @@ function buildImportPreviewFromRows({ parsedRows, sheetName, headers, existingSk
     no_sku_count: noSkuCount,
     preview_rows: previewRows.slice(0, IMPORT_PREVIEW_LIMIT),
     rows: previewRows,
+    ...getImportColumnsRecognition(headers),
   };
 }
 
@@ -907,6 +949,74 @@ router.get(
         ok: false,
         error: "categories_list_failed",
         details: err.message,
+      });
+    }
+  }
+);
+
+router.get(
+  "/import/template",
+  authRequired,
+  requireRole("owner", "admin", "client_owner", "client_manager", "client"),
+  async (req, res) => {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet("Импорт товаров");
+
+      sheet.columns = IMPORT_TEMPLATE_COLUMNS.map((col) => ({
+        header: col.key,
+        key: col.key,
+        width: Math.max(14, col.label.length * 0.9, col.key.length + 2),
+      }));
+
+      const headerRow = sheet.getRow(1);
+      headerRow.eachCell((cell, colNumber) => {
+        const col = IMPORT_TEMPLATE_COLUMNS[colNumber - 1];
+        cell.font = { bold: true };
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFFFFF00" },
+        };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        if (col && col.required) {
+          cell.note = "Обязательная колонка. Без неё файл не примется.";
+        }
+      });
+      headerRow.height = 24;
+
+      // Строка-подсказка с описанием каждой колонки
+      const hintValues = IMPORT_TEMPLATE_COLUMNS.map((col) =>
+        col.required ? `${col.label} (обязательно)` : col.label
+      );
+      const hintRow = sheet.addRow(hintValues);
+      hintRow.eachCell((cell) => {
+        cell.font = { italic: true, color: { argb: "FF808080" }, size: 10 };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+      });
+
+      // Пример заполненной строки, чтобы было видно формат значений
+      const exampleValues = IMPORT_TEMPLATE_COLUMNS.map((col) => col.example);
+      sheet.addRow(exampleValues);
+
+      sheet.views = [{ state: "frozen", ySplit: 1 }];
+
+      const buffer = await workbook.xlsx.writeBuffer();
+
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        'attachment; filename="bfc24_items_import_template.xlsx"'
+      );
+      return res.send(Buffer.from(buffer));
+    } catch (err) {
+      console.error("[GET /items/import/template] error:", err);
+      return res.status(500).json({
+        ok: false,
+        error: "template_generation_failed",
       });
     }
   }

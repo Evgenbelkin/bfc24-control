@@ -475,6 +475,25 @@
       line-height:1.5;
     }
 
+    #importColumnsInfo{
+      margin-top:10px;
+      padding:8px 12px;
+      border-radius:8px;
+      background:#f4f7fb;
+      border:1px solid #e8edf4;
+    }
+
+    #importColumnsInfo.import-columns-warning{
+      background:#fff6e5;
+      border-color:#f0c36d;
+    }
+
+    .import-columns-warning-text{
+      color:#a15c00;
+      font-weight:600;
+      margin-top:4px;
+    }
+
     .import-summary{
       display:grid;
       grid-template-columns:repeat(5,minmax(0,1fr));
@@ -759,6 +778,7 @@
             <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
             <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Отменить редактирование</button>
             <button type="button" class="btn btn-light" id="importExcelBtn" data-i18n="items.importExcelButton">Импорт Excel</button>
+            <button type="button" class="btn btn-light" id="downloadTemplateBtn" data-i18n="items.downloadTemplateButton">Скачать шаблон</button>
             <button type="button" class="btn btn-light" id="refreshBtn" data-i18n="items.refreshButton">Обновить список</button>
           </div>
         </div>
@@ -776,6 +796,10 @@
             <label for="importFile" data-i18n="items.importFileLabel">Файл Excel</label>
             <input id="importFile" type="file" accept=".xlsx,.xls" />
             <div class="import-file-note" data-i18n="items.importFileNote">Поддерживаются Excel-файлы. Пропускаем только строки без SKU, а также дубли SKU в системе и внутри файла.</div>
+            <div class="import-file-note">
+              <span data-i18n="items.importTemplateHint">Не уверен(-а) в формате файла?</span>
+              <a href="#" id="importTemplateInlineLink" data-i18n="items.downloadTemplateButton">Скачать шаблон</a>
+            </div>
           </div>
 
           <div class="field">
@@ -790,6 +814,8 @@
         </div>
 
         <div id="importStatus" class="status"></div>
+
+        <div id="importColumnsInfo" class="import-file-note" style="display:none;"></div>
 
         <div id="importSummary" class="import-summary" style="display:none;">
           <div class="import-stat">
@@ -1024,6 +1050,8 @@
       cancelEditBtn: document.getElementById("cancelEditBtn"),
       refreshBtn: document.getElementById("refreshBtn"),
       importExcelBtn: document.getElementById("importExcelBtn"),
+      downloadTemplateBtn: document.getElementById("downloadTemplateBtn"),
+      importTemplateInlineLink: document.getElementById("importTemplateInlineLink"),
       importPanel: document.getElementById("importPanel"),
       importFile: document.getElementById("importFile"),
       importFileName: document.getElementById("importFileName"),
@@ -1031,6 +1059,7 @@
       runImportBtn: document.getElementById("runImportBtn"),
       closeImportBtn: document.getElementById("closeImportBtn"),
       importStatus: document.getElementById("importStatus"),
+      importColumnsInfo: document.getElementById("importColumnsInfo"),
       importSummary: document.getElementById("importSummary"),
       importTotalRows: document.getElementById("importTotalRows"),
       importNewRows: document.getElementById("importNewRows"),
@@ -1693,6 +1722,46 @@
       els.importPreviewEmpty.style.display = "block";
       els.importPreviewBody.innerHTML = '<tr><td colspan="12" class="empty" data-i18n="items.importPreviewNotLoaded">Preview пока не загружен.</td></tr>';
       els.runImportBtn.disabled = true;
+
+      if (els.importColumnsInfo) {
+        els.importColumnsInfo.style.display = "none";
+        els.importColumnsInfo.innerHTML = "";
+        els.importColumnsInfo.classList.remove("import-columns-warning");
+      }
+    }
+
+    function renderImportColumnsInfo(data) {
+      if (!els.importColumnsInfo) return;
+
+      const recognized = Array.isArray(data.recognized_columns) ? data.recognized_columns : null;
+      const missing = Array.isArray(data.missing_columns) ? data.missing_columns : null;
+
+      if (!recognized || !missing) {
+        els.importColumnsInfo.style.display = "none";
+        return;
+      }
+
+      const total = recognized.length + missing.length;
+      const isLowMatch = total > 0 && recognized.length <= 1;
+
+      const foundText = i18n.format("items.importColumnsFound", {
+        found: recognized.length,
+        total,
+      });
+
+      let html = `<div>${escapeHtml(foundText)}</div>`;
+
+      if (missing.length) {
+        html += `<div>${escapeHtml(i18n.t("items.importColumnsMissingPrefix"))} ${escapeHtml(missing.join(", "))}</div>`;
+      }
+
+      if (isLowMatch) {
+        html += `<div class="import-columns-warning-text">${escapeHtml(i18n.t("items.importFormatWarning"))}</div>`;
+      }
+
+      els.importColumnsInfo.innerHTML = html;
+      els.importColumnsInfo.style.display = "block";
+      els.importColumnsInfo.classList.toggle("import-columns-warning", isLowMatch);
     }
 
     function openImportPanel() {
@@ -1710,6 +1779,8 @@
         resetImportPreviewUi();
         return;
       }
+
+      renderImportColumnsInfo(data);
 
       els.importSummary.style.display = "grid";
       els.importTotalRows.textContent = String(data.total_rows || 0);
@@ -1837,6 +1908,38 @@
       }
     }
 
+    async function handleDownloadTemplate() {
+      try {
+        showStatus(els.importStatus, i18n.t("items.templateDownloading"), "info");
+
+        const token = localStorage.getItem("token");
+        const response = await fetch((window.AppConfig ? window.AppConfig.API_BASE : "") + "/items/import/template", {
+          method: "GET",
+          headers: {
+            "Authorization": "Bearer " + token,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("template_download_failed");
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "bfc24_items_import_template.xlsx";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+        hideStatus(els.importStatus);
+      } catch (err) {
+        showStatus(els.importStatus, i18n.t("items.templateDownloadError"), "error");
+      }
+    }
+
 
     function bindEvents() {
       els.itemForm.addEventListener("submit", handleSubmit);
@@ -1847,6 +1950,13 @@
       els.cancelEditBtn.addEventListener("click", resetForm);
       els.refreshBtn.addEventListener("click", loadData);
       els.importExcelBtn.addEventListener("click", openImportPanel);
+      els.downloadTemplateBtn.addEventListener("click", handleDownloadTemplate);
+      if (els.importTemplateInlineLink) {
+        els.importTemplateInlineLink.addEventListener("click", (event) => {
+          event.preventDefault();
+          handleDownloadTemplate();
+        });
+      }
       els.closeImportBtn.addEventListener("click", closeImportPanel);
       els.previewImportBtn.addEventListener("click", handleImportPreview);
       els.runImportBtn.addEventListener("click", handleImportRun);
