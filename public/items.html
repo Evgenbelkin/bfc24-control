@@ -1838,7 +1838,7 @@
         renderImportPreview(data);
         showStatus(
           els.importStatus,
-          i18n.format("items.importPreviewReady", { total: data.total_rows || 0, created: data.new_count || 0, skipped: data.skipped_count || 0 }),
+          i18n.format("items.importPreviewReady", { total: data.total_rows || 0, newCount: data.new_count || 0, skipped: data.skipped_count || 0 }),
           "success"
         );
       } catch (err) {
