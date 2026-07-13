@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>BFC24 CONTROL — Инструкция</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #e9eef6;
+      --bg-accent: #dde7f5;
+      --card-bg: rgba(255, 255, 255, 0.98);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent-color: #2563eb;
+      --accent-hover: #1d4ed8;
+      --border-color: #dbe4f0;
+      --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 8px 22px rgba(15, 23, 42, 0.08);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top left, #f8fbff 0%, var(--bg-color) 42%, var(--bg-accent) 100%);
+      color: var(--text-main);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 18px 48px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: clamp(26px, 3.6vw, 36px);
+      font-weight: 800;
+      margin: 0 0 4px 0;
+      letter-spacing: -0.02em;
+    }
+
+    .muted { color: var(--text-muted); font-size: 14px; }
+
+    .btn {
+      border: 1px solid var(--border-color);
+      background: rgba(255,255,255,0.95);
+      color: var(--text-main);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .sidebar {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 14px;
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .search-box:focus { border-color: var(--accent-color); }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      margin-bottom: 2px;
+    }
+
+    .nav-item:hover { background: #f1f5f9; }
+
+    .nav-item.active {
+      background: var(--accent-color);
+      color: #fff;
+    }
+
+    .nav-icon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
+
+    .content {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 28px 30px;
+      min-height: 400px;
+    }
+
+    .content h2 {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .content .purpose {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 22px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .block-title {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--accent-color);
+      margin: 22px 0 10px;
+    }
+
+    .block-title:first-of-type { margin-top: 0; }
+
+    ol, ul { margin: 0; padding-left: 22px; }
+
+    ol li, ul li { margin-bottom: 8px; font-size: 15px; }
+
+    .notes-box {
+      background: #eef2ff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 6px;
+    }
+
+    .notes-box ul { padding-left: 20px; }
+
+    .tip-box {
+      background: #eefbf3;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 14px;
+      font-size: 14px;
+      color: #14532d;
+    }
+
+    .empty-state {
+      color: var(--text-muted);
+      text-align: center;
+      padding: 60px 0;
+    }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        max-height: none;
+        display: flex;
+        flex-direction: column;
+      }
+      .content { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Инструкция</h1>
+        <div class="muted">Как пользоваться каждым модулем BFC24 CONTROL</div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn" onclick="window.location.href='/index.html'">← Главное меню</button>
+        <button type="button" class="btn" onclick="logout()">Выйти</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="sidebar">
+        <input type="text" class="search-box" id="searchBox" placeholder="Поиск по разделам..." />
+        <div id="navList"></div>
+      </div>
+      <div class="content" id="contentBox">
+        <div class="empty-state">Выберите раздел слева</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/login.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
+
+    const MODULES = [
+      {
+        id: "items", icon: "📦", title: "Товары",
+        purpose: "Справочник товаров — карточки для приёмки, продажи, списания и остатков.",
+        steps: [
+          "Заполните поля карточки: Название, Артикул фабрики, Фабрика, Категория, Артикул/SKU, Штрихкод, Закупочная цена, Цена продажи, Единица, Штук в коробке, Описание, Фото и размеры коробки (вес, длина/ширина/высота — объём считается автоматически).",
+          "Нажмите «Сохранить» — товар появится в таблице ниже.",
+          "Чтобы изменить товар, нажмите «Редактировать» в его строке, поправьте поля и снова «Сохранить».",
+          "Ищите товары через поле «Поиск» вверху таблицы."
+        ],
+        notesTitle: "Массовый импорт из Excel",
+        notes: [
+          "Нажмите «Скачать шаблон» — получите готовый файл .xlsx с нужными столбцами (MARK — это обязательный SKU, PHOTO, FACTORY, QTY, FACTORY_ARTICLE, BARCODE, WEIGHT_KG, LENGTH_CM, WIDTH_CM, HEIGHT_CM, CATEGORY, NAME, SALE_PRICE).",
+          "Заполните шаблон — фото можно вставлять прямо в ячейку колонки PHOTO.",
+          "Нажмите «Импорт Excel» → загрузите файл → «Показать preview» — система покажет построчный разбор: что новое, что пропущено и почему (нет SKU, дубль в системе или в файле).",
+          "Проверьте блок «распознанные колонки» — он покажет, все ли заголовки файла система узнала.",
+          "Если всё в порядке, нажмите «Импортировать»."
+        ]
+      },
+      {
+        id: "locations", icon: "📍", title: "Места хранения",
+        purpose: "Справочник складов, точек продаж и контейнеров — мест, между которыми перемещается товар.",
+        steps: [
+          "Укажите Название, Код и Тип (Контейнер, Склад, Storage, Магазин, Полка, Другое).",
+          "Нажмите «Сохранить».",
+          "Ищите места через поле поиска (по названию/коду/типу).",
+          "Для редактирования используйте кнопку в строке таблицы."
+        ],
+        tip: "Удалить место хранения нельзя — только деактивировать, чтобы оно перестало предлагаться в списках."
+      },
+      {
+        id: "clients", icon: "👥", title: "Клиенты",
+        purpose: "Справочник покупателей и контрагентов для продаж, долгов и денежных операций.",
+        steps: [
+          "Укажите Имя, Телефон, Комментарий → «Сохранить».",
+          "Клиент сразу становится доступен в выпадающих списках на страницах Продажа, Списание, Долги."
+        ],
+        notesTitle: "Доступ к витрине для клиента",
+        notes: [
+          "В строке клиента нажмите «Создать доступ» — придумайте пароль во всплывающем окне, система покажет логин и пароль для входа в интернет-витрину.",
+          "«Копировать логин» — скопирует логин в буфер обмена.",
+          "«Сбросить пароль» — задать клиенту новый пароль.",
+          "Переключатель включает и отключает доступ клиента к витрине."
+        ]
+      },
+      {
+        id: "stock", icon: "📊", title: "Остатки",
+        purpose: "Фактические остатки товаров по местам хранения.",
+        steps: [
+          "Отфильтруйте по товару/артикулу/штрихкоду, месту хранения, категории.",
+          "Нажмите «Обновить» — таблица покажет фото, товар, категорию, фабрику, артикулы, штрихкод, локацию, количество.",
+          "Наверху — сводка: сколько строк, товаров, мест хранения, сумма остатка по фильтру и всего."
+        ],
+        notesTitle: "Выгрузка в Excel",
+        notes: [
+          "Отметьте нужные строки чекбоксами или нажмите «Выбрать строки по текущим фильтрам».",
+          "Нажмите «Выгрузить выбранное» — получите Excel-файл с выбранными позициями."
+        ]
+      },
+      {
+        id: "incoming", icon: "📥", title: "Приёмка",
+        purpose: "Оприходование поступившего товара на склад или точку.",
+        steps: [
+          "Найдите товар — начните вводить название, SKU или штрихкод, либо нажмите на значок камеры 📷 и отсканируйте штрихкод.",
+          "Выберите Место хранения.",
+          "Укажите режим (Коробки или Штуки — по умолчанию коробки, пересчёт в штуки автоматический) и количество.",
+          "При необходимости добавьте комментарий.",
+          "Нажмите «Провести приёмку»."
+        ],
+        tip: "После приёмки автоматически создаётся партия (см. раздел «Партии / Себестоимость») — зайдите туда и укажите закупочную стоимость и доставку, чтобы система точно считала себестоимость."
+      },
+      {
+        id: "transfer", icon: "↔️", title: "Перемещение",
+        purpose: "Перенос товара между местами хранения — например, со склада в контейнер или в магазин.",
+        steps: [
+          "Найдите товар (ввод вручную или скан штрихкода камерой).",
+          "Система покажет остатки этого товара по всем локациям.",
+          "Выберите «Откуда» и «Куда», единицу (коробки/штуки) и количество — поле «Доступно в источнике» подскажет, сколько есть.",
+          "При нехватке остатка система предупредит.",
+          "Нажмите «Переместить»."
+        ],
+        tip: "Справа — таблица «Последние перемещения» с историей операций."
+      },
+      {
+        id: "sales", icon: "🛒", title: "Продажа",
+        purpose: "Оформление документа продажи — одна или сразу несколько позиций.",
+        steps: [
+          "Укажите способ оплаты и клиента (или «Без клиента»).",
+          "Для каждой позиции: найдите товар (ввод или скан камерой), выберите место хранения, единицу (штуки/коробки), количество и цену за единицу → «Добавить строку».",
+          "Повторите для всех товаров чека.",
+          "Проверьте таблицу и итоговую сумму.",
+          "Нажмите «Провести продажу» — остатки спишутся, документ создастся."
+        ],
+        tip: "Способ оплаты «Под реализацию» создаёт клиенту долг — см. раздел «Долги клиентов»."
+      },
+      {
+        id: "sales-history", icon: "🧾", title: "История продаж",
+        purpose: "Журнал всех проведённых продаж с деталями по каждому документу.",
+        steps: [
+          "Отфильтруйте по статусу оплаты, способу оплаты и дате.",
+          "Сводка вверху — количество документов, выручка, себестоимость, прибыль, штук.",
+          "Откройте документ, чтобы увидеть состав (товары с фото), клиента, суммы, статус оплаты, вес и объём.",
+          "Кнопка «Экспорт в Excel» — выгрузить документ."
+        ]
+      },
+      {
+        id: "writeoff", icon: "🗑️", title: "Списание",
+        purpose: "Списание товара при браке, порче, утере или пересортице.",
+        steps: [
+          "Найдите товар (ввод или скан камерой).",
+          "Выберите Место хранения и количество.",
+          "Обязательно укажите причину в комментарии.",
+          "Нажмите «Провести списание»."
+        ]
+      },
+      {
+        id: "batches", icon: "💱", title: "Партии / Себестоимость",
+        purpose: "Расчёт реальной себестоимости каждой партии товара с учётом курсов валют и доставки.",
+        steps: [
+          "Партии создаются автоматически при каждой приёмке — изначально без финансовых данных.",
+          "Найдите партию в таблице, нажмите «Анализ».",
+          "Заполните: Закупка в юанях, Курс юаня, Доставка в долларах, Курс доллара.",
+          "Нажмите «Сохранить» — система пересчитает себестоимость единицы и всей партии."
+        ],
+        notesTitle: "Дополнительные инструменты на странице",
+        notes: [
+          "Блок «Рынок сейчас» — сравнивает историческую себестоимость с себестоимостью по сегодняшним курсам валют.",
+          "Блок «Цена/прибыль» — введите планируемую цену продажи и сразу увидите ожидаемую прибыль и маржу."
+        ]
+      },
+      {
+        id: "movements", icon: "📜", title: "Движения товара",
+        purpose: "Полный журнал складских операций: приёмки, продажи, списания, перемещения, корректировки.",
+        steps: [
+          "Отфильтруйте по типу операции, периоду или тексту (товар/МХ/комментарий/пользователь).",
+          "Просмотрите таблицу — раздел только для контроля, без возможности редактирования."
+        ]
+      },
+      {
+        id: "cash", icon: "💰", title: "Деньги (касса)",
+        purpose: "Журнал денежных поступлений и расходов — заполняется автоматически другими модулями.",
+        steps: [
+          "Отфильтруйте по типу (доход/расход), способу оплаты, периоду.",
+          "Сводка: количество записей, доход, расход, баланс."
+        ]
+      },
+      {
+        id: "debts", icon: "📇", title: "Долги клиентов",
+        purpose: "Контроль задолженностей по продажам «под реализацию» и приём оплат.",
+        steps: [
+          "Отфильтруйте по статусу (открыт / частично оплачен / оплачен).",
+          "В строке долга укажите сумму оплаты, способ оплаты, комментарий → «Оплатить».",
+          "Долг можно гасить частями — статус обновится автоматически."
+        ]
+      },
+      {
+        id: "expenses", icon: "🧮", title: "Расходы",
+        purpose: "Учёт операционных расходов: аренда, зарплата, закупки и другое.",
+        steps: [
+          "Укажите сумму, категорию, дату и комментарий → «Сохранить расход».",
+          "Отфильтруйте историю по категории и периоду.",
+          "Удалить ошибочную запись можно кнопкой «Удалить» в строке."
+        ]
+      },
+      {
+        id: "analytics", icon: "📈", title: "Аналитика",
+        purpose: "Комплексный финансово-складской дашборд: P&L, склад, долги, оборачиваемость.",
+        steps: [
+          "Укажите период или выберите пресет (7/30/90 дней, месяц, год).",
+          "Изучите блоки: P&L (выручка, себестоимость, прибыль, расходы), график динамики по дням, топ товаров, проблемные товары по оборачиваемости, долги и реализация, состояние склада, расхождения остатков."
+        ],
+        tip: "Данные пересчитываются автоматически при смене периода — кнопка «Обновить» нужна только если появились новые операции."
+      },
+      {
+        id: "turnover", icon: "🔄", title: "Оборачиваемость",
+        purpose: "Анализ скорости продаж и «залежавшихся» товаров, которые замораживают деньги в остатках.",
+        steps: [
+          "Выберите период анализа и при желании отфильтруйте по статусу (healthy/warning/risk/critical/без продаж/нет остатка).",
+          "Настройте цветовые пороги — сколько дней считать жёлтым, оранжевым, красным.",
+          "Изучите таблицу и графики, отсортируйте по нужной колонке.",
+          "Нажмите «CSV» для выгрузки данных."
+        ]
+      },
+      {
+        id: "users", icon: "🧑‍💼", title: "Пользователи",
+        purpose: "Управление учётными записями сотрудников, их ролями и доступом к модулям.",
+        steps: [
+          "Укажите Логин, ФИО, Пароль (при создании обязателен).",
+          "Отметьте галочками, какие модули доступны сотруднику.",
+          "Нажмите «Сохранить» — сотрудник сможет войти под своим логином.",
+          "Дальше доступны действия: «Редактировать», включить/отключить, «Заблокировать», «Сбросить пароль»."
+        ],
+        tip: "Роль владельца через интерфейс не назначается — все новые сотрудники создаются как обычные сотрудники с индивидуальным набором модулей."
+      },
+      {
+        id: "price-check", icon: "🔍", title: "Проверка цены",
+        purpose: "Быстрая мобильная проверка цены и наличия товара по штрихкоду прямо в торговом зале.",
+        steps: [
+          "Откройте страницу с телефона.",
+          "Отсканируйте штрихкод камерой (кнопка «Сканировать камерой») или физическим сканером — поле ввода активно по умолчанию.",
+          "Получите карточку: фото, название, цена продажи и наличие по каждой точке."
+        ]
+      },
+      {
+        id: "showcase", icon: "🛍️", title: "Витрина для клиентов",
+        purpose: "Онлайн-каталог, через который клиенты сами оформляют заказы, а вы их обрабатываете.",
+        steps: [
+          "Настройка (владелец): откройте «Настройки витрины», заполните название магазина, телефон, описание, логотип и баннер, включите переключатель «Витрина включена» и настройте видимость цен.",
+          "Доступ клиента: на странице «Клиенты» нажмите «Создать доступ» и передайте клиенту логин/пароль — он заходит на витрину по Tenant ID, логину и паролю, выбирает товары и оформляет заказ.",
+          "Обработка заказа (продавец): откройте «Заказы витрины», найдите заказ, «Открыть» → «Взять в работу», укажите фактически собранное количество по каждой позиции, отметьте «Готов» и нажмите «Создать продажу»."
+        ],
+        tip: "Клиент следит за статусом своего заказа в разделе «Мои заказы» на витрине."
+      },
+      {
+        id: "notifications", icon: "🔔", title: "Уведомления",
+        purpose: "Telegram-уведомления о новых заказах с витрины и системных событиях.",
+        steps: [
+          "Создайте бота через @BotFather в Telegram и получите Bot token.",
+          "Узнайте свой chat_id и укажите его в поле «Owner chat_id».",
+          "Включите переключатель «Включить Telegram-уведомления» → «Сохранить настройки».",
+          "Нажмите «Отправить тест», чтобы проверить, что сообщения приходят."
+        ]
+      }
+    ];
+
+    const navList = document.getElementById("navList");
+    const contentBox = document.getElementById("contentBox");
+    const searchBox = document.getElementById("searchBox");
+    let activeId = null;
+
+    function renderNav(filter = "") {
+      const q = filter.trim().toLowerCase();
+      navList.innerHTML = "";
+      MODULES
+        .filter((m) => !q || m.title.toLowerCase().includes(q))
+        .forEach((m) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "nav-item" + (m.id === activeId ? " active" : "");
+          btn.innerHTML = `<span class="nav-icon">${m.icon}</span><span>${m.title}</span>`;
+          btn.addEventListener("click", () => showModule(m.id));
+          navList.appendChild(btn);
+        });
+    }
+
+    function showModule(id) {
+      const m = MODULES.find((x) => x.id === id);
+      if (!m) return;
+      activeId = id;
+      renderNav(searchBox.value);
+
+      const stepsHtml = (m.steps || []).map((s) => `<li>${s}</li>`).join("");
+      const notesHtml = m.notes
+        ? `<div class="block-title">${m.notesTitle || "Особенности"}</div>
+           <div class="notes-box"><ul>${m.notes.map((n) => `<li>${n}</li>`).join("")}</ul></div>`
+        : "";
+      const tipHtml = m.tip ? `<div class="tip-box">💡 ${m.tip}</div>` : "";
+
+      contentBox.innerHTML = `
+        <h2><span>${m.icon}</span><span>${m.title}</span></h2>
+        <div class="purpose">${m.purpose}</div>
+        <div class="block-title">Как пользоваться</div>
+        <ol>${stepsHtml}</ol>
+        ${notesHtml}
+        ${tipHtml}
+      `;
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    searchBox.addEventListener("input", () => renderNav(searchBox.value));
+
+    renderNav();
+    showModule(MODULES[0].id);
+  </script>
+</body>
+</html>
