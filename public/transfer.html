@@ -136,7 +136,29 @@
       border-color:#9db8ff;
       box-shadow:0 0 0 4px rgba(37,99,235,.10);
     }
-    .autocomplete{ position:relative; }
+    .item-search-row{ display:flex; gap:8px; align-items:flex-start; }
+    .autocomplete{ position:relative; flex:1; min-width:0; }
+    .scan-btn{ flex-shrink:0; font-size:20px; padding:0 16px; height:44px; line-height:44px; }
+    .scan-modal-overlay{
+      position:fixed; inset:0; background:rgba(15,23,42,.72);
+      display:none; align-items:center; justify-content:center;
+      padding:16px; z-index:2000;
+    }
+    .scan-modal-overlay.open{ display:flex; }
+    .scan-modal-box{
+      width:100%; max-width:480px; background:#000;
+      border-radius:18px; overflow:hidden; position:relative;
+    }
+    #transferCameraReader{ width:100%; min-height:280px; }
+    .scan-modal-close{
+      position:absolute; top:10px; right:10px; z-index:10;
+      width:42px; height:42px; border-radius:50%; border:none;
+      background:rgba(255,255,255,.92); font-size:20px; cursor:pointer;
+    }
+    .scan-modal-hint{
+      color:#fff; text-align:center; font-size:13px;
+      padding:10px; background:rgba(0,0,0,.6);
+    }
     .autocomplete-menu{
       position:absolute;
       top:calc(100% + 6px);
@@ -308,9 +330,12 @@
           <div class="form-grid">
             <div class="field full">
               <label for="itemSearchInput" data-i18n="transfer.searchLabel">Товар</label>
-              <div class="autocomplete">
-                <input id="itemSearchInput" type="text" placeholder="Введите название, SKU или штрихкод" autocomplete="off" data-i18n-placeholder="transfer.searchPlaceholder" />
-                <div id="itemAutocompleteMenu" class="autocomplete-menu"></div>
+              <div class="item-search-row">
+                <div class="autocomplete">
+                  <input id="itemSearchInput" type="text" placeholder="Введите название, SKU или штрихкод" autocomplete="off" data-i18n-placeholder="transfer.searchPlaceholder" />
+                  <div id="itemAutocompleteMenu" class="autocomplete-menu"></div>
+                </div>
+                <button type="button" class="btn btn-light scan-btn" id="scanBarcodeBtn" title="Сканировать камерой">📷</button>
               </div>
               <select id="itemSelect" style="display:none;">
                 <option value="">Сначала выберите товар</option>
@@ -447,6 +472,15 @@
     </div>
   </div>
 
+  <div class="scan-modal-overlay" id="transferScanModal">
+    <div class="scan-modal-box">
+      <button type="button" class="scan-modal-close" id="transferScanCloseBtn">×</button>
+      <div id="transferCameraReader"></div>
+      <div class="scan-modal-hint" data-i18n="transfer.scanModalHint">Наведите камеру на штрихкод товара</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
@@ -542,6 +576,9 @@
       itemSearchInput: document.getElementById("itemSearchInput"),
       itemAutocompleteMenu: document.getElementById("itemAutocompleteMenu"),
       itemSelect: document.getElementById("itemSelect"),
+      scanBarcodeBtn: document.getElementById("scanBarcodeBtn"),
+      transferScanModal: document.getElementById("transferScanModal"),
+      transferScanCloseBtn: document.getElementById("transferScanCloseBtn"),
       modeBoxesCard: document.getElementById("modeBoxesCard"),
       modeUnitsCard: document.getElementById("modeUnitsCard"),
       qtyModeInput: document.getElementById("qtyModeInput"),
@@ -759,6 +796,27 @@
       els.itemAutocompleteMenu.innerHTML = "";
       activeAutocompleteIndex = -1;
       updateUIBySelection();
+    }
+
+    function findItemByExactBarcode(value) {
+      const normalized = String(value || "").trim();
+      if (!normalized) return null;
+      return itemsData.find(item => String(item.barcode || "").trim() === normalized) || null;
+    }
+
+    function handleBarcodeScanned(value) {
+      const found = findItemByExactBarcode(value);
+
+      if (found) {
+        selectItem(found.id);
+        showStatus(t("transfer.scanFoundStatus", { item: found.name || "" }), "success");
+      } else {
+        els.itemSearchInput.value = value;
+        els.itemSelect.value = "";
+        activeAutocompleteIndex = -1;
+        renderItemOptions();
+        showStatus(t("transfer.scanNotFoundStatus", { barcode: value }), "error");
+      }
     }
 
     function renderSelectedItemInfo() {
@@ -1067,6 +1125,52 @@
       }
     }
 
+    // --- Сканирование штрихкода камерой ---
+    let transferHtml5QrCode = null;
+    let transferCameraRunning = false;
+
+    async function openTransferScanModal() {
+      els.transferScanModal.classList.add("open");
+
+      if (typeof Html5Qrcode === "undefined") {
+        showStatus(t("transfer.scanCameraLoadError"), "error");
+        els.transferScanModal.classList.remove("open");
+        return;
+      }
+
+      try {
+        transferHtml5QrCode = new Html5Qrcode("transferCameraReader");
+        transferCameraRunning = true;
+
+        await transferHtml5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 150 } },
+          (decodedText) => {
+            closeTransferScanModal();
+            handleBarcodeScanned(decodedText);
+          },
+          () => {
+            // игнорируем колбэки "не найдено" на каждый кадр
+          }
+        );
+      } catch (err) {
+        transferCameraRunning = false;
+        els.transferScanModal.classList.remove("open");
+        showStatus(t("transfer.scanCameraPermissionError"), "error");
+      }
+    }
+
+    async function closeTransferScanModal() {
+      els.transferScanModal.classList.remove("open");
+      if (transferHtml5QrCode && transferCameraRunning) {
+        try {
+          await transferHtml5QrCode.stop();
+          transferHtml5QrCode.clear();
+        } catch (_) {}
+      }
+      transferCameraRunning = false;
+    }
+
     function bindEvents() {
       els.itemSearchInput.addEventListener("input", () => {
         els.itemSelect.value = "";
@@ -1081,6 +1185,27 @@
         updateNoStockState();
         updateSubmitAvailability();
       });
+
+      // Штрихкод-сканер печатает цифры и шлёт Enter — если это ровно
+      // существующий штрихкод, сразу выбираем товар без клика мышкой и
+      // без навигации стрелками по выпадающему списку.
+      els.itemSearchInput.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+
+        const value = els.itemSearchInput.value.trim();
+        if (!value) return;
+
+        const found = findItemByExactBarcode(value);
+        if (found) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          selectItem(found.id);
+          showStatus(t("transfer.scanFoundStatus", { item: found.name || "" }), "success");
+        }
+      });
+
+      els.scanBarcodeBtn.addEventListener("click", openTransferScanModal);
+      els.transferScanCloseBtn.addEventListener("click", closeTransferScanModal);
 
       els.itemSearchInput.addEventListener("keydown", (e) => {
         const visibleItems = filteredItems.slice(0, 30);
