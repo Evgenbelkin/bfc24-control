@@ -1308,6 +1308,12 @@
           "success",
           true
         );
+
+        // Автофокус на поиск товара — чтобы можно было сразу сканировать
+        // штрихкод сканером, не кликая мышкой в поле.
+        if (els.itemSearch) {
+          els.itemSearch.focus();
+        }
       } catch (err) {
         setPageStatus(f("sales.loadErrorStatus", { error: Ui.translateError(err.message) }, `Ошибка загрузки: ${Ui.translateError(err.message)}`), {}, "error", true);
       }
@@ -1411,6 +1417,9 @@
       updateSaleModeUi();
       renderSelectedItem();
       clearLineStatus();
+
+      // Готовим поле поиска к следующему скану штрихкода без клика мышкой.
+      els.itemSearch.focus();
     }
 
     function addDocumentLine() {

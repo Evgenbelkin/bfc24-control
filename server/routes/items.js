@@ -908,6 +908,107 @@ router.get("/", authRequired, async (req, res) => {
   }
 });
 
+// Точный поиск товара по штрихкоду — для мобильной "Проверки цены" и сканера.
+// Специально НЕ отдаём purchase_price (закупочную цену) — этот эндпоинт
+// рассчитан на рядовых продавцов, которым видеть маржу не нужно.
+router.get(
+  "/lookup-by-barcode/:barcode",
+  authRequired,
+  async (req, res) => {
+    try {
+      const tenantId = getEffectiveTenantId(req);
+      if (!tenantId) {
+        return res.status(400).json({ ok: false, error: "tenant_not_defined" });
+      }
+
+      const barcode = normalizeOptionalText(req.params.barcode);
+      if (!barcode) {
+        return res.status(400).json({ ok: false, error: "barcode_required" });
+      }
+
+      const itemResult = await pool.query(
+        `
+          SELECT
+            i.id,
+            i.name,
+            i.sku,
+            i.barcode,
+            i.unit,
+            i.sale_price,
+            i.image_url,
+            c.name AS category_name
+          FROM core.items i
+          LEFT JOIN core.categories c
+            ON c.id = i.category_id
+           AND c.tenant_id = i.tenant_id
+          WHERE i.tenant_id = $1
+            AND i.barcode = $2
+            AND COALESCE(i.is_active, TRUE) = TRUE
+          LIMIT 1
+        `,
+        [tenantId, barcode]
+      );
+
+      const item = itemResult.rows[0];
+      if (!item) {
+        return res.status(404).json({ ok: false, error: "item_not_found_by_barcode" });
+      }
+
+      const stockResult = await pool.query(
+        `
+          SELECT
+            l.id AS location_id,
+            l.name AS location_name,
+            l.code AS location_code,
+            COALESCE(s.qty, 0) AS qty
+          FROM core.locations l
+          LEFT JOIN core.stock s
+            ON s.location_id = l.id
+           AND s.item_id = $2
+           AND s.tenant_id = l.tenant_id
+          WHERE l.tenant_id = $1
+            AND COALESCE(l.is_active, TRUE) = TRUE
+          ORDER BY l.name
+        `,
+        [tenantId, item.id]
+      );
+
+      const stock = stockResult.rows
+        .map((row) => ({
+          location_id: row.location_id,
+          location_name: row.location_name,
+          location_code: row.location_code,
+          qty: Number(row.qty) || 0,
+        }))
+        .filter((row) => row.qty > 0);
+
+      const totalQty = stock.reduce((sum, row) => sum + row.qty, 0);
+
+      return res.json({
+        ok: true,
+        item: {
+          id: item.id,
+          name: item.name,
+          sku: item.sku,
+          barcode: item.barcode,
+          unit: item.unit,
+          sale_price: item.sale_price,
+          image_url: item.image_url,
+          category_name: item.category_name,
+        },
+        stock,
+        total_qty: totalQty,
+      });
+    } catch (err) {
+      console.error("[GET /items/lookup-by-barcode] error:", err);
+      return res.status(500).json({
+        ok: false,
+        error: "barcode_lookup_failed",
+      });
+    }
+  }
+);
+
 router.get(
   "/categories",
   authRequired,
