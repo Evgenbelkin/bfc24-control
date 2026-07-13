@@ -73,7 +73,18 @@ const ALL_MODULE_CODES = [
   "analytics",
   "turnover",
   "debts",
-  "users"
+  "users",
+  // Ниже — модули, которые физически существуют как страницы (public/*.html
+  // и getModuleCodeByPath в index.html), но исторически не попали в этот
+  // список. Из-за этого владельцы новых клиентов (tenant_owner) не видели
+  // соответствующие карточки в меню, хотя доступ на бэкенде у них был.
+  "transfer",
+  "sales-history",
+  "showcase-admin-orders",
+  "showcase-settings",
+  "showcase",
+  "notifications",
+  "pnl"
 ];
 
 const MODULE_PERMISSION_MAP = {
@@ -91,7 +102,14 @@ const MODULE_PERMISSION_MAP = {
   analytics: ["dashboard.read"],
   turnover: ["dashboard.read"],
   debts: ["debts.read", "debts.pay"],
-  users: ["users.read", "users.create", "users.update", "users.block"]
+  users: ["users.read", "users.create", "users.update", "users.block"],
+  transfer: ["stock.read"],
+  "sales-history": ["sales.read"],
+  "showcase-admin-orders": [],
+  "showcase-settings": [],
+  showcase: [],
+  notifications: [],
+  pnl: ["dashboard.read"]
 };
 
 function normalizeModules(value) {
