@@ -71,6 +71,8 @@
         salesHistoryDesc: "Журнал документов продажи, просмотр состава и экспорт в Excel",
         turnoverTitle: "Оборачиваемость",
         turnoverDesc: "Контроль залеживания, скорости продаж и замороженных денег в остатках",
+        priceCheckTitle: "Проверка цены",
+        priceCheckDesc: "Скан штрихкода камерой телефона — цена и остатки по точкам",
         menuAccessEmptyTitle: "Нет доступных модулей",
         menuAccessEmptyText: "Обратитесь к администратору клиента для выдачи прав доступа.",
         debtsTitle: "Долги клиентов",
@@ -122,6 +124,27 @@
   sending: "Отправляем заявку...",
   success: "Заявка отправлена! Владелец свяжется с вами"
 }
+      },
+
+      priceCheck: {
+        pageTitle: "BFC24 CONTROL — Проверка цены",
+        title: "Проверка цены",
+        barcodePlaceholder: "Штрихкод",
+        hint: "Отсканируйте сканером/камерой или введите штрихкод и нажмите Enter",
+        cameraButton: "📷 Сканировать камерой",
+        priceLabel: "Цена продажи",
+        locationsTitle: "Наличие по точкам",
+        noStock: "Нет в наличии ни на одной точке",
+        noName: "Без названия",
+        searching: "Ищем товар...",
+        notFound: "Товар с таким штрихкодом не найден",
+        searchFailed: "Не удалось выполнить поиск: {error}",
+        cameraLoadError: "Не удалось загрузить модуль камеры. Проверьте интернет-соединение.",
+        cameraModalHint: "Наведите камеру на штрихкод товара",
+        cameraPermissionError: "Не удалось включить камеру: проверьте разрешения браузера.",
+        skuPrefix: "SKU: {value}",
+        barcodePrefix: "ШК: {value}",
+        unitDefault: "шт"
       },
 
       clients: {
@@ -2096,6 +2119,8 @@ sales: {
         salesHistoryDesc: "Sales document journal, composition view, and Excel export",
         turnoverTitle: "Inventory turnover",
         turnoverDesc: "Control of slow-moving stock, sales velocity, and money frozen in inventory",
+        priceCheckTitle: "Price Check",
+        priceCheckDesc: "Scan a barcode with your phone camera — price and stock by location",
         menuAccessEmptyTitle: "No available modules",
         menuAccessEmptyText: "Contact your tenant administrator to get access permissions.",
         debtsTitle: "Client debts",
@@ -2147,6 +2172,27 @@ sales: {
   sending: "Sending request...",
   success: "Request sent! Owner will contact you"
 }
+      },
+
+      priceCheck: {
+        pageTitle: "BFC24 CONTROL — Price Check",
+        title: "Price Check",
+        barcodePlaceholder: "Barcode",
+        hint: "Scan with a scanner/camera or type the barcode and press Enter",
+        cameraButton: "📷 Scan with camera",
+        priceLabel: "Sale price",
+        locationsTitle: "Stock by location",
+        noStock: "Not in stock at any location",
+        noName: "Unnamed",
+        searching: "Searching...",
+        notFound: "No item found with this barcode",
+        searchFailed: "Search failed: {error}",
+        cameraLoadError: "Failed to load camera module. Check your internet connection.",
+        cameraModalHint: "Point the camera at the item's barcode",
+        cameraPermissionError: "Could not start the camera: check browser permissions.",
+        skuPrefix: "SKU: {value}",
+        barcodePrefix: "Barcode: {value}",
+        unitDefault: "pcs"
       },
 
       clients: {
@@ -4124,6 +4170,8 @@ sales: {
         salesHistoryDesc: "销售单据日志、明细查看和 Excel 导出",
         turnoverTitle: "周转分析",
         turnoverDesc: "控制滞销库存、销售速度以及库存中冻结的资金",
+        priceCheckTitle: "价格查询",
+        priceCheckDesc: "用手机摄像头扫描条码——查看价格和各地点库存",
         menuAccessEmptyTitle: "没有可用模块",
         menuAccessEmptyText: "请联系租户管理员为你分配访问权限。",
         debtsTitle: "客户欠款",
@@ -4175,6 +4223,27 @@ sales: {
   sending: "发送中...",
   success: "申请已发送！"
 }
+      },
+
+      priceCheck: {
+        pageTitle: "BFC24 CONTROL — 价格查询",
+        title: "价格查询",
+        barcodePlaceholder: "条码",
+        hint: "使用扫描枪/摄像头扫描，或输入条码后按回车",
+        cameraButton: "📷 摄像头扫描",
+        priceLabel: "售价",
+        locationsTitle: "各地点库存",
+        noStock: "所有地点均无库存",
+        noName: "未命名",
+        searching: "正在查找...",
+        notFound: "未找到该条码对应的商品",
+        searchFailed: "查询失败：{error}",
+        cameraLoadError: "摄像头模块加载失败，请检查网络连接。",
+        cameraModalHint: "将摄像头对准商品条码",
+        cameraPermissionError: "无法启动摄像头，请检查浏览器权限。",
+        skuPrefix: "SKU: {value}",
+        barcodePrefix: "条码: {value}",
+        unitDefault: "件"
       },
 
       clients: {

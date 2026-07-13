@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="priceCheck.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Проверка цены</title>
@@ -44,11 +44,39 @@
       align-items:center;
       gap:10px;
       margin-bottom:16px;
+      flex-wrap:wrap;
     }
 
     .title{
       font-size:22px;
       font-weight:800;
+    }
+
+    .lang-switcher{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      width:100%;
+      justify-content:center;
+      order:3;
+    }
+
+    .lang-switcher button{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      border-radius:10px;
+      padding:8px 10px;
+      cursor:pointer;
+      font-size:12px;
+      font-weight:700;
+      min-width:48px;
+    }
+
+    .lang-switcher button.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
     }
 
     .btn{
@@ -279,9 +307,10 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <button type="button" class="btn btn-light" onclick="goBack()">← Назад</button>
-      <div class="title">Проверка цены</div>
-      <button type="button" class="btn btn-light" onclick="logout()">Выйти</button>
+      <button type="button" class="btn btn-light" onclick="goBack()">← <span data-i18n="common.backButton">Назад</span></button>
+      <div class="title" data-i18n="priceCheck.title">Проверка цены</div>
+      <button type="button" class="btn btn-light" onclick="logout()" data-i18n="common.logoutButton">Выйти</button>
+      <div id="langSwitcher" class="lang-switcher"></div>
     </div>
 
     <div class="card">
@@ -293,11 +322,12 @@
           inputmode="numeric"
           autocomplete="off"
           placeholder="Штрихкод"
+          data-i18n-placeholder="priceCheck.barcodePlaceholder"
           autofocus
         />
       </form>
-      <div class="hint">Отсканируйте сканером/камерой или введите штрихкод и нажмите Enter</div>
-      <button type="button" class="btn btn-primary btn-block camera-btn" id="openCameraBtn">📷 Сканировать камерой</button>
+      <div class="hint" data-i18n="priceCheck.hint">Отсканируйте сканером/камерой или введите штрихкод и нажмите Enter</div>
+      <button type="button" class="btn btn-primary btn-block camera-btn" id="openCameraBtn" data-i18n="priceCheck.cameraButton">📷 Сканировать камерой</button>
     </div>
 
     <div class="status-box" id="statusBox"></div>
@@ -307,10 +337,10 @@
       <div class="result-name" id="resultName"></div>
       <div class="result-sub" id="resultSub"></div>
 
-      <div class="result-price-label">Цена продажи</div>
+      <div class="result-price-label" data-i18n="priceCheck.priceLabel">Цена продажи</div>
       <div class="result-price" id="resultPrice">—</div>
 
-      <div class="locations-title">Наличие по точкам</div>
+      <div class="locations-title" data-i18n="priceCheck.locationsTitle">Наличие по точкам</div>
       <div id="locationsList"></div>
     </div>
   </div>
@@ -319,11 +349,12 @@
     <div class="modal-box">
       <button type="button" class="modal-close" id="closeCameraBtn">×</button>
       <div id="camera-reader"></div>
-      <div class="modal-hint">Наведите камеру на штрихкод товара</div>
+      <div class="modal-hint" data-i18n="priceCheck.cameraModalHint">Наведите камеру на штрихкод товара</div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="/js/i18n.js"></script>
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
 
@@ -431,23 +462,23 @@
         els.resultPhoto.style.display = "none";
       }
 
-      els.resultName.textContent = item.name || "Без названия";
+      els.resultName.textContent = item.name || i18n.t("priceCheck.noName");
 
       const subParts = [];
-      if (item.sku) subParts.push("SKU: " + item.sku);
-      if (item.barcode) subParts.push("ШК: " + item.barcode);
+      if (item.sku) subParts.push(i18n.format("priceCheck.skuPrefix", { value: item.sku }));
+      if (item.barcode) subParts.push(i18n.format("priceCheck.barcodePrefix", { value: item.barcode }));
       if (item.category_name) subParts.push(item.category_name);
       els.resultSub.textContent = subParts.join(" · ");
 
       els.resultPrice.textContent = formatMoney(item.sale_price);
 
       if (!stock.length) {
-        els.locationsList.innerHTML = '<div class="no-stock">Нет в наличии ни на одной точке</div>';
+        els.locationsList.innerHTML = `<div class="no-stock">${escapeHtml(i18n.t("priceCheck.noStock"))}</div>`;
       } else {
         els.locationsList.innerHTML = stock.map((row) => `
           <div class="location-row">
             <span class="location-name">${escapeHtml(row.location_name || "")}${row.location_code ? " (" + escapeHtml(row.location_code) + ")" : ""}</span>
-            <span class="location-qty">${escapeHtml(String(row.qty))} ${escapeHtml(item.unit || "шт")}</span>
+            <span class="location-qty">${escapeHtml(String(row.qty))} ${escapeHtml(item.unit || i18n.t("priceCheck.unitDefault"))}</span>
           </div>
         `).join("");
       }
@@ -460,7 +491,7 @@
       if (!value) return;
 
       hideResult();
-      showStatus("Ищем товар...", "info");
+      showStatus(i18n.t("priceCheck.searching"), "info");
 
       try {
         const data = await apiGet("/items/lookup-by-barcode/" + encodeURIComponent(value));
@@ -469,9 +500,9 @@
       } catch (err) {
         hideResult();
         if (err.code === "item_not_found_by_barcode") {
-          showStatus("Товар с таким штрихкодом не найден", "error");
+          showStatus(i18n.t("priceCheck.notFound"), "error");
         } else {
-          showStatus("Не удалось выполнить поиск: " + err.message, "error");
+          showStatus(i18n.format("priceCheck.searchFailed", { error: err.message }), "error");
         }
       }
     }
@@ -497,7 +528,7 @@
       els.cameraModal.classList.add("open");
 
       if (typeof Html5Qrcode === "undefined") {
-        showStatus("Не удалось загрузить модуль камеры. Проверьте интернет-соединение.", "error");
+        showStatus(i18n.t("priceCheck.cameraLoadError"), "error");
         els.cameraModal.classList.remove("open");
         return;
       }
@@ -523,7 +554,7 @@
       } catch (err) {
         cameraRunning = false;
         els.cameraModal.classList.remove("open");
-        showStatus("Не удалось включить камеру: проверьте разрешения браузера.", "error");
+        showStatus(i18n.t("priceCheck.cameraPermissionError"), "error");
       }
     }
 
@@ -540,6 +571,9 @@
 
     els.openCameraBtn.addEventListener("click", openCamera);
     els.closeCameraBtn.addEventListener("click", closeCamera);
+
+    i18n.applyTranslations();
+    i18n.renderLanguageSwitcher("langSwitcher");
 
     refocusInput();
   </script>
