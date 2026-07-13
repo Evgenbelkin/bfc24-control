@@ -149,6 +149,18 @@
         unitDefault: "шт"
       },
 
+      help: {
+        pageTitle: "BFC24 CONTROL — Инструкция",
+        heading: "Инструкция",
+        subtitle: "Как пользоваться каждым модулем BFC24 CONTROL",
+        backButton: "← Главное меню",
+        logoutButton: "Выйти",
+        searchPlaceholder: "Поиск по разделам...",
+        emptyState: "Выберите раздел слева",
+        howToUseTitle: "Как пользоваться",
+        notesDefaultTitle: "Особенности"
+      },
+
       clients: {
         pageTitle: "BFC24 CONTROL — Клиенты",
         heading: "Клиенты",
@@ -2197,6 +2209,18 @@ sales: {
         skuPrefix: "SKU: {value}",
         barcodePrefix: "Barcode: {value}",
         unitDefault: "pcs"
+      },
+
+      help: {
+        pageTitle: "BFC24 CONTROL — Instructions",
+        heading: "Instructions",
+        subtitle: "How to use every module in BFC24 CONTROL",
+        backButton: "← Main menu",
+        logoutButton: "Log out",
+        searchPlaceholder: "Search sections...",
+        emptyState: "Select a section on the left",
+        howToUseTitle: "How to use it",
+        notesDefaultTitle: "Details"
       },
 
       clients: {
@@ -4250,6 +4274,18 @@ sales: {
         skuPrefix: "SKU: {value}",
         barcodePrefix: "条码: {value}",
         unitDefault: "件"
+      },
+
+      help: {
+        pageTitle: "BFC24 CONTROL — 使用说明",
+        heading: "使用说明",
+        subtitle: "如何使用 BFC24 CONTROL 的每个模块",
+        backButton: "← 主菜单",
+        logoutButton: "退出",
+        searchPlaceholder: "搜索模块...",
+        emptyState: "请在左侧选择一个模块",
+        howToUseTitle: "使用方法",
+        notesDefaultTitle: "补充说明"
       },
 
       clients: {

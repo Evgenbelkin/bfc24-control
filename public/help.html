@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title-i18n="help.pageTitle">
 <head>
   <meta charset="UTF-8" />
   <title>BFC24 CONTROL — Инструкция</title>
@@ -69,6 +69,30 @@
       font-weight: 700;
       cursor: pointer;
       box-shadow: var(--shadow-sm);
+    }
+
+    .lang-switcher {
+      display: flex;
+      gap: 6px;
+    }
+
+    .lang-switcher button {
+      border: 1px solid var(--border-color);
+      background: rgba(255,255,255,0.95);
+      color: var(--text-main);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 44px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .lang-switcher button.active {
+      background: var(--accent-color);
+      color: #fff;
+      border-color: var(--accent-color);
     }
 
     .layout {
@@ -209,26 +233,28 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h1>Инструкция</h1>
-        <div class="muted">Как пользоваться каждым модулем BFC24 CONTROL</div>
+        <h1 data-i18n="help.heading">Инструкция</h1>
+        <div class="muted" data-i18n="help.subtitle">Как пользоваться каждым модулем BFC24 CONTROL</div>
       </div>
-      <div style="display:flex; gap:10px;">
-        <button type="button" class="btn" onclick="window.location.href='/index.html'">← Главное меню</button>
-        <button type="button" class="btn" onclick="logout()">Выйти</button>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <div id="langSwitcher" class="lang-switcher"></div>
+        <button type="button" class="btn" data-i18n="help.backButton" onclick="window.location.href='/index.html'">← Главное меню</button>
+        <button type="button" class="btn" data-i18n="help.logoutButton" onclick="logout()">Выйти</button>
       </div>
     </div>
 
     <div class="layout">
       <div class="sidebar">
-        <input type="text" class="search-box" id="searchBox" placeholder="Поиск по разделам..." />
+        <input type="text" class="search-box" id="searchBox" data-i18n-placeholder="help.searchPlaceholder" placeholder="Поиск по разделам..." />
         <div id="navList"></div>
       </div>
       <div class="content" id="contentBox">
-        <div class="empty-state">Выберите раздел слева</div>
+        <div class="empty-state" data-i18n="help.emptyState">Выберите раздел слева</div>
       </div>
     </div>
   </div>
 
+  <script src="/js/i18n.js"></script>
   <script>
     const token = localStorage.getItem("token");
     if (!token) {
@@ -241,238 +267,694 @@
       window.location.href = "/login.html";
     }
 
-    const MODULES = [
-      {
-        id: "items", icon: "📦", title: "Товары",
-        purpose: "Справочник товаров — карточки для приёмки, продажи, списания и остатков.",
-        steps: [
-          "Заполните поля карточки: Название, Артикул фабрики, Фабрика, Категория, Артикул/SKU, Штрихкод, Закупочная цена, Цена продажи, Единица, Штук в коробке, Описание, Фото и размеры коробки (вес, длина/ширина/высота — объём считается автоматически).",
-          "Нажмите «Сохранить» — товар появится в таблице ниже.",
-          "Чтобы изменить товар, нажмите «Редактировать» в его строке, поправьте поля и снова «Сохранить».",
-          "Ищите товары через поле «Поиск» вверху таблицы."
-        ],
-        notesTitle: "Массовый импорт из Excel",
-        notes: [
-          "Нажмите «Скачать шаблон» — получите готовый файл .xlsx с нужными столбцами (MARK — это обязательный SKU, PHOTO, FACTORY, QTY, FACTORY_ARTICLE, BARCODE, WEIGHT_KG, LENGTH_CM, WIDTH_CM, HEIGHT_CM, CATEGORY, NAME, SALE_PRICE).",
-          "Заполните шаблон — фото можно вставлять прямо в ячейку колонки PHOTO.",
-          "Нажмите «Импорт Excel» → загрузите файл → «Показать preview» — система покажет построчный разбор: что новое, что пропущено и почему (нет SKU, дубль в системе или в файле).",
-          "Проверьте блок «распознанные колонки» — он покажет, все ли заголовки файла система узнала.",
-          "Если всё в порядке, нажмите «Импортировать»."
-        ]
-      },
-      {
-        id: "locations", icon: "📍", title: "Места хранения",
-        purpose: "Справочник складов, точек продаж и контейнеров — мест, между которыми перемещается товар.",
-        steps: [
-          "Укажите Название, Код и Тип (Контейнер, Склад, Storage, Магазин, Полка, Другое).",
-          "Нажмите «Сохранить».",
-          "Ищите места через поле поиска (по названию/коду/типу).",
-          "Для редактирования используйте кнопку в строке таблицы."
-        ],
-        tip: "Удалить место хранения нельзя — только деактивировать, чтобы оно перестало предлагаться в списках."
-      },
-      {
-        id: "clients", icon: "👥", title: "Клиенты",
-        purpose: "Справочник покупателей и контрагентов для продаж, долгов и денежных операций.",
-        steps: [
-          "Укажите Имя, Телефон, Комментарий → «Сохранить».",
-          "Клиент сразу становится доступен в выпадающих списках на страницах Продажа, Списание, Долги."
-        ],
-        notesTitle: "Доступ к витрине для клиента",
-        notes: [
-          "В строке клиента нажмите «Создать доступ» — придумайте пароль во всплывающем окне, система покажет логин и пароль для входа в интернет-витрину.",
-          "«Копировать логин» — скопирует логин в буфер обмена.",
-          "«Сбросить пароль» — задать клиенту новый пароль.",
-          "Переключатель включает и отключает доступ клиента к витрине."
-        ]
-      },
-      {
-        id: "stock", icon: "📊", title: "Остатки",
-        purpose: "Фактические остатки товаров по местам хранения.",
-        steps: [
-          "Отфильтруйте по товару/артикулу/штрихкоду, месту хранения, категории.",
-          "Нажмите «Обновить» — таблица покажет фото, товар, категорию, фабрику, артикулы, штрихкод, локацию, количество.",
-          "Наверху — сводка: сколько строк, товаров, мест хранения, сумма остатка по фильтру и всего."
-        ],
-        notesTitle: "Выгрузка в Excel",
-        notes: [
-          "Отметьте нужные строки чекбоксами или нажмите «Выбрать строки по текущим фильтрам».",
-          "Нажмите «Выгрузить выбранное» — получите Excel-файл с выбранными позициями."
-        ]
-      },
-      {
-        id: "incoming", icon: "📥", title: "Приёмка",
-        purpose: "Оприходование поступившего товара на склад или точку.",
-        steps: [
-          "Найдите товар — начните вводить название, SKU или штрихкод, либо нажмите на значок камеры 📷 и отсканируйте штрихкод.",
-          "Выберите Место хранения.",
-          "Укажите режим (Коробки или Штуки — по умолчанию коробки, пересчёт в штуки автоматический) и количество.",
-          "При необходимости добавьте комментарий.",
-          "Нажмите «Провести приёмку»."
-        ],
-        tip: "После приёмки автоматически создаётся партия (см. раздел «Партии / Себестоимость») — зайдите туда и укажите закупочную стоимость и доставку, чтобы система точно считала себестоимость."
-      },
-      {
-        id: "transfer", icon: "↔️", title: "Перемещение",
-        purpose: "Перенос товара между местами хранения — например, со склада в контейнер или в магазин.",
-        steps: [
-          "Найдите товар (ввод вручную или скан штрихкода камерой).",
-          "Система покажет остатки этого товара по всем локациям.",
-          "Выберите «Откуда» и «Куда», единицу (коробки/штуки) и количество — поле «Доступно в источнике» подскажет, сколько есть.",
-          "При нехватке остатка система предупредит.",
-          "Нажмите «Переместить»."
-        ],
-        tip: "Справа — таблица «Последние перемещения» с историей операций."
-      },
-      {
-        id: "sales", icon: "🛒", title: "Продажа",
-        purpose: "Оформление документа продажи — одна или сразу несколько позиций.",
-        steps: [
-          "Укажите способ оплаты и клиента (или «Без клиента»).",
-          "Для каждой позиции: найдите товар (ввод или скан камерой), выберите место хранения, единицу (штуки/коробки), количество и цену за единицу → «Добавить строку».",
-          "Повторите для всех товаров чека.",
-          "Проверьте таблицу и итоговую сумму.",
-          "Нажмите «Провести продажу» — остатки спишутся, документ создастся."
-        ],
-        tip: "Способ оплаты «Под реализацию» создаёт клиенту долг — см. раздел «Долги клиентов»."
-      },
-      {
-        id: "sales-history", icon: "🧾", title: "История продаж",
-        purpose: "Журнал всех проведённых продаж с деталями по каждому документу.",
-        steps: [
-          "Отфильтруйте по статусу оплаты, способу оплаты и дате.",
-          "Сводка вверху — количество документов, выручка, себестоимость, прибыль, штук.",
-          "Откройте документ, чтобы увидеть состав (товары с фото), клиента, суммы, статус оплаты, вес и объём.",
-          "Кнопка «Экспорт в Excel» — выгрузить документ."
-        ]
-      },
-      {
-        id: "writeoff", icon: "🗑️", title: "Списание",
-        purpose: "Списание товара при браке, порче, утере или пересортице.",
-        steps: [
-          "Найдите товар (ввод или скан камерой).",
-          "Выберите Место хранения и количество.",
-          "Обязательно укажите причину в комментарии.",
-          "Нажмите «Провести списание»."
-        ]
-      },
-      {
-        id: "batches", icon: "💱", title: "Партии / Себестоимость",
-        purpose: "Расчёт реальной себестоимости каждой партии товара с учётом курсов валют и доставки.",
-        steps: [
-          "Партии создаются автоматически при каждой приёмке — изначально без финансовых данных.",
-          "Найдите партию в таблице, нажмите «Анализ».",
-          "Заполните: Закупка в юанях, Курс юаня, Доставка в долларах, Курс доллара.",
-          "Нажмите «Сохранить» — система пересчитает себестоимость единицы и всей партии."
-        ],
-        notesTitle: "Дополнительные инструменты на странице",
-        notes: [
-          "Блок «Рынок сейчас» — сравнивает историческую себестоимость с себестоимостью по сегодняшним курсам валют.",
-          "Блок «Цена/прибыль» — введите планируемую цену продажи и сразу увидите ожидаемую прибыль и маржу."
-        ]
-      },
-      {
-        id: "movements", icon: "📜", title: "Движения товара",
-        purpose: "Полный журнал складских операций: приёмки, продажи, списания, перемещения, корректировки.",
-        steps: [
-          "Отфильтруйте по типу операции, периоду или тексту (товар/МХ/комментарий/пользователь).",
-          "Просмотрите таблицу — раздел только для контроля, без возможности редактирования."
-        ]
-      },
-      {
-        id: "cash", icon: "💰", title: "Деньги (касса)",
-        purpose: "Журнал денежных поступлений и расходов — заполняется автоматически другими модулями.",
-        steps: [
-          "Отфильтруйте по типу (доход/расход), способу оплаты, периоду.",
-          "Сводка: количество записей, доход, расход, баланс."
-        ]
-      },
-      {
-        id: "debts", icon: "📇", title: "Долги клиентов",
-        purpose: "Контроль задолженностей по продажам «под реализацию» и приём оплат.",
-        steps: [
-          "Отфильтруйте по статусу (открыт / частично оплачен / оплачен).",
-          "В строке долга укажите сумму оплаты, способ оплаты, комментарий → «Оплатить».",
-          "Долг можно гасить частями — статус обновится автоматически."
-        ]
-      },
-      {
-        id: "expenses", icon: "🧮", title: "Расходы",
-        purpose: "Учёт операционных расходов: аренда, зарплата, закупки и другое.",
-        steps: [
-          "Укажите сумму, категорию, дату и комментарий → «Сохранить расход».",
-          "Отфильтруйте историю по категории и периоду.",
-          "Удалить ошибочную запись можно кнопкой «Удалить» в строке."
-        ]
-      },
-      {
-        id: "analytics", icon: "📈", title: "Аналитика",
-        purpose: "Комплексный финансово-складской дашборд: P&L, склад, долги, оборачиваемость.",
-        steps: [
-          "Укажите период или выберите пресет (7/30/90 дней, месяц, год).",
-          "Изучите блоки: P&L (выручка, себестоимость, прибыль, расходы), график динамики по дням, топ товаров, проблемные товары по оборачиваемости, долги и реализация, состояние склада, расхождения остатков."
-        ],
-        tip: "Данные пересчитываются автоматически при смене периода — кнопка «Обновить» нужна только если появились новые операции."
-      },
-      {
-        id: "turnover", icon: "🔄", title: "Оборачиваемость",
-        purpose: "Анализ скорости продаж и «залежавшихся» товаров, которые замораживают деньги в остатках.",
-        steps: [
-          "Выберите период анализа и при желании отфильтруйте по статусу (healthy/warning/risk/critical/без продаж/нет остатка).",
-          "Настройте цветовые пороги — сколько дней считать жёлтым, оранжевым, красным.",
-          "Изучите таблицу и графики, отсортируйте по нужной колонке.",
-          "Нажмите «CSV» для выгрузки данных."
-        ]
-      },
-      {
-        id: "users", icon: "🧑‍💼", title: "Пользователи",
-        purpose: "Управление учётными записями сотрудников, их ролями и доступом к модулям.",
-        steps: [
-          "Укажите Логин, ФИО, Пароль (при создании обязателен).",
-          "Отметьте галочками, какие модули доступны сотруднику.",
-          "Нажмите «Сохранить» — сотрудник сможет войти под своим логином.",
-          "Дальше доступны действия: «Редактировать», включить/отключить, «Заблокировать», «Сбросить пароль»."
-        ],
-        tip: "Роль владельца через интерфейс не назначается — все новые сотрудники создаются как обычные сотрудники с индивидуальным набором модулей."
-      },
-      {
-        id: "price-check", icon: "🔍", title: "Проверка цены",
-        purpose: "Быстрая мобильная проверка цены и наличия товара по штрихкоду прямо в торговом зале.",
-        steps: [
-          "Откройте страницу с телефона.",
-          "Отсканируйте штрихкод камерой (кнопка «Сканировать камерой») или физическим сканером — поле ввода активно по умолчанию.",
-          "Получите карточку: фото, название, цена продажи и наличие по каждой точке."
-        ]
-      },
-      {
-        id: "showcase", icon: "🛍️", title: "Витрина для клиентов",
-        purpose: "Онлайн-каталог, через который клиенты сами оформляют заказы, а вы их обрабатываете.",
-        steps: [
-          "Настройка (владелец): откройте «Настройки витрины», заполните название магазина, телефон, описание, логотип и баннер, включите переключатель «Витрина включена» и настройте видимость цен.",
-          "Доступ клиента: на странице «Клиенты» нажмите «Создать доступ» и передайте клиенту логин/пароль — он заходит на витрину по Tenant ID, логину и паролю, выбирает товары и оформляет заказ.",
-          "Обработка заказа (продавец): откройте «Заказы витрины», найдите заказ, «Открыть» → «Взять в работу», укажите фактически собранное количество по каждой позиции, отметьте «Готов» и нажмите «Создать продажу»."
-        ],
-        tip: "Клиент следит за статусом своего заказа в разделе «Мои заказы» на витрине."
-      },
-      {
-        id: "notifications", icon: "🔔", title: "Уведомления",
-        purpose: "Telegram-уведомления о новых заказах с витрины и системных событиях.",
-        steps: [
-          "Создайте бота через @BotFather в Telegram и получите Bot token.",
-          "Узнайте свой chat_id и укажите его в поле «Owner chat_id».",
-          "Включите переключатель «Включить Telegram-уведомления» → «Сохранить настройки».",
-          "Нажмите «Отправить тест», чтобы проверить, что сообщения приходят."
-        ]
-      }
-    ];
+    const MODULES_I18N = {
+      ru: [
+        {
+          id: "items", icon: "📦", title: "Товары",
+          purpose: "Справочник товаров — карточки для приёмки, продажи, списания и остатков.",
+          steps: [
+            "Заполните поля карточки: Название, Артикул фабрики, Фабрика, Категория, Артикул/SKU, Штрихкод, Закупочная цена, Цена продажи, Единица, Штук в коробке, Описание, Фото и размеры коробки (вес, длина/ширина/высота — объём считается автоматически).",
+            "Нажмите «Сохранить» — товар появится в таблице ниже.",
+            "Чтобы изменить товар, нажмите «Редактировать» в его строке, поправьте поля и снова «Сохранить».",
+            "Ищите товары через поле «Поиск» вверху таблицы."
+          ],
+          notesTitle: "Массовый импорт из Excel",
+          notes: [
+            "Нажмите «Скачать шаблон» — получите готовый файл .xlsx с нужными столбцами (MARK — это обязательный SKU, PHOTO, FACTORY, QTY, FACTORY_ARTICLE, BARCODE, WEIGHT_KG, LENGTH_CM, WIDTH_CM, HEIGHT_CM, CATEGORY, NAME, SALE_PRICE).",
+            "Заполните шаблон — фото можно вставлять прямо в ячейку колонки PHOTO.",
+            "Нажмите «Импорт Excel» → загрузите файл → «Показать preview» — система покажет построчный разбор: что новое, что пропущено и почему (нет SKU, дубль в системе или в файле).",
+            "Проверьте блок «распознанные колонки» — он покажет, все ли заголовки файла система узнала.",
+            "Если всё в порядке, нажмите «Импортировать»."
+          ]
+        },
+        {
+          id: "locations", icon: "📍", title: "Места хранения",
+          purpose: "Справочник складов, точек продаж и контейнеров — мест, между которыми перемещается товар.",
+          steps: [
+            "Укажите Название, Код и Тип (Контейнер, Склад, Storage, Магазин, Полка, Другое).",
+            "Нажмите «Сохранить».",
+            "Ищите места через поле поиска (по названию/коду/типу).",
+            "Для редактирования используйте кнопку в строке таблицы."
+          ],
+          tip: "Удалить место хранения нельзя — только деактивировать, чтобы оно перестало предлагаться в списках."
+        },
+        {
+          id: "clients", icon: "👥", title: "Клиенты",
+          purpose: "Справочник покупателей и контрагентов для продаж, долгов и денежных операций.",
+          steps: [
+            "Укажите Имя, Телефон, Комментарий → «Сохранить».",
+            "Клиент сразу становится доступен в выпадающих списках на страницах Продажа, Списание, Долги."
+          ],
+          notesTitle: "Доступ к витрине для клиента",
+          notes: [
+            "В строке клиента нажмите «Создать доступ» — придумайте пароль во всплывающем окне, система покажет логин и пароль для входа в интернет-витрину.",
+            "«Копировать логин» — скопирует логин в буфер обмена.",
+            "«Сбросить пароль» — задать клиенту новый пароль.",
+            "Переключатель включает и отключает доступ клиента к витрине."
+          ]
+        },
+        {
+          id: "stock", icon: "📊", title: "Остатки",
+          purpose: "Фактические остатки товаров по местам хранения.",
+          steps: [
+            "Отфильтруйте по товару/артикулу/штрихкоду, месту хранения, категории.",
+            "Нажмите «Обновить» — таблица покажет фото, товар, категорию, фабрику, артикулы, штрихкод, локацию, количество.",
+            "Наверху — сводка: сколько строк, товаров, мест хранения, сумма остатка по фильтру и всего."
+          ],
+          notesTitle: "Выгрузка в Excel",
+          notes: [
+            "Отметьте нужные строки чекбоксами или нажмите «Выбрать строки по текущим фильтрам».",
+            "Нажмите «Выгрузить выбранное» — получите Excel-файл с выбранными позициями."
+          ]
+        },
+        {
+          id: "incoming", icon: "📥", title: "Приёмка",
+          purpose: "Оприходование поступившего товара на склад или точку.",
+          steps: [
+            "Найдите товар — начните вводить название, SKU или штрихкод, либо нажмите на значок камеры 📷 и отсканируйте штрихкод.",
+            "Выберите Место хранения.",
+            "Укажите режим (Коробки или Штуки — по умолчанию коробки, пересчёт в штуки автоматический) и количество.",
+            "При необходимости добавьте комментарий.",
+            "Нажмите «Провести приёмку»."
+          ],
+          tip: "После приёмки автоматически создаётся партия (см. раздел «Партии / Себестоимость») — зайдите туда и укажите закупочную стоимость и доставку, чтобы система точно считала себестоимость."
+        },
+        {
+          id: "transfer", icon: "↔️", title: "Перемещение",
+          purpose: "Перенос товара между местами хранения — например, со склада в контейнер или в магазин.",
+          steps: [
+            "Найдите товар (ввод вручную или скан штрихкода камерой).",
+            "Система покажет остатки этого товара по всем локациям.",
+            "Выберите «Откуда» и «Куда», единицу (коробки/штуки) и количество — поле «Доступно в источнике» подскажет, сколько есть.",
+            "При нехватке остатка система предупредит.",
+            "Нажмите «Переместить»."
+          ],
+          tip: "Справа — таблица «Последние перемещения» с историей операций."
+        },
+        {
+          id: "sales", icon: "🛒", title: "Продажа",
+          purpose: "Оформление документа продажи — одна или сразу несколько позиций.",
+          steps: [
+            "Укажите способ оплаты и клиента (или «Без клиента»).",
+            "Для каждой позиции: найдите товар (ввод или скан камерой), выберите место хранения, единицу (штуки/коробки), количество и цену за единицу → «Добавить строку».",
+            "Повторите для всех товаров чека.",
+            "Проверьте таблицу и итоговую сумму.",
+            "Нажмите «Провести продажу» — остатки спишутся, документ создастся."
+          ],
+          tip: "Способ оплаты «Под реализацию» создаёт клиенту долг — см. раздел «Долги клиентов»."
+        },
+        {
+          id: "sales-history", icon: "🧾", title: "История продаж",
+          purpose: "Журнал всех проведённых продаж с деталями по каждому документу.",
+          steps: [
+            "Отфильтруйте по статусу оплаты, способу оплаты и дате.",
+            "Сводка вверху — количество документов, выручка, себестоимость, прибыль, штук.",
+            "Откройте документ, чтобы увидеть состав (товары с фото), клиента, суммы, статус оплаты, вес и объём.",
+            "Кнопка «Экспорт в Excel» — выгрузить документ."
+          ]
+        },
+        {
+          id: "writeoff", icon: "🗑️", title: "Списание",
+          purpose: "Списание товара при браке, порче, утере или пересортице.",
+          steps: [
+            "Найдите товар (ввод или скан камерой).",
+            "Выберите Место хранения и количество.",
+            "Обязательно укажите причину в комментарии.",
+            "Нажмите «Провести списание»."
+          ]
+        },
+        {
+          id: "batches", icon: "💱", title: "Партии / Себестоимость",
+          purpose: "Расчёт реальной себестоимости каждой партии товара с учётом курсов валют и доставки.",
+          steps: [
+            "Партии создаются автоматически при каждой приёмке — изначально без финансовых данных.",
+            "Найдите партию в таблице, нажмите «Анализ».",
+            "Заполните: Закупка в юанях, Курс юаня, Доставка в долларах, Курс доллара.",
+            "Нажмите «Сохранить» — система пересчитает себестоимость единицы и всей партии."
+          ],
+          notesTitle: "Дополнительные инструменты на странице",
+          notes: [
+            "Блок «Рынок сейчас» — сравнивает историческую себестоимость с себестоимостью по сегодняшним курсам валют.",
+            "Блок «Цена/прибыль» — введите планируемую цену продажи и сразу увидите ожидаемую прибыль и маржу."
+          ]
+        },
+        {
+          id: "movements", icon: "📜", title: "Движения товара",
+          purpose: "Полный журнал складских операций: приёмки, продажи, списания, перемещения, корректировки.",
+          steps: [
+            "Отфильтруйте по типу операции, периоду или тексту (товар/МХ/комментарий/пользователь).",
+            "Просмотрите таблицу — раздел только для контроля, без возможности редактирования."
+          ]
+        },
+        {
+          id: "cash", icon: "💰", title: "Деньги (касса)",
+          purpose: "Журнал денежных поступлений и расходов — заполняется автоматически другими модулями.",
+          steps: [
+            "Отфильтруйте по типу (доход/расход), способу оплаты, периоду.",
+            "Сводка: количество записей, доход, расход, баланс."
+          ]
+        },
+        {
+          id: "debts", icon: "📇", title: "Долги клиентов",
+          purpose: "Контроль задолженностей по продажам «под реализацию» и приём оплат.",
+          steps: [
+            "Отфильтруйте по статусу (открыт / частично оплачен / оплачен).",
+            "В строке долга укажите сумму оплаты, способ оплаты, комментарий → «Оплатить».",
+            "Долг можно гасить частями — статус обновится автоматически."
+          ]
+        },
+        {
+          id: "expenses", icon: "🧮", title: "Расходы",
+          purpose: "Учёт операционных расходов: аренда, зарплата, закупки и другое.",
+          steps: [
+            "Укажите сумму, категорию, дату и комментарий → «Сохранить расход».",
+            "Отфильтруйте историю по категории и периоду.",
+            "Удалить ошибочную запись можно кнопкой «Удалить» в строке."
+          ]
+        },
+        {
+          id: "analytics", icon: "📈", title: "Аналитика",
+          purpose: "Комплексный финансово-складской дашборд: P&L, склад, долги, оборачиваемость.",
+          steps: [
+            "Укажите период или выберите пресет (7/30/90 дней, месяц, год).",
+            "Изучите блоки: P&L (выручка, себестоимость, прибыль, расходы), график динамики по дням, топ товаров, проблемные товары по оборачиваемости, долги и реализация, состояние склада, расхождения остатков."
+          ],
+          tip: "Данные пересчитываются автоматически при смене периода — кнопка «Обновить» нужна только если появились новые операции."
+        },
+        {
+          id: "turnover", icon: "🔄", title: "Оборачиваемость",
+          purpose: "Анализ скорости продаж и «залежавшихся» товаров, которые замораживают деньги в остатках.",
+          steps: [
+            "Выберите период анализа и при желании отфильтруйте по статусу (healthy/warning/risk/critical/без продаж/нет остатка).",
+            "Настройте цветовые пороги — сколько дней считать жёлтым, оранжевым, красным.",
+            "Изучите таблицу и графики, отсортируйте по нужной колонке.",
+            "Нажмите «CSV» для выгрузки данных."
+          ]
+        },
+        {
+          id: "users", icon: "🧑‍💼", title: "Пользователи",
+          purpose: "Управление учётными записями сотрудников, их ролями и доступом к модулям.",
+          steps: [
+            "Укажите Логин, ФИО, Пароль (при создании обязателен).",
+            "Отметьте галочками, какие модули доступны сотруднику.",
+            "Нажмите «Сохранить» — сотрудник сможет войти под своим логином.",
+            "Дальше доступны действия: «Редактировать», включить/отключить, «Заблокировать», «Сбросить пароль»."
+          ],
+          tip: "Роль владельца через интерфейс не назначается — все новые сотрудники создаются как обычные сотрудники с индивидуальным набором модулей."
+        },
+        {
+          id: "price-check", icon: "🔍", title: "Проверка цены",
+          purpose: "Быстрая мобильная проверка цены и наличия товара по штрихкоду прямо в торговом зале.",
+          steps: [
+            "Откройте страницу с телефона.",
+            "Отсканируйте штрихкод камерой (кнопка «Сканировать камерой») или физическим сканером — поле ввода активно по умолчанию.",
+            "Получите карточку: фото, название, цена продажи и наличие по каждой точке."
+          ]
+        },
+        {
+          id: "showcase", icon: "🛍️", title: "Витрина для клиентов",
+          purpose: "Онлайн-каталог, через который клиенты сами оформляют заказы, а вы их обрабатываете.",
+          steps: [
+            "Настройка (владелец): откройте «Настройки витрины», заполните название магазина, телефон, описание, логотип и баннер, включите переключатель «Витрина включена» и настройте видимость цен.",
+            "Доступ клиента: на странице «Клиенты» нажмите «Создать доступ» и передайте клиенту логин/пароль — он заходит на витрину по Tenant ID, логину и паролю, выбирает товары и оформляет заказ.",
+            "Обработка заказа (продавец): откройте «Заказы витрины», найдите заказ, «Открыть» → «Взять в работу», укажите фактически собранное количество по каждой позиции, отметьте «Готов» и нажмите «Создать продажу»."
+          ],
+          tip: "Клиент следит за статусом своего заказа в разделе «Мои заказы» на витрине."
+        },
+        {
+          id: "notifications", icon: "🔔", title: "Уведомления",
+          purpose: "Telegram-уведомления о новых заказах с витрины и системных событиях.",
+          steps: [
+            "Создайте бота через @BotFather в Telegram и получите Bot token.",
+            "Узнайте свой chat_id и укажите его в поле «Owner chat_id».",
+            "Включите переключатель «Включить Telegram-уведомления» → «Сохранить настройки».",
+            "Нажмите «Отправить тест», чтобы проверить, что сообщения приходят."
+          ]
+        }
+      ],
+      en: [
+        {
+          id: "items", icon: "📦", title: "Items",
+          purpose: "Item catalog — records used for receiving, sales, write-offs, and stock tracking.",
+          steps: [
+            "Fill in the item card: Name, Factory article, Factory, Category, Article/SKU, Barcode, Purchase price, Sale price, Unit, Pieces per box, Description, Photo, and box dimensions (weight, length/width/height — volume is calculated automatically).",
+            "Click “Save” — the item will appear in the table below.",
+            "To edit an item, click “Edit” in its row, adjust the fields, and click “Save” again.",
+            "Search for items using the “Search” field above the table."
+          ],
+          notesTitle: "Bulk import from Excel",
+          notes: [
+            "Click “Download template” to get a ready-made .xlsx file with the required columns (MARK is the required SKU, plus PHOTO, FACTORY, QTY, FACTORY_ARTICLE, BARCODE, WEIGHT_KG, LENGTH_CM, WIDTH_CM, HEIGHT_CM, CATEGORY, NAME, SALE_PRICE).",
+            "Fill in the template — photos can be pasted directly into the PHOTO column cells.",
+            "Click “Import Excel” → upload the file → “Show preview” — the system displays a row-by-row breakdown: what's new, what's skipped and why (missing SKU, duplicate in the system or in the file).",
+            "Check the “Recognized columns” block — it shows whether the system understood all the file's headers.",
+            "If everything looks right, click “Import”."
+          ]
+        },
+        {
+          id: "locations", icon: "📍", title: "Storage locations",
+          purpose: "Directory of warehouses, points of sale, and containers — the locations items move between.",
+          steps: [
+            "Enter Name, Code, and Type (Container, Warehouse, Storage, Shop, Shelf, Other).",
+            "Click “Save”.",
+            "Search locations using the search field (by name/code/type).",
+            "Use the button in the table row to edit."
+          ],
+          tip: "A storage location can't be deleted — only deactivated, so it stops appearing in dropdown lists."
+        },
+        {
+          id: "clients", icon: "👥", title: "Clients",
+          purpose: "Directory of customers and counterparties for sales, debts, and cash operations.",
+          steps: [
+            "Enter Name, Phone, Comment → “Save”.",
+            "The client immediately becomes available in the dropdown lists on the Sales, Write-off, and Debts pages."
+          ],
+          notesTitle: "Client storefront access",
+          notes: [
+            "“Create access” in the client's row — set a password in the popup, and the system will show the login and password for the online storefront.",
+            "“Copy login” — copies the login to the clipboard.",
+            "“Reset password” — set a new password for the client.",
+            "The toggle switch turns the client's storefront access on and off."
+          ]
+        },
+        {
+          id: "stock", icon: "📊", title: "Stock",
+          purpose: "Actual item stock by storage location.",
+          steps: [
+            "Filter by item/article/barcode, storage location, or category.",
+            "Click “Refresh” — the table shows photo, item, category, factory, articles, barcode, location, and quantity.",
+            "The summary at the top shows the number of rows, items, storage locations, and the stock value for the current filter and overall."
+          ],
+          notesTitle: "Export to Excel",
+          notes: [
+            "Check the rows you need, or click “Select rows for current filters”.",
+            "Click “Export selected” to get an Excel file with the chosen items."
+          ]
+        },
+        {
+          id: "incoming", icon: "📥", title: "Receiving",
+          purpose: "Recording newly arrived stock at a warehouse or point of sale.",
+          steps: [
+            "Find the item — start typing its name, SKU, or barcode, or tap the camera icon 📷 to scan the barcode.",
+            "Select the Storage location.",
+            "Choose the mode (Boxes or Pieces — boxes by default, converted to pieces automatically) and the quantity.",
+            "Add a comment if needed.",
+            "Click “Confirm receiving”."
+          ],
+          tip: "A batch is created automatically after receiving (see “Batches / Cost price”) — open it and enter the purchase cost and shipping so the system can calculate the exact cost price."
+        },
+        {
+          id: "transfer", icon: "↔️", title: "Transfers",
+          purpose: "Moving items between storage locations — for example, from a warehouse to a container or a shop.",
+          steps: [
+            "Find the item (type it in manually or scan the barcode with the camera).",
+            "The system shows this item's stock across all locations.",
+            "Choose “From” and “To”, the unit (boxes/pieces), and the quantity — the “Available at source” field shows how much is there.",
+            "If there isn't enough stock, the system will warn you.",
+            "Click “Transfer”."
+          ],
+          tip: "The “Recent transfers” table on the right shows the operation history."
+        },
+        {
+          id: "sales", icon: "🛒", title: "Sales",
+          purpose: "Creating a sales document — one item or several at once.",
+          steps: [
+            "Specify the payment method and the client (or “No client”).",
+            "For each item: find it (type it in or scan with the camera), choose the storage location, unit (pieces/boxes), quantity, and price per unit → “Add line”.",
+            "Repeat for every item in the receipt.",
+            "Check the table and the total amount.",
+            "Click “Confirm sale” — stock is deducted and the document is created."
+          ],
+          tip: "“On consignment” as the payment method creates a debt for the client — see “Customer debts”."
+        },
+        {
+          id: "sales-history", icon: "🧾", title: "Sales history",
+          purpose: "Log of all completed sales with details for each document.",
+          steps: [
+            "Filter by payment status, payment method, and date.",
+            "The summary at the top shows the number of documents, revenue, cost price, profit, and pieces sold.",
+            "Open a document to see its contents (items with photos), the client, amounts, payment status, weight, and volume.",
+            "The “Export to Excel” button downloads the document."
+          ]
+        },
+        {
+          id: "writeoff", icon: "🗑️", title: "Write-offs",
+          purpose: "Writing off stock due to defects, damage, loss, or miscount.",
+          steps: [
+            "Find the item (type it in or scan with the camera).",
+            "Choose the Storage location and quantity.",
+            "Be sure to state the reason in the comment.",
+            "Click “Confirm write-off”."
+          ]
+        },
+        {
+          id: "batches", icon: "💱", title: "Batches / Cost price",
+          purpose: "Calculating the real cost price of every batch of items, accounting for exchange rates and shipping.",
+          steps: [
+            "Batches are created automatically with every receiving — initially with no financial data.",
+            "Find the batch in the table and click “Analyze”.",
+            "Fill in: Purchase cost in yuan, Yuan exchange rate, Shipping cost in dollars, Dollar exchange rate.",
+            "Click “Save” — the system recalculates the cost price per unit and for the whole batch."
+          ],
+          notesTitle: "Additional tools on this page",
+          notes: [
+            "The “Market now” block compares the historical cost price with the cost price at today's exchange rates.",
+            "The “Price / profit” block — enter a planned sale price and instantly see the expected profit and margin."
+          ]
+        },
+        {
+          id: "movements", icon: "📜", title: "Stock movements",
+          purpose: "A complete log of warehouse operations: receiving, sales, write-offs, transfers, adjustments.",
+          steps: [
+            "Filter by operation type, period, or text (item/location/comment/user).",
+            "Review the table — this section is for monitoring only, it can't be edited."
+          ]
+        },
+        {
+          id: "cash", icon: "💰", title: "Cash",
+          purpose: "Log of cash inflows and expenses — filled in automatically by other modules.",
+          steps: [
+            "Filter by type (income/expense), payment method, and period.",
+            "Summary: number of records, income, expenses, balance."
+          ]
+        },
+        {
+          id: "debts", icon: "📇", title: "Customer debts",
+          purpose: "Tracking debts from consignment sales and recording payments.",
+          steps: [
+            "Filter by status (open / partially paid / paid).",
+            "In the debt's row, enter the payment amount, payment method, and comment → “Pay”.",
+            "A debt can be paid off in installments — the status updates automatically."
+          ]
+        },
+        {
+          id: "expenses", icon: "🧮", title: "Expenses",
+          purpose: "Tracking operating expenses: rent, salaries, purchases, and more.",
+          steps: [
+            "Enter the amount, category, date, and comment → “Save expense”.",
+            "Filter the history by category and period.",
+            "Delete a mistaken entry with the “Delete” button in its row."
+          ]
+        },
+        {
+          id: "analytics", icon: "📈", title: "Analytics",
+          purpose: "A comprehensive financial and warehouse dashboard: P&L, stock, debts, turnover.",
+          steps: [
+            "Set a period or choose a preset (7/30/90 days, month, year).",
+            "Review the blocks: P&L (revenue, cost price, profit, expenses), a daily trend chart, top items, problem items by turnover, debts and consignment, stock status, and stock discrepancies."
+          ],
+          tip: "Data recalculates automatically when you change the period — the “Refresh” button is only needed if new operations were added."
+        },
+        {
+          id: "turnover", icon: "🔄", title: "Turnover",
+          purpose: "Analyzing sales speed and slow-moving items that tie up money in stock.",
+          steps: [
+            "Choose the analysis period and, if you like, filter by status (healthy/warning/risk/critical/no sales/no stock).",
+            "Set the color thresholds — how many days count as yellow, orange, or red.",
+            "Review the table and charts, and sort by any column.",
+            "Click “CSV” to export the data."
+          ]
+        },
+        {
+          id: "users", icon: "🧑‍💼", title: "Users",
+          purpose: "Managing staff accounts, their roles, and access to modules.",
+          steps: [
+            "Enter Login, Full name, Password (required when creating a new account).",
+            "Check the boxes for which modules the employee can access.",
+            "Click “Save” — the employee can now log in with their credentials.",
+            "Further actions available: “Edit”, enable/disable, “Block”, “Reset password”."
+          ],
+          tip: "The owner role isn't assigned through the interface — every new employee is created as a regular staff member with their own set of modules."
+        },
+        {
+          id: "price-check", icon: "🔍", title: "Price check",
+          purpose: "A quick mobile check of an item's price and availability by barcode, right on the sales floor.",
+          steps: [
+            "Open the page on your phone.",
+            "Scan the barcode with the camera (“Scan with camera” button) or a physical scanner — the input field is focused by default.",
+            "Get a card showing the photo, name, sale price, and availability at each location."
+          ]
+        },
+        {
+          id: "showcase", icon: "🛍️", title: "Client storefront",
+          purpose: "An online catalog where clients place their own orders for you to fulfill.",
+          steps: [
+            "Setup (owner): open “Storefront settings”, fill in the shop name, phone, description, logo, and banner, turn on the “Storefront enabled” toggle, and configure price visibility.",
+            "Client access: on the “Clients” page, click “Create access” and give the client the login/password — they log in to the storefront with the Tenant ID, login, and password, choose items, and place an order.",
+            "Processing an order (seller): open “Storefront orders”, find the order, “Open” → “Start processing”, enter the quantity actually picked for each line, mark it “Ready” and click “Create sale”."
+          ],
+          tip: "The client tracks their order status in “My orders” on the storefront."
+        },
+        {
+          id: "notifications", icon: "🔔", title: "Notifications",
+          purpose: "Telegram notifications for new storefront orders and system events.",
+          steps: [
+            "Create a bot via @BotFather in Telegram and get a Bot token.",
+            "Find your chat_id and enter it in the “Owner chat_id” field.",
+            "Turn on the “Enable Telegram notifications” toggle → “Save settings”.",
+            "Click “Send test” to check that messages arrive."
+          ]
+        }
+      ],
+      zh: [
+        {
+          id: "items", icon: "📦", title: "商品",
+          purpose: "商品档案——用于入库、销售、报损和库存记录的商品卡片。",
+          steps: [
+            "填写商品卡片：名称、工厂货号、工厂、分类、货号/SKU、条码、采购价、销售价、单位、每箱数量、描述、照片，以及箱子尺寸（重量、长/宽/高——体积自动计算）。",
+            "点击「保存」——商品将出现在下方的表格中。",
+            "如需修改商品，点击该行的「编辑」，调整字段后再次点击「保存」。",
+            "使用表格上方的「搜索」框查找商品。"
+          ],
+          notesTitle: "从Excel批量导入商品",
+          notes: [
+            "点击「下载模板」，获取包含所需列的现成 .xlsx 文件（MARK 是必填的 SKU，此外还有 PHOTO、FACTORY、QTY、FACTORY_ARTICLE、BARCODE、WEIGHT_KG、LENGTH_CM、WIDTH_CM、HEIGHT_CM、CATEGORY、NAME、SALE_PRICE）。",
+            "填写模板——照片可以直接粘贴到 PHOTO 列的单元格中。",
+            "点击「导入Excel」 → 上传文件 → 「显示预览」——系统会逐行显示解析结果：哪些是新增的，哪些被跳过以及原因（缺少 SKU、系统中或文件中存在重复）。",
+            "查看「已识别列」区块——它会显示系统是否识别了文件中的所有表头。",
+            "确认无误后，点击「导入」。"
+          ]
+        },
+        {
+          id: "locations", icon: "📍", title: "存放地点",
+          purpose: "仓库、销售点和容器的档案——商品在这些地点之间流转。",
+          steps: [
+            "填写名称、编码和类型（容器、仓库、Storage、门店、货架、其他）。",
+            "点击「保存」。",
+            "使用搜索框按名称/编码/类型查找地点。",
+            "使用表格行中的按钮进行编辑。"
+          ],
+          tip: "存放地点无法删除——只能停用，使其不再出现在下拉列表中。"
+        },
+        {
+          id: "clients", icon: "👥", title: "客户",
+          purpose: "用于销售、欠款和资金往来的客户及往来单位档案。",
+          steps: [
+            "填写姓名、电话、备注 → 「保存」。",
+            "客户会立即出现在「销售」「报损」「欠款」等页面的下拉列表中。"
+          ],
+          notesTitle: "客户商城访问权限",
+          notes: [
+            "在客户行中点击「创建访问权限」——在弹窗中设置密码，系统会显示用于登录网上商城的登录名和密码。",
+            "「复制登录名」——将登录名复制到剪贴板。",
+            "「重置密码」——为客户设置新密码。",
+            "开关按钮用于开启或关闭客户对商城的访问权限。"
+          ]
+        },
+        {
+          id: "stock", icon: "📊", title: "库存",
+          purpose: "按存放地点统计的商品实际库存。",
+          steps: [
+            "按商品/货号/条码、存放地点或分类进行筛选。",
+            "点击「刷新」——表格将显示照片、商品、分类、工厂、货号、条码、地点和数量。",
+            "顶部为汇总信息：行数、商品数、存放地点数，以及当前筛选和全部的库存总值。"
+          ],
+          notesTitle: "导出到Excel",
+          notes: [
+            "勾选所需的行，或点击「按当前筛选选择行」。",
+            "点击「导出所选」，获取包含所选项目的Excel文件。"
+          ]
+        },
+        {
+          id: "incoming", icon: "📥", title: "入库",
+          purpose: "登记到达仓库或销售点的新商品。",
+          steps: [
+            "查找商品——输入名称、SKU或条码，或点击相机图标📷扫描条码。",
+            "选择存放地点。",
+            "选择模式（箱或件——默认为箱，自动换算为件）并输入数量。",
+            "如有需要，添加备注。",
+            "点击「确认入库」。"
+          ],
+          tip: "入库后会自动创建一个批次（见「批次与成本核算」）——请进入该页面填写采购成本和运费，以便系统准确计算成本价。"
+        },
+        {
+          id: "transfer", icon: "↔️", title: "调拨",
+          purpose: "在存放地点之间转移商品——例如从仓库转移到容器或门店。",
+          steps: [
+            "查找商品（手动输入或用相机扫描条码）。",
+            "系统会显示该商品在所有地点的库存。",
+            "选择「从」和「到」、单位（箱/件）和数量——「源头可用数量」字段会显示可用库存。",
+            "如果库存不足，系统会提示。",
+            "点击「调拨」。"
+          ],
+          tip: "右侧的「最近调拨」表格显示操作历史记录。"
+        },
+        {
+          id: "sales", icon: "🛒", title: "销售",
+          purpose: "创建销售单据——可一次录入一个或多个商品。",
+          steps: [
+            "选择付款方式和客户（或「无客户」）。",
+            "对每个商品：查找它（输入或用相机扫描），选择存放地点、单位（件/箱）、数量和单价 → 「添加行」。",
+            "对小票中的所有商品重复上述操作。",
+            "核对表格和总金额。",
+            "点击「确认销售」——库存将被扣减，单据随之生成。"
+          ],
+          tip: "「赊销」付款方式会为客户生成欠款——见「客户欠款」。"
+        },
+        {
+          id: "sales-history", icon: "🧾", title: "销售记录",
+          purpose: "所有已完成销售的记录，包含每张单据的详细信息。",
+          steps: [
+            "按付款状态、付款方式和日期筛选。",
+            "顶部汇总显示：单据数量、营业额、成本、利润、销售件数。",
+            "打开单据可查看明细（带照片的商品）、客户、金额、付款状态、重量和体积。",
+            "「导出到Excel」按钮可导出该单据。"
+          ]
+        },
+        {
+          id: "writeoff", icon: "🗑️", title: "报损",
+          purpose: "因残次、损坏、丢失或盘点差异而对商品进行报损处理。",
+          steps: [
+            "查找商品（输入或用相机扫描）。",
+            "选择存放地点和数量。",
+            "务必在备注中注明原因。",
+            "点击「确认报损」。"
+          ]
+        },
+        {
+          id: "batches", icon: "💱", title: "批次与成本核算",
+          purpose: "根据汇率和运费，计算每个商品批次的真实成本价。",
+          steps: [
+            "每次入库都会自动创建批次——初始没有财务数据。",
+            "在表格中找到批次，点击「分析」。",
+            "填写：人民币采购金额、人民币汇率、美元运费、美元汇率。",
+            "点击「保存」——系统会重新计算单件及整批的成本价。"
+          ],
+          notesTitle: "页面上的其他工具",
+          notes: [
+            "「当前市场」区块——将历史成本价与按今日汇率计算的成本价进行对比。",
+            "「价格/利润」区块——输入计划销售价，即可立即看到预期利润和利润率。"
+          ]
+        },
+        {
+          id: "movements", icon: "📜", title: "库存变动",
+          purpose: "完整的仓库操作日志：入库、销售、报损、调拨、调整。",
+          steps: [
+            "按操作类型、时间段或文本（商品/地点/备注/用户）进行筛选。",
+            "查看表格——该板块仅用于查看，不能编辑。"
+          ]
+        },
+        {
+          id: "cash", icon: "💰", title: "资金（收银）",
+          purpose: "资金收支日志——由其他模块自动填写。",
+          steps: [
+            "按类型（收入/支出）、付款方式、时间段进行筛选。",
+            "汇总信息：记录数量、收入、支出、结余。"
+          ]
+        },
+        {
+          id: "debts", icon: "📇", title: "客户欠款",
+          purpose: "跟踪赊销产生的欠款并登记还款。",
+          steps: [
+            "按状态筛选（未还清 / 部分还款 / 已还清）。",
+            "在欠款行中输入还款金额、付款方式和备注 → 「还款」。",
+            "欠款可以分期偿还——状态会自动更新。"
+          ]
+        },
+        {
+          id: "expenses", icon: "🧮", title: "支出",
+          purpose: "记录房租、工资、采购等经营支出。",
+          steps: [
+            "输入金额、类别、日期和备注 → 「保存支出」。",
+            "按类别和时间段筛选历史记录。",
+            "可通过该行的「删除」按钮删除错误记录。"
+          ]
+        },
+        {
+          id: "analytics", icon: "📈", title: "数据分析",
+          purpose: "综合财务与仓库看板：损益、库存、欠款、周转情况。",
+          steps: [
+            "设置时间段或选择预设选项（7/30/90天、月、年）。",
+            "查看各板块：损益（营业额、成本、利润、支出）、按日趋势图、热销商品、周转异常商品、欠款与赊销、库存状态、库存差异。"
+          ],
+          tip: "更改时间段后数据会自动重新计算——只有在新增操作后才需要点击「刷新」按钮。"
+        },
+        {
+          id: "turnover", icon: "🔄", title: "周转分析",
+          purpose: "分析销售速度和占用资金的滞销商品。",
+          steps: [
+            "选择分析时间段，如有需要可按状态筛选（健康/预警/风险/严重/无销售/无库存）。",
+            "设置颜色阈值——多少天算黄色、橙色、红色。",
+            "查看表格和图表，可按任意列排序。",
+            "点击「CSV」导出数据。"
+          ]
+        },
+        {
+          id: "users", icon: "🧑‍💼", title: "用户",
+          purpose: "管理员工账号、角色以及对各模块的访问权限。",
+          steps: [
+            "填写登录名、姓名、密码（新建账号时必填）。",
+            "勾选该员工可访问的模块。",
+            "点击「保存」——员工即可使用自己的账号登录。",
+            "后续可执行的操作：「编辑」、启用/停用、「锁定」、「重置密码」。"
+          ],
+          tip: "所有者角色不能通过界面分配——所有新员工都以普通员工身份创建，并拥有各自的模块权限。"
+        },
+        {
+          id: "price-check", icon: "🔍", title: "价格查询",
+          purpose: "在卖场直接通过条码快速查询商品价格和库存情况的手机页面。",
+          steps: [
+            "用手机打开该页面。",
+            "用相机扫描条码（「用相机扫描」按钮）或使用物理扫码枪——输入框默认处于聚焦状态。",
+            "获取商品卡片：照片、名称、销售价，以及各地点的库存情况。"
+          ]
+        },
+        {
+          id: "showcase", icon: "🛍️", title: "客户商城",
+          purpose: "客户可自行下单、由您负责处理的在线商城。",
+          steps: [
+            "设置（所有者）：打开「商城设置」，填写店铺名称、电话、简介、Logo和横幅图，打开「商城已启用」开关，并设置价格可见性。",
+            "客户访问权限：在「客户」页面点击「创建访问权限」，将登录名/密码提供给客户——客户使用 Tenant ID、登录名和密码登录商城，选择商品并下单。",
+            "处理订单（销售员）：打开「商城订单」，找到订单，「打开」 → 「开始处理」，填写每个商品实际备货数量，标记为「已完成」并点击「创建销售」。"
+          ],
+          tip: "客户可在商城的「我的订单」中查看订单状态。"
+        },
+        {
+          id: "notifications", icon: "🔔", title: "通知",
+          purpose: "关于商城新订单和系统事件的Telegram通知。",
+          steps: [
+            "在Telegram中通过 @BotFather 创建一个机器人并获取 Bot token。",
+            "获取您的 chat_id，并填写到「Owner chat_id」字段中。",
+            "打开「启用Telegram通知」开关 → 「保存设置」。",
+            "点击「发送测试」，检查消息是否能够送达。"
+          ]
+        }
+      ]
+    };
 
     const navList = document.getElementById("navList");
     const contentBox = document.getElementById("contentBox");
     const searchBox = document.getElementById("searchBox");
     let activeId = null;
 
+    function getModules() {
+      const lang = window.i18n ? window.i18n.getLang() : "ru";
+      return MODULES_I18N[lang] || MODULES_I18N.ru;
+    }
+
     function renderNav(filter = "") {
       const q = filter.trim().toLowerCase();
+      const MODULES = getModules();
       navList.innerHTML = "";
       MODULES
         .filter((m) => !q || m.title.toLowerCase().includes(q))
@@ -487,14 +969,18 @@
     }
 
     function showModule(id) {
-      const m = MODULES.find((x) => x.id === id);
+      const MODULES = getModules();
+      const m = MODULES.find((x) => x.id === id) || MODULES[0];
       if (!m) return;
-      activeId = id;
+      activeId = m.id;
       renderNav(searchBox.value);
+
+      const howToUseTitle = window.i18n ? window.i18n.t("help.howToUseTitle") : "Как пользоваться";
+      const notesDefaultTitle = window.i18n ? window.i18n.t("help.notesDefaultTitle") : "Особенности";
 
       const stepsHtml = (m.steps || []).map((s) => `<li>${s}</li>`).join("");
       const notesHtml = m.notes
-        ? `<div class="block-title">${m.notesTitle || "Особенности"}</div>
+        ? `<div class="block-title">${m.notesTitle || notesDefaultTitle}</div>
            <div class="notes-box"><ul>${m.notes.map((n) => `<li>${n}</li>`).join("")}</ul></div>`
         : "";
       const tipHtml = m.tip ? `<div class="tip-box">💡 ${m.tip}</div>` : "";
@@ -502,7 +988,7 @@
       contentBox.innerHTML = `
         <h2><span>${m.icon}</span><span>${m.title}</span></h2>
         <div class="purpose">${m.purpose}</div>
-        <div class="block-title">Как пользоваться</div>
+        <div class="block-title">${howToUseTitle}</div>
         <ol>${stepsHtml}</ol>
         ${notesHtml}
         ${tipHtml}
@@ -513,8 +999,19 @@
 
     searchBox.addEventListener("input", () => renderNav(searchBox.value));
 
+    document.addEventListener("app:language-changed", () => {
+      const currentId = activeId;
+      renderNav(searchBox.value);
+      showModule(currentId || getModules()[0].id);
+    });
+
+    if (window.i18n) {
+      i18n.applyTranslations();
+      i18n.renderLanguageSwitcher("langSwitcher");
+    }
+
     renderNav();
-    showModule(MODULES[0].id);
+    showModule(getModules()[0].id);
   </script>
 </body>
 </html>
