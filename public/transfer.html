@@ -1065,6 +1065,7 @@
         updateUIBySelection();
         showStatus(t("transfer.loadedData"), "success");
         setTimeout(clearStatus, 1200);
+        if (els.itemSearchInput) els.itemSearchInput.focus();
       } catch (e) {
         console.error("[transfer] loadPage error:", e);
         showStatus(t("transfer.loadError", { error: e.message || e }), "error");
@@ -1106,6 +1107,7 @@
 
         await Promise.all([loadStock(), loadTransfers()]);
         updateUIBySelection();
+        if (els.itemSearchInput) els.itemSearchInput.focus();
       } catch (e) {
         console.error("[transfer] submitTransfer error:", e);
         const payload = e.payload || {};
