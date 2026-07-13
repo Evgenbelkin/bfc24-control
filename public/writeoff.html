@@ -171,8 +171,75 @@
       resize:vertical;
     }
 
+    .item-search-row{
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+    }
+
     .autocomplete{
       position:relative;
+      flex:1;
+      min-width:0;
+    }
+
+    .scan-btn{
+      flex-shrink:0;
+      font-size:20px;
+      padding:0 16px;
+      height:44px;
+      line-height:44px;
+    }
+
+    .scan-modal-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:2000;
+    }
+
+    .scan-modal-overlay.open{
+      display:flex;
+    }
+
+    .scan-modal-box{
+      width:100%;
+      max-width:480px;
+      background:#000;
+      border-radius:18px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    #writeoffCameraReader{
+      width:100%;
+      min-height:280px;
+    }
+
+    .scan-modal-close{
+      position:absolute;
+      top:10px;
+      right:10px;
+      z-index:10;
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      border:none;
+      background:rgba(255,255,255,.92);
+      font-size:20px;
+      cursor:pointer;
+    }
+
+    .scan-modal-hint{
+      color:#fff;
+      text-align:center;
+      font-size:13px;
+      padding:10px;
+      background:rgba(0,0,0,.6);
     }
 
     .results{
@@ -355,15 +422,18 @@
         <div class="form-grid" style="margin-top:18px;">
           <div class="field full">
             <label for="itemSearch" data-i18n="writeoff.itemSearchLabel">Товар</label>
-            <div class="autocomplete">
-              <input
-                id="itemSearch"
-                type="text"
-                data-i18n-placeholder="writeoff.itemSearchPlaceholder"
-                placeholder="Начни вводить название, штрихкод, SKU или артикул"
-                autocomplete="off"
-              />
-              <div id="itemResults" class="results"></div>
+            <div class="item-search-row">
+              <div class="autocomplete">
+                <input
+                  id="itemSearch"
+                  type="text"
+                  data-i18n-placeholder="writeoff.itemSearchPlaceholder"
+                  placeholder="Начни вводить название, штрихкод, SKU или артикул"
+                  autocomplete="off"
+                />
+                <div id="itemResults" class="results"></div>
+              </div>
+              <button type="button" class="btn btn-light scan-btn" id="scanBarcodeBtn" title="Сканировать камерой">📷</button>
             </div>
             <div id="selectedItemBox" class="selected-box"></div>
           </div>
@@ -397,6 +467,15 @@
     </div>
   </div>
 
+  <div class="scan-modal-overlay" id="writeoffScanModal">
+    <div class="scan-modal-box">
+      <button type="button" class="scan-modal-close" id="writeoffScanCloseBtn">×</button>
+      <div id="writeoffCameraReader"></div>
+      <div class="scan-modal-hint" data-i18n="writeoff.scanModalHint">Наведите камеру на штрихкод товара</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/app-ui.js"></script>
@@ -515,6 +594,9 @@
       itemSearch: document.getElementById("itemSearch"),
       itemResults: document.getElementById("itemResults"),
       selectedItemBox: document.getElementById("selectedItemBox"),
+      scanBarcodeBtn: document.getElementById("scanBarcodeBtn"),
+      writeoffScanModal: document.getElementById("writeoffScanModal"),
+      writeoffScanCloseBtn: document.getElementById("writeoffScanCloseBtn"),
       locationId: document.getElementById("locationId"),
       qty: document.getElementById("qty"),
       comment: document.getElementById("comment"),
@@ -695,16 +777,41 @@
 
       els.itemResults.querySelectorAll(".result-item[data-id]").forEach(node => {
         node.addEventListener("click", () => {
-          const id = String(node.dataset.id);
-          const found = allItems.find(x => String(x.id) === id);
-          if (found) {
-            selectedItem = found;
-            els.itemSearch.value = found.name || "";
-            els.itemResults.style.display = "none";
-            renderSelectedItem();
-          }
+          selectItemById(node.dataset.id);
         });
       });
+    }
+
+    // Общая функция выбора товара — используется и при клике по результату
+    // поиска, и при сканировании штрихкода (сканером/камерой).
+    function selectItemById(id) {
+      const found = allItems.find(x => String(x.id) === String(id));
+      if (!found) return false;
+
+      selectedItem = found;
+      els.itemSearch.value = found.name || "";
+      els.itemResults.style.display = "none";
+      renderSelectedItem();
+      return true;
+    }
+
+    function findItemByExactBarcode(value) {
+      const normalized = String(value || "").trim();
+      if (!normalized) return null;
+      return allItems.find(item => String(item.barcode || "").trim() === normalized) || null;
+    }
+
+    function handleBarcodeScanned(value) {
+      const found = findItemByExactBarcode(value);
+
+      if (found) {
+        selectItemById(found.id);
+        setSubmitStatus("writeoff.scanFoundStatus", { item: found.name || "" }, "success");
+      } else {
+        els.itemSearch.value = value;
+        onItemSearchInput();
+        setSubmitStatus("writeoff.scanNotFoundStatus", { barcode: value }, "error");
+      }
     }
 
     function fillLocations() {
@@ -752,6 +859,8 @@
           items: allItems.length,
           locations: allLocations.length
         }, "success");
+
+        els.itemSearch.focus();
       } catch (err) {
         setPageStatus("writeoff.loadErrorStatus", {
           error: Ui.translateError(err.message)
@@ -822,11 +931,58 @@
         selectedItem = null;
         renderSelectedItem();
         els.itemResults.style.display = "none";
+        els.itemSearch.focus();
       } catch (err) {
         setSubmitStatus("writeoff.errorStatus", {
           error: Ui.translateError(err.message)
         }, "error");
       }
+    }
+
+    // --- Сканирование штрихкода камерой ---
+    let writeoffHtml5QrCode = null;
+    let writeoffCameraRunning = false;
+
+    async function openWriteoffScanModal() {
+      els.writeoffScanModal.classList.add("open");
+
+      if (typeof Html5Qrcode === "undefined") {
+        setSubmitStatus("writeoff.scanCameraLoadError", {}, "error");
+        els.writeoffScanModal.classList.remove("open");
+        return;
+      }
+
+      try {
+        writeoffHtml5QrCode = new Html5Qrcode("writeoffCameraReader");
+        writeoffCameraRunning = true;
+
+        await writeoffHtml5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 150 } },
+          (decodedText) => {
+            closeWriteoffScanModal();
+            handleBarcodeScanned(decodedText);
+          },
+          () => {
+            // игнорируем колбэки "не найдено" на каждый кадр
+          }
+        );
+      } catch (err) {
+        writeoffCameraRunning = false;
+        els.writeoffScanModal.classList.remove("open");
+        setSubmitStatus("writeoff.scanCameraPermissionError", {}, "error");
+      }
+    }
+
+    async function closeWriteoffScanModal() {
+      els.writeoffScanModal.classList.remove("open");
+      if (writeoffHtml5QrCode && writeoffCameraRunning) {
+        try {
+          await writeoffHtml5QrCode.stop();
+          writeoffHtml5QrCode.clear();
+        } catch (_) {}
+      }
+      writeoffCameraRunning = false;
     }
 
     function bindEvents() {
@@ -837,6 +993,25 @@
           onItemSearchInput();
         }
       });
+
+      // Штрихкод-сканер печатает цифры и шлёт Enter — если это ровно
+      // существующий штрихкод, сразу выбираем товар без клика мышкой.
+      els.itemSearch.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter") return;
+
+        const value = els.itemSearch.value.trim();
+        if (!value) return;
+
+        const found = findItemByExactBarcode(value);
+        if (found) {
+          event.preventDefault();
+          selectItemById(found.id);
+          setSubmitStatus("writeoff.scanFoundStatus", { item: found.name || "" }, "success");
+        }
+      });
+
+      els.scanBarcodeBtn.addEventListener("click", openWriteoffScanModal);
+      els.writeoffScanCloseBtn.addEventListener("click", closeWriteoffScanModal);
 
       document.addEventListener("click", (e) => {
         const inAutocomplete = e.target.closest(".autocomplete");
